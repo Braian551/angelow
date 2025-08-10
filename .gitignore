@@ -1,8 +1,9 @@
 vendor/
 *.log
 .env
-composer.json
-composer.lock
+*.zip
+*.rar
+/compart
 /conexion.php
 /conexionservidor.php
 /config.php
