@@ -1,0 +1,85 @@
+/* ===== NOTIFICACIONES ===== */
+.floating-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  color: white;
+  animation: slideIn 0.5s forwards;
+  padding: 1.5rem 2rem;
+  border-radius: var(--border-radius);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  background-color: #2195f3ea;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 400px;
+  box-shadow: var(--shadow-lg);
+  border-left: 4px solid #355d8a;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.floating-notification.success {
+    background-color: rgba(75, 181, 67, 0.928);
+
+  border-left: 4px solid #3a8a35;
+}
+
+.floating-notification.error {
+ background-color: rgba(255, 51, 51, 0.893);
+  border-left: 4px solid #cc0000;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-grow: 1;
+}
+
+.notification-content i {
+  font-size: 1.8rem;
+}
+
+.floating-notification.fade-out {
+  animation: fadeOut 0.5s forwards;
+}
+
+.close-notification {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 0 0 0 1rem;
+  transition: var(--transition);
+  opacity: 0.8;
+}
+
+.close-notification:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}

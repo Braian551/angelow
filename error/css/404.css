@@ -1,0 +1,197 @@
+/* ===== ESTILOS PARA PÁGINA 404 ===== */
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    padding: 4rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.error-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 119, 182, 0.05) 0%, rgba(144, 224, 239, 0.05) 100%);
+    z-index: -1;
+}
+
+.error-content {
+    max-width: 600px;
+    position: relative;
+    padding: 3rem;
+    background-color: var(--bg-light);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.error-number {
+    font-size: 12rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    line-height: 1;
+    position: relative;
+    display: inline-block;
+    animation: bounce 2s infinite alternate;
+}
+
+.error-number::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-light), var(--primary-dark));
+    border-radius: 2px;
+}
+
+.error-title {
+    font-size: 2.8rem;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    animation: slideInRight 0.8s ease-out;
+}
+
+.error-message {
+    font-size: 1.8rem;
+    color: var(--text-color);
+    margin-bottom: 3rem;
+    animation: slideInLeft 0.8s ease-out;
+}
+
+.error-illustration {
+    width: 300px;
+    height: 200px;
+    margin: 0 auto 3rem;
+    position: relative;
+    animation: float 6s ease-in-out infinite;
+}
+
+.error-illustration img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.error-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 1.2rem 2.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.6rem;
+    box-shadow: 0 4px 15px rgba(0, 119, 182, 0.3);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    animation: fadeIn 1.5s ease-out;
+}
+
+.error-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 119, 182, 0.4);
+}
+
+.error-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s ease;
+}
+
+.error-btn:hover::before {
+    left: 100%;
+}
+
+.error-btn i {
+    margin-right: 1rem;
+    font-size: 1.8rem;
+}
+
+/* ===== ANIMACIONES ADICIONALES ===== */
+@keyframes bounce {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .error-number {
+        font-size: 8rem;
+    }
+    
+    .error-title {
+        font-size: 2.2rem;
+    }
+    
+    .error-message {
+        font-size: 1.6rem;
+    }
+    
+    .error-illustration {
+        width: 220px;
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .error-number {
+        font-size: 6rem;
+    }
+    
+    .error-title {
+        font-size: 1.8rem;
+    }
+    
+    .error-message {
+        font-size: 1.4rem;
+    }
+    
+    .error-btn {
+        padding: 1rem 2rem;
+        font-size: 1.4rem;
+    }
+}

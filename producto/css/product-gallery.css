@@ -1,0 +1,479 @@
+/* ===== MODERN PRODUCT GALLERY - 2023 STYLE ===== */
+.product-gallery {
+  position: sticky;
+  top: 2rem;
+  display: flex;
+  padding: 8px;
+  flex-direction: column;
+  gap: 2.4rem;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Main image container - Modern card style */
+.gallery-main {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #fff;
+  aspect-ratio: 1/1;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.gallery-main:hover {
+  box-shadow: 0 8px 32px rgba(0, 119, 182, 0.12);
+}
+
+.main-image {
+  display: none;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.main-image.active {
+  display: block;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.main-image img {
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  transition: transform 0.3s ease;
+}
+
+.main-image:hover img {
+  transform: scale(1.02);
+}
+
+/* Modern zoom button with floating effect */
+.zoom-btn {
+  position: absolute;
+  bottom: 2.4rem;
+  right: 2.4rem;
+  width: 4.8rem;
+  height: 4.8rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 2;
+  border: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transform: translateY(10px);
+  cursor: pointer;
+}
+
+.main-image:hover .zoom-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.zoom-btn:hover {
+  background-color: #0077b6;
+  color: white;
+  transform: translateY(0) scale(1.1);
+  box-shadow: 0 6px 24px rgba(0, 119, 182, 0.3);
+}
+
+.zoom-btn i {
+  font-size: 1.8rem;
+  transition: transform 0.3s ease;
+}
+
+.zoom-btn:hover i {
+  transform: scale(1.1);
+}
+
+/* Thumbnails container - Modern scrolling gallery */
+.thumbnails-container {
+  position: relative;
+  width: 100%;
+  padding: 0 6rem;
+}
+
+.thumbnails-track {
+  display: flex;
+  padding: 5px 0;
+  gap: 1.27rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 1.6rem;
+}
+
+.thumbnails-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Modern thumbnail items with subtle border animation */
+.thumb-item {
+  flex: 0 0 9.6rem;
+  height: 9.6rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  scroll-snap-align: start;
+  position: relative;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.thumb-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.03), transparent);
+  z-index: 1;
+}
+
+.thumb-item:hover {
+  border-color: #0077b6;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 119, 182, 0.15);
+}
+
+.thumb-item.active {
+  border-color: #0077b6;
+  box-shadow: 0 0 0 2px rgba(0, 119, 182, 0.3);
+  position: relative;
+}
+
+.thumb-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #0077b6;
+}
+
+.thumb-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.thumb-item:hover img {
+  transform: scale(1.05);
+}
+
+/* Modern navigation arrows with hover effect */
+.thumb-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-72%);
+  width: 4.4rem;
+  margin: 8px;
+  z-index: 2;
+  height: 4.4rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  color: #0077b6;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid;
+  backdrop-filter: blur(8px);
+  opacity: 0.9;
+}
+
+.thumb-nav:hover {
+  background-color: #0077b6;
+  color: white;
+  transform: translateY(-74%) scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 119, 182, 0.3);
+}
+
+.thumb-nav.prev {
+  left: 0;
+}
+
+.thumb-nav.next {
+  right: 0;
+}
+
+.thumb-nav i {
+  font-size: 1.6rem;
+  transition: transform 0.3s ease;
+}
+
+.thumb-nav:hover i {
+  transform: scale(1.1);
+}
+
+.thumb-nav.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Additional images section - Modern grid layout */
+.gallery-additional {
+  margin-top: 3.2rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 2.4rem;
+}
+
+.gallery-additional h4 {
+  font-size: 1.8rem;
+  margin-bottom: 1.6rem;
+  color: #111;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  position: relative;
+  display: inline-block;
+}
+
+.gallery-additional h4::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #0077b6, #00b4d8);
+}
+
+.additional-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 1.6rem;
+}
+
+/* Modern additional image cards with hover effect */
+.additional-item {
+  height: 14rem;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.additional-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.03), transparent);
+  z-index: 1;
+}
+
+.additional-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 119, 182, 0.15);
+  border-color: rgba(0, 180, 216, 0.2);
+}
+
+.additional-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.additional-item:hover img {
+  transform: scale(1.08);
+}
+
+/* Badge for new/featured images - Modern style */
+.image-badge {
+  position: absolute;
+  top: 1.2rem;
+  left: 1.2rem;
+  background: linear-gradient(135deg, #0077b6, #00b4d8);
+  color: white;
+  padding: 0.4rem 1.2rem;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Performance optimizations */
+.thumb-item {
+  will-change: transform;
+}
+
+.main-image img {
+  will-change: transform;
+}
+
+/* Loading state - Modern skeleton loader */
+.gallery-loading .main-image,
+.gallery-loading .thumb-item,
+.gallery-loading .additional-item {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Accessibility improvements */
+.thumb-item:focus-visible {
+  outline: 2px solid #0077b6;
+  outline-offset: 2px;
+}
+
+.zoom-btn:focus-visible {
+  outline: 2px solid #0077b6;
+  outline-offset: 2px;
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+  .zoom-btn {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .thumb-nav {
+    opacity: 1;
+  }
+  
+  .thumb-item:hover {
+    transform: none;
+  }
+  
+  .additional-item:hover {
+    transform: none;
+  }
+}
+
+/* Responsive design - Mobile first approach */
+@media (max-width: 992px) {
+  .product-gallery {
+    position: static;
+    margin-bottom: 4rem;
+  }
+
+  .gallery-main {
+    width: 600px;
+    margin: 0 auto;
+  }
+
+  .thumbnails-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .thumb-nav {
+    width: 4rem;
+    height: 4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .thumb-item {
+    flex: 0 0 7.2rem;
+    height: 7.2rem;
+  }
+
+  .additional-images {
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  }
+
+  .additional-item {
+    height: 10rem;
+  }
+
+  .zoom-btn {
+    width: 4rem;
+    height: 4rem;
+    bottom: 1.6rem;
+    right: 1.6rem;
+  }
+  
+  .thumbnails-container {
+    padding: 0 7rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .thumb-item {
+    flex: 0 0 6.4rem;
+    height: 6.4rem;
+  }
+
+  .additional-images {
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: 1.2rem;
+  }
+
+  .additional-item {
+    height: 8rem;
+  }
+
+  .thumb-nav {
+    width: 3.6rem;
+    height: 3.6rem;
+  }
+
+  .gallery-additional h4 {
+    font-size: 1.6rem;
+  }
+  
+  .thumbnails-container {
+    padding: 0 5.5rem;
+  }
+}

@@ -1,0 +1,317 @@
+/* ===== ESTILOS PARA CONFIRMACIÓN ===== */
+.confirmation-container {
+    max-width: 1000px;
+    margin: 3rem auto;
+    padding: 0 1.5rem;
+}
+
+.confirmation-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
+
+.confirmation-header {
+    text-align: center;
+    padding: 3rem 2rem;
+    background-color: #90e0ef;
+    color: #333;
+}
+
+.confirmation-success-icon {
+    font-size: 5rem;
+    color: #4bb543;
+    margin-bottom: 1.5rem;
+}
+
+.confirmation-title {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.confirmation-message {
+    font-size: 1.6rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.confirmation-order-number {
+    font-size: 1.8rem;
+    margin: 1.5rem 0;
+    color: #333;
+}
+
+.confirmation-order-number strong {
+    color: #0077b6;
+}
+
+.confirmation-order-date {
+    font-size: 1.4rem;
+    color: #666;
+}
+
+.confirmation-details {
+    padding: 2rem;
+}
+
+.confirmation-details-section {
+    margin-bottom: 3rem;
+}
+
+.confirmation-section-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.confirmation-items {
+    margin-bottom: 2rem;
+}
+
+.confirmation-item {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.confirmation-item:last-child {
+    border-bottom: none;
+}
+
+.confirmation-item-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.confirmation-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.confirmation-item-info {
+    flex: 1;
+}
+
+.confirmation-item-title {
+    font-size: 1.6rem;
+    margin-bottom: 0.8rem;
+}
+
+.confirmation-item-title a {
+    color: #0077b6;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.confirmation-item-title a:hover {
+    text-decoration: underline;
+}
+
+.confirmation-item-variant {
+    font-size: 1.4rem;
+    color: #333;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.confirmation-item-quantity {
+    font-size: 1.4rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.confirmation-item-price {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #6a96cf;
+    min-width: 80px;
+    text-align: right;
+}
+
+.confirmation-totals {
+    margin-top: 1.5rem;
+}
+
+.confirmation-total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+    font-size: 1.5rem;
+}
+
+.confirmation-grand-total {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ddd;
+    font-weight: bold;
+}
+
+.confirmation-payment-method {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.confirmation-payment-icon {
+    font-size: 2.5rem;
+    color: #0077b6;
+}
+
+.confirmation-payment-name {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.confirmation-payment-description {
+    font-size: 1.4rem;
+    color: #666;
+}
+
+.confirmation-instructions {
+    padding-left: 1.5rem;
+}
+
+.confirmation-instruction-step {
+    font-size: 1.4rem;
+    color: #333;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.confirmation-instruction-step::before {
+    content: '•';
+    position: absolute;
+    left: -1.5rem;
+    color: #0077b6;
+}
+
+.confirmation-bank-info {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    border: 1px solid #e0e0e0;
+}
+
+.confirmation-bank-info p {
+    font-size: 1.4rem;
+    margin: 0.8rem 0;
+    color: #333;
+}
+
+.confirmation-bank-info p strong {
+    color: #333;
+}
+
+.confirmation-actions {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 2rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.confirmation-action-btn {
+    min-width: 200px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 1.2rem 2.5rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.confirmation-view-orders {
+    background-color: #0077b6;
+    color: white;
+}
+
+.confirmation-view-orders:hover {
+    background-color: #6a96cf;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.confirmation-continue-shopping {
+    background-color: #fff;
+    color: #0077b6;
+    border: 1px solid #0077b6;
+}
+
+.confirmation-continue-shopping:hover {
+    background-color: #90e0ef;
+}
+/* Estilo para el botón de descarga de factura */
+.confirmation-download-invoice {
+    background-color: #d90429;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.confirmation-download-invoice:hover {
+    background-color: #ef233c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Icono dentro del botón */
+.confirmation-download-invoice i {
+    font-size: 1.6rem;
+    transition: transform 0.3s ease;
+}
+
+.confirmation-download-invoice:hover i {
+    transform: scale(1.1);
+}
+
+/* Efecto al hacer clic */
+.confirmation-download-invoice:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+/* ===== MEDIA QUERIES ===== */
+@media (max-width: 768px) {
+    .confirmation-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .confirmation-action-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .confirmation-title {
+        font-size: 2.2rem;
+    }
+    
+    .confirmation-success-icon {
+        font-size: 4rem;
+    }
+    
+    .confirmation-item {
+        flex-direction: column;
+    }
+    
+    .confirmation-item-price {
+        text-align: left;
+    }
+}

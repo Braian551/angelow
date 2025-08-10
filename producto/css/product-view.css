@@ -1,0 +1,228 @@
+/* ===== ESTILOS BASE MEJORADOS ===== */
+:root {
+    --primary-color: #0077b6;
+    --primary-light: #90e0ef;
+    --primary-dark: #6a96cf;
+    --secondary-color: #48cae4;
+    --accent-color: #00b4d8;
+    --text-color: #333333;
+    --text-light: #777777;
+    --text-dark: #111111;
+    --bg-light: #ffffff;
+    --bg-dark: #f8f9fa;
+    --border-color: #e0e0e0;
+    --success-color: #4bb543;
+    --error-color: #ff3333;
+    --warning-color: #ffcc00;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.16);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --border-radius: 8px;
+    --border-radius-lg: 12px;
+}
+
+/* ===== RESET Y TIPOGRAFÍA ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 62.5%;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-light);
+    font-size: 1.6rem;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--text-dark);
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+button,
+input,
+textarea,
+select {
+    font-family: inherit;
+    transition: var(--transition);
+}
+
+/* ===== ESTRUCTURA PRINCIPAL ===== */
+.product-detail-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 3rem 3rem;
+}
+
+.back-button-container {
+   max-width: 1400px;
+    margin: 3rem auto 0rem;
+    padding: 0rem 4rem;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1.2rem 2.4rem;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: var(--border-radius);
+    font-size: 1.5rem;
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+
+.back-button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: white;
+}
+
+.back-button i {
+    font-size: 1.4rem;
+    transition: transform 0.3s ease;
+}
+
+.back-button:hover i {
+    transform: translateX(-3px);
+}
+
+
+
+
+/* ===== SECCIÓN PRINCIPAL DEL PRODUCTO ===== */
+.product-main-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 6rem;
+}
+
+/* ===== ANIMACIONES ADICIONALES ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+    .product-detail-container {
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .product-main-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .back-button-container {
+        padding: 0 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .back-button {
+        padding: 1rem 2rem;
+        font-size: 1.4rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .product-detail-container {
+        padding: 1.5rem;
+    }
+
+    .product-title {
+        font-size: 2.4rem;
+    }
+
+    .current-price {
+        font-size: 2.4rem;
+    }
+
+    .original-price {
+        font-size: 1.8rem;
+    }
+
+    .back-button-container {
+        padding: 0 1.5rem;
+    }
+
+    .back-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
