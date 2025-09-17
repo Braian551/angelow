@@ -540,7 +540,10 @@ textarea.form-control {
   transition: all 0.2s ease;
   margin-top: 10px;
 }
-
+.check2{
+  margin-bottom: 2px !important;
+  margin-left: 24px !important;
+}
 #open-products-modal:hover {
   background-color: rgba(0, 119, 182, 0.1);
 }
