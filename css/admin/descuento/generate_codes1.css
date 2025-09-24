@@ -384,8 +384,9 @@
 .form-row {
   grid-column: span 2;
   display: grid;
+  align-items: center;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-md);
+  gap: 45px;
   margin-bottom: var(--space-md);
 }
 
@@ -399,7 +400,6 @@
   font-size: 1.4rem;
   font-weight: 500;
   color: var(--primary-color);
-  margin-bottom: 0.6rem;
   justify-content: stretch;
   gap: 7px;
   align-items: center;
@@ -452,10 +452,12 @@ textarea.form-control {
 }
 
 .input-group-text {
-  font-size: 1.4rem;
-  color: var(--text-medium);
-}
+ font-size: 2.4rem;
+    position: relative;
+    right: 8px;
+    color: var(--text-medium);
 
+}
 .form-check {
   display: flex;
   align-items: center;
@@ -467,17 +469,17 @@ textarea.form-control {
 }
 
 .form-check-input {
-  width: 2rem;
+width: 2rem;
   height: 2rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
   cursor: pointer;
   transition: var(--transition);
   appearance: none;
-  position: absolute;
+  /* position: absolute; */
   left: 0;
   top: 50%;
-  transform: translateY(-50%);
+  /* transform: translateY(-50%); */
   background-color: var(--bg-light);
   display: flex;
   align-items: center;
@@ -819,7 +821,7 @@ textarea.form-control {
 }
 
 .btn-sm {
-  width: 3.4rem;
+  width: 8.4rem;
   height: 3.4rem;
   border-radius: var(--radius-md);
   display: flex;
@@ -1012,7 +1014,6 @@ textarea.form-control {
 .modal-body .table-container th {
   position: sticky;
   top: 0;
-  background-color: var(--primary-color);
   color: white;
   padding: 1rem;
 }
