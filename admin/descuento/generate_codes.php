@@ -39,8 +39,11 @@ $id = filter_var($id, FILTER_VALIDATE_INT);
 switch ($action) {
     case 'generate':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Debug: mostrar datos recibidos
+            error_log("POST data recibida: " . print_r($_POST, true));
+            
             $discount_type = $_POST['discount_type'];
-            $discount_value = $_POST['discount_value'] ?? null;
+            $discount_value = null;
             $max_uses = $_POST['max_uses'] ?: null;
             $start_date = $_POST['start_date'] ?: null;
             $end_date = $_POST['end_date'] ?: null;
@@ -50,17 +53,29 @@ switch ($action) {
             $send_notification = isset($_POST['send_notification']) ? 1 : 0;
             $selected_users = json_decode($_POST['selected_users'] ?? '[]', true) ?: [];
 
-            // Validaciones
+            // Validaciones básicas
             if (empty($discount_type)) {
                 $_SESSION['alert'] = ['type' => 'error', 'message' => 'Tipo de descuento es requerido'];
                 header("Location: generate_codes.php?action=generate");
                 exit();
             }
 
+            // Obtener el valor del descuento según el tipo
+            if ($discount_type == 1) { // Porcentaje
+                $discount_value = $_POST['discount_value'] ?? null;
+            } elseif ($discount_type == 2) { // Monto fijo
+                $discount_value = $_POST['fixed_amount'] ?? null;
+            } else { // Envío gratis
+                $discount_value = 0;
+            }
+
+            // Debug: mostrar valor obtenido
+            error_log("Tipo: $discount_type, Valor: $discount_value");
+
             // Validar valor según tipo
             if ($discount_type != 3) { // No es envío gratis
-                if (empty($discount_value)) {
-                    $_SESSION['alert'] = ['type' => 'error', 'message' => 'Valor del descuento es requerido'];
+                if (empty($discount_value) || $discount_value <= 0) {
+                    $_SESSION['alert'] = ['type' => 'error', 'message' => 'Valor del descuento es requerido y debe ser mayor a 0'];
                     header("Location: generate_codes.php?action=generate");
                     exit();
                 }
@@ -77,8 +92,6 @@ switch ($action) {
                     header("Location: generate_codes.php?action=generate");
                     exit();
                 }
-            } else {
-                $discount_value = 0; // Forzar 0 para envío gratis
             }
 
             // Validar fechas
@@ -94,15 +107,19 @@ switch ($action) {
             try {
                 $conn->beginTransaction();
 
-                // Insertar código de descuento principal
-                $stmt = $conn->prepare("INSERT INTO discount_codes 
-                    (code, discount_type_id, discount_value, max_uses, start_date, end_date, is_single_use, created_by) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                // Debug: verificar estructura de tabla
+                error_log("Insertando código: $code, tipo: $discount_type, valor: $discount_value");
 
-                $stmt->execute([
+                // Insertar código de descuento principal
+                $sql = "INSERT INTO discount_codes 
+                    (code, discount_type_id, discount_value, max_uses, start_date, end_date, is_single_use, created_by) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                
+                $stmt = $conn->prepare($sql);
+                $result = $stmt->execute([
                     $code,
                     $discount_type,
-                    $discount_type == 3 ? 0 : $discount_value, // Envío gratis siempre tiene valor 0
+                    $discount_value,
                     $max_uses,
                     $start_date,
                     $end_date,
@@ -110,32 +127,43 @@ switch ($action) {
                     $_SESSION['user_id']
                 ]);
 
+                if (!$result) {
+                    throw new Exception("Error al insertar código principal");
+                }
+
                 $discount_id = $conn->lastInsertId();
+                error_log("Código insertado con ID: $discount_id");
 
                 // Insertar en la tabla específica según el tipo de descuento
                 switch ($discount_type) {
-                    case 1: // Porcentaje
+                    case '1': // Porcentaje (como string por si viene del formulario)
+                    case 1:   // Porcentaje (como int)
                         $max_discount = $_POST['max_discount_amount'] ?? null;
                         $stmt = $conn->prepare("INSERT INTO percentage_discounts 
                             (discount_code_id, percentage, max_discount_amount) 
                             VALUES (?, ?, ?)");
                         $stmt->execute([$discount_id, $discount_value, $max_discount]);
+                        error_log("Descuento porcentaje insertado");
                         break;
 
-                    case 2: // Monto fijo
+                    case '2': // Monto fijo (como string)
+                    case 2:   // Monto fijo (como int)
                         $min_order = $_POST['min_order_amount'] ?? null;
                         $stmt = $conn->prepare("INSERT INTO fixed_amount_discounts 
                             (discount_code_id, amount, min_order_amount) 
                             VALUES (?, ?, ?)");
                         $stmt->execute([$discount_id, $discount_value, $min_order]);
+                        error_log("Descuento monto fijo insertado");
                         break;
 
-                    case 3: // Envío gratis
+                    case '3': // Envío gratis (como string)
+                    case 3:   // Envío gratis (como int)
                         $shipping_method = $_POST['shipping_method_id'] ?? null;
                         $stmt = $conn->prepare("INSERT INTO free_shipping_discounts 
                             (discount_code_id, shipping_method_id) 
                             VALUES (?, ?)");
                         $stmt->execute([$discount_id, $shipping_method]);
+                        error_log("Descuento envío gratis insertado");
                         break;
                 }
 
@@ -145,25 +173,39 @@ switch ($action) {
                     foreach ($selected_products as $product_id) {
                         $stmt->execute([$discount_id, $product_id]);
                     }
+                    error_log("Productos asignados: " . count($selected_products));
                 }
 
                 $conn->commit();
+                error_log("Transacción completada exitosamente");
 
                 // Enviar notificación si se solicitó
                 if ($send_notification && !empty($selected_users)) {
-                    require_once __DIR__ . '/../admin/api/descuento/send_discount_email.php';
-                    foreach ($selected_users as $user_id) {
-                        sendDiscountEmail($user_id, $code, $discount_type, $discount_value, $end_date);
+                    $email_file = __DIR__ . '/../admin/api/descuento/send_discount_email.php';
+                    if (file_exists($email_file)) {
+                        require_once $email_file;
+                        foreach ($selected_users as $user_id) {
+                            sendDiscountEmail($user_id, $code, $discount_type, $discount_value, $end_date);
+                        }
                     }
                 }
 
-                $_SESSION['alert'] = ['type' => 'success', 'message' => 'Código de descuento generado exitosamente'];
+                $_SESSION['alert'] = ['type' => 'success', 'message' => 'Código de descuento generado exitosamente: ' . $code];
                 header("Location: generate_codes.php");
                 exit();
             } catch (PDOException $e) {
                 $conn->rollBack();
                 error_log("Error al generar código: " . $e->getMessage());
-                $_SESSION['alert'] = ['type' => 'error', 'message' => 'Error al generar el código. Por favor intenta nuevamente.'];
+                error_log("SQL State: " . $e->getCode());
+                error_log("Error Info: " . print_r($e->errorInfo, true));
+                
+                // Mostrar error más específico en desarrollo
+                $errorMessage = 'Error al generar el código: ' . $e->getMessage();
+                if ($_ENV['APP_DEBUG'] ?? false) {
+                    $errorMessage .= ' (Código: ' . $e->getCode() . ')';
+                }
+                
+                $_SESSION['alert'] = ['type' => 'error', 'message' => $errorMessage];
                 header("Location: generate_codes.php?action=generate");
                 exit();
             }
@@ -239,7 +281,7 @@ $productos = obtenerProductos($conn);
 // Obtener usuarios clientes
 function obtenerUsuarios($conn)
 {
-    $sql = "SELECT id, name, email, phone FROM users WHERE role = 'customer' ORDER BY name";
+    $sql = "SELECT id, name, email, phone FROM users WHERE role = 'customer' AND id IS NOT NULL ORDER BY name";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -257,6 +299,30 @@ function obtenerTiposDescuento($conn)
 }
 
 $tiposDescuento = obtenerTiposDescuento($conn);
+
+// Obtener métodos de envío
+function obtenerMetodosEnvio($conn)
+{
+    try {
+        // Verificar si la tabla existe antes de consultarla
+        $stmt = $conn->prepare("SHOW TABLES LIKE 'shipping_methods'");
+        $stmt->execute();
+        if ($stmt->rowCount() == 0) {
+            // Si la tabla no existe, retornar array vacío
+            return [];
+        }
+        
+        $sql = "SELECT id, name FROM shipping_methods WHERE is_active = 1 ORDER BY name";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error al obtener métodos de envío: " . $e->getMessage());
+        return []; // Retornar array vacío si hay error
+    }
+}
+
+$metodosEnvio = obtenerMetodosEnvio($conn);
 
 // Mostrar alerta almacenada en sesión si existe
 if (isset($_SESSION['alert'])) {
@@ -311,55 +377,72 @@ if (isset($_SESSION['alert'])) {
                                         <select id="discount_type" name="discount_type" class="form-control" required>
                                             <option value="">Seleccionar tipo</option>
                                             <?php foreach ($tiposDescuento as $tipo): ?>
-                                                <option value="<?= $tipo['id'] ?>"><?= htmlspecialchars($tipo['name']) ?></option>
+                                                <option value="<?= $tipo['id'] ?>"><?= htmlspecialchars($tipo['name']) ?>
+                                                </option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
-                                    <div class="form-group col-md-6" id="discount-value-group">
-                                        <label for="discount_value">Valor del Descuento*</label>
+                                    
+                                    <!-- Campo para porcentaje -->
+                                    <div class="form-group col-md-6" id="discount-value-group" style="display: none;">
+                                        <label for="discount_value">Porcentaje de Descuento*</label>
                                         <div class="input-group">
                                             <input type="number" id="discount_value" name="discount_value"
-                                                class="form-control" min="1" max="100" step="0.01">
+                                                class="form-control" min="1" max="100" step="0.01" placeholder="Ej: 10">
                                             <div class="input-group-append">
                                                 <span class="input-group-text">%</span>
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Campo para monto fijo -->
                                     <div class="form-group col-md-6" id="fixed-amount-group" style="display: none;">
                                         <label for="fixed_amount">Monto Fijo*</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">$</span>
                                             </div>
-                                            <input type="number" id="fixed_amount" name="discount_value"
-                                                class="form-control" min="1" step="0.01">
+                                            <input type="number" id="fixed_amount" name="fixed_amount"
+                                                class="form-control" min="1" step="0.01" placeholder="Ej: 50">
                                         </div>
                                     </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <!-- Campo para monto máximo en porcentaje -->
                                     <div class="form-group col-md-6" id="max-discount-group" style="display: none;">
-                                        <label for="max_discount_amount">Monto Máximo (opcional)</label>
+                                        <label for="max_discount_amount">Monto Máximo de Descuento (opcional)</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">$</span>
                                             </div>
                                             <input type="number" id="max_discount_amount" name="max_discount_amount"
-                                                class="form-control" min="0" step="0.01">
+                                                class="form-control" min="0" step="0.01" placeholder="Ej: 100">
                                         </div>
+                                        <small class="form-text text-muted">Límite máximo del descuento aplicable</small>
                                     </div>
+                                    
+                                    <!-- Campo para compra mínima en monto fijo -->
                                     <div class="form-group col-md-6" id="min-order-group" style="display: none;">
-                                        <label for="min_order_amount">Mínimo de Compra (opcional)</label>
+                                        <label for="min_order_amount">Compra Mínima (opcional)</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">$</span>
                                             </div>
                                             <input type="number" id="min_order_amount" name="min_order_amount"
-                                                class="form-control" min="0" step="0.01">
+                                                class="form-control" min="0" step="0.01" placeholder="Ej: 200">
                                         </div>
+                                        <small class="form-text text-muted">Monto mínimo requerido para aplicar descuento</small>
                                     </div>
+                                    
+                                    <!-- Campo para método de envío -->
                                     <div class="form-group col-md-6" id="shipping-method-group" style="display: none;">
                                         <label for="shipping_method_id">Método de Envío (opcional)</label>
                                         <select id="shipping_method_id" name="shipping_method_id" class="form-control">
                                             <option value="">Todos los métodos</option>
-                                            <!-- Opciones de métodos de envío -->
+                                            <?php foreach ($metodosEnvio as $metodo): ?>
+                                                <option value="<?= $metodo['id'] ?>"><?= htmlspecialchars($metodo['name']) ?></option>
+                                            <?php endforeach; ?>
                                         </select>
                                     </div>
                                 </div>
@@ -367,14 +450,16 @@ if (isset($_SESSION['alert'])) {
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label for="max_uses">Usos Máximos (opcional)</label>
-                                        <input type="number" id="max_uses" name="max_uses" class="form-control" min="1">
+                                        <input type="number" id="max_uses" name="max_uses" class="form-control" min="1" placeholder="Ej: 100">
                                         <small class="form-text text-muted">Dejar vacío para usos ilimitados</small>
                                     </div>
                                     <div class="form-group col-md-6">
-                                        <label for="is_single_use">
+                                        <label for="is_single_use" class="checkbox-container">
                                             <input type="checkbox" id="is_single_use" name="is_single_use" class="form-check-input">
-                                            <span class="form-check-label">Uso único por cliente</span>
+                                            <span class="checkmark"></span>
+                                            Uso único por cliente
                                         </label>
+                                        <small class="form-text text-muted">Cada cliente solo puede usar este código una vez</small>
                                     </div>
                                 </div>
 
@@ -390,20 +475,34 @@ if (isset($_SESSION['alert'])) {
                                 </div>
 
                                 <div class="form-group">
-                                    <label>
+                                    <label for="apply_to_all" class="checkbox-container">
                                         <input type="checkbox" id="apply_to_all" name="apply_to_all" class="form-check-input check2" checked>
-                                        <span class="form-check-label">Aplicar a todos los productos</span>
+                                        <span class="checkmark"></span>
+                                        Aplicar a todos los productos
                                     </label>
+                                    
                                     <button type="button" id="open-products-modal" class="btn btn-outline-primary" style="display: none; margin-top: 10px;">
                                         <i class="fas fa-boxes"></i> Seleccionar productos específicos
                                     </button>
+
+                                    <div id="selected-products-info" class="selected-products-info" style="display: none; margin-top: 10px;">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span id="selected-products-count-display"></span>
+                                        </div>
+                                        <button type="button" id="clear-selected-products" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-times"></i> Limpiar
+                                        </button>
+                                    </div>
+
                                     <input type="hidden" name="products" id="selected-products" value="[]">
                                 </div>
 
                                 <div class="form-group notification-section">
-                                    <label>
+                                    <label for="send_notification" class="checkbox-container">
                                         <input type="checkbox" id="send_notification" name="send_notification" class="form-check-input">
-                                        <span class="form-check-label">Enviar notificación por email</span>
+                                        <span class="checkmark"></span>
+                                        Enviar notificación por email
                                     </label>
                                 </div>
 
@@ -516,17 +615,13 @@ if (isset($_SESSION['alert'])) {
                                                         <?= $codigo['product_count'] > 0 ? $codigo['product_count'] . ' productos' : 'Todos' ?>
                                                     </td>
                                                     <td class="actions">
-                                                        <a href="#" class="btn btn-sm btn-info btn-copy"
-                                                            data-code="<?= htmlspecialchars($codigo['code']) ?>" title="Copiar">
+                                                        <a href="#" class="btn btn-sm btn-info btn-copy" data-code="<?= htmlspecialchars($codigo['code']) ?>" title="Copiar">
                                                             <i class="fas fa-copy"></i>
                                                         </a>
-                                                        <a href="<?= BASE_URL ?>/admin/api/descuento/generate_pdf.php?id=<?= $codigo['id'] ?>"
-                                                            class="btn btn-sm btn-secondary" title="Descargar PDF">
+                                                        <a href="<?= BASE_URL ?>/admin/api/descuento/generate_pdf.php?id=<?= $codigo['id'] ?>" class="btn btn-sm btn-secondary" title="Descargar PDF">
                                                             <i class="fas fa-file-pdf"></i>
                                                         </a>
-                                                        <a href="generate_codes.php?action=delete&id=<?= $codigo['id'] ?>"
-                                                            class="btn btn-sm btn-danger" title="Eliminar"
-                                                            onclick="return confirm('¿Estás seguro de eliminar este código?')">
+                                                        <a href="generate_codes.php?action=delete&id=<?= $codigo['id'] ?>" class="btn btn-sm btn-danger" title="Eliminar" onclick="return confirm('¿Estás seguro de eliminar este código?')">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
                                                     </td>
@@ -546,14 +641,28 @@ if (isset($_SESSION['alert'])) {
             </div>
         </main>
     </div>
-    <?php require_once __DIR__ . '/../../admin/descuento/modals/modal_usuario.php'; ?>
-    <?php require_once __DIR__ . '/../../admin/descuento/modals/modal_producto.php'; ?>
+    
+    <?php if ($action === 'generate'): ?>
+        <?php require_once __DIR__ . '/../../admin/descuento/modals/modal_usuario.php'; ?>
+        <?php require_once __DIR__ . '/../../admin/descuento/modals/modal_producto.php'; ?>
+    <?php endif; ?>
 
-
+    <!-- Script para pasar datos de PHP a JavaScript -->
+    <script>
+        // Pasar usuarios de PHP a JavaScript
+        window.allUsersFromPHP = <?= json_encode($usuarios, JSON_UNESCAPED_UNICODE) ?>;
+        console.log('Usuarios cargados desde PHP:', window.allUsersFromPHP);
+        
+        // Pasar base URL para las peticiones AJAX
+        window.BASE_URL = '<?= BASE_URL ?>';
+    </script>
 
     <script src="<?= BASE_URL ?>/js/dashboardadmin.js"></script>
     <script src="<?= BASE_URL ?>/js/alerta.js"></script>
-    <?php require_once __DIR__ . '/../../js/admin/descuento/generate_codesjs.php'; ?>
+    
+    <?php if ($action === 'generate'): ?>
+        <?php require_once __DIR__ . '/../../js/admin/descuento/generate_codesjs.php'; ?>
+    <?php endif; ?>
 </body>
 
 </html>

@@ -70,27 +70,45 @@ try {
     // Obtener y validar el término de búsqueda
     $searchTerm = isset($_GET['q']) ? trim($_GET['q']) : '';
     
-    if (strlen($searchTerm) < 2) {
-        sendJsonResponse([]);
+    // Si no hay término de búsqueda, devolver todos los usuarios
+    if (empty($searchTerm)) {
+        // Obtener todos los usuarios clientes
+        $stmt = $conn->prepare("
+            SELECT id, name, email, phone 
+            FROM users 
+            WHERE role = 'customer'
+            AND id IS NOT NULL
+            AND name IS NOT NULL
+            AND email IS NOT NULL
+            ORDER BY name ASC
+            LIMIT 50
+        ");
+    } else {
+        // Realizar búsqueda de usuarios
+        $searchPattern = "%$searchTerm%";
+        $stmt = $conn->prepare("
+            SELECT id, name, email, phone 
+            FROM users 
+            WHERE (name LIKE ? OR email LIKE ?) 
+            AND role = 'customer'
+            AND id IS NOT NULL
+            AND name IS NOT NULL
+            AND email IS NOT NULL
+            ORDER BY name ASC
+            LIMIT 20
+        ");
     }
-
-    // Realizar búsqueda de usuarios
-    $searchPattern = "%$searchTerm%";
-    $stmt = $conn->prepare("
-        SELECT id, name, email, phone 
-        FROM users 
-        WHERE (name LIKE ? OR email LIKE ?) 
-        AND role = 'customer'
-        AND id IS NOT NULL
-        ORDER BY name ASC
-        LIMIT 20
-    ");
     
     if (!$stmt) {
         sendJsonResponse(['error' => 'Error al preparar la consulta'], 500);
     }
     
-    $result = $stmt->execute([$searchPattern, $searchPattern]);
+    if (empty($searchTerm)) {
+        $result = $stmt->execute();
+    } else {
+        $result = $stmt->execute([$searchPattern, $searchPattern]);
+    }
+    
     if (!$result) {
         sendJsonResponse(['error' => 'Error al ejecutar la búsqueda'], 500);
     }
@@ -100,10 +118,10 @@ try {
     // Limpiar y validar los datos
     $cleanUsers = [];
     foreach ($users as $user) {
-        if (isset($user['id']) && $user['id']) {
+        if (isset($user['id']) && $user['id'] && isset($user['name']) && !empty(trim($user['name']))) {
             $cleanUsers[] = [
                 'id' => (int)$user['id'],
-                'name' => isset($user['name']) ? trim(strip_tags($user['name'])) : '',
+                'name' => trim(strip_tags($user['name'])),
                 'email' => isset($user['email']) ? trim(strip_tags($user['email'])) : '',
                 'phone' => isset($user['phone']) ? trim(strip_tags($user['phone'])) : ''
             ];
@@ -119,4 +137,3 @@ try {
     error_log("Error general en search_users.php: " . $e->getMessage());
     sendJsonResponse(['error' => 'Error interno del servidor'], 500);
 }
-?>

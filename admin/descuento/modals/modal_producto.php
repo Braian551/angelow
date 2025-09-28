@@ -20,6 +20,7 @@
                     </label>
                 </div>
                 <span id="selected-products-count" class="selected-count">0 seleccionados</span>
+                
             </div>
 
             <div class="table-container">

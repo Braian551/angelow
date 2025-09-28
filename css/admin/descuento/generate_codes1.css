@@ -452,12 +452,13 @@ textarea.form-control {
 }
 
 .input-group-text {
- font-size: 2.4rem;
-    position: relative;
-    right: 8px;
-    color: var(--text-medium);
+  font-size: 2.4rem;
+  position: relative;
+  right: 8px;
+  color: var(--text-medium);
 
 }
+
 .form-check {
   display: flex;
   align-items: center;
@@ -469,7 +470,7 @@ textarea.form-control {
 }
 
 .form-check-input {
-width: 2rem;
+  width: 2rem;
   height: 2rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
@@ -605,6 +606,79 @@ width: 2rem;
 #open-user-modal:hover {
   background-color: rgba(0, 119, 182, 0.1);
 }
+
+
+/* Estilos para la información de productos seleccionados */
+.selected-products-info {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background-color: #e6f7ff;
+    border-radius: 6px;
+    border: 1px solid #b3e0ff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: fadeIn 0.3s ease-in;
+    transition: all 0.3s ease; 
+}
+
+.selected-products-info .alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: #0077b6;
+  font-size: 14px;
+}
+
+#clear-selected-products {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#clear-selected-products:hover {
+  text-decoration: underline;
+}
+
+/* Estilos para la tabla de productos en el modal */
+.product-selection-row {
+  transition: background-color 0.2s ease;
+}
+
+.product-selection-row:hover {
+  background-color: #f8f9fa;
+}
+
+.product-selection-row.selected {
+  background-color: #e3f2fd;
+  border-left: 3px solid #2196f3;
+}
+
+
+
+/* Animación para fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {}
 
 .selected-user-info {
   margin-top: 15px;
@@ -1317,6 +1391,23 @@ width: 2rem;
   padding: var(--space-sm);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* ===== ANIMACIONES ===== */
 @keyframes fadeIn {
   from {
@@ -1353,6 +1444,7 @@ width: 2rem;
   .dashboard-content {
     padding: var(--space-lg);
   }
+
 
   .actions-bar {
     flex-direction: column;
@@ -1420,6 +1512,19 @@ width: 2rem;
 
   .modal-footer {
     padding: var(--space-md);
+  }
+  .selected-products-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .selected-products-info .alert {
+    align-self: flex-start;
+  }
+
+  #clear-selected-products {
+    align-self: flex-end;
   }
 }
 
