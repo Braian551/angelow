@@ -5,7 +5,7 @@
 error_log("POST data recibida para actualización: " . print_r($_POST, true));
 
 $code_id = $_POST['code_id'] ?? null;
-$discount_type = $_POST['discount_type'];
+$discount_type = $_POST['discount_type'] ?? ($_POST['discount_type_display'] ?? null);
 $discount_value = null;
 $max_uses = $_POST['max_uses'] ?: null;
 $start_date = $_POST['start_date'] ?: null;
@@ -14,6 +14,10 @@ $is_single_use = isset($_POST['is_single_use']) ? 1 : 0;
 $is_active = isset($_POST['is_active']) ? 1 : 0;
 $apply_to_all = isset($_POST['apply_to_all']) ? 1 : 0;
 $selected_products = json_decode($_POST['products'] ?? '[]', true) ?: [];
+// Usuarios seleccionados para notificación (puede venir vacío)
+$selected_users = json_decode($_POST['selected_users'] ?? '[]', true) ?: [];
+// Flag para enviar notificación
+$send_notification = isset($_POST['send_notification']) ? true : false;
 
 // Validaciones básicas
 if (empty($code_id)) {
@@ -165,7 +169,98 @@ try {
 
     $conn->commit();
 
-    $_SESSION['alert'] = ['type' => 'success', 'message' => 'Código de descuento actualizado exitosamente'];
+    // Después de confirmar la transacción, enviar notificaciones si corresponde
+    $sent = 0;
+    $failed = 0;
+
+    if ($send_notification && !empty($selected_users)) {
+        // Incluir la función de envío
+        $sendFile = __DIR__ . '/../../api/descuento/send_discount_email.php';
+        if (file_exists($sendFile)) {
+            require_once $sendFile;
+
+            // Obtener el código si no lo tenemos
+            if (empty($code)) {
+                $q = $conn->prepare("SELECT code FROM discount_codes WHERE id = ?");
+                $q->execute([$code_id]);
+                $row = $q->fetch(PDO::FETCH_ASSOC);
+                $code = $row['code'] ?? '';
+            }
+
+            // Obtener nombre tipo descuento si es posible
+            $dtypeName = $discount_type;
+            try {
+                $q2 = $conn->prepare("SELECT name FROM discount_types WHERE id = ?");
+                $q2->execute([$discount_type]);
+                $dtypeName = $q2->fetchColumn() ?: $discount_type;
+            } catch (Exception $e) {
+                // ignorar, usar id si no hay nombre
+            }
+
+            // Generar PDF en memoria para adjuntar
+            try {
+                require_once __DIR__ . '/../../../vendor/autoload.php';
+                $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
+                $pdf->SetCreator(PDF_CREATOR);
+                $pdf->SetAuthor('Angelow Ropa Infantil');
+                $pdf->SetTitle('Código de Descuento ' . ($code ?: ''));
+                $pdf->SetSubject('Código de Descuento');
+                $pdf->SetMargins(15, 25, 15);
+                $pdf->SetHeaderMargin(10);
+                $pdf->SetFooterMargin(15);
+                $pdf->setPrintFooter(true);
+                $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+                $pdf->SetFont('helvetica', '', 10);
+                $logoPath = __DIR__ . '/../../../images/logo2.png';
+                $logoExists = file_exists($logoPath);
+                $pdf->AddPage();
+
+                $html = '<div style="text-align:center;">';
+                if ($logoExists) {
+                    $html .= '<img src="' . $logoPath . '" width="180"/>';
+                } else {
+                    $html .= '<h1>Angelow Ropa Infantil</h1>';
+                }
+                $html .= '<h2 style="color:#006699;">CÓDIGO DE DESCUENTO</h2>';
+                $html .= '<div style="font-size:28px;color:#006699;margin:10px 0;font-weight:bold;">' . htmlspecialchars($code) . '</div>';
+                $html .= '<div style="font-size:18px;color:#FF6600;margin-bottom:10px;">' . htmlspecialchars($dtypeName) . ' ' . htmlspecialchars($discount_value) . '%</div>';
+                if ($end_date) {
+                    $html .= '<div style="font-style:italic;color:#666;">Válido hasta: ' . date('d/m/Y', strtotime($end_date)) . '</div>';
+                } else {
+                    $html .= '<div style="font-style:italic;color:#666;">Sin fecha de expiración</div>';
+                }
+                $html .= '</div>';
+
+                $pdf->writeHTML($html, true, false, true, false, '');
+                $pdfContent = $pdf->Output('codigo_descuento_' . $code . '.pdf', 'S');
+                $pdfFilename = 'codigo_descuento_' . $code . '.pdf';
+            } catch (Exception $e) {
+                error_log('Error generando PDF para adjuntar: ' . $e->getMessage());
+                $pdfContent = null;
+                $pdfFilename = null;
+            }
+
+            foreach ($selected_users as $userId) {
+                try {
+                    $ok = sendDiscountEmail($userId, $code, $dtypeName, $discount_value, $end_date, $pdfContent, $pdfFilename);
+                    if ($ok) $sent++; else $failed++;
+                } catch (Exception $e) {
+                    error_log('Error enviando email a usuario ' . $userId . ': ' . $e->getMessage());
+                    $failed++;
+                }
+            }
+        } else {
+            error_log('No se encontró el archivo de envío de emails: ' . $sendFile);
+        }
+    }
+
+    // Preparar mensaje final
+    $message = 'Código de descuento actualizado exitosamente.';
+    if ($send_notification) {
+        $message .= ' Correos enviados: ' . $sent . '. Fallidos: ' . $failed . '.';
+    }
+
+    $_SESSION['alert'] = ['type' => 'success', 'message' => $message];
     header("Location: generate_codes.php");
     exit();
 } catch (PDOException $e) {
