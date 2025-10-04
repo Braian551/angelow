@@ -232,47 +232,20 @@ try {
                 // ignorar, usar id si no hay nombre
             }
 
-            // Generar PDF en memoria para adjuntar (reutiliza plantilla de admin/api/descuento/generate_pdf.php)
+            // Generar PDF en memoria para adjuntar usando el helper (pdf_helpers.php)
             try {
-                // Cargar TCPDF
-                require_once __DIR__ . '/../../../vendor/autoload.php';
-                $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
-                $pdf->SetCreator(PDF_CREATOR);
-                $pdf->SetAuthor('Angelow Ropa Infantil');
-                $pdf->SetTitle('Código de Descuento ' . ($code ?: '')); 
-                $pdf->SetSubject('Código de Descuento');
-                $pdf->SetMargins(15, 25, 15);
-                $pdf->SetHeaderMargin(10);
-                $pdf->SetFooterMargin(15);
-                $pdf->setPrintFooter(true);
-                $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-                $pdf->SetFont('helvetica', '', 10);
-                $logoPath = __DIR__ . '/../../../images/logo2.png';
-                $logoExists = file_exists($logoPath);
-                $pdf->AddPage();
-
-                // Construir HTML simple (basado en generate_pdf.php)
-                $html = '<div style="text-align:center;">';
-                if ($logoExists) {
-                    $html .= '<img src="' . $logoPath . '" width="180"/>';
+                $helperFile = __DIR__ . '/../../api/descuento/pdf_helpers.php';
+                if (file_exists($helperFile)) {
+                    require_once $helperFile;
+                    $pdfContent = generateDiscountPdfContent($code_id);
+                    $pdfFilename = $pdfContent ? 'codigo_descuento_' . ($code ?: $code_id) . '.pdf' : null;
                 } else {
-                    $html .= '<h1>Angelow Ropa Infantil</h1>';
+                    error_log('No se encontró pdf_helpers.php en: ' . $helperFile);
+                    $pdfContent = null;
+                    $pdfFilename = null;
                 }
-                $html .= '<h2 style="color:#006699;">CÓDIGO DE DESCUENTO</h2>';
-                $html .= '<div style="font-size:28px;color:#006699;margin:10px 0;font-weight:bold;">' . htmlspecialchars($code) . '</div>';
-                $html .= '<div style="font-size:18px;color:#FF6600;margin-bottom:10px;">' . htmlspecialchars($dtypeName) . ' ' . htmlspecialchars($discount_value) . '%</div>';
-                if ($end_date) {
-                    $html .= '<div style="font-style:italic;color:#666;">Válido hasta: ' . date('d/m/Y', strtotime($end_date)) . '</div>';
-                } else {
-                    $html .= '<div style="font-style:italic;color:#666;">Sin fecha de expiración</div>';
-                }
-                $html .= '</div>';
-
-                $pdf->writeHTML($html, true, false, true, false, '');
-                $pdfContent = $pdf->Output('codigo_descuento_' . $code . '.pdf', 'S');
-                $pdfFilename = 'codigo_descuento_' . $code . '.pdf';
             } catch (Exception $e) {
-                error_log('Error generando PDF para adjuntar: ' . $e->getMessage());
+                error_log('Error generando PDF para adjuntar (helper): ' . $e->getMessage());
                 $pdfContent = null;
                 $pdfFilename = null;
             }

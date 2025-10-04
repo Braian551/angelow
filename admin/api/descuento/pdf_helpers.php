@@ -1,42 +1,179 @@
 <?php
-// Helper para construir el HTML del PDF de código de descuento
-function getDiscountPdfHtml(array $codigo, array $productos = []) {
-    // Usamos la misma estructura y estilos que en generate_pdf.php
-    $logoPath = __DIR__ . '/../../../../images/logo2.png';
-    $logoExists = file_exists($logoPath);
+// admin/api/descuento/generate_pdf.php
 
-    $html = "\n    <style>\n        .header-title {\n            color: #006699;\n            font-size: 16pt;\n            font-weight: bold;\n            margin-bottom: 5px;\n        }\n        .header-subtitle {\n            color: #666666;\n            font-size: 10pt;\n            margin-top: 0;\n        }\n        .section-title {\n            color: #006699;\n            padding: 6px 8px;\n            font-size: 11pt;\n            font-weight: bold;\n            margin-top: 15px;\n            border-radius: 3px;\n        }\n        .label {\n            font-weight: bold;\n            color: #333333;\n            width: 120px;\n            display: inline-block;\n        }\n        .value {\n            color: #555555;\n        }\n        .footer {\n            font-size: 8pt;\n            color: #666666;\n            text-align: center;\n            border-top: 1px solid #CCCCCC;\n            padding-top: 8px;\n            margin-top: 20px;\n        }\n        .discount-code {\n            font-size: 24pt;\n            color: #006699;\n            font-weight: bold;\n            text-align: center;\n            margin: 20px 0;\n            letter-spacing: 3px;\n        }\n        .discount-value {\n            font-size: 18pt;\n            color: #FF6600;\n            font-weight: bold;\n            text-align: center;\n            margin: 10px 0;\n        }\n        .validity {\n            font-size: 10pt;\n            color: #666666;\n            text-align: center;\n            font-style: italic;\n        }\n        .product-table {\n            width: 100%;\n            border-collapse: collapse;\n            margin-top: 10px;\n        }\n        .product-table th {\n            background-color: #006699;\n            color: #FFFFFF;\n            border: 1px solid #DDDDDD;\n            padding: 8px;\n            font-weight: bold;\n            font-size: 9pt;\n        }\n        .product-table td {\n            border: 1px solid #DDDDDD;\n            padding: 8px;\n            font-size: 9pt;\n        }\n        .text-center {\n            text-align: center;\n        }\n        .text-right {\n            text-align: right;\n        }\n        .terms {\n            font-size: 8pt;\n            color: #666666;\n            margin-top: 15px;\n            border-top: 1px solid #EEEEEE;\n            padding-top: 10px;\n        }\n        .company-info {\n            font-size: 9pt;\n            color: #666666;\n            line-height: 1.4;\n        }\n        .barcode {\n            text-align: center;\n            margin: 15px 0;\n        }\n    </style>\n    \n    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\n        <tr>\n            <td width=\"40%\">";
+require_once __DIR__ . '/../../../config.php';
+require_once __DIR__ . '/../../../conexion.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
-    if ($logoExists) {
-        $html .= '<img src="' . $logoPath . '" width="180">';
-    } else {
-        $html .= '<h1 class="header-title">Angelow Ropa Infantil</h1>' .
-                 '<p class="header-subtitle">Moda infantil de calidad</p>';
-    }
+use TCPDF;
 
-    $html .= "</td>\n            <td width=\"60%\" style=\"text-align: right; vertical-align: top;\">\n                <h1 class=\"header-title\">C\xD3DIGO DE DESCUENTO</h1>\n                <p><span class=\"label\">Generado por:</span> " . htmlspecialchars($codigo['created_by_name'] ?? 'Administrador') . "</p>\n                <p><span class=\"label\">Fecha creaci\xF3n:</span> " . date('d/m/Y H:i', strtotime($codigo['created_at'])) . "</p>\n            </td>\n        </tr>\n    </table>\n    \n    <div class=\"barcode\">\n        <div class=\"discount-code\">" . htmlspecialchars($codigo['code']) . "</div>\n        <div class=\"discount-value\">" . htmlspecialchars($codigo['discount_type_name']) . " DEL " . $codigo['discount_value'] . "%</div>";
+// Configurar manejo de errores
+set_error_handler(function($severity, $message, $file, $line) {
+    throw new ErrorException($message, 0, $severity, $file, $line);
+});
 
-    if (!empty($codigo['end_date'])) {
-        $html .= '<div class="validity">V&aacute;lido hasta: ' . date('d/m/Y', strtotime($codigo['end_date'])) . '</div>';
-    } else {
-        $html .= '<div class="validity">Sin fecha de expiraci&oacute;n</div>';
-    }
+/**
+ * Genera el PDF del código de descuento y devuelve el contenido binario (string).
+ * Retorna null en caso de error.
+ */
+function generateDiscountPdfContent(int $id)
+{
+    // Usa la conexión disponible en el contexto global
+    global $conn;
 
-    $html .= "</div>\n    \n    <h3 class=\"section-title\">INFORMACI\xD3N DEL DESCUENTO</h3>\n    <table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">\n        <tr>\n            <td width=\"25%\"><span class=\"label\">Tipo:</span></td>\n            <td width=\"75%\" class=\"value\">" . htmlspecialchars($codigo['discount_type_name']) . "</td>\n        </tr>\n        <tr>\n            <td><span class=\"label\">Valor:</span></td>\n            <td class=\"value\">" . $codigo['discount_value'] . "% de descuento</td>\n        </tr>\n        <tr>\n            <td><span class=\"label\">Usos m\xE1ximos:</span></td>\n            <td class=\"value\">" . ($codigo['max_uses'] ? $codigo['max_uses'] : 'Ilimitados') . "</td>\n        </tr>\n        <tr>\n            <td><span class=\"label\">Uso \xFAnico:</span></td>\n            <td class=\"value\">" . ($codigo['is_single_use'] ? 'S&iacute;' : 'No') . "</td>\n        </tr>\n        <tr>\n            <td><span class=\"label\">V\xE1lido desde:</span></td>\n            <td class=\"value\">" . ($codigo['start_date'] ? date('d/m/Y H:i', strtotime($codigo['start_date'])) : 'Inmediatamente') . "</td>\n        </tr>\n        <tr>\n            <td><span class=\"label\">V\xE1lido hasta:</span></td>\n            <td class=\"value\">" . ($codigo['end_date'] ? date('d/m/Y H:i', strtotime($codigo['end_date'])) : 'Sin fecha de expiraci&oacute;n') . "</td>\n        </tr>\n    </table>";
-
-    if (!empty($productos) && count($productos) > 0) {
-        $html .= "\n        <h3 class=\"section-title\">PRODUCTOS APLICABLES</h3>\n        <table class=\"product-table\">\n            <thead>\n                <tr>\n                    <th style=\"text-align: left;\">Producto</th>\n                    <th style=\"text-align: right;\">Precio</th>\n                </tr>\n            </thead>\n            <tbody>";
-
-        foreach ($productos as $producto) {
-            $html .= "\n                <tr>\n                    <td>" . htmlspecialchars($producto['name']) . "</td>\n                    <td class=\"text-right\">$" . number_format($producto['price'], 2, ',', '.') . "</td>\n                </tr>";
+    try {
+        // Obtener información del código de descuento
+        $stmt = $conn->prepare(
+            "SELECT dc.*, dt.name as discount_type_name,"
+            . " (SELECT COUNT(*) FROM discount_code_products WHERE discount_code_id = dc.id) as product_count,"
+            . " u.name as created_by_name"
+            . " FROM discount_codes dc"
+            . " JOIN discount_types dt ON dc.discount_type_id = dt.id"
+            . " LEFT JOIN users u ON dc.created_by = u.id"
+            . " WHERE dc.id = ?"
+        );
+        $stmt->execute([$id]);
+        $codigo = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$codigo) {
+            return null;
         }
 
-        $html .= "\n            </tbody>\n        </table>";
-    } else {
-        $html .= "\n        <h3 class=\"section-title\">APLICACI\xD3N</h3>\n        <p>Este descuento aplica a todos los productos de la tienda.</p>";
+        // Obtener productos asociados si aplica
+        $productos = [];
+        if ($codigo['product_count'] > 0) {
+            $stmt = $conn->prepare(
+                "SELECT p.id, p.name, p.price"
+                . " FROM discount_code_products dcp"
+                . " JOIN products p ON dcp.product_id = p.id"
+                . " WHERE dcp.discount_code_id = ?"
+                . " ORDER BY p.name"
+            );
+            $stmt->execute([$id]);
+            $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        // Crear el PDF en memoria
+        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
+        $pdf->SetCreator(PDF_CREATOR);
+        $pdf->SetAuthor('Angelow Ropa Infantil');
+        $pdf->SetTitle('Código de Descuento ' . $codigo['code']);
+        $pdf->SetSubject('Código de Descuento');
+        $pdf->SetKeywords('Descuento, Cupón, Promoción, Angelow');
+        $pdf->SetMargins(15, 25, 15);
+        $pdf->SetHeaderMargin(10);
+        $pdf->SetFooterMargin(15);
+        $pdf->setPrintFooter(true);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        $pdf->SetFont('helvetica', '', 10);
+        $logoPath = __DIR__ . '/../../../../images/logo2.png';
+        $logoExists = file_exists($logoPath);
+        $pdf->AddPage();
+
+        // Construir HTML (igual que en el script principal)
+        $html = '';
+        // ... construimos el mismo HTML que usa el script (simplificado llamando a la parte existente)
+        // Para mantener la misma apariencia usamos el HTML que ya existe más abajo creando una copia ligera aquí
+
+        $html .= '<div style="font-family:helvetica">';
+        if ($logoExists) {
+            $html .= '<div style="text-align:left;"><img src="' . $logoPath . '" width="180"/></div>';
+        } else {
+            $html .= '<h1 style="color:#006699">Angelow Ropa Infantil</h1>';
+        }
+        $html .= '<h2 style="text-align:center;color:#006699">CÓDIGO DE DESCUENTO</h2>';
+        $html .= '<div style="text-align:center;font-size:24pt;color:#006699;font-weight:bold;letter-spacing:3px;">' . htmlspecialchars($codigo['code']) . '</div>';
+        $html .= '<div style="text-align:center;font-size:18pt;color:#FF6600;margin-bottom:10px;">' . htmlspecialchars($codigo['discount_type_name']) . ' DEL ' . $codigo['discount_value'] . '%</div>';
+        if (!empty($codigo['end_date'])) {
+            $html .= '<div style="text-align:center;font-style:italic;color:#666">Válido hasta: ' . date('d/m/Y', strtotime($codigo['end_date'])) . '</div>';
+        } else {
+            $html .= '<div style="text-align:center;font-style:italic;color:#666">Sin fecha de expiración</div>';
+        }
+
+        // Información básica
+        $html .= '<h3 style="color:#006699">INFORMACIÓN DEL DESCUENTO</h3>';
+        $html .= '<table cellpadding="3" cellspacing="0" width="100%">';
+        $html .= '<tr><td style="width:25%;font-weight:bold">Tipo:</td><td>' . htmlspecialchars($codigo['discount_type_name']) . '</td></tr>';
+        $html .= '<tr><td style="font-weight:bold">Valor:</td><td>' . $codigo['discount_value'] . '% de descuento</td></tr>';
+        $html .= '<tr><td style="font-weight:bold">Usos máximos:</td><td>' . ($codigo['max_uses'] ? $codigo['max_uses'] : 'Ilimitados') . '</td></tr>';
+        $html .= '</table>';
+
+        if (!empty($productos)) {
+            $html .= '<h3 style="color:#006699">PRODUCTOS APLICABLES</h3>';
+            $html .= '<table width="100%" border="1" cellpadding="4" cellspacing="0">';
+            $html .= '<tr style="background:#006699;color:#fff"><th>Producto</th><th style="text-align:right">Precio</th></tr>';
+            foreach ($productos as $p) {
+                $html .= '<tr><td>' . htmlspecialchars($p['name']) . '</td><td style="text-align:right">$' . number_format($p['price'], 2, ',', '.') . '</td></tr>';
+            }
+            $html .= '</table>';
+        } else {
+            $html .= '<p>Este descuento aplica a todos los productos de la tienda.</p>';
+        }
+
+        $html .= '<div style="font-size:8pt;color:#666;margin-top:10px">Angelow Ropa Infantil</div>';
+        $html .= '</div>';
+
+        $pdf->writeHTML($html, true, false, true, false, '');
+
+        // Devolver contenido en memoria
+        return $pdf->Output('codigo_descuento_' . $codigo['code'] . '.pdf', 'S');
+    } catch (Exception $e) {
+        error_log('generateDiscountPdfContent error: ' . $e->getMessage());
+        return null;
+    }
+}
+
+// Si el archivo es accedido directamente por URL, responder con el PDF descargable.
+// Cuando se incluye el archivo (require_once) no queremos ejecutar nada.
+if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
+    // Archivo accedido directamente
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
     }
 
-    $html .= "\n    <h3 class=\"section-title\">T\xC9RMINOS Y CONDICIONES</h3>\n    <div class=\"terms\">\n        <p>1. Este c\xF3digo es v\xE1lido para una sola transacci\xF3n y no puede ser combinado con otras promociones.</p>\n        <p>2. El descuento aplica sobre el valor total de los productos antes de impuestos y env\xEDo.</p>\n        <p>3. Angelow se reserva el derecho de modificar o cancelar esta promoci\xF3n en cualquier momento.</p>\n        <p>4. Para reclamar el descuento, ingrese el c\xF3digo en el campo correspondiente durante el proceso de pago.</p>\n        <p>5. No aplica para compras anteriores a la fecha de generaci\xF3n del c\xF3digo.</p>\n    </div>\n    \n    <div class=\"footer\">\n        <strong>Angelow Ropa Infantil</strong><br>\n        NIT: 901234567-8 | Tel: +57 604 1234567 | Email: contacto@angelow.com<br>\n        Calle 10 # 40-20, Medell\xEDn, Antioquia - www.angelow.com\n    </div>";
+    $id = $_GET['id'] ?? 0;
+    $id = filter_var($id, FILTER_VALIDATE_INT);
+    if (!$id) {
+        header("HTTP/1.0 404 Not Found");
+        exit();
+    }
 
-    return $html;
+    try {
+        // Verificar autenticación y permisos de admin
+        if (!isset($_SESSION['user_id'])) {
+            throw new Exception("Usuario no autenticado");
+        }
+
+        $userStmt = $conn->prepare("SELECT role FROM users WHERE id = ?");
+        $userStmt->execute([$_SESSION['user_id']]);
+        $user = $userStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$user || $user['role'] !== 'admin') {
+            throw new Exception("Acceso no autorizado");
+        }
+
+        $pdfContent = generateDiscountPdfContent($id);
+        if (!$pdfContent) {
+            header("HTTP/1.0 404 Not Found");
+            exit();
+        }
+
+        // Limpiar buffers y enviar el PDF al navegador
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="codigo_descuento_' . $id . '.pdf"');
+        header('Cache-Control: private, max-age=0, must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . strlen($pdfContent));
+        echo $pdfContent;
+        exit();
+
+    } catch (Exception $e) {
+        while (ob_get_level()) { ob_end_clean(); }
+        http_response_code(403);
+        echo 'Acceso no autorizado';
+        exit();
+    }
 }
+?>
