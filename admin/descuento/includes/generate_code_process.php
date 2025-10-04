@@ -12,7 +12,9 @@ $max_uses = $_POST['max_uses'] ?: null;
 $start_date = $_POST['start_date'] ?: null;
 $end_date = $_POST['end_date'] ?: null;
 $is_single_use = isset($_POST['is_single_use']) ? 1 : 0;
-$is_active = isset($_POST['is_active']) ? 1 : 0;
+// Por defecto, al crear un nuevo código queremos que esté activo (1).
+// Si el formulario envía explícitamente is_active (checkbox presente), respetamos su valor.
+$is_active = isset($_POST['is_active']) ? 1 : null;
 $apply_to_all = isset($_POST['apply_to_all']) ? 1 : 0;
 $selected_products = json_decode($_POST['products'] ?? '[]', true) ?: [];
 // Usuarios seleccionados para notificación
@@ -87,6 +89,11 @@ try {
 
         if (!$generated) {
             throw new Exception('No se pudo generar un código único, intenta de nuevo');
+        }
+
+        // Si el formulario no indicó is_active, por defecto lo activamos
+        if ($is_active === null) {
+            $is_active = 1;
         }
 
         $insertSql = "INSERT INTO discount_codes (code, discount_type_id, discount_value, max_uses, start_date, end_date, is_active, is_single_use, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
