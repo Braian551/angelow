@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-function sendDiscountEmail($userId, $code, $discount_type, $discount_value, $expiry_date) {
+function sendDiscountEmail($userId, $code, $discount_type, $discount_value, $expiry_date, $pdfContent = null, $pdfFilename = null) {
     global $conn;
     
     // Obtener información del usuario
@@ -50,7 +50,7 @@ function sendDiscountEmail($userId, $code, $discount_type, $discount_value, $exp
 
         $expiry_text = $expiry_date ? 'Válido hasta: ' . date('d/m/Y', strtotime($expiry_date)) : 'Sin fecha de expiración';
 
-        $mail->Body = '
+    $mail->Body = '
 <!DOCTYPE html>
 <html>
 <head>
@@ -110,6 +110,15 @@ function sendDiscountEmail($userId, $code, $discount_type, $discount_value, $exp
     </div>
 </body>
 </html>';
+
+        // Si nos pasaron contenido PDF, adjuntarlo
+        if (!empty($pdfContent) && !empty($pdfFilename)) {
+            try {
+                $mail->addStringAttachment($pdfContent, $pdfFilename, 'base64', 'application/pdf');
+            } catch (Exception $e) {
+                error_log('Error adjuntando PDF al correo: ' . $e->getMessage());
+            }
+        }
 
         $mail->send();
         return true;

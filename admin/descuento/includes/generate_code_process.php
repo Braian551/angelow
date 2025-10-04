@@ -2,10 +2,11 @@
 // admin/descuento/includes/update_code_process.php
 
 // Debug: mostrar datos recibidos
-error_log("POST data recibida para actualización: " . print_r($_POST, true));
+error_log("POST data recibida para generación/actualización: " . print_r($_POST, true));
 
+// Si viene code_id es edición, si no es creación
 $code_id = $_POST['code_id'] ?? null;
-$discount_type = $_POST['discount_type'];
+$discount_type = $_POST['discount_type'] ?? ($_POST['discount_type_display'] ?? null);
 $discount_value = null;
 $max_uses = $_POST['max_uses'] ?: null;
 $start_date = $_POST['start_date'] ?: null;
@@ -14,17 +15,17 @@ $is_single_use = isset($_POST['is_single_use']) ? 1 : 0;
 $is_active = isset($_POST['is_active']) ? 1 : 0;
 $apply_to_all = isset($_POST['apply_to_all']) ? 1 : 0;
 $selected_products = json_decode($_POST['products'] ?? '[]', true) ?: [];
+// Usuarios seleccionados para notificación
+$selected_users = json_decode($_POST['selected_users'] ?? '[]', true) ?: [];
+// Flag para enviar notificación
+$send_notification = isset($_POST['send_notification']) ? true : false;
 
 // Validaciones básicas
-if (empty($code_id)) {
-    $_SESSION['alert'] = ['type' => 'error', 'message' => 'ID de código no válido'];
-    header("Location: generate_codes.php");
-    exit();
-}
+// En modo creación permitimos que $code_id sea nulo; no hacer redirect aquí
 
 if (empty($discount_type)) {
     $_SESSION['alert'] = ['type' => 'error', 'message' => 'Tipo de descuento es requerido'];
-    header("Location: generate_codes.php?action=generate&edit=" . $code_id);
+    header("Location: generate_codes.php?action=generate" . ($code_id ? '&edit=' . $code_id : ''));
     exit();
 }
 
@@ -68,25 +69,65 @@ if ($start_date && $end_date && strtotime($start_date) > strtotime($end_date)) {
 
 try {
     $conn->beginTransaction();
+    // Si no existe $code_id -> creamos un nuevo código, si existe -> actualizamos
+    if (empty($code_id)) {
+        // Generar código único simple (prefijo + aleatorio)
+        $generated = false;
+        $attempts = 0;
+        do {
+            $attempts++;
+            $code = strtoupper(substr(md5(uniqid('', true) . rand()), 0, 8));
+            // Verificar unicidad
+            $check = $conn->prepare("SELECT id FROM discount_codes WHERE code = ?");
+            $check->execute([$code]);
+            if ($check->rowCount() === 0) {
+                $generated = true;
+            }
+        } while (!$generated && $attempts < 5);
 
-    // Actualizar código de descuento principal
-    $sql = "UPDATE discount_codes 
+        if (!$generated) {
+            throw new Exception('No se pudo generar un código único, intenta de nuevo');
+        }
+
+        $insertSql = "INSERT INTO discount_codes (code, discount_type_id, discount_value, max_uses, start_date, end_date, is_active, is_single_use, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($insertSql);
+        $created_by = $_SESSION['user_id'] ?? 'admin';
+        $res = $stmt->execute([
+            $code,
+            $discount_type,
+            $discount_value,
+            $max_uses,
+            $start_date,
+            $end_date,
+            $is_active,
+            $is_single_use,
+            $created_by
+        ]);
+
+        if (!$res) {
+            throw new Exception('Error al insertar el código de descuento');
+        }
+
+        $code_id = $conn->lastInsertId();
+    } else {
+        // Actualizar código existente
+        $sql = "UPDATE discount_codes 
             SET discount_value = ?, max_uses = ?, start_date = ?, end_date = ?, is_single_use = ?, is_active = ?
             WHERE id = ?";
-    
-    $stmt = $conn->prepare($sql);
-    $result = $stmt->execute([
-        $discount_value,
-        $max_uses,
-        $start_date,
-        $end_date,
-        $is_single_use,
-        $is_active,
-        $code_id
-    ]);
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->execute([
+            $discount_value,
+            $max_uses,
+            $start_date,
+            $end_date,
+            $is_single_use,
+            $is_active,
+            $code_id
+        ]);
 
-    if (!$result) {
-        throw new Exception("Error al actualizar código principal");
+        if (!$result) {
+            throw new Exception("Error al actualizar código principal");
+        }
     }
 
     // Actualizar en la tabla específica según el tipo de descuento
@@ -164,8 +205,99 @@ try {
     }
 
     $conn->commit();
+    // Después de confirmar la transacción, enviar notificaciones si corresponde
+    $sent = 0;
+    $failed = 0;
 
-    $_SESSION['alert'] = ['type' => 'success', 'message' => 'Código de descuento actualizado exitosamente'];
+    if ($send_notification && !empty($selected_users)) {
+        // Incluir la función de envío
+        $sendFile = __DIR__ . '/../../api/descuento/send_discount_email.php';
+        if (file_exists($sendFile)) {
+            require_once $sendFile;
+
+            // Obtener el código y nombre del tipo si no los tenemos
+            if (empty($code)) {
+                $q = $conn->prepare("SELECT code FROM discount_codes WHERE id = ?");
+                $q->execute([$code_id]);
+                $row = $q->fetch(PDO::FETCH_ASSOC);
+                $code = $row['code'] ?? '';
+            }
+
+            $dtypeName = $discount_type;
+            try {
+                $q2 = $conn->prepare("SELECT name FROM discount_types WHERE id = ?");
+                $q2->execute([$discount_type]);
+                $dtypeName = $q2->fetchColumn() ?: $discount_type;
+            } catch (Exception $e) {
+                // ignorar, usar id si no hay nombre
+            }
+
+            // Generar PDF en memoria para adjuntar (reutiliza plantilla de admin/api/descuento/generate_pdf.php)
+            try {
+                // Cargar TCPDF
+                require_once __DIR__ . '/../../../vendor/autoload.php';
+                $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
+                $pdf->SetCreator(PDF_CREATOR);
+                $pdf->SetAuthor('Angelow Ropa Infantil');
+                $pdf->SetTitle('Código de Descuento ' . ($code ?: '')); 
+                $pdf->SetSubject('Código de Descuento');
+                $pdf->SetMargins(15, 25, 15);
+                $pdf->SetHeaderMargin(10);
+                $pdf->SetFooterMargin(15);
+                $pdf->setPrintFooter(true);
+                $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+                $pdf->SetFont('helvetica', '', 10);
+                $logoPath = __DIR__ . '/../../../images/logo2.png';
+                $logoExists = file_exists($logoPath);
+                $pdf->AddPage();
+
+                // Construir HTML simple (basado en generate_pdf.php)
+                $html = '<div style="text-align:center;">';
+                if ($logoExists) {
+                    $html .= '<img src="' . $logoPath . '" width="180"/>';
+                } else {
+                    $html .= '<h1>Angelow Ropa Infantil</h1>';
+                }
+                $html .= '<h2 style="color:#006699;">CÓDIGO DE DESCUENTO</h2>';
+                $html .= '<div style="font-size:28px;color:#006699;margin:10px 0;font-weight:bold;">' . htmlspecialchars($code) . '</div>';
+                $html .= '<div style="font-size:18px;color:#FF6600;margin-bottom:10px;">' . htmlspecialchars($dtypeName) . ' ' . htmlspecialchars($discount_value) . '%</div>';
+                if ($end_date) {
+                    $html .= '<div style="font-style:italic;color:#666;">Válido hasta: ' . date('d/m/Y', strtotime($end_date)) . '</div>';
+                } else {
+                    $html .= '<div style="font-style:italic;color:#666;">Sin fecha de expiración</div>';
+                }
+                $html .= '</div>';
+
+                $pdf->writeHTML($html, true, false, true, false, '');
+                $pdfContent = $pdf->Output('codigo_descuento_' . $code . '.pdf', 'S');
+                $pdfFilename = 'codigo_descuento_' . $code . '.pdf';
+            } catch (Exception $e) {
+                error_log('Error generando PDF para adjuntar: ' . $e->getMessage());
+                $pdfContent = null;
+                $pdfFilename = null;
+            }
+
+            foreach ($selected_users as $userId) {
+                try {
+                    $ok = sendDiscountEmail($userId, $code, $dtypeName, $discount_value, $end_date, $pdfContent, $pdfFilename);
+                    if ($ok) $sent++; else $failed++;
+                } catch (Exception $e) {
+                    error_log('Error enviando email a usuario ' . $userId . ': ' . $e->getMessage());
+                    $failed++;
+                }
+            }
+        } else {
+            error_log('No se encontró el archivo de envío de emails: ' . $sendFile);
+        }
+    }
+
+    // Preparar mensaje final
+    $message = 'Código de descuento guardado exitosamente.';
+    if ($send_notification) {
+        $message .= ' Correos enviados: ' . $sent . '. Fallidos: ' . $failed . '.';
+    }
+
+    $_SESSION['alert'] = ['type' => 'success', 'message' => $message];
     header("Location: generate_codes.php");
     exit();
 } catch (PDOException $e) {
