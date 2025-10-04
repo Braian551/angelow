@@ -115,6 +115,10 @@ try {
                     <span>3</span>
                     <p>Pago</p>
                 </div>
+                <div class="step">
+                    <span>4</span>
+                    <p>Confirmación</p>
+                </div>
             </div>
         </div>
 
@@ -231,13 +235,7 @@ try {
 
                     </div>
 
-                    <div class="cart-promo">
-                        <h4>¿Tienes un código de descuento?</h4>
-                        <div class="promo-form">
-                            <input type="text" placeholder="Ingresa tu código" class="promo-input">
-                            <button class="btn btn-outline promo-btn">Aplicar</button>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         <?php endif; ?>
