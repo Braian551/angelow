@@ -136,25 +136,25 @@
                                 </td>
                                 <td class="actions">
                                     <button class="btn btn-sm btn-copy"
-                                        data-tooltip="Copiar código"
+                                        title="Copiar código"
                                         data-code="<?= htmlspecialchars($codigo['code']) ?>">
                                         <i class="fas fa-copy"></i>
                                     </button>
 
                                     <a href="<?= BASE_URL ?>/admin/api/descuento/generate_pdf.php?id=<?= $codigo['id'] ?>"
                                         class="btn btn-sm btn-pdf"
-                                        data-tooltip="Descargar PDF">
+                                        title="Descargar PDF">
                                         <i class="fas fa-file-pdf"></i>
                                     </a>
 
                                     <a href="generate_codes.php?action=generate&edit=<?= $codigo['id'] ?>"
                                         class="btn btn-sm btn-edit"
-                                        data-tooltip="Editar código">
+                                        title="Editar código">
                                         <i class="fas fa-edit"></i>
                                     </a>
 
                                     <button class="btn btn-sm btn-status"
-                                        data-tooltip="<?= $isActive ? 'Desactivar' : 'Activar' ?>"
+                                        title="<?= $isActive ? 'Desactivar' : 'Activar' ?>"
                                         data-id="<?= $codigo['id'] ?>"
                                         data-active="<?= $isActive ? '1' : '0' ?>">
                                         <i class="fas fa-<?= $isActive ? 'pause' : 'play' ?>"></i>
@@ -162,7 +162,7 @@
 
                                     <a href="generate_codes.php?action=delete&id=<?= $codigo['id'] ?>"
                                         class="btn btn-sm btn-delete"
-                                        data-tooltip="Eliminar código"
+                                        title="Eliminar código"
                                         onclick="return confirm('¿Estás seguro de eliminar este código?')">
                                         <i class="fas fa-trash"></i>
                                     </a>
