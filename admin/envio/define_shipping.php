@@ -255,7 +255,7 @@ if (isset($_SESSION['alert'])) {
                         <i class="fas fa-shipping-fast"></i> Métodos de Envío - Medellín
                     </h1>
                     <div class="breadcrumb">
-                        <a href="<?= BASE_URL ?>/admin">Dashboard</a> / <a href="<?= BASE_URL ?>/admin/envio/shipping_rules.php">Envios</a> / <span>Definir métodos</span>
+                        <a href="<?= BASE_URL ?>/admin">Dashboard</a> / <span>Envíos</span>  / <span>Definir métodos</span>
                     </div>
                 </div>
 

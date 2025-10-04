@@ -504,12 +504,15 @@ textarea.form-control {
 }
 
 .data-table td {
-  padding: 1.4rem 1.6rem;
-  border-bottom: 1px solid var(--border-color);
-  vertical-align: middle;
-  color: var(--text-medium);
-  background-color: var(--bg-card);
-  transition: var(--transition-fast);
+    padding: 1.4rem 1.6rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+    color: var(--text-medium);
+    background-color: var(--bg-card);
+    transition: var(--transition-fast);
+    /* Cambiar altura fija por automática */
+    height: auto;
+    min-height: 80px;
 }
 
 .data-table tr:last-child td {
@@ -576,8 +579,13 @@ textarea.form-control {
 
 /* ACCIONES DE TABLA */
 .actions {
-  display: flex;
-  gap: var(--space-sm);
+    display: flex;
+    gap: var(--space-sm);
+    height: 100%;
+    min-height: 60px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .btn-sm {
