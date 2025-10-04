@@ -527,7 +527,7 @@ if ($action === 'edit' && $id) {
                         <?php else: ?>
                             <div class="addresses-grid">
                                 <?php foreach ($addresses as $address): ?>
-                                    <div class="address-card <?= $address['is_default'] ? 'default-address' : '' ?> animate__animated animate__fadeInUp">
+                                    <div class="address-card <?= $address['is_default'] ? 'default-address' : '' ?> animate__animated animate__fadeInUp" data-id="<?= $address['id'] ?>">
                                         <div class="address-header">
                                             <div class="address-icon">
                                                 <?php if ($address['address_type'] === 'casa'): ?>
@@ -689,20 +689,58 @@ if ($action === 'edit' && $id) {
                 }
             );
             
-            // Seleccionar dirección para compras futuras
+            // Seleccionar dirección para compras futuras y establecer como principal vía AJAX
             $('.address-card').click(function(e) {
                 if (!$(e.target).closest('.address-actions a').length) {
-                    const addressId = $(this).find('.address-actions a').attr('href').match(/id=(\d+)/)[1];
-                    
+                    const $card = $(this);
+                    const addressId = $card.data('id') || $card.find('.address-actions a').attr('href').match(/id=(\d+)/)[1];
+
                     // Guardar en localStorage para futuras compras
                     localStorage.setItem('selectedAddressId', addressId);
-                    
+
                     // Feedback visual
                     $('.address-card').removeClass('selected-address');
-                    $(this).addClass('selected-address animate__animated animate__pulse');
-                    
-                    // Mostrar notificación
-                    showNotification('Dirección seleccionada para tus próximas compras', 'success');
+                    $card.addClass('selected-address animate__animated animate__pulse');
+
+                    // Llamada AJAX para establecer como principal
+                    $.post('ajax_set_default.php', { id: addressId }, function(resp) {
+                        try {
+                            const data = typeof resp === 'object' ? resp : JSON.parse(resp);
+                            if (data.success) {
+                                // Actualizar badges y clases
+                                $('.address-card').removeClass('default-address');
+                                $('.address-card .default-badge').remove();
+
+                                $card.addClass('default-address');
+                                $card.find('.address-header').append('<div class="default-badge"><i class="fas fa-star"></i> Principal</div>');
+
+                                showNotification('Dirección seleccionada para tus próximas compras, ahora es tu dirección principal', 'success');
+                            } else {
+                                showNotification(data.message || 'No se pudo establecer como principal', 'error');
+                            }
+                        } catch (err) {
+                            showNotification('Respuesta inesperada del servidor', 'error');
+                        }
+                    }).fail(function(jqXHR, textStatus, errorThrown) {
+                        // Log detallado para depuración
+                        console.error('AJAX error:', textStatus, errorThrown);
+                        console.error('Response:', jqXHR.responseText);
+
+                        // Intentar mostrar mensaje enviado por el servidor (JSON)
+                        let serverMessage = null;
+                        try {
+                            const parsed = JSON.parse(jqXHR.responseText);
+                            serverMessage = parsed.message || parsed.error || null;
+                        } catch (e) {
+                            // no es JSON
+                        }
+
+                        if (serverMessage) {
+                            showNotification(serverMessage, 'error');
+                        } else {
+                            showNotification('Error al comunicarse con el servidor (ver consola para más detalles)', 'error');
+                        }
+                    });
                 }
             });
             

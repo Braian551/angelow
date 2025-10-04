@@ -43,7 +43,7 @@
                         <button type="submit" name="action" value="deactivate" class="btn btn-deactivate" id="bulk-deactivate" disabled title="Desactivar seleccionados">
                             <i class="fas fa-pause"></i>
                         </button>
-                        <button type="submit" name="action" value="delete" class="btn btn-delete" id="bulk-delete" disabled title="Eliminar seleccionados" onclick="return confirm('¿Estás seguro de realizar esta acción sobre los códigos seleccionados? Se eliminarán permanentemente.');">
+                        <button type="button" name="action" value="delete" class="btn btn-delete" id="bulk-delete" disabled title="Eliminar seleccionados">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -160,12 +160,11 @@
                                         <i class="fas fa-<?= $isActive ? 'pause' : 'play' ?>"></i>
                                     </button>
 
-                                    <a href="generate_codes.php?action=delete&id=<?= $codigo['id'] ?>"
-                                        class="btn btn-sm btn-delete"
+                                    <button type="button" class="btn btn-sm btn-delete btn-delete-row"
                                         title="Eliminar código"
-                                        onclick="return confirm('¿Estás seguro de eliminar este código?')">
+                                        data-id="<?= $codigo['id'] ?>">
                                         <i class="fas fa-trash"></i>
-                                    </a>
+                                    </button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -182,6 +181,8 @@
 </div>
 
 <?php require_once __DIR__ . '/../../../admin/descuento/modals/modal_desactivar.php'; ?>
+<?php require_once __DIR__ . '/../../../admin/descuento/modals/modal_eliminar.php'; ?>
+<?php require_once __DIR__ . '/../../../admin/descuento/modals/modal_bulk_delete.php'; ?>
 
 <script>
 // Bulk select/enable buttons logic

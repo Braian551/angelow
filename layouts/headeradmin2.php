@@ -95,7 +95,7 @@ try {
                 </a>
                 <ul class="submenu">
                     <li><a href="<?= BASE_URL ?>/admin/envio/shipping_rules.php">Reglas por precio</a></li>
-                    <li><a href="<?= BASE_URL ?>/admin/envio/definirenvi.php">Definir envíos</a></li>
+                    <li><a href="<?= BASE_URL ?>/admin/envio/define_shipping.php">Definir envíos</a></li>
                 </ul>
             </li>
 
