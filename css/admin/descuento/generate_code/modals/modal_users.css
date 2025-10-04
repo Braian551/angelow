@@ -1,0 +1,232 @@
+/* ===== ESTILOS ESPECÍFICOS PARA MODAL DE USUARIOS ===== */
+#user-modal .modal-content {
+  max-width: 800px;
+}
+
+#user-modal .user-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+#user-modal .user-actions button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 1.3rem;
+}
+
+#user-modal .selected-count {
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
+.modal-body .search-container {
+  margin-bottom: var(--space-md);
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.modal-body .search-container input {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.modal-body .search-container button {
+  padding: 0.8rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.modal-body .selection-options {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+
+.modal-body .selection-options button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 1.3rem;
+}
+
+.modal-body .table-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.modal-body .table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-body .table-container th {
+  position: sticky;
+  top: 0;
+  color: white;
+  padding: 1rem;
+}
+
+.modal-body .table-container td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-body .table-container tr:last-child td {
+  border-bottom: none;
+}
+
+.modal-body .table-container tr:hover {
+  background-color: var(--bg-hover);
+}
+
+.modal-body .select-all-checkbox {
+  margin-right: var(--space-sm);
+}
+
+/* Tabla de usuarios en modal */
+#users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.4rem;
+  background-color: var(--bg-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+#users-table th {
+  text-align: left;
+  padding: 1.2rem 1.6rem;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+}
+
+#users-table td {
+  padding: 1.2rem 1.6rem;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+  color: var(--text-medium);
+  background-color: var(--bg-light);
+  transition: var(--transition-fast);
+}
+
+#users-table tr:last-child td {
+  border-bottom: none;
+}
+
+#users-table tr:hover td {
+  background-color: var(--bg-hover);
+}
+
+.select-user {
+  padding: 0.8rem 1.6rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-bounce);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.select-user:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-md);
+}
+
+.select-user:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.select-user i {
+  font-size: 1.2rem;
+}
+
+.user-selection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.user-selection label {
+  font-size: 1.4rem;
+  color: var(--text-dark);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+#open-user-modal {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* ESTADOS DE CARGA Y ERROR */
+#search-loading,
+#no-users-found,
+#search-error {
+  padding: var(--space-xl);
+  text-align: center;
+  background-color: var(--bg-light);
+  border-radius: var(--radius-md);
+  margin: var(--space-md) 0;
+}
+
+#search-loading i {
+  font-size: 3rem;
+  margin-bottom: var(--space-sm);
+  color: var(--primary-color);
+  animation: spin 1.5s linear infinite;
+}
+
+#no-users-found i {
+  font-size: 3rem;
+  margin-bottom: var(--space-sm);
+  color: var(--text-lighter);
+}
+
+#search-error {
+  background-color: var(--error-light);
+  color: var(--error-color);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+}
+
+#search-error i {
+  font-size: 2rem;
+}
+
+.user-info-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-sm);
+}

@@ -1,0 +1,117 @@
+/* ===== ESTILOS ESPECÍFICOS PARA MODAL DE PRODUCTOS ===== */
+#products-modal .modal-content {
+  max-width: 800px;
+}
+
+#products-modal .product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-sm);
+  max-height: 400px;
+  overflow-y: auto;
+  padding: var(--space-sm);
+}
+
+#products-modal .product-item {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+#products-modal .product-item:hover {
+  border-color: var(--primary-color);
+}
+
+#products-modal .product-item.selected {
+  background-color: var(--primary-lightest);
+  border-color: var(--primary-color);
+}
+
+#products-modal .product-checkbox {
+  margin-right: var(--space-xs);
+}
+
+#products-modal .product-name {
+  font-weight: 500;
+}
+
+/* Estilos mejorados para la tabla de productos en el modal */
+.modal-body .data-table {
+  font-size: 0.9em;
+}
+
+.modal-body .data-table th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.product-image {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.stock-low {
+  color: #f44336;
+  font-weight: bold;
+}
+
+.stock-medium {
+  color: #ff9800;
+}
+
+.stock-high {
+  color: #4caf50;
+}
+
+.status-active {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.status-inactive {
+  color: #f44336;
+}
+
+tr.selected {
+  background-color: #e3f2fd !important;
+}
+
+tr.selected td {
+  border-color: #2196f3;
+}
+
+/* Estilos para la selección de productos */
+.product-selection-row {
+  transition: background-color 0.2s ease;
+}
+
+.product-selection-row:hover {
+  background-color: #f8f9fa;
+}
+
+.product-selection-row.selected {
+  background-color: #e3f2fd;
+  border-left: 3px solid #2196f3;
+}
+
+/* Mejoras de responsive para modal de productos */
+@media (max-width: 768px) {
+  #products-modal .modal-content {
+    width: 98%;
+    margin: 1%;
+  }
+
+  .modal-body .table-container {
+    max-height: 300px;
+  }
+
+  .modal-body .data-table {
+    font-size: 0.8em;
+  }
+}

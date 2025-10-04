@@ -1,0 +1,321 @@
+/* ===== ESTILOS ESPECÍFICOS DE TABLAS ===== */
+.discount-code {
+  font-family: monospace;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  margin-left: var(--space-xs);
+}
+
+.badge-info {
+  background-color: var(--info-light);
+  color: var(--info-color);
+}
+
+.table-responsive {
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.4rem;
+  min-width: 600px;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 1.4rem 1.6rem;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.data-table th:first-child {
+  border-top-left-radius: var(--radius-lg);
+}
+
+.data-table th:last-child {
+  border-top-right-radius: var(--radius-lg);
+}
+
+.data-table td {
+  padding: 1.4rem 1.6rem;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+  color: var(--text-medium);
+  background-color: var(--bg-card);
+  transition: var(--transition-fast);
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tr:hover td {
+  background-color: var(--bg-hover);
+  transform: scale(1.005);
+}
+
+#no-results {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  background-color: var(--bg-card);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  border-top: 1px solid var(--border-color);
+}
+
+#no-results i {
+  font-size: 5rem;
+  color: var(--text-lighter);
+  margin-bottom: var(--space-md);
+}
+
+#no-results p {
+  font-size: 1.6rem;
+  color: var(--text-medium);
+  margin-bottom: var(--space-md);
+  text-align: center;
+}
+
+/* BADGES DE ESTADO */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  gap: var(--space-xs);
+  transition: var(--transition);
+}
+
+.status-badge i {
+  font-size: 1rem;
+}
+
+.status-badge.active {
+  background-color: var(--success-light);
+  color: var(--success-color);
+  box-shadow: 0 1px 2px 0 rgba(22, 163, 74, 0.1);
+}
+
+.status-badge.inactive {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: var(--text-light);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* ACCIONES DE TABLA - MEJORADO */
+.actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+.btn-sm {
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-bounce);
+  font-size: 1.4rem;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-sm::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 0;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.5, 1.6, 0.4, 0.7);
+}
+
+.btn-sm:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.btn-sm i {
+  position: relative;
+  z-index: 1;
+}
+
+/* Botón Copiar - Azul */
+.btn-copy {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--primary-color);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.btn-copy:hover {
+  background-color: rgba(37, 99, 235, 0.2);
+  color: var(--primary-hover);
+  transform: translateY(-2px) scale(1.1);
+}
+
+/* Botón PDF - Verde */
+.btn-pdf {
+  background-color: rgba(22, 163, 74, 0.1);
+  color: var(--success-color);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.btn-pdf:hover {
+  background-color: rgba(22, 163, 74, 0.2);
+  color: var(--success-color);
+  transform: translateY(-2px) scale(1.1);
+}
+
+/* Botón Eliminar - Rojo */
+.btn-delete {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: var(--error-color);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.btn-delete:hover {
+  background-color: rgba(220, 38, 38, 0.2);
+  color: var(--error-hover);
+  transform: translateY(-2px) scale(1.1);
+}
+
+/* Botón Editar - Amarillo */
+.btn-edit {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning-color);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.btn-edit:hover {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: var(--warning-color);
+  transform: translateY(-2px) scale(1.1);
+}
+
+/* Botón Estado - Púrpura */
+.btn-status {
+  background-color: rgba(147, 51, 234, 0.1);
+  color: #9333ea;
+  border: 1px solid rgba(147, 51, 234, 0.2);
+}
+
+.btn-status:hover {
+  background-color: rgba(147, 51, 234, 0.2);
+  color: #7c3aed;
+  transform: translateY(-2px) scale(1.1);
+}
+
+/* Responsive de tablas */
+@media (max-width: 768px) {
+  .data-table th,
+  .data-table td {
+    padding: 1.2rem;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
+/* Estilos para tooltips en botones - MEJORADO */
+.btn-sm[data-tooltip] {
+  position: relative;
+}
+
+.btn-sm[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--text-dark);
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 1.2rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+  pointer-events: none;
+  z-index: 1000;
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+  min-width: max-content;
+}
+
+.btn-sm[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-8px);
+}
+
+/* Tooltip para enlaces también */
+a.btn-sm[data-tooltip] {
+  position: relative;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+a.btn-sm[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--text-dark);
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 1.2rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+  pointer-events: none;
+  z-index: 1000;
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+  min-width: max-content;
+}
+
+a.btn-sm[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-8px);
+}
