@@ -1,0 +1,322 @@
+/* ===== BULK ACTIONS HEADER - ESTILOS PROFESIONALES UNIFICADOS ===== */
+.bulk-header {
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md) var(--space-lg);
+    margin-bottom: var(--space-lg);
+    box-shadow: var(--glass-shadow);
+    transition: var(--transition-slow);
+}
+
+.bulk-header:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--border-dark);
+}
+
+.bulk-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.bulk-title i {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    background-color: var(--primary-lightest);
+    width: 3.2rem;
+    height: 3.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.bulk-title strong {
+    font-size: 1.6rem;
+    color: var(--text-dark);
+    font-weight: 700;
+}
+
+.bulk-sub {
+    font-size: 1.3rem;
+    color: var(--text-light);
+    margin-left: auto;
+    font-weight: 500;
+}
+
+.bulk-actions-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--border-color);
+}
+
+.bulk-actions-bar label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 1.4rem;
+    color: var(--text-medium);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.bulk-actions-bar label:hover {
+    color: var(--primary-color);
+}
+
+.bulk-actions-bar input[type="checkbox"] {
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.bulk-actions-bar input[type="checkbox"]:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* ===== BOTONES DE ACCIONES MASIVAS - UNIFICADOS CON LA TABLA ===== */
+.bulk-actions-bar .btn {
+    width: 3.4rem;
+    height: 3.4rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-bounce);
+    font-size: 1.4rem;
+    position: relative;
+    overflow: hidden;
+    border: none;
+    cursor: pointer;
+}
+
+.bulk-actions-bar .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.bulk-actions-bar .btn:not(:disabled):hover {
+    transform: translateY(-2px) scale(1.1);
+}
+
+.bulk-actions-bar .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 0;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s cubic-bezier(0.5, 1.6, 0.4, 0.7);
+}
+
+.bulk-actions-bar .btn:not(:disabled):hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.bulk-actions-bar .btn i {
+    position: relative;
+    z-index: 1;
+}
+
+/* Botón Activar - Mismo estilo que la tabla */
+.bulk-actions-bar .btn-activate {
+    background-color: rgba(147, 51, 234, 0.1);
+    color: #9333ea;
+    border: 1px solid rgba(147, 51, 234, 0.2);
+}
+
+.bulk-actions-bar .btn-activate:not(:disabled):hover {
+    background-color: rgba(147, 51, 234, 0.2);
+    color: #7c3aed;
+}
+
+/* Botón Desactivar - Mismo estilo que la tabla */
+.bulk-actions-bar .btn-deactivate {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning-color);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.bulk-actions-bar .btn-deactivate:not(:disabled):hover {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: var(--warning-color);
+}
+
+/* Botón Eliminar - Mismo estilo que la tabla */
+.bulk-actions-bar .btn-delete {
+    background-color: rgba(220, 38, 38, 0.1);
+    color: var(--error-color);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.bulk-actions-bar .btn-delete:not(:disabled):hover {
+    background-color: rgba(220, 38, 38, 0.2);
+    color: var(--error-hover);
+}
+
+/* Tooltips para botones del bulk actions */
+.bulk-actions-bar .btn[title] {
+    position: relative;
+}
+
+.bulk-actions-bar .btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--text-dark);
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 1.2rem;
+    white-space: nowrap;
+    opacity: 1;
+    visibility: visible;
+    z-index: 1000;
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 8px;
+}
+
+.bulk-actions-bar .btn[title]::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--text-dark);
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 1.2rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    pointer-events: none;
+    z-index: 1000;
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 8px;
+}
+
+.bulk-actions-bar .btn[title]:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-8px);
+}
+
+/* ===== ESTADOS DE BOTONES DESHABILITADOS MEJORADOS ===== */
+.bulk-actions-bar .btn:disabled {
+    background-color: rgba(107, 114, 128, 0.1) !important;
+    color: var(--text-light) !important;
+    border-color: rgba(107, 114, 128, 0.2) !important;
+    cursor: not-allowed;
+}
+
+.bulk-actions-bar .btn:disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.bulk-actions-bar .btn:disabled:hover::before {
+    transform: scaleX(0) !important;
+}
+
+/* ===== RESPONSIVE PARA BULK ACTIONS ===== */
+@media (max-width: 768px) {
+    .bulk-header {
+        padding: var(--space-md);
+    }
+    
+    .bulk-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
+    }
+    
+    .bulk-sub {
+        margin-left: 0;
+        font-size: 1.2rem;
+    }
+    
+    .bulk-actions-bar {
+        gap: var(--space-sm);
+    }
+    
+    .bulk-actions-bar label {
+        font-size: 1.3rem;
+    }
+
+    .bulk-actions-bar .btn {
+        width: 3.2rem;
+        height: 3.2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .bulk-actions-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+    
+    .bulk-actions-bar .btn {
+        width: 100%;
+        justify-content: flex-start;
+        padding-left: var(--space-md);
+        height: 3.6rem;
+    }
+
+    .bulk-actions-bar .btn i {
+        margin-right: var(--space-sm);
+    }
+}
+
+/* ===== ANIMACIONES ESPECÍFICAS PARA BULK ACTIONS ===== */
+@keyframes bulkActionPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(37, 99, 235, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+    }
+}
+
+.bulk-actions-bar .btn:not(:disabled):active {
+    animation: bulkActionPulse 0.3s ease-out;
+}
+
+/* ===== INDICADOR VISUAL DE SELECCIÓN MASIVA ===== */
+.bulk-header.has-selection {
+    border-left: 4px solid var(--primary-color);
+    background: linear-gradient(135deg, var(--glass-bg), var(--primary-lightest));
+}
+
+.bulk-header.has-selection .bulk-title i {
+    background-color: var(--primary-color);
+    color: white;
+    animation: spin 1s ease-in-out;
+}

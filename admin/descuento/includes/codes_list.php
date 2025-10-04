@@ -23,21 +23,48 @@
                 </a>
             </div>
         <?php else: ?>
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Tipo</th>
-                            <th>Valor</th>
-                            <th>Usos</th>
-                            <th>Válido hasta</th>
-                            <th>Productos</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <!-- Bulk actions form -->
+            <form id="bulk-form" method="post" action="includes/bulk_codes_action.php">
+                <!-- Header de acciones masivas - MEJORADO -->
+                <div class="bulk-header">
+                    <div class="bulk-title">
+                        <i class="fas fa-layer-group"></i>
+                        <strong>Acciones en lote</strong>
+                        <span class="bulk-sub">Selecciona varios códigos para activar, desactivar o eliminar</span>
+                    </div>
+                    <div class="bulk-actions-bar">
+                        <label>
+                            <input type="checkbox" id="select-all"> 
+                            <span>Seleccionar todos</span>
+                        </label>
+                        <button type="submit" name="action" value="activate" class="btn btn-activate" id="bulk-activate" disabled title="Activar seleccionados">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button type="submit" name="action" value="deactivate" class="btn btn-deactivate" id="bulk-deactivate" disabled title="Desactivar seleccionados">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                        <button type="submit" name="action" value="delete" class="btn btn-delete" id="bulk-delete" disabled title="Eliminar seleccionados" onclick="return confirm('¿Estás seguro de realizar esta acción sobre los códigos seleccionados? Se eliminarán permanentemente.');">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th width="50"></th>
+                                <th>Código</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Usos</th>
+                                <th>Válido hasta</th>
+                                <th>Productos</th>
+                                <th>Estado</th>
+                                <th width="220">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                         <?php foreach ($codigos as $codigo):
                             // Determinar estado del código
                             $isActive = $codigo['is_active'] ?? true;
@@ -56,6 +83,9 @@
                             }
                         ?>
                             <tr data-searchable="<?= htmlspecialchars(strtolower($codigo['code'])) ?>">
+                                <td>
+                                    <input type="checkbox" name="ids[]" class="row-checkbox" value="<?= (int)$codigo['id'] ?>">
+                                </td>
                                 <td>
                                     <span class="discount-code"><?= htmlspecialchars($codigo['code']) ?></span>
                                     <?php if ($codigo['is_single_use']): ?>
@@ -140,14 +170,58 @@
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
-                </table>
-                <div id="no-results" class="empty-state" style="display: none;">
-                    <i class="fas fa-search-minus"></i>
-                    <p>No se encontraron códigos que coincidan con tu búsqueda</p>
+                    </table>
                 </div>
+            </form>
+            <div id="no-results" class="empty-state" style="display: none;">
+                <i class="fas fa-search-minus"></i>
+                <p>No se encontraron códigos que coincidan con tu búsqueda</p>
             </div>
         <?php endif; ?>
     </div>
 </div>
 
 <?php require_once __DIR__ . '/../../../admin/descuento/modals/modal_desactivar.php'; ?>
+
+<script>
+// Bulk select/enable buttons logic
+document.addEventListener('DOMContentLoaded', function(){
+    const selectAll = document.getElementById('select-all');
+    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+    const bulkButtons = [document.getElementById('bulk-activate'), document.getElementById('bulk-deactivate'), document.getElementById('bulk-delete')];
+
+    function updateBulkButtons(){
+        const anyChecked = Array.from(rowCheckboxes).some(cb => cb.checked);
+        bulkButtons.forEach(b => { 
+            if (b) {
+                b.disabled = !anyChecked;
+                // Agregar efecto visual cuando está habilitado
+                if (!b.disabled) {
+                    b.style.opacity = '1';
+                    b.style.cursor = 'pointer';
+                } else {
+                    b.style.opacity = '0.5';
+                    b.style.cursor = 'not-allowed';
+                }
+            }
+        });
+    }
+
+    if(selectAll){
+        selectAll.addEventListener('change', function(){
+            rowCheckboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateBulkButtons();
+        });
+    }
+
+    rowCheckboxes.forEach(cb => cb.addEventListener('change', function(){
+        // If any unchecked, uncheck selectAll
+        if (!cb.checked && selectAll) selectAll.checked = false;
+        // If all checked, check selectAll
+        if (selectAll) selectAll.checked = Array.from(rowCheckboxes).every(cb2 => cb2.checked);
+        updateBulkButtons();
+    }));
+
+    updateBulkButtons();
+});
+</script>
