@@ -1,5 +1,5 @@
 <?php
-// admin/api/descuento/generate_pdf.php
+// admin/api/descuento/pdf_helpers.php
 
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use TCPDF;
 
-// Configurar manejo de errores
+// Configurar manejo de errores para obtener excepciones en lugar de warnings/notices
 set_error_handler(function($severity, $message, $file, $line) {
     throw new ErrorException($message, 0, $severity, $file, $line);
 });
@@ -18,7 +18,6 @@ set_error_handler(function($severity, $message, $file, $line) {
  */
 function generateDiscountPdfContent(int $id)
 {
-    // Usa la conexión disponible en el contexto global
     global $conn;
 
     try {
@@ -52,7 +51,7 @@ function generateDiscountPdfContent(int $id)
             $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
-        // Crear el PDF en memoria
+        // Crear el PDF en memoria con la misma configuración y HTML que generate_pdf.php
         $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
         $pdf->SetCreator(PDF_CREATOR);
         $pdf->SetAuthor('Angelow Ropa Infantil');
@@ -69,49 +68,218 @@ function generateDiscountPdfContent(int $id)
         $logoExists = file_exists($logoPath);
         $pdf->AddPage();
 
-        // Construir HTML (igual que en el script principal)
-        $html = '';
-        // ... construimos el mismo HTML que usa el script (simplificado llamando a la parte existente)
-        // Para mantener la misma apariencia usamos el HTML que ya existe más abajo creando una copia ligera aquí
+        // Reproducir exactamente el HTML y estilos de generate_pdf.php
+        $html = '
+    <style>
+        .header-title {
+            color: #006699;
+            font-size: 16pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .header-subtitle {
+            color: #666666;
+            font-size: 10pt;
+            margin-top: 0;
+        }
+        .section-title {
+            color: #006699;
+            padding: 6px 8px;
+            font-size: 11pt;
+            font-weight: bold;
+            margin-top: 15px;
+            border-radius: 3px;
+        }
+        .label {
+            font-weight: bold;
+            color: #333333;
+            width: 120px;
+            display: inline-block;
+        }
+        .value {
+            color: #555555;
+        }
+        .footer {
+            font-size: 8pt;
+            color: #666666;
+            text-align: center;
+            border-top: 1px solid #CCCCCC;
+            padding-top: 8px;
+            margin-top: 20px;
+        }
+        .discount-code {
+            font-size: 24pt;
+            color: #006699;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            letter-spacing: 3px;
+        }
+        .discount-value {
+            font-size: 18pt;
+            color: #FF6600;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .validity {
+            font-size: 10pt;
+            color: #666666;
+            text-align: center;
+            font-style: italic;
+        }
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .product-table th {
+            background-color: #006699;
+            color: #FFFFFF;
+            border: 1px solid #DDDDDD;
+            padding: 8px;
+            font-weight: bold;
+            font-size: 9pt;
+        }
+        .product-table td {
+            border: 1px solid #DDDDDD;
+            padding: 8px;
+            font-size: 9pt;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .terms {
+            font-size: 8pt;
+            color: #666666;
+            margin-top: 15px;
+            border-top: 1px solid #EEEEEE;
+            padding-top: 10px;
+        }
+        .company-info {
+            font-size: 9pt;
+            color: #666666;
+            line-height: 1.4;
+        }
+        .barcode {
+            text-align: center;
+            margin: 15px 0;
+        }
+    </style>
 
-        $html .= '<div style="font-family:helvetica">';
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td width="40%">';
+
         if ($logoExists) {
-            $html .= '<div style="text-align:left;"><img src="' . $logoPath . '" width="180"/></div>';
+            $html .= '<img src="' . $logoPath . '" width="180">';
         } else {
-            $html .= '<h1 style="color:#006699">Angelow Ropa Infantil</h1>';
-        }
-        $html .= '<h2 style="text-align:center;color:#006699">CÓDIGO DE DESCUENTO</h2>';
-        $html .= '<div style="text-align:center;font-size:24pt;color:#006699;font-weight:bold;letter-spacing:3px;">' . htmlspecialchars($codigo['code']) . '</div>';
-        $html .= '<div style="text-align:center;font-size:18pt;color:#FF6600;margin-bottom:10px;">' . htmlspecialchars($codigo['discount_type_name']) . ' DEL ' . $codigo['discount_value'] . '%</div>';
-        if (!empty($codigo['end_date'])) {
-            $html .= '<div style="text-align:center;font-style:italic;color:#666">Válido hasta: ' . date('d/m/Y', strtotime($codigo['end_date'])) . '</div>';
-        } else {
-            $html .= '<div style="text-align:center;font-style:italic;color:#666">Sin fecha de expiración</div>';
+            $html .= '<h1 class="header-title">Angelow Ropa Infantil</h1>
+                  <p class="header-subtitle">Moda infantil de calidad</p>';
         }
 
-        // Información básica
-        $html .= '<h3 style="color:#006699">INFORMACIÓN DEL DESCUENTO</h3>';
-        $html .= '<table cellpadding="3" cellspacing="0" width="100%">';
-        $html .= '<tr><td style="width:25%;font-weight:bold">Tipo:</td><td>' . htmlspecialchars($codigo['discount_type_name']) . '</td></tr>';
-        $html .= '<tr><td style="font-weight:bold">Valor:</td><td>' . $codigo['discount_value'] . '% de descuento</td></tr>';
-        $html .= '<tr><td style="font-weight:bold">Usos máximos:</td><td>' . ($codigo['max_uses'] ? $codigo['max_uses'] : 'Ilimitados') . '</td></tr>';
-        $html .= '</table>';
+        $html .= '
+            </td>
+            <td width="60%" style="text-align: right; vertical-align: top;">
+                <h1 class="header-title">CÓDIGO DE DESCUENTO</h1>
+                <p><span class="label">Generado por:</span> ' . htmlspecialchars($codigo['created_by_name'] ?? 'Administrador') . '</p>
+                <p><span class="label">Fecha creación:</span> ' . date('d/m/Y H:i', strtotime($codigo['created_at'])) . '</p>
+            </td>
+        </tr>
+    </table>
+    
+    <!-- Código de descuento destacado -->
+    <div class="barcode">
+        <div class="discount-code">' . htmlspecialchars($codigo['code']) . '</div>
+        <div class="discount-value">' . htmlspecialchars($codigo['discount_type_name']) . ' DEL ' . $codigo['discount_value'] . '%</div>';
 
-        if (!empty($productos)) {
-            $html .= '<h3 style="color:#006699">PRODUCTOS APLICABLES</h3>';
-            $html .= '<table width="100%" border="1" cellpadding="4" cellspacing="0">';
-            $html .= '<tr style="background:#006699;color:#fff"><th>Producto</th><th style="text-align:right">Precio</th></tr>';
-            foreach ($productos as $p) {
-                $html .= '<tr><td>' . htmlspecialchars($p['name']) . '</td><td style="text-align:right">$' . number_format($p['price'], 2, ',', '.') . '</td></tr>';
+        if ($codigo['end_date']) {
+            $html .= '<div class="validity">Válido hasta: ' . date('d/m/Y', strtotime($codigo['end_date'])) . '</div>';
+        } else {
+            $html .= '<div class="validity">Sin fecha de expiración</div>';
+        }
+
+        $html .= '
+    </div>
+    
+    <!-- Detalles del descuento -->
+    <h3 class="section-title">INFORMACIÓN DEL DESCUENTO</h3>
+    <table border="0" cellpadding="3" cellspacing="0" width="100%">
+        <tr>
+            <td width="25%"><span class="label">Tipo:</span></td>
+            <td width="75%" class="value">' . htmlspecialchars($codigo['discount_type_name']) . '</td>
+        </tr>
+        <tr>
+            <td><span class="label">Valor:</span></td>
+            <td class="value">' . $codigo['discount_value'] . '% de descuento</td>
+        </tr>
+        <tr>
+            <td><span class="label">Usos máximos:</span></td>
+            <td class="value">' . ($codigo['max_uses'] ? $codigo['max_uses'] : 'Ilimitados') . '</td>
+        </tr>
+        <tr>
+            <td><span class="label">Uso único:</span></td>
+            <td class="value">' . ($codigo['is_single_use'] ? 'Sí' : 'No') . '</td>
+        </tr>
+        <tr>
+            <td><span class="label">Válido desde:</span></td>
+            <td class="value">' . ($codigo['start_date'] ? date('d/m/Y H:i', strtotime($codigo['start_date'])) : 'Inmediatamente') . '</td>
+        </tr>
+        <tr>
+            <td><span class="label">Válido hasta:</span></td>
+            <td class="value">' . ($codigo['end_date'] ? date('d/m/Y H:i', strtotime($codigo['end_date'])) : 'Sin fecha de expiración') . '</td>
+        </tr>
+    </table>';
+
+        // Mostrar productos aplicables si no es para todos
+        if ($codigo['product_count'] > 0) {
+            $html .= '
+        <h3 class="section-title">PRODUCTOS APLICABLES</h3>
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Producto</th>
+                    <th style="text-align: right;">Precio</th>
+                </tr>
+            </thead>
+            <tbody>';
+            foreach ($productos as $producto) {
+                $html .= '
+                <tr>
+                    <td>' . htmlspecialchars($producto['name']) . '</td>
+                    <td class="text-right">$' . number_format($producto['price'], 2, ',', '.') . '</td>
+                </tr>';
             }
-            $html .= '</table>';
+            $html .= '
+            </tbody>
+        </table>';
         } else {
-            $html .= '<p>Este descuento aplica a todos los productos de la tienda.</p>';
+            $html .= '
+        <h3 class="section-title">APLICACIÓN</h3>
+        <p>Este descuento aplica a todos los productos de la tienda.</p>';
         }
 
-        $html .= '<div style="font-size:8pt;color:#666;margin-top:10px">Angelow Ropa Infantil</div>';
-        $html .= '</div>';
+        // Términos y condiciones
+        $html .= '
+    <h3 class="section-title">TÉRMINOS Y CONDICIONES</h3>
+    <div class="terms">
+        <p>1. Este código es válido para una sola transacción y no puede ser combinado con otras promociones.</p>
+        <p>2. El descuento aplica sobre el valor total de los productos antes de impuestos y envío.</p>
+        <p>3. Angelow se reserva el derecho de modificar o cancelar esta promoción en cualquier momento.</p>
+        <p>4. Para reclamar el descuento, ingrese el código en el campo correspondiente durante el proceso de pago.</p>
+        <p>5. No aplica para compras anteriores a la fecha de generación del código.</p>
+    </div>
+    
+    <div class="footer">
+        <strong>Angelow Ropa Infantil</strong><br>
+        NIT: 901234567-8 | Tel: +57 604 1234567 | Email: contacto@angelow.com<br>
+        Calle 10 # 40-20, Medellín, Antioquia - www.angelow.com
+    </div>';
 
+        // Escribir el HTML en el PDF
         $pdf->writeHTML($html, true, false, true, false, '');
 
         // Devolver contenido en memoria
@@ -122,10 +290,9 @@ function generateDiscountPdfContent(int $id)
     }
 }
 
-// Si el archivo es accedido directamente por URL, responder con el PDF descargable.
-// Cuando se incluye el archivo (require_once) no queremos ejecutar nada.
+// Mantener comportamiento de descarga si el archivo es accedido directamente via URL
 if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
-    // Archivo accedido directamente
+    // Acceso directo: iniciar sesión y validar
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
@@ -138,7 +305,6 @@ if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
     }
 
     try {
-        // Verificar autenticación y permisos de admin
         if (!isset($_SESSION['user_id'])) {
             throw new Exception("Usuario no autenticado");
         }
@@ -176,4 +342,5 @@ if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
         exit();
     }
 }
+
 ?>
