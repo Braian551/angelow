@@ -12,8 +12,8 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$pageTitle = "Checkout - Paso 2: Envío y Pago";
-$currentPage = 'checkout';
+$pageTitle = "Envío - Paso 2: Envío y Pago";
+$currentPage = 'envio';
 
 $user_id = $_SESSION['user_id'];
 
@@ -103,6 +103,27 @@ try {
     $shippingMethods = [];
 }
 
+// Verificar si hay un descuento aplicado previamente
+$appliedDiscount = null;
+try {
+    $discountQuery = "
+        SELECT uad.*, dc.code, pdc.percentage, pdc.max_discount_amount 
+        FROM user_applied_discounts uad
+        JOIN discount_codes dc ON uad.discount_code_id = dc.id
+        LEFT JOIN percentage_discounts pdc ON dc.id = pdc.discount_code_id
+        WHERE uad.user_id = :user_id 
+        AND uad.is_used = 0 
+        AND uad.expires_at > NOW()
+        ORDER BY uad.applied_at DESC 
+        LIMIT 1
+    ";
+    $stmt = $conn->prepare($discountQuery);
+    $stmt->execute([':user_id' => $user_id]);
+    $appliedDiscount = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log("Error al obtener descuento aplicado: " . $e->getMessage());
+}
+
 // Procesar el formulario de checkout
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errors = [];
@@ -152,6 +173,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Procesar código de descuento si se proporcionó
     $discount_amount = 0;
     $discount_id = null;
+    $discount_code_used = '';
+    
     if (!empty($discount_code)) {
         try {
             $discountQuery = "
@@ -184,6 +207,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $discount_amount = $discount['max_discount_amount'];
                     }
                     $discount_id = $discount['id'];
+                    $discount_code_used = $discount_code;
+                    
+                    // Guardar en tabla de descuentos aplicados
+                    $expiresAt = $discount['end_date'] ?: date('Y-m-d H:i:s', strtotime('+30 days'));
+                    $saveDiscount = $conn->prepare("
+                        INSERT INTO user_applied_discounts (user_id, discount_code_id, discount_code, discount_amount, expires_at) 
+                        VALUES (?, ?, ?, ?, ?)
+                        ON DUPLICATE KEY UPDATE discount_amount = VALUES(discount_amount), expires_at = VALUES(expires_at)
+                    ");
+                    $saveDiscount->execute([$user_id, $discount_id, $discount_code, $discount_amount, $expiresAt]);
                 }
             } else {
                 $errors[] = "El código de descuento no es válido o ha expirado";
@@ -192,6 +225,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             error_log("Error al procesar código de descuento: " . $e->getMessage());
             $errors[] = "Error al procesar el código de descuento";
         }
+    } elseif ($appliedDiscount) {
+        // Usar el descuento previamente aplicado
+        $discount_amount = $appliedDiscount['discount_amount'];
+        $discount_id = $appliedDiscount['discount_code_id'];
+        $discount_code_used = $appliedDiscount['discount_code'];
     }
 
     // Calcular costos finales
@@ -205,25 +243,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['checkout_data'] = [
             'address_id' => $selected_address_id,
             'shipping_method_id' => $shipping_method_id,
-            'discount_code' => $discount_code,
+            'discount_code' => $discount_code_used,
             'discount_amount' => $discount_amount,
             'discount_id' => $discount_id,
             'payment_method' => $payment_method,
             'subtotal' => $cartSubtotal,
             'shipping_cost' => $shipping_cost,
             'tax' => $tax,
-            'total' => $total
+            'total' => $total,
+            'cart_id' => $cart['id']
         ];
+
+        // Marcar el descuento como usado
+        if ($discount_id && $appliedDiscount) {
+            $markUsed = $conn->prepare("UPDATE user_applied_discounts SET is_used = 1, used_at = NOW() WHERE id = ?");
+            $markUsed->execute([$appliedDiscount['id']]);
+        }
 
         header("Location: " . BASE_URL . "/tienda/confirmacion.php");
         exit();
     }
 }
 
-// Calcular costos iniciales (sin descuento)
+// Calcular costos iniciales (con descuento aplicado si existe)
 $shipping_cost = 0;
 $tax = 0;
-$total = $cartSubtotal;
+$currentDiscount = $appliedDiscount ? $appliedDiscount['discount_amount'] : 0;
+$total = $cartSubtotal - $currentDiscount;
+
+// Si hay un descuento aplicado, establecer el código en el input
+$currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : '';
 ?>
 
 <!DOCTYPE html>
@@ -234,7 +283,7 @@ $total = $cartSubtotal;
     <title><?= htmlspecialchars($pageTitle) ?> | <?= SITE_NAME ?></title>
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/cart.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/checkout.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/envio.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/notificaciones/notification2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -275,7 +324,7 @@ $total = $cartSubtotal;
             </div>
         <?php endif; ?>
 
-        <form method="POST" class="checkout-form">
+        <form method="POST" class="checkout-form" id="checkout-form">
             <div class="checkout-content">
                 <div class="checkout-sections">
                     <!-- Sección de Dirección de Envío -->
@@ -300,14 +349,14 @@ $total = $cartSubtotal;
                                     </div>
                                 </div>
                             <?php else: ?>
-                                <div class="addresses-grid">
-                                    <?php foreach ($addresses as $address): ?>
-                                        <div class="address-card <?= $address['is_default'] ? 'default-address' : '' ?>">
+                                <div class="addresses-grid" id="addresses-container">
+                                    <?php foreach ($addresses as $index => $address): ?>
+                                        <div class="address-card <?= $address['is_default'] ? 'default-address' : '' ?> <?= $index === 0 ? 'selected-address' : '' ?>" data-address-id="<?= $address['id'] ?>">
                                             <input type="radio" 
                                                    name="selected_address" 
                                                    value="<?= $address['id'] ?>" 
                                                    id="address_<?= $address['id'] ?>"
-                                                   <?= $address['is_default'] ? 'checked' : '' ?>
+                                                   <?= $index === 0 ? 'checked' : '' ?>
                                                    class="address-radio">
                                             <label for="address_<?= $address['id'] ?>" class="address-label">
                                                 <div class="address-header">
@@ -373,22 +422,22 @@ $total = $cartSubtotal;
                             <h2><i class="fas fa-truck"></i> Método de Envío</h2>
                         </div>
                         
-                        <div class="shipping-methods">
+                        <div class="shipping-methods" id="shipping-container">
                             <?php if (empty($shippingMethods)): ?>
                                 <div class="no-shipping">
                                     <i class="fas fa-exclamation-circle"></i>
                                     <p>No hay métodos de envío disponibles en este momento</p>
                                 </div>
                             <?php else: ?>
-                                <?php foreach ($shippingMethods as $method): ?>
-                                    <div class="shipping-method-card">
+                                <?php foreach ($shippingMethods as $index => $method): ?>
+                                    <div class="shipping-method-card <?= $index === 1 ? 'selected-shipping' : '' ?>" data-shipping-id="<?= $method['id'] ?>">
                                         <input type="radio" 
                                                name="shipping_method" 
                                                value="<?= $method['id'] ?>" 
                                                id="shipping_<?= $method['id'] ?>"
                                                data-cost="<?= $method['base_cost'] ?>"
                                                class="shipping-radio"
-                                               <?= $method['id'] == 2 ? 'checked' : '' ?>>
+                                               <?= $index === 1 ? 'checked' : '' ?>>
                                         <label for="shipping_<?= $method['id'] ?>" class="shipping-label">
                                             <div class="shipping-header">
                                                 <div class="shipping-icon">
@@ -417,44 +466,7 @@ $total = $cartSubtotal;
                         </div>
                     </section>
 
-                    <!-- Sección de Método de Pago -->
-                    <section class="checkout-section">
-                        <div class="section-header">
-                            <h2><i class="fas fa-credit-card"></i> Método de Pago</h2>
-                        </div>
-                        
-                        <div class="payment-methods-selection">
-                            <div class="payment-method-card">
-                                <input type="radio" name="payment_method" value="transferencia" id="payment_transfer" checked>
-                                <label for="payment_transfer" class="payment-label">
-                                    <div class="payment-header">
-                                        <div class="payment-icon">
-                                            <i class="fas fa-university"></i>
-                                        </div>
-                                        <div class="payment-info">
-                                            <h3>Transferencia Bancaria</h3>
-                                            <p>Paga mediante transferencia bancaria</p>
-                                        </div>
-                                    </div>
-                                </label>
-                            </div>
-                            
-                            <div class="payment-method-card">
-                                <input type="radio" name="payment_method" value="contra_entrega" id="payment_cash">
-                                <label for="payment_cash" class="payment-label">
-                                    <div class="payment-header">
-                                        <div class="payment-icon">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                        </div>
-                                        <div class="payment-info">
-                                            <h3>Contra Entrega</h3>
-                                            <p>Paga cuando recibas tu pedido</p>
-                                        </div>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-                    </section>
+                
                 </div>
 
                 <!-- Resumen del Pedido -->
@@ -501,13 +513,20 @@ $total = $cartSubtotal;
                             
                             <div class="summary-row shipping-cost-row">
                                 <span>Envío</span>
-                                <span id="shipping-cost">$<?= number_format($shipping_cost, 0, ',', '.') ?></span>
+                                <span id="shipping-cost">$0</span>
                             </div>
                             
-                            <div class="summary-row discount-row" id="discount-row" style="display: none;">
-                                <span>Descuento</span>
-                                <span id="discount-amount" class="discount-text">-$0</span>
-                            </div>
+                            <?php if ($currentDiscount > 0): ?>
+                                <div class="summary-row discount-row" id="discount-row">
+                                    <span>Descuento (<?= $currentDiscountCode ?>)</span>
+                                    <span id="discount-amount" class="discount-text">-$<?= number_format($currentDiscount, 0, ',', '.') ?></span>
+                                </div>
+                            <?php else: ?>
+                                <div class="summary-row discount-row" id="discount-row" style="display: none;">
+                                    <span>Descuento</span>
+                                    <span id="discount-amount" class="discount-text">-$0</span>
+                                </div>
+                            <?php endif; ?>
                             
                             <div class="summary-row total">
                                 <span>Total</span>
@@ -524,12 +543,21 @@ $total = $cartSubtotal;
                                        id="discount_code" 
                                        placeholder="Ingresa tu código" 
                                        class="discount-input"
-                                       value="<?= htmlspecialchars($_POST['discount_code'] ?? '') ?>">
+                                       value="<?= htmlspecialchars($currentDiscountCode) ?>">
                                 <button type="button" id="apply-discount" class="btn btn-outline discount-btn">
-                                    Aplicar
+                                    <?= $currentDiscount > 0 ? 'Cambiar' : 'Aplicar' ?>
                                 </button>
+                                <?php if ($currentDiscount > 0): ?>
+                                    <button type="button" id="remove-discount" class="btn btn-danger discount-btn">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                <?php endif; ?>
                             </div>
-                            <div id="discount-message" class="discount-message"></div>
+                            <div id="discount-message" class="discount-message <?= $currentDiscount > 0 ? 'success' : '' ?>">
+                                <?php if ($currentDiscount > 0): ?>
+                                    ¡Descuento aplicado! Ahorras $<?= number_format($currentDiscount, 0, ',', '.') ?>
+                                <?php endif; ?>
+                            </div>
                         </div>
 
                         <!-- Botón de Confirmación -->
@@ -558,6 +586,7 @@ $total = $cartSubtotal;
     document.addEventListener('DOMContentLoaded', function() {
         const shippingRadios = document.querySelectorAll('.shipping-radio');
         const discountBtn = document.getElementById('apply-discount');
+        const removeDiscountBtn = document.getElementById('remove-discount');
         const discountInput = document.getElementById('discount_code');
         const discountMessage = document.getElementById('discount-message');
         const subtotalAmount = document.getElementById('subtotal-amount');
@@ -565,10 +594,57 @@ $total = $cartSubtotal;
         const discountRow = document.getElementById('discount-row');
         const discountAmount = document.getElementById('discount-amount');
         const totalAmount = document.getElementById('total-amount');
+        const checkoutForm = document.getElementById('checkout-form');
         
         const subtotal = <?= $cartSubtotal ?>;
-        let currentDiscount = 0;
+        let currentDiscount = <?= $currentDiscount ?>;
         let currentShipping = 0;
+
+        // Selección visual de direcciones
+        const addressCards = document.querySelectorAll('.address-card');
+        addressCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remover selección de todas las tarjetas
+                addressCards.forEach(c => c.classList.remove('selected-address'));
+                // Agregar selección a la tarjeta clickeada
+                this.classList.add('selected-address');
+                // Marcar el radio button
+                const radio = this.querySelector('.address-radio');
+                if (radio) radio.checked = true;
+            });
+        });
+
+        // Selección visual de métodos de envío
+        const shippingCards = document.querySelectorAll('.shipping-method-card');
+        shippingCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remover selección de todas las tarjetas
+                shippingCards.forEach(c => c.classList.remove('selected-shipping'));
+                // Agregar selección a la tarjeta clickeada
+                this.classList.add('selected-shipping');
+                // Marcar el radio button
+                const radio = this.querySelector('.shipping-radio');
+                if (radio) {
+                    radio.checked = true;
+                    currentShipping = parseFloat(radio.dataset.cost);
+                    updateTotals();
+                }
+            });
+        });
+
+        // Selección visual de métodos de pago
+        const paymentCards = document.querySelectorAll('.payment-method-card');
+        paymentCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remover selección de todas las tarjetas
+                paymentCards.forEach(c => c.classList.remove('selected-payment'));
+                // Agregar selección a la tarjeta clickeada
+                this.classList.add('selected-payment');
+                // Marcar el radio button
+                const radio = this.querySelector('.payment-radio');
+                if (radio) radio.checked = true;
+            });
+        });
 
         // Actualizar costos de envío
         shippingRadios.forEach(radio => {
@@ -581,26 +657,33 @@ $total = $cartSubtotal;
         });
 
         // Aplicar descuento
-        discountBtn.addEventListener('click', function() {
-            const code = discountInput.value.trim();
-            
-            if (!code) {
-                showDiscountMessage('Ingresa un código de descuento', 'error');
-                return;
-            }
+        if (discountBtn) {
+            discountBtn.addEventListener('click', function() {
+                const code = discountInput.value.trim();
+                
+                if (!code) {
+                    showDiscountMessage('Ingresa un código de descuento', 'error');
+                    return;
+                }
 
-            // Simular validación del código de descuento
-            applyDiscount(code);
-        });
+                applyDiscount(code);
+            });
+        }
+
+        // Remover descuento
+        if (removeDiscountBtn) {
+            removeDiscountBtn.addEventListener('click', function() {
+                removeDiscount();
+            });
+        }
 
         function applyDiscount(code) {
-            // En una implementación real, esto haría una petición AJAX al servidor
             fetch('<?= BASE_URL ?>/tienda/apply_discount.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: 'discount_code=' + encodeURIComponent(code) + '&subtotal=' + subtotal
+                body: 'discount_code=' + encodeURIComponent(code) + '&subtotal=' + subtotal + '&action=apply'
             })
             .then(response => response.json())
             .then(data => {
@@ -608,6 +691,10 @@ $total = $cartSubtotal;
                     currentDiscount = data.discount_amount;
                     showDiscountMessage(data.message, 'success');
                     updateTotals();
+                    // Recargar la página para mostrar el estado persistente
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 } else {
                     currentDiscount = 0;
                     showDiscountMessage(data.message, 'error');
@@ -620,6 +707,33 @@ $total = $cartSubtotal;
             });
         }
 
+        function removeDiscount() {
+            fetch('<?= BASE_URL ?>/tienda/apply_discount.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'action=remove'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentDiscount = 0;
+                    discountInput.value = '';
+                    showDiscountMessage(data.message, 'success');
+                    updateTotals();
+                    // Recargar la página
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showDiscountMessage('Error al remover el descuento', 'error');
+            });
+        }
+
         function showDiscountMessage(message, type) {
             discountMessage.textContent = message;
             discountMessage.className = 'discount-message ' + type;
@@ -628,52 +742,47 @@ $total = $cartSubtotal;
 
         function updateTotals() {
             // Actualizar display de costos
-            shippingCost.textContent = currentShipping > 0 ? 
-                '$' + currentShipping.toLocaleString('es-CO') : 'Gratis';
+            shippingCost.textContent = currentShipping > 0 ? '$' + currentShipping.toLocaleString('es-CO') : 'Gratis';
             
-            // Mostrar/ocultar fila de descuento
+            // Actualizar descuento
             if (currentDiscount > 0) {
                 discountRow.style.display = 'flex';
                 discountAmount.textContent = '-$' + currentDiscount.toLocaleString('es-CO');
-                discountAmount.className = 'discount-text';
             } else {
                 discountRow.style.display = 'none';
             }
-
-            // Calcular total
+            
+            // Calcular y actualizar total
             const total = subtotal + currentShipping - currentDiscount;
             totalAmount.textContent = '$' + total.toLocaleString('es-CO');
         }
 
         // Inicializar totales
-        const initialShipping = document.querySelector('.shipping-radio:checked');
-        if (initialShipping) {
-            currentShipping = parseFloat(initialShipping.dataset.cost);
-        }
         updateTotals();
 
         // Validación del formulario antes de enviar
-        document.querySelector('.checkout-form').addEventListener('submit', function(e) {
+        checkoutForm.addEventListener('submit', function(e) {
             const selectedAddress = document.querySelector('input[name="selected_address"]:checked');
             const selectedShipping = document.querySelector('input[name="shipping_method"]:checked');
             const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
-
+            
+            let errors = [];
+            
             if (!selectedAddress) {
-                e.preventDefault();
-                alert('Por favor selecciona una dirección de envío');
-                return;
+                errors.push('Debes seleccionar una dirección de envío');
             }
-
+            
             if (!selectedShipping) {
-                e.preventDefault();
-                alert('Por favor selecciona un método de envío');
-                return;
+                errors.push('Debes seleccionar un método de envío');
             }
-
+            
             if (!selectedPayment) {
+                errors.push('Debes seleccionar un método de pago');
+            }
+            
+            if (errors.length > 0) {
                 e.preventDefault();
-                alert('Por favor selecciona un método de pago');
-                return;
+                alert('Por favor completa los siguientes campos:\n\n' + errors.join('\n'));
             }
         });
     });

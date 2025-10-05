@@ -210,15 +210,17 @@
     background-color: rgba(0, 119, 182, 0.03);
 }
 
-.address-radio {
-    position: absolute;
-    opacity: 0;
-}
-
-.address-radio:checked + .address-label .address-card {
+/* ESTILOS DE SELECCIÓN MEJORADOS */
+.address-card.selected-address {
     border-color: var(--checkout-primary);
     background-color: var(--checkout-primary-light);
     box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.1);
+    transform: translateY(-2px);
+}
+
+.address-radio {
+    position: absolute;
+    opacity: 0;
 }
 
 .address-label {
@@ -363,15 +365,17 @@
     transform: translateY(-1px);
 }
 
-.shipping-radio {
-    position: absolute;
-    opacity: 0;
-}
-
-.shipping-radio:checked + .shipping-label .shipping-method-card {
+/* ESTILOS DE SELECCIÓN MEJORADOS */
+.shipping-method-card.selected-shipping {
     border-color: var(--checkout-primary);
     background-color: var(--checkout-primary-light);
     box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.1);
+    transform: translateY(-1px);
+}
+
+.shipping-radio {
+    position: absolute;
+    opacity: 0;
 }
 
 .shipping-label {
@@ -436,45 +440,17 @@
     font-weight: 700;
 }
 
-/* Métodos de Pago */
-.payment-methods-selection {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.payment-method-card {
-    position: relative;
-    border: 2px solid var(--checkout-border);
+/* Método de Pago Único */
+.payment-method-single {
+    background: white;
+    border: 2px solid var(--checkout-primary);
     border-radius: var(--checkout-radius);
     padding: 2rem;
-    transition: var(--checkout-transition);
-    cursor: pointer;
-    background: white;
-}
-
-.payment-method-card:hover {
-    border-color: var(--checkout-primary);
-    transform: translateY(-1px);
-}
-
-.payment-method-card input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-}
-
-.payment-method-card input[type="radio"]:checked + .payment-label .payment-method-card {
-    border-color: var(--checkout-primary);
     background-color: var(--checkout-primary-light);
     box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.1);
 }
 
-.payment-label {
-    cursor: pointer;
-    margin: 0;
-}
-
-.payment-header {
+.payment-method-header {
     display: flex;
     align-items: center;
     gap: 1.5rem;
@@ -730,6 +706,23 @@
     transform: translateY(-1px);
 }
 
+/* Botón de eliminar descuento */
+.btn-danger {
+    background-color: var(--checkout-error);
+    color: white;
+    border: none;
+    padding: 1.2rem 1.5rem;
+    border-radius: var(--checkout-radius);
+    font-weight: 600;
+    transition: var(--checkout-transition);
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background-color: #d32f2f;
+    transform: translateY(-1px);
+}
+
 .discount-message {
     font-size: 1.3rem;
     padding: 1rem;
@@ -742,12 +735,14 @@
     background-color: rgba(75, 181, 67, 0.1);
     color: var(--checkout-success);
     border: 1px solid var(--checkout-success);
+    display: block;
 }
 
 .discount-message.error {
     background-color: rgba(255, 51, 51, 0.1);
     color: var(--checkout-error);
     border: 1px solid var(--checkout-error);
+    display: block;
 }
 
 /* Acciones del Checkout */
@@ -855,7 +850,7 @@
 
     .address-header,
     .shipping-header,
-    .payment-header {
+    .payment-method-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
@@ -885,7 +880,7 @@
 
     .address-card,
     .shipping-method-card,
-    .payment-method-card {
+    .payment-method-single {
         padding: 1.5rem;
     }
 

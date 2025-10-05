@@ -85,8 +85,13 @@ try {
                     <span>Reseñas</span>
                 </a>
             </li>
+             <li class="nav-item">
+                <a href="<?= BASE_URL ?>/admin/pagos/define_pay.php">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Pagos</span>
+                </a>
+            </li>
 
-            <!-- Nueva sección de Configuraciones de Envíos -->
             <li class="nav-item with-submenu">
                 <a href="#envios">
                     <i class="fas fa-truck"></i>

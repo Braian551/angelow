@@ -227,7 +227,7 @@ try {
                         </div>
 
                         <div class="summary-actions">
-                            <a href="<?= BASE_URL ?>/tienda/checkout.php" class="btn btn-primary btn-block">
+                            <a href="<?= BASE_URL ?>/tienda/envio.php" class="btn btn-primary btn-block">
                                 Proceder al pago <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
