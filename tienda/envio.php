@@ -132,7 +132,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $selected_address_id = $_POST['selected_address'] ?? '';
     $shipping_method_id = $_POST['shipping_method'] ?? '';
     $discount_code = trim($_POST['discount_code'] ?? '');
-    $payment_method = $_POST['payment_method'] ?? '';
 
     // Validaciones
     if (empty($selected_address_id)) {
@@ -143,9 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Debes seleccionar un método de envío";
     }
 
-    if (empty($payment_method)) {
-        $errors[] = "Debes seleccionar un método de pago";
-    }
+
 
     // Verificar dirección seleccionada
     if (!empty($selected_address_id)) {
@@ -259,7 +256,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $markUsed->execute([$appliedDiscount['id']]);
         }
 
-        header("Location: " . BASE_URL . "/tienda/confirmacion.php");
+        header("Location: " . BASE_URL . "/tienda/pay.php");
         exit();
     }
 }
@@ -794,7 +791,6 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
             checkoutForm.addEventListener('submit', function(e) {
                 const selectedAddress = document.querySelector('input[name="selected_address"]:checked');
                 const selectedShipping = document.querySelector('input[name="shipping_method"]:checked');
-                const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
 
                 let errors = [];
 
@@ -806,9 +802,7 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                     errors.push('Debes seleccionar un método de envío');
                 }
 
-                if (!selectedPayment) {
-                    errors.push('Debes seleccionar un método de pago');
-                }
+               
 
                 if (errors.length > 0) {
                     e.preventDefault();
