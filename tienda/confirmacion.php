@@ -3,7 +3,8 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use TCPDF;
+// Verificar disponibilidad de la clase TCPDF (puede no estar instalada)
+$tcpdf_available = class_exists('TCPDF') || class_exists('\TCPDF');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -75,6 +76,13 @@ try {
 // Procesar generación de PDF
 if (isset($_POST['download_pdf'])) {
     try {
+        if (!$tcpdf_available) {
+            // Registrar y preparar mensaje para el usuario en la interfaz
+            error_log('Intento de generar PDF pero la clase TCPDF no está disponible.');
+            $pdfErrorMessage = 'La generación de PDF no está disponible en este servidor. Por favor contacte al administrador.';
+            // No intentar generar el PDF
+            throw new Exception($pdfErrorMessage);
+        }
         // Limpiar buffers de salida
         while (ob_get_level()) {
             ob_end_clean();
@@ -86,11 +94,18 @@ if (isset($_POST['download_pdf'])) {
         header('Cache-Control: private, max-age=0, must-revalidate');
         header('Pragma: public');
 
-        // Crear nuevo documento PDF
-        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
+    // Crear nuevo documento PDF (usar valores por defecto si las constantes no están definidas)
+    $orientation = defined('PDF_PAGE_ORIENTATION') ? PDF_PAGE_ORIENTATION : 'P';
+    $unit = defined('PDF_UNIT') ? PDF_UNIT : 'mm';
+    $pageFormat = 'LETTER';
+    $creator = defined('PDF_CREATOR') ? PDF_CREATOR : SITE_NAME;
+    $marginBottom = defined('PDF_MARGIN_BOTTOM') ? PDF_MARGIN_BOTTOM : 20;
+
+    // Usar la clase con su namespace global
+    $pdf = new \TCPDF($orientation, $unit, $pageFormat, true, 'UTF-8', false);
         
         // Configuración del documento
-        $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetCreator($creator);
         $pdf->SetAuthor(SITE_NAME);
         $pdf->SetTitle('Comprobante de Pedido ' . $order_number);
         $pdf->SetSubject('Comprobante de Pedido');
@@ -103,7 +118,7 @@ if (isset($_POST['download_pdf'])) {
         $pdf->setPrintFooter(true);
         
         // Auto saltos de página
-        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+    $pdf->SetAutoPageBreak(TRUE, $marginBottom);
         
         // Fuente principal
         $pdf->SetFont('helvetica', '', 10);
@@ -246,7 +261,7 @@ if (isset($_POST['download_pdf'])) {
                 </td>
                 <td width="60%" style="text-align: right; vertical-align: top;">
                     <h1 class="header-title">COMPROBANTE DE PEDIDO</h1>
-                    <p><span class="label">Fecha:</span> ' . date('d/m/Y H:i', strtotime($order['created_at'])) . '</p>
+                    <p><span class="label">Fecha:</span> ' . (!empty($order['created_at']) ? date('d/m/Y H:i', strtotime($order['created_at'])) : 'N/A') . '</p>
                     <p><span class="label">Cliente:</span> ' . htmlspecialchars($order['user_name']) . '</p>
                 </td>
             </tr>
@@ -377,7 +392,7 @@ if (isset($_POST['download_pdf'])) {
             </tr>
             <tr>
                 <td><span class="label">Fecha de pago:</span></td>
-                <td class="value">' . date('d/m/Y H:i', strtotime($order['payment_date'])) . '</td>
+                <td class="value">' . (!empty($order['payment_date']) ? date('d/m/Y H:i', strtotime($order['payment_date'])) : 'N/A') . '</td>
             </tr>
             <tr>
                 <td><span class="label">Estado:</span></td>
@@ -394,8 +409,8 @@ if (isset($_POST['download_pdf'])) {
         
         <div class="footer">
             <strong>' . SITE_NAME . '</strong><br>
-            ' . SITE_CONTACT . ' | Email: ' . SITE_EMAIL . '<br>
-            ' . SITE_ADDRESS . ' - ' . SITE_URL . '
+            ' . (defined('SITE_CONTACT') ? constant('SITE_CONTACT') : 'Contacto') . ' | Email: ' . (defined('SITE_EMAIL') ? constant('SITE_EMAIL') : 'no-reply@ejemplo.com') . '<br>
+            ' . (defined('SITE_ADDRESS') ? constant('SITE_ADDRESS') : 'Dirección no disponible') . ' - ' . (defined('SITE_URL') ? constant('SITE_URL') : BASE_URL) . '
         </div>';
         
         // Escribir el HTML en el PDF
@@ -681,11 +696,11 @@ try {
                 <div class="contact-methods">
                     <div class="contact-method">
                         <i class="fas fa-envelope"></i>
-                        <span><?= SITE_EMAIL ?></span>
+                        <span><?= htmlspecialchars(defined('SITE_EMAIL') ? constant('SITE_EMAIL') : 'no-reply@ejemplo.com') ?></span>
                     </div>
                     <div class="contact-method">
                         <i class="fas fa-phone"></i>
-                        <span><?= SITE_CONTACT ?></span>
+                        <span><?= htmlspecialchars(defined('SITE_CONTACT') ? constant('SITE_CONTACT') : 'Contacto') ?></span>
                     </div>
                     <div class="contact-method">
                         <i class="fas fa-clock"></i>
