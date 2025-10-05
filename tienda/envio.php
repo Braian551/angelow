@@ -74,7 +74,6 @@ try {
         $cartSubtotal += $item['item_total'];
         $itemCount += $item['quantity'];
     }
-
 } catch (PDOException $e) {
     error_log("Error al obtener el carrito: " . $e->getMessage());
     header("Location: " . BASE_URL . "/tienda/cart.php");
@@ -153,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $addressCheck = $conn->prepare("SELECT * FROM user_addresses WHERE id = ? AND user_id = ?");
         $addressCheck->execute([$selected_address_id, $user_id]);
         $selectedAddress = $addressCheck->fetch(PDO::FETCH_ASSOC);
-        
+
         if (!$selectedAddress) {
             $errors[] = "La dirección seleccionada no es válida";
         }
@@ -164,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $shippingCheck = $conn->prepare("SELECT * FROM shipping_methods WHERE id = ? AND is_active = 1");
         $shippingCheck->execute([$shipping_method_id]);
         $selectedShipping = $shippingCheck->fetch(PDO::FETCH_ASSOC);
-        
+
         if (!$selectedShipping) {
             $errors[] = "El método de envío seleccionado no es válido";
         }
@@ -174,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $discount_amount = 0;
     $discount_id = null;
     $discount_code_used = '';
-    
+
     if (!empty($discount_code)) {
         try {
             $discountQuery = "
@@ -208,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     $discount_id = $discount['id'];
                     $discount_code_used = $discount_code;
-                    
+
                     // Guardar en tabla de descuentos aplicados
                     $expiresAt = $discount['end_date'] ?: date('Y-m-d H:i:s', strtotime('+30 days'));
                     $saveDiscount = $conn->prepare("
@@ -277,6 +276,7 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -287,6 +287,7 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/notificaciones/notification2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <?php include __DIR__ . '/../layouts/headerproducts.php'; ?>
 
@@ -335,7 +336,7 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                                 <i class="fas fa-plus"></i> Gestionar Direcciones
                             </a>
                         </div>
-                        
+
                         <div class="address-selection">
                             <?php if (empty($addresses)): ?>
                                 <div class="no-addresses">
@@ -352,12 +353,12 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                                 <div class="addresses-grid" id="addresses-container">
                                     <?php foreach ($addresses as $index => $address): ?>
                                         <div class="address-card <?= $address['is_default'] ? 'default-address' : '' ?> <?= $index === 0 ? 'selected-address' : '' ?>" data-address-id="<?= $address['id'] ?>">
-                                            <input type="radio" 
-                                                   name="selected_address" 
-                                                   value="<?= $address['id'] ?>" 
-                                                   id="address_<?= $address['id'] ?>"
-                                                   <?= $index === 0 ? 'checked' : '' ?>
-                                                   class="address-radio">
+                                            <input type="radio"
+                                                name="selected_address"
+                                                value="<?= $address['id'] ?>"
+                                                id="address_<?= $address['id'] ?>"
+                                                <?= $index === 0 ? 'checked' : '' ?>
+                                                class="address-radio">
                                             <label for="address_<?= $address['id'] ?>" class="address-label">
                                                 <div class="address-header">
                                                     <div class="address-icon">
@@ -381,7 +382,7 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                                                         </div>
                                                     <?php endif; ?>
                                                 </div>
-                                                
+
                                                 <div class="address-details">
                                                     <div class="detail-item">
                                                         <i class="fas fa-user"></i>
@@ -421,7 +422,7 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                         <div class="section-header">
                             <h2><i class="fas fa-truck"></i> Método de Envío</h2>
                         </div>
-                        
+
                         <div class="shipping-methods" id="shipping-container">
                             <?php if (empty($shippingMethods)): ?>
                                 <div class="no-shipping">
@@ -431,13 +432,13 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                             <?php else: ?>
                                 <?php foreach ($shippingMethods as $index => $method): ?>
                                     <div class="shipping-method-card <?= $index === 1 ? 'selected-shipping' : '' ?>" data-shipping-id="<?= $method['id'] ?>">
-                                        <input type="radio" 
-                                               name="shipping_method" 
-                                               value="<?= $method['id'] ?>" 
-                                               id="shipping_<?= $method['id'] ?>"
-                                               data-cost="<?= $method['base_cost'] ?>"
-                                               class="shipping-radio"
-                                               <?= $index === 1 ? 'checked' : '' ?>>
+                                        <input type="radio"
+                                            name="shipping_method"
+                                            value="<?= $method['id'] ?>"
+                                            id="shipping_<?= $method['id'] ?>"
+                                            data-cost="<?= $method['base_cost'] ?>"
+                                            class="shipping-radio"
+                                            <?= $index === 1 ? 'checked' : '' ?>>
                                         <label for="shipping_<?= $method['id'] ?>" class="shipping-label">
                                             <div class="shipping-header">
                                                 <div class="shipping-icon">
@@ -466,22 +467,22 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                         </div>
                     </section>
 
-                
+
                 </div>
 
                 <!-- Resumen del Pedido -->
                 <div class="checkout-summary">
                     <div class="summary-card">
                         <h3>Resumen del Pedido</h3>
-                        
+
                         <div class="order-items-preview">
                             <h4>Productos (<?= $itemCount ?>)</h4>
                             <div class="items-list">
                                 <?php foreach ($cartItems as $item): ?>
                                     <div class="order-item">
                                         <div class="item-image">
-                                            <img src="<?= BASE_URL ?>/<?= htmlspecialchars($item['primary_image'] ?? 'assets/images/placeholder-product.jpg') ?>" 
-                                                 alt="<?= htmlspecialchars($item['product_name']) ?>">
+                                            <img src="<?= BASE_URL ?>/<?= htmlspecialchars($item['primary_image'] ?? 'assets/images/placeholder-product.jpg') ?>"
+                                                alt="<?= htmlspecialchars($item['product_name']) ?>">
                                         </div>
                                         <div class="item-details">
                                             <h5><?= htmlspecialchars($item['product_name']) ?></h5>
@@ -510,12 +511,12 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                                 <span>Subtotal</span>
                                 <span id="subtotal-amount">$<?= number_format($cartSubtotal, 0, ',', '.') ?></span>
                             </div>
-                            
+
                             <div class="summary-row shipping-cost-row">
                                 <span>Envío</span>
                                 <span id="shipping-cost">$0</span>
                             </div>
-                            
+
                             <?php if ($currentDiscount > 0): ?>
                                 <div class="summary-row discount-row" id="discount-row">
                                     <span>Descuento (<?= $currentDiscountCode ?>)</span>
@@ -527,7 +528,7 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                                     <span id="discount-amount" class="discount-text">-$0</span>
                                 </div>
                             <?php endif; ?>
-                            
+
                             <div class="summary-row total">
                                 <span>Total</span>
                                 <span id="total-amount">$<?= number_format($total, 0, ',', '.') ?></span>
@@ -538,20 +539,22 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                         <div class="discount-section">
                             <h4>¿Tienes un código de descuento?</h4>
                             <div class="discount-form">
-                                <input type="text" 
-                                       name="discount_code" 
-                                       id="discount_code" 
-                                       placeholder="Ingresa tu código" 
-                                       class="discount-input"
-                                       value="<?= htmlspecialchars($currentDiscountCode) ?>">
-                                <button type="button" id="apply-discount" class="btn btn-outline discount-btn">
-                                    <?= $currentDiscount > 0 ? 'Cambiar' : 'Aplicar' ?>
-                                </button>
-                                <?php if ($currentDiscount > 0): ?>
-                                    <button type="button" id="remove-discount" class="btn btn-danger discount-btn">
-                                        <i class="fas fa-times"></i>
+                                <input type="text"
+                                    name="discount_code"
+                                    id="discount_code"
+                                    placeholder="Ingresa tu código"
+                                    class="discount-input"
+                                    value="<?= htmlspecialchars($currentDiscountCode) ?>">
+                                <div class="discount-buttons-container">
+                                    <button type="button" id="apply-discount" class="discount-btn">
+                                        <?= $currentDiscount > 0 ? 'Cambiar' : 'Aplicar' ?>
                                     </button>
-                                <?php endif; ?>
+                                    <?php if ($currentDiscount > 0): ?>
+                                        <button type="button" id="remove-discount" class="btn-danger discount-remove" title="Eliminar descuento">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                             <div id="discount-message" class="discount-message <?= $currentDiscount > 0 ? 'success' : '' ?>">
                                 <?php if ($currentDiscount > 0): ?>
@@ -583,209 +586,237 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
     <?php include __DIR__ . '/../layouts/footer.php'; ?>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const shippingRadios = document.querySelectorAll('.shipping-radio');
-        const discountBtn = document.getElementById('apply-discount');
-        const removeDiscountBtn = document.getElementById('remove-discount');
-        const discountInput = document.getElementById('discount_code');
-        const discountMessage = document.getElementById('discount-message');
-        const subtotalAmount = document.getElementById('subtotal-amount');
-        const shippingCost = document.getElementById('shipping-cost');
-        const discountRow = document.getElementById('discount-row');
-        const discountAmount = document.getElementById('discount-amount');
-        const totalAmount = document.getElementById('total-amount');
-        const checkoutForm = document.getElementById('checkout-form');
-        
-        const subtotal = <?= $cartSubtotal ?>;
-        let currentDiscount = <?= $currentDiscount ?>;
-        let currentShipping = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+            const shippingRadios = document.querySelectorAll('.shipping-radio');
+            const discountBtn = document.getElementById('apply-discount');
+            const removeDiscountBtn = document.getElementById('remove-discount');
+            const discountInput = document.getElementById('discount_code');
+            const discountMessage = document.getElementById('discount-message');
+            const subtotalAmount = document.getElementById('subtotal-amount');
+            const shippingCost = document.getElementById('shipping-cost');
+            const discountRow = document.getElementById('discount-row');
+            const discountAmount = document.getElementById('discount-amount');
+            const totalAmount = document.getElementById('total-amount');
+            const checkoutForm = document.getElementById('checkout-form');
 
-        // Selección visual de direcciones
-        const addressCards = document.querySelectorAll('.address-card');
-        addressCards.forEach(card => {
-            card.addEventListener('click', function() {
-                // Remover selección de todas las tarjetas
-                addressCards.forEach(c => c.classList.remove('selected-address'));
-                // Agregar selección a la tarjeta clickeada
-                this.classList.add('selected-address');
-                // Marcar el radio button
-                const radio = this.querySelector('.address-radio');
-                if (radio) radio.checked = true;
+            const subtotal = <?= $cartSubtotal ?>;
+            let currentDiscount = <?= $currentDiscount ?>;
+            let currentShipping = 0;
+
+            // Selección visual de direcciones
+            const addressCards = document.querySelectorAll('.address-card');
+            addressCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remover selección de todas las tarjetas
+                    addressCards.forEach(c => c.classList.remove('selected-address'));
+                    // Agregar selección a la tarjeta clickeada
+                    this.classList.add('selected-address');
+                    // Marcar el radio button
+                    const radio = this.querySelector('.address-radio');
+                    if (radio) radio.checked = true;
+                });
             });
-        });
 
-        // Selección visual de métodos de envío
-        const shippingCards = document.querySelectorAll('.shipping-method-card');
-        shippingCards.forEach(card => {
-            card.addEventListener('click', function() {
-                // Remover selección de todas las tarjetas
-                shippingCards.forEach(c => c.classList.remove('selected-shipping'));
-                // Agregar selección a la tarjeta clickeada
-                this.classList.add('selected-shipping');
-                // Marcar el radio button
-                const radio = this.querySelector('.shipping-radio');
-                if (radio) {
-                    radio.checked = true;
-                    currentShipping = parseFloat(radio.dataset.cost);
-                    updateTotals();
-                }
+            // Selección visual de métodos de envío
+            const shippingCards = document.querySelectorAll('.shipping-method-card');
+            shippingCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remover selección de todas las tarjetas
+                    shippingCards.forEach(c => c.classList.remove('selected-shipping'));
+                    // Agregar selección a la tarjeta clickeada
+                    this.classList.add('selected-shipping');
+                    // Marcar el radio button
+                    const radio = this.querySelector('.shipping-radio');
+                    if (radio) {
+                        radio.checked = true;
+                        currentShipping = parseFloat(radio.dataset.cost);
+                        updateTotals();
+                    }
+                });
             });
-        });
 
-        // Selección visual de métodos de pago
-        const paymentCards = document.querySelectorAll('.payment-method-card');
-        paymentCards.forEach(card => {
-            card.addEventListener('click', function() {
-                // Remover selección de todas las tarjetas
-                paymentCards.forEach(c => c.classList.remove('selected-payment'));
-                // Agregar selección a la tarjeta clickeada
-                this.classList.add('selected-payment');
-                // Marcar el radio button
-                const radio = this.querySelector('.payment-radio');
-                if (radio) radio.checked = true;
+            // Selección visual de métodos de pago
+            const paymentCards = document.querySelectorAll('.payment-method-card');
+            paymentCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remover selección de todas las tarjetas
+                    paymentCards.forEach(c => c.classList.remove('selected-payment'));
+                    // Agregar selección a la tarjeta clickeada
+                    this.classList.add('selected-payment');
+                    // Marcar el radio button
+                    const radio = this.querySelector('.payment-radio');
+                    if (radio) radio.checked = true;
+                });
             });
-        });
 
-        // Actualizar costos de envío
-        shippingRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                if (this.checked) {
-                    currentShipping = parseFloat(this.dataset.cost);
-                    updateTotals();
-                }
+            // Actualizar costos de envío
+            shippingRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.checked) {
+                        currentShipping = parseFloat(this.dataset.cost);
+                        updateTotals();
+                    }
+                });
             });
-        });
 
-        // Aplicar descuento
-        if (discountBtn) {
-            discountBtn.addEventListener('click', function() {
-                const code = discountInput.value.trim();
-                
-                if (!code) {
-                    showDiscountMessage('Ingresa un código de descuento', 'error');
-                    return;
-                }
+            // Aplicar descuento
+            if (discountBtn) {
+                discountBtn.addEventListener('click', function() {
+                    const code = discountInput.value.trim();
 
-                applyDiscount(code);
-            });
-        }
+                    if (!code) {
+                        showDiscountMessage('Ingresa un código de descuento', 'error');
+                        return;
+                    }
 
-        // Remover descuento
-        if (removeDiscountBtn) {
-            removeDiscountBtn.addEventListener('click', function() {
-                removeDiscount();
-            });
-        }
+                    applyDiscount(code);
+                });
+            }
 
-        function applyDiscount(code) {
-            fetch('<?= BASE_URL ?>/tienda/apply_discount.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'discount_code=' + encodeURIComponent(code) + '&subtotal=' + subtotal + '&action=apply'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    currentDiscount = data.discount_amount;
-                    showDiscountMessage(data.message, 'success');
-                    updateTotals();
-                    // Recargar la página para mostrar el estado persistente
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
+            // Remover descuento
+            if (removeDiscountBtn) {
+                removeDiscountBtn.addEventListener('click', function() {
+                    removeDiscount();
+                });
+            }
+
+            function applyDiscount(code) {
+                // Mostrar loading en el botón
+                const applyBtn = document.getElementById('apply-discount');
+                const originalText = applyBtn.textContent;
+                applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                applyBtn.disabled = true;
+
+                fetch('<?= BASE_URL ?>/tienda/apply_discount.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'discount_code=' + encodeURIComponent(code) + '&subtotal=' + subtotal + '&action=apply'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Restaurar botón
+                        applyBtn.innerHTML = originalText;
+                        applyBtn.disabled = false;
+
+                        if (data.success) {
+                            currentDiscount = data.discount_amount;
+                            showDiscountMessage(data.message, 'success');
+                            updateTotals();
+                            // Recargar la página para mostrar el estado persistente
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            currentDiscount = 0;
+                            showDiscountMessage(data.message, 'error');
+                            updateTotals();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Restaurar botón
+                        applyBtn.innerHTML = originalText;
+                        applyBtn.disabled = false;
+                        showDiscountMessage('Error al aplicar el descuento', 'error');
+                    });
+            }
+
+            function removeDiscount() {
+                // Mostrar loading en el botón de eliminar
+                const removeBtn = document.getElementById('remove-discount');
+                const originalHTML = removeBtn.innerHTML;
+                removeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                removeBtn.disabled = true;
+
+                fetch('<?= BASE_URL ?>/tienda/apply_discount.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'action=remove'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            currentDiscount = 0;
+                            discountInput.value = '';
+                            showDiscountMessage(data.message, 'success');
+                            updateTotals();
+                            // Recargar la página
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            // Restaurar botón si hay error
+                            removeBtn.innerHTML = originalHTML;
+                            removeBtn.disabled = false;
+                            showDiscountMessage('Error al remover el descuento', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Restaurar botón
+                        removeBtn.innerHTML = originalHTML;
+                        removeBtn.disabled = false;
+                        showDiscountMessage('Error al remover el descuento', 'error');
+                    });
+            }
+
+            function showDiscountMessage(message, type) {
+                discountMessage.textContent = message;
+                discountMessage.className = 'discount-message ' + type;
+                discountMessage.style.display = 'block';
+            }
+
+            function updateTotals() {
+                // Actualizar display de costos
+                shippingCost.textContent = currentShipping > 0 ? '$' + currentShipping.toLocaleString('es-CO') : 'Gratis';
+
+                // Actualizar descuento
+                if (currentDiscount > 0) {
+                    discountRow.style.display = 'flex';
+                    discountAmount.textContent = '-$' + currentDiscount.toLocaleString('es-CO');
                 } else {
-                    currentDiscount = 0;
-                    showDiscountMessage(data.message, 'error');
-                    updateTotals();
+                    discountRow.style.display = 'none';
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showDiscountMessage('Error al aplicar el descuento', 'error');
-            });
-        }
 
-        function removeDiscount() {
-            fetch('<?= BASE_URL ?>/tienda/apply_discount.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'action=remove'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    currentDiscount = 0;
-                    discountInput.value = '';
-                    showDiscountMessage(data.message, 'success');
-                    updateTotals();
-                    // Recargar la página
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
+                // Calcular y actualizar total
+                const total = subtotal + currentShipping - currentDiscount;
+                totalAmount.textContent = '$' + total.toLocaleString('es-CO');
+            }
+
+            // Inicializar totales
+            updateTotals();
+
+            // Validación del formulario antes de enviar
+            checkoutForm.addEventListener('submit', function(e) {
+                const selectedAddress = document.querySelector('input[name="selected_address"]:checked');
+                const selectedShipping = document.querySelector('input[name="shipping_method"]:checked');
+                const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
+
+                let errors = [];
+
+                if (!selectedAddress) {
+                    errors.push('Debes seleccionar una dirección de envío');
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showDiscountMessage('Error al remover el descuento', 'error');
+
+                if (!selectedShipping) {
+                    errors.push('Debes seleccionar un método de envío');
+                }
+
+                if (!selectedPayment) {
+                    errors.push('Debes seleccionar un método de pago');
+                }
+
+                if (errors.length > 0) {
+                    e.preventDefault();
+                    alert('Por favor completa los siguientes campos:\n\n' + errors.join('\n'));
+                }
             });
-        }
-
-        function showDiscountMessage(message, type) {
-            discountMessage.textContent = message;
-            discountMessage.className = 'discount-message ' + type;
-            discountMessage.style.display = 'block';
-        }
-
-        function updateTotals() {
-            // Actualizar display de costos
-            shippingCost.textContent = currentShipping > 0 ? '$' + currentShipping.toLocaleString('es-CO') : 'Gratis';
-            
-            // Actualizar descuento
-            if (currentDiscount > 0) {
-                discountRow.style.display = 'flex';
-                discountAmount.textContent = '-$' + currentDiscount.toLocaleString('es-CO');
-            } else {
-                discountRow.style.display = 'none';
-            }
-            
-            // Calcular y actualizar total
-            const total = subtotal + currentShipping - currentDiscount;
-            totalAmount.textContent = '$' + total.toLocaleString('es-CO');
-        }
-
-        // Inicializar totales
-        updateTotals();
-
-        // Validación del formulario antes de enviar
-        checkoutForm.addEventListener('submit', function(e) {
-            const selectedAddress = document.querySelector('input[name="selected_address"]:checked');
-            const selectedShipping = document.querySelector('input[name="shipping_method"]:checked');
-            const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
-            
-            let errors = [];
-            
-            if (!selectedAddress) {
-                errors.push('Debes seleccionar una dirección de envío');
-            }
-            
-            if (!selectedShipping) {
-                errors.push('Debes seleccionar un método de envío');
-            }
-            
-            if (!selectedPayment) {
-                errors.push('Debes seleccionar un método de pago');
-            }
-            
-            if (errors.length > 0) {
-                e.preventDefault();
-                alert('Por favor completa los siguientes campos:\n\n' + errors.join('\n'));
-            }
         });
-    });
     </script>
 </body>
+
 </html>
