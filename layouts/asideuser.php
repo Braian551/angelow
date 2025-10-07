@@ -22,9 +22,14 @@
 ?>
   <aside class="user-sidebar">
       <div class="user-profile-summary">
-          <a href="<?= BASE_URL ?>" class="back-button" style="position: absolute; left: 20px; top: 20px;">
+          <a href="<?= BASE_URL ?>" class="back-button" style="position: absolute; left: 20px; top: 20px;" onclick="event.preventDefault(); if (document.referrer && document.referrer !== window.location.href) { history.back(); } else { window.location.href = '<?= BASE_URL ?>'; }">
               <i class="fas fa-arrow-left"></i>
           </a>
+          <noscript>
+              <a href="<?= BASE_URL ?>" class="back-button" style="position: absolute; left: 20px; top: 20px;">
+                  <i class="fas fa-arrow-left"></i>
+              </a>
+          </noscript>
           <div class="user-avatar">
               <img src="<?= BASE_URL ?>/<?php echo !empty($userData['image']) ? htmlspecialchars($userData['image']) : 'images/default-avatar.png'; ?>" alt="Foto de perfil">
           </div>
