@@ -169,7 +169,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (move_uploaded_file($_FILES['payment_proof']['tmp_name'], $file_path)) {
                 $payment_proof = 'uploads/payment_proofs/' . $file_name;
             } else {
-                $errors[] = "Error al subir el archivo";
+                // Logging detallado para diagnosticar fallos en move_uploaded_file
+                error_log('Error al mover archivo de comprobante. tmp_name: ' . ($_FILES['payment_proof']['tmp_name'] ?? '') . ' dest: ' . $file_path . ' file_error: ' . ($_FILES['payment_proof']['error'] ?? '') . ' user_id: ' . $user_id);
+                error_log('$_FILES payment_proof: ' . print_r($_FILES['payment_proof'], true));
+                if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                    $errors[] = "Error al subir el archivo: no se pudo mover el archivo al directorio de uploads. Revisa permisos y espacio en disco.";
+                } else {
+                    $errors[] = "Error al subir el archivo";
+                }
             }
         }
     } else {
@@ -193,9 +200,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $orderQuery = "
                 INSERT INTO orders (
                     order_number, user_id, status, subtotal, shipping_cost, 
-                    discount_amount, total, payment_method, payment_status,
+                    total, payment_method, payment_status,
                     shipping_address, shipping_city
-                ) VALUES (?, ?, 'pending', ?, ?, ?, ?, 'transfer', 'pending', ?, ?)
+                ) VALUES (?, ?, 'pending', ?, ?, ?, 'transfer', 'pending', ?, ?)
             ";
             
             $shipping_address = $selectedAddress['address'] . ', ' . $selectedAddress['neighborhood'];
@@ -209,7 +216,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $user_id,
                 $checkout_data['subtotal'],
                 $checkout_data['shipping_cost'],
-                $checkout_data['discount_amount'],
                 $checkout_data['total'],
                 $shipping_address,
                 'Medellín' // Asumiendo que todas las direcciones son en Medellín
@@ -292,8 +298,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
         } catch (Exception $e) {
             $conn->rollBack();
-            error_log("Error al procesar pago: " . $e->getMessage());
-            $errors[] = "Error al procesar el pago. Por favor intenta nuevamente.";
+            // Registrar traza completa y datos relevantes para diagnóstico
+            error_log("Error al procesar pago: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString() . "\nPOST: " . print_r($_POST, true) . "\nFILES: " . print_r($_FILES, true) . "\nCheckout data: " . print_r($checkout_data, true));
+
+            // En modo DEBUG mostrar detalle en la interfaz para facilitar debugging local
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                $errors[] = "Error al procesar el pago: " . $e->getMessage();
+            } else {
+                $errors[] = "Error al procesar el pago. Por favor intenta nuevamente.";
+            }
         }
     }
 }
