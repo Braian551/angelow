@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
-require_once __DIR__ . '/../layouts/header2.php';
+require_once __DIR__ . '/../layouts/client/headerclientconfig.php';
 require_once __DIR__ . '/../layouts/functions.php';
 
 ?>
@@ -85,7 +85,7 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                 <div class="no-orders">
                     <i class="fas fa-box-open"></i>
                     <p>Aún no has realizado ningún pedido</p>
-                    <a href="<?= BASE_URL ?>/tienda/productos.php" class="btn">Ir a la tienda</a>
+                    <a href="<?= BASE_URL ?>" class="btn">Ir a la tienda</a>
                 </div>
             </section>
 
