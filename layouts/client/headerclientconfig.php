@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../../conexion.php';
+require_once __DIR__ . '/../../config.php';
 
 if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
@@ -33,7 +34,7 @@ if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
 
 // Obtener el conteo del carrito si no está en sesión
 if (!isset($_SESSION['cart_count'])) {
-    require_once __DIR__ . '/../config.php';
+    require_once __DIR__ . '/../../config.php';
     $user_id = $_SESSION['user_id'] ?? null;
     $session_id = session_id();
 
