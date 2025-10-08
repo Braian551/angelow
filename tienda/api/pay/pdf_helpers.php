@@ -1,5 +1,5 @@
 <?php
-// admin/api/pay/generate_pdf.php
+// admin/api/pay/pdf_helpers.php
 
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
@@ -8,78 +8,10 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
-// Configurar manejo de errores
-set_error_handler(function($severity, $message, $file, $line) {
-    throw new ErrorException($message, 0, $severity, $file, $line);
-});
-
-// Inicializar sesión si no está iniciada
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Verificar ID de la orden
-$order_id = $_GET['id'] ?? 0;
-$order_id = filter_var($order_id, FILTER_VALIDATE_INT);
-if (!$order_id) {
-    header("HTTP/1.0 404 Not Found");
-    exit();
-}
-
-try {
-    // Verificar autenticación
-    if (!isset($_SESSION['user_id'])) {
-        throw new Exception("Usuario no autenticado");
-    }
-
-    $user_id = $_SESSION['user_id'];
-
-    // Obtener información completa de la orden
-    $orderQuery = "
-        SELECT o.*, u.name as user_name, u.email as user_email, u.phone as user_phone,
-               pt.reference_number, pt.payment_proof, pt.created_at as payment_date,
-               sm.name as shipping_method_name, sm.description as shipping_description
-        FROM orders o
-        JOIN users u ON o.user_id = u.id
-        LEFT JOIN payment_transactions pt ON o.id = pt.order_id
-        LEFT JOIN shipping_methods sm ON o.shipping_method_id = sm.id
-        WHERE o.id = ? AND o.user_id = ?
-    ";
-    $stmt = $conn->prepare($orderQuery);
-    $stmt->execute([$order_id, $user_id]);
-    $order = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$order) {
-        header("HTTP/1.0 404 Not Found");
-        exit();
-    }
-
-    // Obtener items de la orden con imágenes
-    $itemsQuery = "
-        SELECT oi.*, p.slug as product_slug,
-               COALESCE(vi.image_path, pi.image_path) as primary_image
-        FROM order_items oi
-        LEFT JOIN products p ON oi.product_id = p.id
-        LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_primary = 1
-        LEFT JOIN product_color_variants pcv ON oi.color_variant_id = pcv.id
-        LEFT JOIN variant_images vi ON pcv.id = vi.color_variant_id AND vi.is_primary = 1
-        WHERE oi.order_id = ?
-    ";
-    $stmt = $conn->prepare($itemsQuery);
-    $stmt->execute([$order_id]);
-    $orderItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Limpiar buffers de salida antes de generar PDF
-    while (ob_get_level()) {
-        ob_end_clean();
-    }
-
-    // Configurar headers para descarga de PDF
-    header('Content-Type: application/pdf');
-    header('Content-Disposition: attachment; filename="comprobante_pedido_' . $order['order_number'] . '.pdf"');
-    header('Cache-Control: private, max-age=0, must-revalidate');
-    header('Pragma: public');
-
+/**
+ * Genera el contenido PDF del comprobante de pedido y lo devuelve como string
+ */
+function generateOrderPdfContent($order, $orderItems) {
     // Configurar Dompdf
     $options = new Options();
     $options->set('isRemoteEnabled', true);
@@ -88,7 +20,7 @@ try {
     
     $dompdf = new Dompdf($options);
 
-    // HTML para el contenido del PDF
+    // HTML para el contenido del PDF (mismo que el archivo principal)
     $html = '
     <!DOCTYPE html>
     <html>
@@ -447,38 +379,33 @@ try {
     // Renderizar el PDF
     $dompdf->render();
     
-    // Salida del PDF
-    $dompdf->stream('comprobante_pedido_' . $order['order_number'] . '.pdf', [
-        'Attachment' => true
-    ]);
-    exit();
+    // Devolver el contenido del PDF
+    return $dompdf->output();
+}
 
-} catch (Exception $e) {
-    // Limpiar buffers antes de enviar respuesta de error
+/**
+ * Función para enviar el PDF directamente al navegador
+ */
+function streamOrderPdfDownload($order, $orderItems) {
+    $pdfContent = generateOrderPdfContent($order, $orderItems);
+    
+    if (!$pdfContent) {
+        throw new Exception("No se pudo generar el PDF");
+    }
+    
+    // Limpiar buffers
     while (ob_get_level()) {
         ob_end_clean();
     }
     
-    // Registrar error detallado
-    $errorMsg = "[" . date('Y-m-d H:i:s') . "] Error al generar PDF de comprobante: " . $e->getMessage() . 
-                " en " . $e->getFile() . " línea " . $e->getLine() . "\n";
+    // Configurar headers
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: attachment; filename="comprobante_pedido_' . $order['order_number'] . '.pdf"');
+    header('Cache-Control: private, max-age=0, must-revalidate');
+    header('Pragma: public');
+    header('Content-Length: ' . strlen($pdfContent));
     
-    // Intentar escribir al log
-    $logPath = __DIR__ . '/../../../../php_errors.log';
-    if (is_writable(dirname($logPath))) {
-        error_log($errorMsg, 3, $logPath);
-    } else {
-        error_log($errorMsg); // Log al sistema
-    }
-    
-    // Responder con error
-    header('Content-Type: application/json');
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'error' => 'Ocurrió un error al generar el comprobante PDF.',
-        'debug' => defined('DEBUG_MODE') && DEBUG_MODE ? $e->getMessage() : null
-    ]);
+    echo $pdfContent;
     exit();
 }
 ?>

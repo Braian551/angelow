@@ -3,8 +3,8 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// Verificar disponibilidad de la clase TCPDF (puede no estar instalada)
-$tcpdf_available = class_exists('TCPDF') || class_exists('\TCPDF');
+// Verificar disponibilidad de una librería para generar PDF (Dompdf o TCPDF)
+$pdf_available = class_exists('\Dompdf\\Dompdf') || class_exists('Dompdf') || class_exists('TCPDF') || class_exists('\\TCPDF');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -75,8 +75,8 @@ try {
 
 // Incluir el helper de correo (envío de confirmación)
 require_once __DIR__ . '/api/pay/send_confirmation.php';
-// Incluir helper para generar PDF
-require_once __DIR__ . '/api/pay/generate_pdf.php';
+// Incluir helper puro para generar PDF (no ejecutar endpoint que haga stream/exit al incluir)
+require_once __DIR__ . '/api/pay/pdf_helpers.php';
 
 // Enviar correo de confirmación una sola vez por número de orden (adjuntar PDF si es posible)
 try {
@@ -85,7 +85,8 @@ try {
         $pdfContent = null;
         $pdfFilename = 'comprobante_pedido_' . $order_number . '.pdf';
 
-        if ($tcpdf_available) {
+        // Intentar generar PDF en memoria si hay un motor disponible (generate_pdf.php usa Dompdf)
+        if ($pdf_available) {
             try {
                 $pdfContent = generateOrderPdfContent($order, $orderItems);
             } catch (Exception $e) {
@@ -106,12 +107,12 @@ try {
 // Procesar generación de PDF (descarga)
 if (isset($_POST['download_pdf'])) {
     try {
-        if (!$tcpdf_available) {
-            error_log('Intento de generar PDF pero la clase TCPDF no está disponible.');
+        if (!$pdf_available) {
+            error_log('Intento de generar PDF pero no hay un motor de PDF disponible (Dompdf/TCPDF).');
             throw new Exception('La generación de PDF no está disponible en este servidor.');
         }
 
-        // Generar y enviar la descarga
+        // Generar y enviar la descarga (generate_pdf.php implementa streamOrderPdfDownload usando Dompdf)
         streamOrderPdfDownload($order, $orderItems);
         exit();
     } catch (Exception $e) {
