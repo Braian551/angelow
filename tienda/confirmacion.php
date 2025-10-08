@@ -73,353 +73,47 @@ try {
     exit();
 }
 
-// Procesar generación de PDF
+// Incluir el helper de correo (envío de confirmación)
+require_once __DIR__ . '/api/pay/send_confirmation.php';
+// Incluir helper para generar PDF
+require_once __DIR__ . '/api/pay/generate_pdf.php';
+
+// Enviar correo de confirmación una sola vez por número de orden (adjuntar PDF si es posible)
+try {
+    $sessionFlag = 'confirmation_email_sent_' . $order_number;
+    if (empty($_SESSION[$sessionFlag])) {
+        $pdfContent = null;
+        $pdfFilename = 'comprobante_pedido_' . $order_number . '.pdf';
+
+        if ($tcpdf_available) {
+            try {
+                $pdfContent = generateOrderPdfContent($order, $orderItems);
+            } catch (Exception $e) {
+                error_log('Error al generar PDF en memoria para adjuntar: ' . $e->getMessage());
+                $pdfContent = null;
+            }
+        }
+
+        $sent = sendOrderConfirmationEmail($order, $orderItems, $pdfContent, $pdfFilename);
+        if ($sent) {
+            $_SESSION[$sessionFlag] = true;
+        }
+    }
+} catch (Exception $e) {
+    error_log('Error al intentar enviar correo de confirmación: ' . $e->getMessage());
+}
+
+// Procesar generación de PDF (descarga)
 if (isset($_POST['download_pdf'])) {
     try {
         if (!$tcpdf_available) {
-            // Registrar y preparar mensaje para el usuario en la interfaz
             error_log('Intento de generar PDF pero la clase TCPDF no está disponible.');
-            $pdfErrorMessage = 'La generación de PDF no está disponible en este servidor. Por favor contacte al administrador.';
-            // No intentar generar el PDF
-            throw new Exception($pdfErrorMessage);
-        }
-        // Limpiar buffers de salida
-        while (ob_get_level()) {
-            ob_end_clean();
+            throw new Exception('La generación de PDF no está disponible en este servidor.');
         }
 
-        // Configurar headers para descarga de PDF
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="comprobante_pedido_' . $order_number . '.pdf"');
-        header('Cache-Control: private, max-age=0, must-revalidate');
-        header('Pragma: public');
-
-    // Crear nuevo documento PDF (usar valores por defecto si las constantes no están definidas)
-    $orientation = defined('PDF_PAGE_ORIENTATION') ? PDF_PAGE_ORIENTATION : 'P';
-    $unit = defined('PDF_UNIT') ? PDF_UNIT : 'mm';
-    $pageFormat = 'LETTER';
-    $creator = defined('PDF_CREATOR') ? PDF_CREATOR : SITE_NAME;
-    $marginBottom = defined('PDF_MARGIN_BOTTOM') ? PDF_MARGIN_BOTTOM : 20;
-
-    // Usar la clase con su namespace global
-    $pdf = new \TCPDF($orientation, $unit, $pageFormat, true, 'UTF-8', false);
-        
-        // Configuración del documento
-    $pdf->SetCreator($creator);
-        $pdf->SetAuthor(SITE_NAME);
-        $pdf->SetTitle('Comprobante de Pedido ' . $order_number);
-        $pdf->SetSubject('Comprobante de Pedido');
-        $pdf->SetKeywords('Pedido, Comprobante, ' . SITE_NAME);
-        
-        // Configuración de márgenes
-        $pdf->SetMargins(15, 25, 15);
-        $pdf->SetHeaderMargin(10);
-        $pdf->SetFooterMargin(15);
-        $pdf->setPrintFooter(true);
-        
-        // Auto saltos de página
-    $pdf->SetAutoPageBreak(TRUE, $marginBottom);
-        
-        // Fuente principal
-        $pdf->SetFont('helvetica', '', 10);
-        
-        // Verificar si existe el logo
-        $logoPath = __DIR__ . '/../../images/logo2.png';
-        $logoExists = file_exists($logoPath);
-        
-        // Agregar página
-        $pdf->AddPage();
-        
-        // HTML para el contenido del PDF
-        $html = '
-        <style>
-            .header-title {
-                color: #006699;
-                font-size: 16pt;
-                font-weight: bold;
-                margin-bottom: 5px;
-            }
-            .header-subtitle {
-                color: #666666;
-                font-size: 10pt;
-                margin-top: 0;
-            }
-            .section-title {
-                color: #006699;
-                padding: 6px 8px;
-                font-size: 11pt;
-                font-weight: bold;
-                margin-top: 15px;
-                border-radius: 3px;
-            }
-            .label {
-                font-weight: bold;
-                color: #333333;
-                width: 120px;
-                display: inline-block;
-            }
-            .value {
-                color: #555555;
-            }
-            .footer {
-                font-size: 8pt;
-                color: #666666;
-                text-align: center;
-                border-top: 1px solid #CCCCCC;
-                padding-top: 8px;
-                margin-top: 20px;
-            }
-            .order-number {
-                font-size: 20pt;
-                color: #006699;
-                font-weight: bold;
-                text-align: center;
-                margin: 20px 0;
-                letter-spacing: 2px;
-            }
-            .order-total {
-                font-size: 16pt;
-                color: #FF6600;
-                font-weight: bold;
-                text-align: center;
-                margin: 10px 0;
-            }
-            .product-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-            }
-            .product-table th {
-                background-color: #006699;
-                color: #FFFFFF;
-                border: 1px solid #DDDDDD;
-                padding: 8px;
-                font-weight: bold;
-                font-size: 9pt;
-            }
-            .product-table td {
-                border: 1px solid #DDDDDD;
-                padding: 8px;
-                font-size: 9pt;
-            }
-            .text-center {
-                text-align: center;
-            }
-            .text-right {
-                text-align: right;
-            }
-            .text-left {
-                text-align: left;
-            }
-            .status-badge {
-                display: inline-block;
-                padding: 4px 12px;
-                border-radius: 20px;
-                font-weight: bold;
-                font-size: 9pt;
-            }
-            .status-pending {
-                background-color: #FFF3CD;
-                color: #856404;
-            }
-            .status-confirmed {
-                background-color: #D1ECF1;
-                color: #0C5460;
-            }
-            .company-info {
-                font-size: 9pt;
-                color: #666666;
-                line-height: 1.4;
-            }
-            .summary-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 10px 0;
-            }
-            .summary-table td {
-                padding: 6px 8px;
-                border-bottom: 1px solid #EEEEEE;
-            }
-            .summary-table .total-row {
-                border-top: 2px solid #006699;
-                font-weight: bold;
-            }
-        </style>
-        
-        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-            <tr>
-                <td width="40%">';
-        
-        if ($logoExists) {
-            $html .= '<img src="' . $logoPath . '" width="180">';
-        } else {
-            $html .= '<h1 class="header-title">' . SITE_NAME . '</h1>
-                      <p class="header-subtitle">Moda infantil de calidad</p>';
-        }
-        
-        $html .= '
-                </td>
-                <td width="60%" style="text-align: right; vertical-align: top;">
-                    <h1 class="header-title">COMPROBANTE DE PEDIDO</h1>
-                    <p><span class="label">Fecha:</span> ' . (!empty($order['created_at']) ? date('d/m/Y H:i', strtotime($order['created_at'])) : 'N/A') . '</p>
-                    <p><span class="label">Cliente:</span> ' . htmlspecialchars($order['user_name']) . '</p>
-                </td>
-            </tr>
-        </table>
-        
-        <!-- Número de orden destacado -->
-        <div class="order-number">PEDIDO #' . htmlspecialchars($order_number) . '</div>
-        <div class="order-total">TOTAL: $' . number_format($order['total'], 0, ',', '.') . '</div>
-        
-        <!-- Información del pedido -->
-        <h3 class="section-title">INFORMACIÓN DEL PEDIDO</h3>
-        <table border="0" cellpadding="3" cellspacing="0" width="100%">
-            <tr>
-                <td width="25%"><span class="label">Número de orden:</span></td>
-                <td width="75%" class="value">' . htmlspecialchars($order_number) . '</td>
-            </tr>
-            <tr>
-                <td><span class="label">Fecha:</span></td>
-                <td class="value">' . date('d/m/Y H:i', strtotime($order['created_at'])) . '</td>
-            </tr>
-            <tr>
-                <td><span class="label">Estado:</span></td>
-                <td class="value"><span class="status-badge status-pending">' . ucfirst($order['status']) . '</span></td>
-            </tr>
-            <tr>
-                <td><span class="label">Método de pago:</span></td>
-                <td class="value">Transferencia bancaria</td>
-            </tr>
-            <tr>
-                <td><span class="label">Referencia:</span></td>
-                <td class="value">' . htmlspecialchars($order['reference_number']) . '</td>
-            </tr>
-        </table>
-        
-        <!-- Información de envío -->
-        <h3 class="section-title">INFORMACIÓN DE ENVÍO</h3>
-        <table border="0" cellpadding="3" cellspacing="0" width="100%">
-            <tr>
-                <td width="25%"><span class="label">Cliente:</span></td>
-                <td width="75%" class="value">' . htmlspecialchars($order['user_name']) . '</td>
-            </tr>';
-        
-        if ($order['user_phone']) {
-            $html .= '
-            <tr>
-                <td><span class="label">Teléfono:</span></td>
-                <td class="value">' . htmlspecialchars($order['user_phone']) . '</td>
-            </tr>';
-        }
-        
-        $html .= '
-            <tr>
-                <td><span class="label">Email:</span></td>
-                <td class="value">' . htmlspecialchars($order['user_email']) . '</td>
-            </tr>
-            <tr>
-                <td><span class="label">Dirección:</span></td>
-                <td class="value">' . htmlspecialchars($shipping_address) . '</td>
-            </tr>
-        </table>
-        
-        <!-- Productos del pedido -->
-        <h3 class="section-title">PRODUCTOS DEL PEDIDO</h3>
-        <table class="product-table">
-            <thead>
-                <tr>
-                    <th style="text-align: left;">Producto</th>
-                    <th style="text-align: center;">Variante</th>
-                    <th style="text-align: center;">Cantidad</th>
-                    <th style="text-align: right;">Precio Unit.</th>
-                    <th style="text-align: right;">Total</th>
-                </tr>
-            </thead>
-            <tbody>';
-        
-        foreach ($orderItems as $item) {
-            $html .= '
-                <tr>
-                    <td class="text-left">' . htmlspecialchars($item['product_name']) . '</td>
-                    <td class="text-center">' . htmlspecialchars($item['variant_name'] ?? 'N/A') . '</td>
-                    <td class="text-center">' . $item['quantity'] . '</td>
-                    <td class="text-right">$' . number_format($item['price'], 0, ',', '.') . '</td>
-                    <td class="text-right">$' . number_format($item['total'], 0, ',', '.') . '</td>
-                </tr>';
-        }
-        
-        $html .= '
-            </tbody>
-        </table>
-        
-        <!-- Resumen de pagos -->
-        <h3 class="section-title">RESUMEN DE PAGOS</h3>
-        <table class="summary-table">
-            <tr>
-                <td class="text-left">Subtotal:</td>
-                <td class="text-right">$' . number_format($order['subtotal'], 0, ',', '.') . '</td>
-            </tr>';
-        
-        if ($order['discount_amount'] > 0) {
-            $html .= '
-            <tr>
-                <td class="text-left">Descuento:</td>
-                <td class="text-right">-$' . number_format($order['discount_amount'], 0, ',', '.') . '</td>
-            </tr>';
-        }
-        
-        $html .= '
-            <tr>
-                <td class="text-left">Costo de envío:</td>
-                <td class="text-right">$' . number_format($order['shipping_cost'], 0, ',', '.') . '</td>
-            </tr>
-            <tr class="total-row">
-                <td class="text-left"><strong>TOTAL:</strong></td>
-                <td class="text-right"><strong>$' . number_format($order['total'], 0, ',', '.') . '</strong></td>
-            </tr>
-        </table>
-        
-        <!-- Información de pago -->
-        <h3 class="section-title">INFORMACIÓN DE PAGO</h3>
-        <table border="0" cellpadding="3" cellspacing="0" width="100%">
-            <tr>
-                <td width="25%"><span class="label">Método:</span></td>
-                <td width="75%" class="value">Transferencia bancaria</td>
-            </tr>
-            <tr>
-                <td><span class="label">Referencia:</span></td>
-                <td class="value">' . htmlspecialchars($order['reference_number']) . '</td>
-            </tr>
-            <tr>
-                <td><span class="label">Fecha de pago:</span></td>
-                <td class="value">' . (!empty($order['payment_date']) ? date('d/m/Y H:i', strtotime($order['payment_date'])) : 'N/A') . '</td>
-            </tr>
-            <tr>
-                <td><span class="label">Estado:</span></td>
-                <td class="value"><span class="status-badge status-pending">Pendiente de verificación</span></td>
-            </tr>
-        </table>
-        
-        <!-- Instrucciones -->
-        <h3 class="section-title">PRÓXIMOS PASOS</h3>
-        <p>1. Tu pedido ha sido recibido y está siendo procesado.</p>
-        <p>2. Verificaremos el pago en un plazo máximo de 24 horas.</p>
-        <p>3. Recibirás una notificación cuando tu pedido sea enviado.</p>
-        <p>4. El tiempo de entrega depende del método de envío seleccionado.</p>
-        
-        <div class="footer">
-            <strong>' . SITE_NAME . '</strong><br>
-            ' . (defined('SITE_CONTACT') ? constant('SITE_CONTACT') : 'Contacto') . ' | Email: ' . (defined('SITE_EMAIL') ? constant('SITE_EMAIL') : 'no-reply@ejemplo.com') . '<br>
-            ' . (defined('SITE_ADDRESS') ? constant('SITE_ADDRESS') : 'Dirección no disponible') . ' - ' . (defined('SITE_URL') ? constant('SITE_URL') : BASE_URL) . '
-        </div>';
-        
-        // Escribir el HTML en el PDF
-        $pdf->writeHTML($html, true, false, true, false, '');
-
-        // Salida del PDF
-        $pdf->Output('comprobante_pedido_' . $order_number . '.pdf', 'D');
+        // Generar y enviar la descarga
+        streamOrderPdfDownload($order, $orderItems);
         exit();
-
     } catch (Exception $e) {
         error_log("Error al generar PDF: " . $e->getMessage());
         // Si hay error en PDF, continuar mostrando la página normal
@@ -735,5 +429,4 @@ try {
         });
     </script>
 </body>
-
 </html>
