@@ -33,12 +33,19 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
         $mail->Subject = 'Confirmación de tu pedido #' . htmlspecialchars($order['order_number']);
 
         // Construir cuerpo HTML con estilo más profesional
-        $logoUrl = defined('BASE_URL') ? rtrim(BASE_URL, '/') . '/images/logo2.png' : '';
+        require_once __DIR__ . '/pdf_helpers.php';
+        $logoUrl = ImageHelper::getFullUrl('images/logo2.png');
 
         $itemsHtml = '';
         foreach ($orderItems as $it) {
+            $imageUrl = !empty($it['primary_image']) ? 
+                       ImageHelper::getFullUrl($it['primary_image']) : 
+                       ImageHelper::getFullUrl('images/default-product.jpg');
+
             $itemsHtml .= '<tr>' .
-                '<td style="padding:8px;border-bottom:1px solid #e6e6e6;">' . htmlspecialchars($it['product_name']) . '</td>' .
+                '<td style="padding:8px;border-bottom:1px solid #e6e6e6;">' .
+                '<img src="' . $imageUrl . '" alt="' . htmlspecialchars($it['product_name']) . '" style="width:50px;height:50px;object-fit:cover;vertical-align:middle;margin-right:10px;">' .
+                htmlspecialchars($it['product_name']) . '</td>' .
                 '<td style="padding:8px;border-bottom:1px solid #e6e6e6;text-align:center;">' . intval($it['quantity']) . '</td>' .
                 '<td style="padding:8px;border-bottom:1px solid #e6e6e6;text-align:right;">$' . number_format($it['price'], 0, ',', '.') . '</td>' .
                 '<td style="padding:8px;border-bottom:1px solid #e6e6e6;text-align:right;">$' . number_format($it['total'], 0, ',', '.') . '</td>' .

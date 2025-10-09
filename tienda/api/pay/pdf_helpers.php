@@ -9,6 +9,77 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 
 /**
+ * Funciones auxiliares para manejo de imágenes y rutas
+ */
+class ImageHelper {
+    /**
+     * Convierte una ruta relativa a URL absoluta usando BASE_URL
+     */
+    public static function getFullUrl($path) {
+        return rtrim(BASE_URL, '/') . '/' . ltrim($path, '/');
+    }
+
+    /**
+     * Convierte una ruta relativa a ruta absoluta del servidor
+     */
+    public static function getServerPath($path) {
+        return rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/angelow/' . ltrim($path, '/');
+    }
+
+    /**
+     * Obtiene la ruta del logo
+     */
+    public static function getLogoPath($useDefault = true) {
+        $logo2Path = self::getServerPath('images/logo2.png');
+        if (file_exists($logo2Path)) {
+            return $logo2Path;
+        }
+        
+        if ($useDefault) {
+            $logoPath = self::getServerPath('images/logo.png');
+            if (file_exists($logoPath)) {
+                return $logoPath;
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * Obtiene la ruta de una imagen de producto
+     */
+    public static function getProductImagePath($relativePath) {
+        if (empty($relativePath)) {
+            return self::getServerPath('images/default-product.jpg');
+        }
+
+        // Asegurar que la ruta sea relativa a uploads/productos
+        if (strpos($relativePath, 'uploads/productos/') === false) {
+            $relativePath = 'uploads/productos/' . basename($relativePath);
+        }
+
+        return self::getServerPath($relativePath);
+    }
+
+    /**
+     * Convierte una imagen a base64
+     */
+    public static function convertToBase64($path) {
+        if (!$path || !file_exists($path)) {
+            return null;
+        }
+
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);
+        if ($data === false) {
+            return null;
+        }
+
+        return 'data:image/' . $type . ';base64,' . base64_encode($data);
+    }
+}
+
+/**
  * Genera el contenido PDF del comprobante de pedido y lo devuelve como string
  */
 // Función para convertir imagen a base64
@@ -226,14 +297,9 @@ function generateOrderPdfContent($order, $orderItems) {
             <!-- Encabezado -->
             <div class="header">';
     
-    // Agregar el logo
-    $logoPath = $_SERVER['DOCUMENT_ROOT'] . '/angelow/images/logo2.png';
-    $logoBase64 = convertImageToBase64($logoPath);
-    if (!$logoBase64) {
-        // Intentar con logo.png si logo2.png no existe
-        $logoPath = $_SERVER['DOCUMENT_ROOT'] . '/angelow/images/logo.png';
-        $logoBase64 = convertImageToBase64($logoPath);
-    }
+    // Agregar el logo usando ImageHelper
+    $logoPath = ImageHelper::getLogoPath();
+    $logoBase64 = ImageHelper::convertToBase64($logoPath);
     
     if ($logoBase64) {
         $html .= '<img src="' . $logoBase64 . '" style="width:150px; margin-bottom:10px;" alt="Logo Angelow">';
@@ -333,8 +399,8 @@ function generateOrderPdfContent($order, $orderItems) {
 
     foreach ($orderItems as $item) {
         // Obtener la ruta de la imagen y convertirla a base64
-        $imagePath = getImagePath($item['primary_image']);
-        $base64Image = convertImageToBase64($imagePath);
+        $imagePath = ImageHelper::getProductImagePath($item['primary_image']);
+        $base64Image = ImageHelper::convertToBase64($imagePath);
         
         $html .= '
                     <tr>
