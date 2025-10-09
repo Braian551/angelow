@@ -133,9 +133,25 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
         .social-links { margin: 20px 0; }
         .social-links a { margin: 0 10px; color: #2968c8; text-decoration: none; }
         .badge { background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .step-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin: 30px 0; }
-        .step { text-align: center; padding: 30px 20px; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border: 2px solid #e8f0fe; border-radius: 12px; box-shadow: 0 4px 12px rgba(41, 104, 200, 0.08); transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .step:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(41, 104, 200, 0.12); }
+        .step-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 40px; 
+            margin: 40px 0; 
+        }
+        .step { 
+            text-align: center; 
+            padding: 35px 25px; 
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); 
+            border: 2px solid #e8f0fe; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(41, 104, 200, 0.08); 
+            transition: transform 0.2s ease, box-shadow 0.2s ease; 
+        }
+        .step:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(41, 104, 200, 0.12); 
+        }
         .step-number { 
             display: inline-block; 
             width: 40px; 
@@ -147,7 +163,7 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
             font-size: 18px; 
             line-height: 40px; 
             text-align: center; 
-            margin-bottom: 15px;
+            margin: 0 0 20px 0;
             box-shadow: 0 2px 4px rgba(41, 104, 200, 0.2);
         }
         .step-title { font-size: 17px; font-weight: 700; margin: 15px 0 10px 0; color: #2968c8; }
