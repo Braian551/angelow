@@ -95,6 +95,14 @@ try {
             }
         }
 
+        // Asegurarse de que las imágenes en el email usen URLs absolutas
+        $baseUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/angelow';
+        foreach ($orderItems as &$item) {
+            if (!empty($item['primary_image'])) {
+                $item['primary_image'] = $baseUrl . '/' . $item['primary_image'];
+            }
+        }
+        
         $sent = sendOrderConfirmationEmail($order, $orderItems, $pdfContent, $pdfFilename);
         if ($sent) {
             $_SESSION[$sessionFlag] = true;

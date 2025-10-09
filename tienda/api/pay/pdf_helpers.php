@@ -11,12 +11,40 @@ use Dompdf\Options;
 /**
  * Genera el contenido PDF del comprobante de pedido y lo devuelve como string
  */
+// Función para convertir imagen a base64
+function convertImageToBase64($path) {
+    if (file_exists($path)) {
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);
+        if ($data !== false) {
+            return 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+    }
+    return false;
+}
+
+// Función para obtener la ruta real de una imagen
+function getImagePath($relativePath) {
+    if (empty($relativePath)) {
+        return $_SERVER['DOCUMENT_ROOT'] . '/angelow/images/default-product.jpg';
+    }
+    
+    // Asegurarse de que la ruta comience con uploads/productos si es una imagen de producto
+    if (strpos($relativePath, 'uploads/productos/') === false) {
+        $relativePath = 'uploads/productos/' . basename($relativePath);
+    }
+    
+    return $_SERVER['DOCUMENT_ROOT'] . '/angelow/' . ltrim($relativePath, '/');
+}
+
 function generateOrderPdfContent($order, $orderItems) {
     // Configurar Dompdf
     $options = new Options();
     $options->set('isRemoteEnabled', true);
     $options->set('isHtml5ParserEnabled', true);
     $options->set('defaultFont', 'Helvetica');
+    $options->set('enable_php', true);
+    $options->set('isPhpEnabled', true);
     
     $dompdf = new Dompdf($options);
 
@@ -196,7 +224,22 @@ function generateOrderPdfContent($order, $orderItems) {
     <body>
         <div class="container">
             <!-- Encabezado -->
-            <div class="header">
+            <div class="header">';
+    
+    // Agregar el logo
+    $logoPath = $_SERVER['DOCUMENT_ROOT'] . '/angelow/images/logo2.png';
+    $logoBase64 = convertImageToBase64($logoPath);
+    if (!$logoBase64) {
+        // Intentar con logo.png si logo2.png no existe
+        $logoPath = $_SERVER['DOCUMENT_ROOT'] . '/angelow/images/logo.png';
+        $logoBase64 = convertImageToBase64($logoPath);
+    }
+    
+    if ($logoBase64) {
+        $html .= '<img src="' . $logoBase64 . '" style="width:150px; margin-bottom:10px;" alt="Logo Angelow">';
+    }
+    
+    $html .= '
                 <h1 class="header-title">Angelow Ropa Infantil</h1>
                 <p class="header-subtitle">Comprobante de Pedido</p>
             </div>
@@ -289,19 +332,28 @@ function generateOrderPdfContent($order, $orderItems) {
                 <tbody>';
 
     foreach ($orderItems as $item) {
-        $imagePath = __DIR__ . '/../../../../' . ($item['primary_image'] ?? 'assets/images/placeholder-product.jpg');
-        $imageExists = file_exists($imagePath) && $item['primary_image'];
+        // Obtener la ruta de la imagen y convertirla a base64
+        $imagePath = getImagePath($item['primary_image']);
+        $base64Image = convertImageToBase64($imagePath);
         
         $html .= '
                     <tr>
                         <td class="text-center">';
         
-        if ($imageExists) {
-            $html .= '<img src="' . $imagePath . '" class="product-image">';
+        if ($base64Image) {
+            $html .= '<img src="' . $base64Image . '" class="product-image" style="width:50px; height:50px; object-fit:cover;">';
         } else {
-            $html .= '<div style="width:50px;height:50px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;border-radius:3px;">
+            // Intentar con la imagen por defecto
+            $defaultImage = $_SERVER['DOCUMENT_ROOT'] . '/angelow/images/default-product.jpg';
+            $defaultBase64 = convertImageToBase64($defaultImage);
+            
+            if ($defaultBase64) {
+                $html .= '<img src="' . $defaultBase64 . '" class="product-image" style="width:50px; height:50px; object-fit:cover;">';
+            } else {
+                $html .= '<div style="width:50px;height:50px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;border-radius:3px;">
                          <span style="font-size:8px;color:#999;">Sin imagen</span>
                       </div>';
+            }
         }
         
         $html .= '
