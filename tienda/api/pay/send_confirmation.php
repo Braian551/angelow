@@ -83,15 +83,13 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
             $rowStyle = $itemCount % 2 === 0 ? 'background-color: #fafafa;' : 'background-color: #ffffff;';
             
             $itemsHtml .= '<tr style="' . $rowStyle . '">' .
+                '<td style="padding: 16px; border-bottom: 1px solid #e8e8e8; vertical-align: middle; text-align: center;">' .
+                '<img src="' . $imageUrl . '" alt="' . htmlspecialchars($it['product_name']) . '" style="width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #f0f0f0; display: inline-block;">' .
+                '</td>' .
                 '<td style="padding: 16px; border-bottom: 1px solid #e8e8e8; vertical-align: top;">' .
-                '<div style="display: flex; align-items: flex-start; gap: 15px;">' .
-                '<img src="' . $imageUrl . '" alt="' . htmlspecialchars($it['product_name']) . '" style="width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #f0f0f0; flex-shrink: 0;">' .
-                '<div style="flex: 1; min-width: 0;">' .
                 '<div style="font-weight: 600; color: #333; margin-bottom: 6px; font-size: 15px; line-height: 1.3;">' . htmlspecialchars($it['product_name']) . '</div>' .
                 '<div style="font-size: 13px; color: #666; line-height: 1.4;">' . 
                     (!empty($it['variant_name']) ? htmlspecialchars($it['variant_name']) : '') . 
-                '</div>' .
-                '</div>' .
                 '</div>' .
                 '</td>' .
                 '<td style="padding: 16px; border-bottom: 1px solid #e8e8e8; text-align: center; vertical-align: top; font-weight: 500; font-size: 14px;">' . intval($it['quantity']) . '</td>' .
@@ -195,7 +193,8 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
             <table class="table">
                 <thead>
                     <tr>
-                        <th style="width: 50%;">Producto</th>
+                        <th style="width: 15%;">Imagen</th>
+                        <th style="width: 35%;">Producto</th>
                         <th style="width: 12%; text-align: center;">Cantidad</th>
                         <th style="width: 19%; text-align: right;">Precio Unitario</th>
                         <th style="width: 19%; text-align: right;">Total</th>
