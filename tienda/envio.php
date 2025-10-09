@@ -451,7 +451,7 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                                                 </div>
                                                 <div class="shipping-cost">
                                                     <?php if ($method['base_cost'] > 0): ?>
-                                                        $<?= number_format($method['base_cost'], 0, ',', '.') ?>
+                                                        <span class="cost-amount">$<?= number_format($method['base_cost'], 0, ',', '.') ?></span>
                                                     <?php else: ?>
                                                         <span class="free-shipping">Gratis</span>
                                                     <?php endif; ?>
@@ -459,6 +459,16 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                                             </div>
                                         </label>
                                     </div>
+                                    <?php if ($index === 1): ?>
+                                        <script>
+                                            // Asegurarse de que el método estándar esté seleccionado inicialmente
+                                            document.addEventListener('DOMContentLoaded', function() {
+                                                const initialCost = <?= $method['base_cost'] ?>;
+                                                document.getElementById('shipping-cost').textContent = 
+                                                    initialCost > 0 ? '$' + initialCost.toLocaleString('es-CO') : 'Gratis';
+                                            });
+                                        </script>
+                                    <?php endif; ?>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
@@ -598,7 +608,9 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
 
             const subtotal = <?= $cartSubtotal ?>;
             let currentDiscount = <?= $currentDiscount ?>;
-            let currentShipping = 0;
+            // Obtener el costo de envío inicial del método estándar (el segundo método)
+            const defaultShippingRadio = document.querySelector('.shipping-radio[checked]');
+            let currentShipping = defaultShippingRadio ? parseFloat(defaultShippingRadio.dataset.cost) : 0;
 
             // Selección visual de direcciones
             const addressCards = document.querySelectorAll('.address-card');
