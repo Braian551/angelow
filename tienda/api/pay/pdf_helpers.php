@@ -204,7 +204,7 @@ function generateOrderPdfContent($order, $orderItems) {
     // Agregar el logo usando BASE_URL
     $logoUrl = BASE_URL . '/images/logo2.png';
     $html .= '
-                <div style="position: absolute; top: 20px; right: 20px;">
+                <div style="position: absolute; top: 20px; left: 20px;">
                     <img src="' . $logoUrl . '" style="width:80px; height:auto;" alt="Logo Angelow">
                 </div>
                 <h1 class="header-title">Angelow Ropa Infantil</h1>

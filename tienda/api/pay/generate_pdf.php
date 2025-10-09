@@ -364,7 +364,7 @@ try {
     error_log("[PDF_DEBUG] Intentando cargar logo desde URL: " . $logoUrl);
     error_log("[PDF_DEBUG] Ruta del servidor para logo: " . $logoPath);
     
-    $html .= '<div style="position: absolute; top: 20px; right: 20px;">';
+    $html .= '<div style="position: absolute; top: 20px; left: 20px;">';
     if (file_exists($logoPath)) {
         $logoData = base64_encode(file_get_contents($logoPath));
         $html .= '<img src="data:image/png;base64,' . $logoData . '" style="width:80px; height:auto;" alt="Logo Angelow">';
