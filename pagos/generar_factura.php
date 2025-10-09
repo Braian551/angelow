@@ -107,9 +107,13 @@ try {
     // Añadir página
     $pdf->AddPage();
     
-    // Logo de la empresa (ajusta la ruta según tu estructura)
-    $logoPath = __DIR__ . '/../images/logo2.png';
-    $logo = file_exists($logoPath) ? '<img src="' . $logoPath . '" width="120">' : '<h1>Angelow Ropa Infantil</h1>';
+    // Logo de la empresa usando ImageHelper
+    require_once __DIR__ . '/../tienda/api/pay/pdf_helpers.php';
+    $logoPath = ImageHelper::getLogoPath();
+    $logoBase64 = ImageHelper::convertToBase64($logoPath);
+    $logo = $logoBase64 ? 
+        '<img src="' . $logoBase64 . '" width="120">' : 
+        '<h1>Angelow Ropa Infantil</h1>';
     
     // Encabezado con logo y datos de la empresa
     $html = '

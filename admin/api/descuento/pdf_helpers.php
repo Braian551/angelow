@@ -3,6 +3,7 @@
 
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
+require_once __DIR__ . '/../../../includes/ImageHelper.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use TCPDF;
@@ -64,8 +65,10 @@ function generateDiscountPdfContent(int $id)
         $pdf->setPrintFooter(true);
         $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
         $pdf->SetFont('helvetica', '', 10);
-        $logoPath = __DIR__ . '/../../../../images/logo2.png';
-        $logoExists = file_exists($logoPath);
+        
+        // Obtener el logo usando ImageHelper
+        $logoBase64 = ImageHelper::getLogoBase64();
+        
         $pdf->AddPage();
 
         // Reproducir exactamente el HTML y estilos de generate_pdf.php
@@ -174,14 +177,12 @@ function generateDiscountPdfContent(int $id)
         <tr>
             <td width="40%">';
 
-        if ($logoExists) {
-            $html .= '<img src="' . $logoPath . '" width="180">';
-        } else {
-            $html .= '<h1 class="header-title">Angelow Ropa Infantil</h1>
+            if ($logoBase64) {
+                $html .= '<img src="' . $logoBase64 . '" width="180">';
+            } else {
+                $html .= '<h1 class="header-title">Angelow Ropa Infantil</h1>
                   <p class="header-subtitle">Moda infantil de calidad</p>';
-        }
-
-        $html .= '
+            }        $html .= '
             </td>
             <td width="60%" style="text-align: right; vertical-align: top;">
                 <h1 class="header-title">CÓDIGO DE DESCUENTO</h1>
