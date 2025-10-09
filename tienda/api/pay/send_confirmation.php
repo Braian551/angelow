@@ -138,8 +138,20 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
         .step-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin: 30px 0; }
         .step { text-align: center; padding: 30px 20px; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border: 2px solid #e8f0fe; border-radius: 12px; box-shadow: 0 4px 12px rgba(41, 104, 200, 0.08); transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .step:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(41, 104, 200, 0.12); }
-        .step-icon { font-size: 32px; margin-bottom: 15px; height: 60px; display: flex; align-items: center; justify-content: center; }
-        .step-number { display: inline-block; width: 30px; height: 30px; background: #2968c8; color: white; border-radius: 50%; font-weight: 600; font-size: 14px; line-height: 30px; text-align: center; margin-bottom: 10px; }
+        .step-number { 
+            display: inline-block; 
+            width: 40px; 
+            height: 40px; 
+            background: #2968c8; 
+            color: white; 
+            border-radius: 50%; 
+            font-weight: 600; 
+            font-size: 18px; 
+            line-height: 40px; 
+            text-align: center; 
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(41, 104, 200, 0.2);
+        }
         .step-title { font-size: 17px; font-weight: 700; margin: 15px 0 10px 0; color: #2968c8; }
         .step-description { font-size: 14px; color: #666; line-height: 1.5; }
         .step-divider { width: 40px; height: 3px; background: linear-gradient(90deg, #2968c8, #1e4d9c); margin: 12px auto; border-radius: 2px; }
@@ -266,23 +278,20 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
             <div class="step-container">
                 <div class="step">
                     <div class="step-number">1</div>
-                    <div class="step-icon">📦</div>
-                    <div class="step-divider"></div>
                     <div class="step-title">Preparación</div>
+                    <div class="step-divider"></div>
                     <div class="step-description">Estamos preparando tu pedido con cuidado y revisando cada detalle para garantizar la mejor calidad.</div>
                 </div>
                 <div class="step">
                     <div class="step-number">2</div>
-                    <div class="step-icon">🚚</div>
-                    <div class="step-divider"></div>
                     <div class="step-title">Envío</div>
+                    <div class="step-divider"></div>
                     <div class="step-description">Tu pedido será empacado y enviado pronto. Recibirás una notificación cuando salga de nuestro almacén.</div>
                 </div>
                 <div class="step">
                     <div class="step-number">3</div>
-                    <div class="step-icon">🏠</div>
-                    <div class="step-divider"></div>
                     <div class="step-title">Entrega</div>
+                    <div class="step-divider"></div>
                     <div class="step-description">Recibirás tu pedido en la dirección indicada. Estaremos en contacto para coordinar la entrega.</div>
                 </div>
             </div>
