@@ -3,7 +3,6 @@
 
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
-require_once __DIR__ . '/../../../includes/ImageHelper.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Dompdf\Dompdf;
@@ -202,12 +201,9 @@ function generateOrderPdfContent($order, $orderItems) {
             <!-- Encabezado -->
             <div class="header">';
     
-    // Agregar el logo usando ImageHelper
-    $logoBase64 = ImageHelper::getLogoBase64();
-    
-    if ($logoBase64) {
-        $html .= '<img src="' . $logoBase64 . '" style="width:150px; margin-bottom:10px;" alt="Logo Angelow">';
-    }
+    // Agregar el logo usando BASE_URL
+    $logoUrl = BASE_URL . '/images/logo2.png';
+    $html .= '<img src="' . $logoUrl . '" style="width:150px; margin-bottom:10px;" alt="Logo Angelow">';
     
     $html .= '
                 <h1 class="header-title">Angelow Ropa Infantil</h1>
@@ -302,27 +298,15 @@ function generateOrderPdfContent($order, $orderItems) {
                 <tbody>';
 
     foreach ($orderItems as $item) {
-        // Obtener la ruta de la imagen y convertirla a base64
-        $base64Image = null;
-        if (!empty($item['primary_image'])) {
-            $base64Image = ImageHelper::convertToBase64(ImageHelper::getProductImagePath($item['primary_image']));
-        }
-        
-        if (!$base64Image) {
-            $base64Image = ImageHelper::convertToBase64(ImageHelper::getProductImagePath(''));  // Will get default product image
-        }
-        
+        // Obtener la URL de la imagen
+        $imageUrl = !empty($item['primary_image']) ? 
+                   BASE_URL . '/' . $item['primary_image'] : 
+                   BASE_URL . '/images/default-product.jpg';
+                   
         $html .= '
                     <tr>
-                        <td class="text-center">';
-        
-        if ($base64Image) {
-            $html .= '<img src="' . $base64Image . '" class="product-image" style="width:50px; height:50px; object-fit:cover;">';
-        } else {
-            $html .= '<div style="width:50px;height:50px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;border-radius:3px;">
-                     <span style="font-size:8px;color:#999;">Sin imagen</span>
-                  </div>';
-        }
+                        <td class="text-center">
+                            <img src="' . $imageUrl . '" class="product-image" style="width:50px; height:50px; object-fit:cover;">';
         
         $html .= '
                         </td>

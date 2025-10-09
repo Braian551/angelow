@@ -3,7 +3,6 @@
 
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
-require_once __DIR__ . '/../../../includes/ImageHelper.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use TCPDF;
@@ -66,8 +65,8 @@ function generateDiscountPdfContent(int $id)
         $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
         $pdf->SetFont('helvetica', '', 10);
         
-        // Obtener el logo usando ImageHelper
-        $logoBase64 = ImageHelper::getLogoBase64();
+        // URL del logo
+        $logoUrl = BASE_URL . '/images/logo2.png';
         
         $pdf->AddPage();
 
@@ -177,12 +176,7 @@ function generateDiscountPdfContent(int $id)
         <tr>
             <td width="40%">';
 
-            if ($logoBase64) {
-                $html .= '<img src="' . $logoBase64 . '" width="180">';
-            } else {
-                $html .= '<h1 class="header-title">Angelow Ropa Infantil</h1>
-                  <p class="header-subtitle">Moda infantil de calidad</p>';
-            }        $html .= '
+            $html .= '<img src="' . $logoUrl . '" width="180">';        $html .= '
             </td>
             <td width="60%" style="text-align: right; vertical-align: top;">
                 <h1 class="header-title">CÓDIGO DE DESCUENTO</h1>

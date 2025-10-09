@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
-require_once __DIR__ . '/../../../includes/ImageHelper.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -49,8 +48,8 @@ function sendDiscountEmail($userId, $code, $discount_type, $discount_value, $exp
         $mail->isHTML(true);
         $mail->Subject = '¡Tienes un descuento especial en Angelow!';
 
-        // Obtener logo en base64 usando ImageHelper
-        $logoBase64 = ImageHelper::getLogoBase64();
+        // URL del logo
+        $logoUrl = BASE_URL . '/images/logo2.png';
         
         $expiry_text = $expiry_date ? 'Válido hasta: ' . date('d/m/Y', strtotime($expiry_date)) : 'Sin fecha de expiración';
 

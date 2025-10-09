@@ -32,15 +32,68 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
         $mail->isHTML(true);
         $mail->Subject = 'Confirmación de tu pedido #' . htmlspecialchars($order['order_number']);
 
-        // Construir cuerpo HTML con estilo más profesional
-        require_once __DIR__ . '/pdf_helpers.php';
-        $logoUrl = ImageHelper::getFullUrl('images/logo2.png');
+        // Añadir logo al email como imagen embebida
+        $logoPath = realpath(__DIR__ . '/../../../images/logo2.png');
+        $logoEmbedId = 'logo';
+        $logoUrl = BASE_URL . '/images/logo2.png'; // URL por defecto
+        
+        if ($logoPath && file_exists($logoPath)) {
+            try {
+                $mail->addEmbeddedImage($logoPath, $logoEmbedId, 'logo.png');
+                $logoUrl = 'cid:' . $logoEmbedId;
+            } catch (Exception $e) {
+                error_log('Error al embeber logo en email: ' . $e->getMessage());
+            }
+        } else {
+            error_log('Logo no encontrado en: ' . __DIR__ . '/../../../images/logo2.png');
+        }
 
         $itemsHtml = '';
         foreach ($orderItems as $it) {
-            $imageUrl = !empty($it['primary_image']) ? 
-                       ImageHelper::getFullUrl($it['primary_image']) : 
-                       ImageHelper::getFullUrl('images/default-product.jpg');
+            $defaultImagePath = realpath(__DIR__ . '/../../../images/default-product.jpg');
+            // Asegurarnos de que primary_image no contenga la URL completa
+            $rawPath = !empty($it['primary_image']) ? $it['primary_image'] : 'images/default-product.jpg';
+            error_log('Ruta original de imagen: ' . $rawPath);
+            
+            // Limpiar la URL si existe
+            $imagePath = str_replace(
+                [BASE_URL . '/', 'http://localhost/angelow/', 'https://localhost/angelow/'],
+                '',
+                $rawPath
+            );
+            error_log('Ruta limpia de imagen: ' . $imagePath);
+            
+            // Obtener la ruta absoluta
+            $productImagePath = realpath(__DIR__ . '/../../../' . $imagePath);
+            error_log('Ruta absoluta de imagen: ' . ($productImagePath ?: 'no encontrada'));
+            
+            $embedId = 'product_' . md5(uniqid()); // ID único para cada imagen
+            $imageUrl = BASE_URL . (!empty($it['primary_image']) ? '/' . $it['primary_image'] : '/images/default-product.jpg'); // URL por defecto
+            
+            if ($productImagePath && file_exists($productImagePath)) {
+                if (is_readable($productImagePath)) {
+                    try {
+                        error_log('Intentando embeber imagen desde: ' . $productImagePath);
+                        $mail->addEmbeddedImage($productImagePath, $embedId, basename($productImagePath));
+                        $imageUrl = 'cid:' . $embedId;
+                        error_log('Imagen embebida correctamente con ID: ' . $embedId);
+                    } catch (Exception $e) {
+                        error_log('Error al embeber imagen de producto en email: ' . $e->getMessage());
+                        error_log('Detalles de la imagen:');
+                        error_log('- Ruta: ' . $productImagePath);
+                        error_log('- Tamaño: ' . filesize($productImagePath) . ' bytes');
+                        error_log('- Permisos: ' . substr(sprintf('%o', fileperms($productImagePath)), -4));
+                    }
+                } else {
+                    error_log('La imagen existe pero no se puede leer: ' . $productImagePath);
+                    error_log('Permisos del archivo: ' . substr(sprintf('%o', fileperms($productImagePath)), -4));
+                }
+            } else {
+                error_log('Imagen de producto no encontrada:');
+                error_log('- Ruta original: ' . $rawPath);
+                error_log('- Ruta limpia: ' . $imagePath);
+                error_log('- Ruta absoluta intentada: ' . __DIR__ . '/../../../' . $imagePath);
+            }
 
             $itemsHtml .= '<tr>' .
                 '<td style="padding:8px;border-bottom:1px solid #e6e6e6;">' .
@@ -55,7 +108,7 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
         $body = '<!doctype html><html><head><meta charset="utf-8"><title>Confirmación de pedido</title></head><body>' .
             '<div style="font-family:Arial,Helvetica,sans-serif;color:#333;max-width:700px;margin:0 auto;padding:20px;">' .
             '<div style="text-align:center;padding:20px 0;">' .
-            ($logoUrl ? '<img src="' . $logoUrl . '" alt="' . htmlspecialchars(SITE_NAME) . '" style="max-height:60px;">' : '<h1 style="margin:0;color:#2968c8;">' . htmlspecialchars(SITE_NAME) . '</h1>') .
+            '<img src="' . $logoUrl . '" alt="' . htmlspecialchars(SITE_NAME) . '" style="max-height:60px;">' .
             '</div>' .
             '<div style="background:#ffffff;border:1px solid #f0f0f0;border-radius:8px;overflow:hidden;">' .
             '<div style="background:#2968c8;color:#fff;padding:18px 20px;">' .

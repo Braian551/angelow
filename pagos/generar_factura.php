@@ -107,13 +107,9 @@ try {
     // Añadir página
     $pdf->AddPage();
     
-    // Logo de la empresa usando ImageHelper
-    require_once __DIR__ . '/../tienda/api/pay/pdf_helpers.php';
-    $logoPath = ImageHelper::getLogoPath();
-    $logoBase64 = ImageHelper::convertToBase64($logoPath);
-    $logo = $logoBase64 ? 
-        '<img src="' . $logoBase64 . '" width="120">' : 
-        '<h1>Angelow Ropa Infantil</h1>';
+    // Logo de la empresa
+    $logoUrl = BASE_URL . '/images/logo2.png';
+    $logo = '<img src="' . $logoUrl . '" width="120">';
     
     // Encabezado con logo y datos de la empresa
     $html = '
