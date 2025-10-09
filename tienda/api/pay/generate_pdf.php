@@ -364,9 +364,10 @@ try {
     error_log("[PDF_DEBUG] Intentando cargar logo desde URL: " . $logoUrl);
     error_log("[PDF_DEBUG] Ruta del servidor para logo: " . $logoPath);
     
+    $html .= '<div style="position: absolute; top: 20px; right: 20px;">';
     if (file_exists($logoPath)) {
         $logoData = base64_encode(file_get_contents($logoPath));
-        $html .= '<img src="data:image/png;base64,' . $logoData . '" style="width:150px; margin-bottom:10px;" alt="Logo Angelow">';
+        $html .= '<img src="data:image/png;base64,' . $logoData . '" style="width:80px; height:auto;" alt="Logo Angelow">';
         error_log("[PDF_DEBUG] Logo cargado exitosamente");
     } else {
         error_log("[PDF_DEBUG] Logo no encontrado en: " . $logoPath);
@@ -374,10 +375,11 @@ try {
         $logoPath = str_replace('logo2.png', 'logo.png', $logoPath);
         if (file_exists($logoPath)) {
             $logoData = base64_encode(file_get_contents($logoPath));
-            $html .= '<img src="data:image/png;base64,' . $logoData . '" style="width:150px; margin-bottom:10px;" alt="Logo Angelow">';
+            $html .= '<img src="data:image/png;base64,' . $logoData . '" style="width:80px; height:auto;" alt="Logo Angelow">';
             error_log("[PDF_DEBUG] Logo alternativo cargado exitosamente");
         }
     }
+    $html .= '</div>';
 
     $html .= '
                 <h1 class="header-title">Angelow Ropa Infantil</h1>
