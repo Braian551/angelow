@@ -257,7 +257,7 @@ try {
                         <?php foreach ($orderItems as $item): ?>
                             <div class="order-item-confirm">
                                 <div class="item-image">
-                                    <img src="<?= BASE_URL ?>/<?= htmlspecialchars($item['primary_image'] ?? 'images/default-product.jpg') ?>" 
+                                    <img src="<?= htmlspecialchars($item['primary_image'] ?? BASE_URL . '/images/default-product.jpg') ?>" 
                                          alt="<?= htmlspecialchars($item['product_name']) ?>">
                                 </div>
                                 <div class="item-details">
