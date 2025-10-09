@@ -1,21 +1,62 @@
+# Dependencies
 vendor/
-*.log
+node_modules/
+
+# Environment and configuration
 .env
+.env.*
+!.env.example
+config.local.php
+conexion.php
+conexionservidor.php
+config.php
+config3.php
+auth/google_auth.php
+
+# Database
+*.sql
+!basededatos.template.sql
+!procedimiento*.sql
+!trigger_*.sql
+
+# Uploads and media
+uploads/
+images/productos/
+images/campaigns/
+images/comprobante/
+
+# Compressed files
 *.zip
 *.rar
-/compart
-/conexion.php
-/conexionservidor.php
-/config.php
-/config3.php
+*.gz
+*.tar
+*.7z
+
+# Compiled files
 *.exe
-uploads/
-auth/google_auth.php
 *.0
 *.obj
 *.dll
 *.class
 *.pyc
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
+
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Security files
 *.pem
 *.key
+*.crt
+*.cer
+*.p12
