@@ -17,6 +17,22 @@
     backdrop-filter: blur(2px);
 }
 
+.notification.clickable {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.notification.clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+}
+
+.notification .view-cart {
+    font-size: 0.9em;
+    opacity: 0.9;
+    font-style: italic;
+}
+
 .notification.success {
     background-color: rgba(75, 181, 67, 0.928);
     border-left: 4px solid #3a8a35;

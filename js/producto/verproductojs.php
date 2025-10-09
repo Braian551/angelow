@@ -88,8 +88,9 @@
 
         // Mostrar notificación
         function showNotification(message, type) {
+            const isCartSuccess = type === 'success' && message.toLowerCase().includes('carrito');
             const notification = $(`
-        <div class="floating-notification ${type}">
+        <div class="floating-notification ${type} ${isCartSuccess ? 'clickable' : ''}" ${isCartSuccess ? `style="cursor: pointer;"` : ''}>
             <div class="notification-content">
                 <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
                 <span>${message}</span>
@@ -100,6 +101,16 @@
 
             $('body').append(notification);
 
+            // Manejar clic en la notificación
+            if (type === 'success' && message.toLowerCase().includes('carrito')) {
+                notification.click(function(e) {
+                    // No redirigir si se hace clic en el botón de cerrar
+                    if (!$(e.target).hasClass('close-notification') && !$(e.target).closest('.close-notification').length) {
+                        window.location.href = '<?= BASE_URL ?>/tienda/cart.php';
+                    }
+                });
+            }
+
             // Auto cerrar después de 3 segundos
             setTimeout(() => {
                 notification.addClass('fade-out');
@@ -107,7 +118,8 @@
             }, 3000);
 
             // Cerrar manualmente
-            notification.find('.close-notification').click(function() {
+            notification.find('.close-notification').click(function(e) {
+                e.stopPropagation(); // Evitar que el clic se propague a la notificación
                 notification.addClass('fade-out');
                 setTimeout(() => notification.remove(), 500);
             });
