@@ -300,7 +300,7 @@ function generateOrderPdfContent($order, $orderItems) {
     foreach ($orderItems as $item) {
         // Obtener la URL de la imagen
         $imageUrl = !empty($item['primary_image']) ? 
-                   BASE_URL . '/' . $item['primary_image'] : 
+                   $item['primary_image'] : 
                    BASE_URL . '/images/default-product.jpg';
                    
         $html .= '

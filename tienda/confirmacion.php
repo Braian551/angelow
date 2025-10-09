@@ -49,10 +49,10 @@ try {
         throw new Exception("Orden no encontrada");
     }
     
-    // Obtener items de la orden
+    // Obtener items de la orden con rutas absolutas de imágenes
     $itemsQuery = "
         SELECT oi.*, p.slug as product_slug,
-               COALESCE(vi.image_path, pi.image_path) as primary_image
+               CONCAT('" . BASE_URL . "/', COALESCE(vi.image_path, pi.image_path)) as primary_image
         FROM order_items oi
         LEFT JOIN products p ON oi.product_id = p.id
         LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_primary = 1
@@ -95,13 +95,7 @@ try {
             }
         }
 
-        // Asegurarse de que las imágenes en el email usen URLs absolutas
-        $baseUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/angelow';
-        foreach ($orderItems as &$item) {
-            if (!empty($item['primary_image'])) {
-                $item['primary_image'] = $baseUrl . '/' . $item['primary_image'];
-            }
-        }
+        // Ya no necesitamos modificar las rutas aquí ya que se obtienen completas desde la consulta SQL
         
         $sent = sendOrderConfirmationEmail($order, $orderItems, $pdfContent, $pdfFilename);
         if ($sent) {
@@ -263,7 +257,7 @@ try {
                         <?php foreach ($orderItems as $item): ?>
                             <div class="order-item-confirm">
                                 <div class="item-image">
-                                    <img src="<?= BASE_URL ?>/<?= htmlspecialchars($item['primary_image'] ?? 'assets/images/placeholder-product.jpg') ?>" 
+                                    <img src="<?= BASE_URL ?>/<?= htmlspecialchars($item['primary_image'] ?? 'images/default-product.jpg') ?>" 
                                          alt="<?= htmlspecialchars($item['product_name']) ?>">
                                 </div>
                                 <div class="item-details">
