@@ -135,17 +135,22 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
         .social-links { margin: 20px 0; }
         .social-links a { margin: 0 10px; color: #2968c8; text-decoration: none; }
         .badge { background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .step-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
-        .step { text-align: center; padding: 20px; background: #f0f7ff; border-radius: 8px; }
-        .step-title { font-size: 16px; font-weight: 600; margin: 10px 0 5px 0; }
-        .step-description { font-size: 14px; color: #666; }
-        .contact-btn { background: #2968c8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block; }
-        .icon-text { display: inline-block; margin-right: 8px; width: 20px; text-align: center; }
+        .step-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin: 30px 0; }
+        .step { text-align: center; padding: 30px 20px; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border: 2px solid #e8f0fe; border-radius: 12px; box-shadow: 0 4px 12px rgba(41, 104, 200, 0.08); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .step:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(41, 104, 200, 0.12); }
+        .step-icon { font-size: 32px; margin-bottom: 15px; height: 60px; display: flex; align-items: center; justify-content: center; }
+        .step-number { display: inline-block; width: 30px; height: 30px; background: #2968c8; color: white; border-radius: 50%; font-weight: 600; font-size: 14px; line-height: 30px; text-align: center; margin-bottom: 10px; }
+        .step-title { font-size: 17px; font-weight: 700; margin: 15px 0 10px 0; color: #2968c8; }
+        .step-description { font-size: 14px; color: #666; line-height: 1.5; }
+        .step-divider { width: 40px; height: 3px; background: linear-gradient(90deg, #2968c8, #1e4d9c); margin: 12px auto; border-radius: 2px; }
+        .contact-btn { background: #2968c8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block; transition: background 0.2s ease; }
+        .contact-btn:hover { background: #1e4d9c; }
         @media (max-width: 600px) {
             .content { padding: 20px; }
             .table { font-size: 12px; }
             .table th, .table td { padding: 12px 8px; }
-            .step-container { grid-template-columns: 1fr; }
+            .step-container { grid-template-columns: 1fr; gap: 20px; }
+            .step { padding: 25px 15px; }
         }
     </style>
 </head>
@@ -260,26 +265,32 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
             <div class="section-title">Próximos Pasos</div>
             <div class="step-container">
                 <div class="step">
-                    <div style="font-size: 24px; margin-bottom: 10px; color: #2968c8;">📦</div>
+                    <div class="step-number">1</div>
+                    <div class="step-icon">📦</div>
+                    <div class="step-divider"></div>
                     <div class="step-title">Preparación</div>
-                    <div class="step-description">Estamos preparando tu pedido con cuidado</div>
+                    <div class="step-description">Estamos preparando tu pedido con cuidado y revisando cada detalle para garantizar la mejor calidad.</div>
                 </div>
                 <div class="step">
-                    <div style="font-size: 24px; margin-bottom: 10px; color: #2968c8;">🚚</div>
+                    <div class="step-number">2</div>
+                    <div class="step-icon">🚚</div>
+                    <div class="step-divider"></div>
                     <div class="step-title">Envío</div>
-                    <div class="step-description">Tu pedido será enviado pronto</div>
+                    <div class="step-description">Tu pedido será empacado y enviado pronto. Recibirás una notificación cuando salga de nuestro almacén.</div>
                 </div>
                 <div class="step">
-                    <div style="font-size: 24px; margin-bottom: 10px; color: #2968c8;">🏠</div>
+                    <div class="step-number">3</div>
+                    <div class="step-icon">🏠</div>
+                    <div class="step-divider"></div>
                     <div class="step-title">Entrega</div>
-                    <div class="step-description">Recibirás tu pedido en la dirección indicada</div>
+                    <div class="step-description">Recibirás tu pedido en la dirección indicada. Estaremos en contacto para coordinar la entrega.</div>
                 </div>
             </div>
 
             <!-- Asistencia -->
-            <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 30px 0; text-align: center;">
-                <h3 style="color: #2968c8; margin-bottom: 10px;">¿Necesitas ayuda?</h3>
-                <p style="margin-bottom: 15px;">Estamos aquí para ayudarte con cualquier pregunta sobre tu pedido.</p>
+            <div style="background: #f8fafc; padding: 25px; border-radius: 10px; margin: 40px 0 20px 0; text-align: center; border: 1px solid #e8f0fe;">
+                <h3 style="color: #2968c8; margin-bottom: 12px; font-size: 20px;">¿Necesitas ayuda?</h3>
+                <p style="margin-bottom: 20px; font-size: 15px; color: #666;">Estamos aquí para ayudarte con cualquier pregunta sobre tu pedido.</p>
                 <a href="' . BASE_URL . '/contacto" class="contact-btn">
                     Contactar Soporte
                 </a>
