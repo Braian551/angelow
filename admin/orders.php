@@ -98,56 +98,109 @@ $paymentMethods = [
 
                 <!-- Filtros y búsqueda -->
                 <div class="card filters-card">
+                    <div class="filters-header">
+                        <div class="filters-title">
+                            <i class="fas fa-sliders-h"></i>
+                            <h3>Filtros de búsqueda</h3>
+                        </div>
+                        <button type="button" class="filters-toggle" id="toggle-filters" aria-label="Mostrar/Ocultar filtros">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </div>
+
                     <form id="search-orders-form" class="filters-form">
-                        <div class="filters-grid">
-                            <div class="filters-field filters-field--search">
-                                <label for="search-input" class="sr-only">Buscar órdenes</label>
-                                <input type="text" id="search-input" name="search" placeholder="Buscar órdenes..." class="filters-control form-control">
-                                <button type="submit" class="filters-search-btn" aria-label="Buscar">
-                                    <i class="fas fa-search"></i>
+                        <!-- Barra de búsqueda principal -->
+                        <div class="search-bar">
+                            <div class="search-input-wrapper">
+                                <i class="fas fa-search search-icon"></i>
+                                <input 
+                                    type="text" 
+                                    id="search-input" 
+                                    name="search" 
+                                    placeholder="Buscar por N° orden, cliente, email..." 
+                                    class="search-input"
+                                    autocomplete="off">
+                                <button type="button" class="search-clear" id="clear-search" style="display: none;">
+                                    <i class="fas fa-times"></i>
                                 </button>
                             </div>
-
-                            <div class="filters-field">
-                                <label for="status-filter" class="sr-only">Estado de la orden</label>
-                                <select name="status" id="status-filter" class="filters-control form-control">
-                                    <option value="">Todos los estados</option>
-                                    <?php foreach ($statuses as $value => $label): ?>
-                                        <option value="<?= $value ?>"><?= htmlspecialchars($label) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <div class="filters-field">
-                                <label for="payment-status-filter" class="sr-only">Estado del pago</label>
-                                <select name="payment_status" id="payment-status-filter" class="filters-control form-control">
-                                    <option value="">Todos los estados de pago</option>
-                                    <?php foreach ($paymentStatuses as $value => $label): ?>
-                                        <option value="<?= $value ?>"><?= htmlspecialchars($label) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <div class="filters-field">
-                                <label for="from-date" class="sr-only">Fecha desde</label>
-                                <input type="date" name="from_date" id="from-date" class="filters-control form-control" placeholder="Desde">
-                            </div>
+                            <button type="submit" class="search-submit-btn">
+                                <i class="fas fa-search"></i>
+                                <span>Buscar</span>
+                            </button>
                         </div>
 
-                        <div class="filters-footer">
-                            <div class="filters-field">
-                                <label for="to-date" class="sr-only">Fecha hasta</label>
-                                <input type="date" name="to_date" id="to-date" class="filters-control form-control" placeholder="Hasta">
+                        <!-- Filtros avanzados -->
+                        <div class="filters-advanced" id="advanced-filters">
+                            <div class="filters-row">
+                                <div class="filter-group">
+                                    <label for="status-filter" class="filter-label">
+                                        <i class="fas fa-tag"></i>
+                                        Estado de orden
+                                    </label>
+                                    <select name="status" id="status-filter" class="filter-select">
+                                        <option value="">Todos los estados</option>
+                                        <?php foreach ($statuses as $value => $label): ?>
+                                            <option value="<?= $value ?>"><?= htmlspecialchars($label) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="payment-status-filter" class="filter-label">
+                                        <i class="fas fa-credit-card"></i>
+                                        Estado de pago
+                                    </label>
+                                    <select name="payment_status" id="payment-status-filter" class="filter-select">
+                                        <option value="">Todos los estados</option>
+                                        <?php foreach ($paymentStatuses as $value => $label): ?>
+                                            <option value="<?= $value ?>"><?= htmlspecialchars($label) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="from-date" class="filter-label">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Fecha desde
+                                    </label>
+                                    <input 
+                                        type="date" 
+                                        name="from_date" 
+                                        id="from-date" 
+                                        class="filter-input">
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="to-date" class="filter-label">
+                                        <i class="fas fa-calendar-check"></i>
+                                        Fecha hasta
+                                    </label>
+                                    <input 
+                                        type="date" 
+                                        name="to_date" 
+                                        id="to-date" 
+                                        class="filter-input">
+                                </div>
                             </div>
 
-                            <div class="filters-actions">
-                                <button type="submit" class="btn btn-primary filters-btn">
-                                    <i class="fas fa-filter"></i> Filtrar
-                                </button>
+                            <!-- Acciones de filtrado -->
+                            <div class="filters-actions-bar">
+                                <div class="active-filters" id="active-filters-count">
+                                    <i class="fas fa-filter"></i>
+                                    <span>0 filtros activos</span>
+                                </div>
 
-                                <a href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" class="btn btn-secondary filters-btn">
-                                    <i class="fas fa-sync-alt"></i> Limpiar
-                                </a>
+                                <div class="filters-buttons">
+                                    <button type="button" class="btn-clear-filters" id="clear-all-filters">
+                                        <i class="fas fa-times-circle"></i>
+                                        Limpiar todo
+                                    </button>
+                                    <button type="submit" class="btn-apply-filters">
+                                        <i class="fas fa-check-circle"></i>
+                                        Aplicar filtros
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </form>
