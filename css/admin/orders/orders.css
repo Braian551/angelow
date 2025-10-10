@@ -1130,13 +1130,14 @@ button:focus {
 
 /* ===== TABLA DE ÓRDENES ===== */
 .orders-table-container {
-  background-color: var(--glass-bg);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-lg);
   box-shadow: var(--glass-shadow);
   overflow: hidden;
   margin-bottom: var(--space-xl);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(8px);
   transition: var(--transition-slow);
 }
 
@@ -1186,14 +1187,15 @@ button:focus {
   border-bottom: none;
 }
 
-.orders-table tr:hover td {
+.orders-table tbody tr:hover td {
   background-color: var(--bg-hover);
-  transform: scale(1.005);
+  transform: scale(1.002);
 }
 
 .loading-row {
   text-align: center;
-  padding: var(--space-xl);
+  padding: var(--space-xl) !important;
+  background: var(--bg-card) !important;
 }
 
 .loading-spinner {
@@ -1203,10 +1205,13 @@ button:focus {
   gap: var(--space-sm);
   color: var(--text-light);
   font-size: 1.4rem;
+  padding: var(--space-lg);
 }
 
 .loading-spinner i {
   animation: spin 1s linear infinite;
+  color: var(--primary-color);
+  font-size: 1.8rem;
 }
 
 /* ===== BADGES DE ESTADO ===== */
@@ -1890,6 +1895,12 @@ input[type="checkbox"] {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+input[type="checkbox"]:hover {
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 2px rgba(0, 119, 182, 0.1);
 }
 
 input[type="checkbox"]:checked {
@@ -2025,9 +2036,15 @@ input[type="checkbox"]:checked::after {
     text-align: center;
   }
   
+  .orders-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
   .orders-table th, 
   .orders-table td {
     padding: 1.2rem;
+    font-size: 1.3rem;
   }
   
   .actions {
@@ -2053,6 +2070,12 @@ input[type="checkbox"]:checked::after {
   .quick-actions {
     flex-direction: column;
     width: 100%;
+  }
+  
+  .orders-table th, 
+  .orders-table td {
+    padding: 1rem;
+    font-size: 1.2rem;
   }
   
   .pagination {
