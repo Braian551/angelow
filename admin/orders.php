@@ -79,7 +79,7 @@ $paymentMethods = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/ordersadmin.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/orders/orders.css">
 </head>
 
 <body>
@@ -197,7 +197,24 @@ $paymentMethods = [
                 </div>
 
                 <!-- Paginación -->
-                <div class="pagination" id="pagination-container"></div>
+                <div class="pagination" id="pagination-container">
+                    <a href="#" class="pagination-item" title="Primera página">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                    <a href="#" class="pagination-item" title="Página anterior">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                    <a href="#" class="pagination-item active">1</a>
+                    <a href="#" class="pagination-item">2</a>
+                    <a href="#" class="pagination-item">3</a>
+                    <span class="pagination-item">...</span>
+                    <a href="#" class="pagination-item" title="Página siguiente">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a href="#" class="pagination-item" title="Última página">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </div>
             </div>
         </main>
     </div>
