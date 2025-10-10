@@ -8,17 +8,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const advancedFilters = document.getElementById('advanced-filters');
     
     if (toggleFiltersBtn && advancedFilters) {
+        const icon = toggleFiltersBtn.querySelector('i');
+        
         toggleFiltersBtn.addEventListener('click', function() {
-            const isCollapsed = advancedFilters.style.display === 'none';
+            // Verificar si está colapsado usando la clase del botón
+            const isCollapsed = toggleFiltersBtn.classList.contains('collapsed');
             
             if (isCollapsed) {
+                // Mostrar filtros
                 advancedFilters.style.display = 'flex';
                 toggleFiltersBtn.classList.remove('collapsed');
-                toggleFiltersBtn.querySelector('i').style.transform = 'rotate(0deg)';
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+                
+                // Permitir que la animación funcione
+                setTimeout(() => {
+                    advancedFilters.style.opacity = '1';
+                    advancedFilters.style.maxHeight = '1000px';
+                }, 10);
             } else {
-                advancedFilters.style.display = 'none';
+                // Ocultar filtros con animación
+                advancedFilters.style.opacity = '0';
+                advancedFilters.style.maxHeight = '0';
                 toggleFiltersBtn.classList.add('collapsed');
-                toggleFiltersBtn.querySelector('i').style.transform = 'rotate(180deg)';
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+                
+                // Esperar a que termine la animación antes de ocultar
+                setTimeout(() => {
+                    advancedFilters.style.display = 'none';
+                }, 400);
             }
         });
     }

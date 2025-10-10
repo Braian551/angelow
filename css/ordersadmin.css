@@ -1048,6 +1048,106 @@
   100% { transform: rotate(360deg); }
 }
 
+/* ===== BOTONES DE ACCIÓN ===== */
+.actions-cell {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  align-items: center;
+}
+
+.action-btn {
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-bounce);
+  font-size: 1.4rem;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 0;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.5, 1.6, 0.4, 0.7);
+}
+
+.action-btn:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.action-btn i {
+  position: relative;
+  z-index: 1;
+}
+
+/* Botón Ver/Ver detalle */
+.action-btn.view {
+  background-color: rgba(2, 132, 199, 0.1);
+  color: var(--info-color);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+}
+
+.action-btn.view:hover {
+  background-color: rgba(2, 132, 199, 0.2);
+  color: var(--primary-hover);
+  transform: translateY(-2px) scale(1.1);
+}
+
+/* Botón Editar */
+.action-btn.edit {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--primary-color);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.action-btn.edit:hover {
+  background-color: rgba(37, 99, 235, 0.2);
+  color: var(--primary-hover);
+  transform: translateY(-2px) scale(1.1);
+}
+
+/* Botón Estado/Cambiar estado */
+.action-btn.status {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #FFC107;
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.action-btn.status:hover {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #FFB300;
+  transform: translateY(-2px) scale(1.1);
+}
+
+/* Botón Eliminar */
+.action-btn.delete {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: var(--error-color);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.action-btn.delete:hover {
+  background-color: rgba(220, 38, 38, 0.2);
+  color: var(--error-hover);
+  transform: translateY(-2px) scale(1.1);
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .filter-group.search-group {

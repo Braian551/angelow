@@ -268,19 +268,21 @@ exportBtn.addEventListener('click', function() {
                             ${order.payment_method ? `(${getPaymentMethodLabel(order.payment_method)})` : ''}
                         </span>
                     </td>
-                    <td class="actions-cell">
-                        <a href="<?= BASE_URL ?>/admin/order/detail.php?id=${order.id}" class="action-btn view" title="Ver detalle">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <button class="action-btn edit" title="Editar" onclick="editOrder(${order.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn status" title="Cambiar estado" onclick="openStatusChangeModal(${order.id})">
-                            <i class="fas fa-exchange-alt"></i>
-                        </button>
-                        <button class="action-btn delete" title="Eliminar" onclick="openDeleteOrderModal(${order.id})">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+                    <td>
+                        <div class="actions-cell">
+                            <a href="<?= BASE_URL ?>/admin/order/detail.php?id=${order.id}" class="action-btn view" title="Ver detalle">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <button class="action-btn edit" title="Editar" onclick="editOrder(${order.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn status" title="Cambiar estado" onclick="openStatusChangeModal(${order.id})">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                            <button class="action-btn delete" title="Eliminar" onclick="openDeleteOrderModal(${order.id})">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `;
@@ -442,5 +444,115 @@ exportBtn.addEventListener('click', function() {
                 showAlert(error.message, 'error');
             });
     }
+
+    // ===== INYECTAR ESTILOS CSS PARA BOTONES DE ACCIÓN =====
+    const actionButtonsStyles = document.createElement('style');
+    actionButtonsStyles.textContent = `
+        /* Estilos para botones de acción en tabla de órdenes */
+        .orders-table .actions-cell {
+            display: flex !important;
+            gap: 0.8rem !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        .orders-table .action-btn {
+            width: 3.4rem !important;
+            height: 3.4rem !important;
+            border-radius: 0.8rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+            font-size: 1.4rem !important;
+            position: relative !important;
+            overflow: hidden !important;
+            border: none !important;
+            cursor: pointer !important;
+            text-decoration: none !important;
+        }
+
+        .orders-table .action-btn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            z-index: 0 !important;
+            transform: scaleX(0) !important;
+            transform-origin: right !important;
+            transition: transform 0.3s cubic-bezier(0.5, 1.6, 0.4, 0.7) !important;
+        }
+
+        .orders-table .action-btn:hover::before {
+            transform: scaleX(1) !important;
+            transform-origin: left !important;
+        }
+
+        .orders-table .action-btn i {
+            position: relative !important;
+            z-index: 1 !important;
+        }
+
+        /* Botón Ver/Ver detalle */
+        .orders-table .action-btn.view {
+            background-color: rgba(2, 132, 199, 0.1) !important;
+            color: #0284C7 !important;
+            border: 1px solid rgba(2, 132, 199, 0.2) !important;
+        }
+
+        .orders-table .action-btn.view:hover {
+            background-color: rgba(2, 132, 199, 0.2) !important;
+            color: #0369A1 !important;
+            transform: translateY(-2px) scale(1.1) !important;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25) !important;
+        }
+
+        /* Botón Editar */
+        .orders-table .action-btn.edit {
+            background-color: rgba(37, 99, 235, 0.1) !important;
+            color: #2563EB !important;
+            border: 1px solid rgba(37, 99, 235, 0.2) !important;
+        }
+
+        .orders-table .action-btn.edit:hover {
+            background-color: rgba(37, 99, 235, 0.2) !important;
+            color: #1D4ED8 !important;
+            transform: translateY(-2px) scale(1.1) !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+        }
+
+        /* Botón Estado/Cambiar estado */
+        .orders-table .action-btn.status {
+            background-color: rgba(255, 193, 7, 0.1) !important;
+            color: #FFC107 !important;
+            border: 1px solid rgba(255, 193, 7, 0.2) !important;
+        }
+
+        .orders-table .action-btn.status:hover {
+            background-color: rgba(255, 193, 7, 0.2) !important;
+            color: #FFB300 !important;
+            transform: translateY(-2px) scale(1.1) !important;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.25) !important;
+        }
+
+        /* Botón Eliminar */
+        .orders-table .action-btn.delete {
+            background-color: rgba(220, 38, 38, 0.1) !important;
+            color: #DC2626 !important;
+            border: 1px solid rgba(220, 38, 38, 0.2) !important;
+        }
+
+        .orders-table .action-btn.delete:hover {
+            background-color: rgba(220, 38, 38, 0.2) !important;
+            color: #B91C1C !important;
+            transform: translateY(-2px) scale(1.1) !important;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25) !important;
+        }
+    `;
+    document.head.appendChild(actionButtonsStyles);
+    console.log('✓ Estilos de botones de acción inyectados correctamente');
 });
 </script>

@@ -262,10 +262,6 @@
   transition: var(--transition);
 }
 
-.filters-toggle.collapsed i {
-  transform: rotate(180deg);
-}
-
 .filters-form {
   display: flex;
   flex-direction: column;
@@ -378,6 +374,17 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 1000px;
+  opacity: 1;
+}
+
+.filters-advanced[style*="display: none"] {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .filters-row {
@@ -417,7 +424,9 @@
   font-size: 0.95rem;
   color: var(--text-dark);
   background: rgba(255, 255, 255, 0.9);
-  transition: var(--transition);
+  transition: border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+              background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   box-shadow: var(--shadow-sm);
 }
@@ -434,7 +443,7 @@
 .filter-select:hover,
 .filter-input:hover {
   border-color: var(--border-dark);
-  background: var(--bg-light);
+  background-color: var(--bg-light);
 }
 
 .filter-select:focus,
@@ -442,7 +451,7 @@
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.1);
-  background: var(--bg-light);
+  background-color: var(--bg-light);
 }
 
 /* Barra de acciones de filtrado */
@@ -1305,6 +1314,93 @@ button:focus {
   gap: var(--space-sm);
 }
 
+.order-action-btn {
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-bounce);
+  font-size: 1.4rem;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.order-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 0;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.5, 1.6, 0.4, 0.7);
+}
+
+.order-action-btn:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.order-action-btn i {
+  position: relative;
+  z-index: 1;
+}
+
+.order-action-btn.edit {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--primary-color);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.order-action-btn.edit:hover {
+  background-color: rgba(37, 99, 235, 0.2);
+  color: var(--primary-hover);
+  transform: translateY(-2px) scale(1.1);
+}
+
+.order-action-btn.delete {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: var(--error-color);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.order-action-btn.delete:hover {
+  background-color: rgba(220, 38, 38, 0.2);
+  color: var(--error-hover);
+  transform: translateY(-2px) scale(1.1);
+}
+
+.order-action-btn.status {
+  background-color: rgba(2, 132, 199, 0.1);
+  color: var(--info-color);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+}
+
+.order-action-btn.status:hover {
+  background-color: rgba(2, 132, 199, 0.2);
+  color: var(--primary-hover);
+  transform: translateY(-2px) scale(1.1);
+}
+
+.order-action-btn.view {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.order-action-btn.view:hover {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: var(--success-color);
+  transform: translateY(-2px) scale(1.1);
+}
+
+/* Mantener compatibilidad con clases antiguas si se usan */
 .btn-sm {
   width: 3.4rem;
   height: 3.4rem;
@@ -1316,6 +1412,7 @@ button:focus {
   font-size: 1.4rem;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .btn-sm::before {

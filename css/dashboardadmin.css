@@ -721,7 +721,8 @@ button {
   color: #721c24;
 }
 
-.action-btn {
+/* Botones de acción específicos del dashboard principal */
+.dashboard-action {
   width: 3rem;
   height: 3rem;
   border-radius: 4px;
@@ -732,22 +733,22 @@ button {
   transition: var(--transition);
 }
 
-.action-btn.view {
+.dashboard-action.view {
   background-color: rgba(0, 119, 182, 0.1);
   color: var(--primary-color);
 }
 
-.action-btn.edit {
+.dashboard-action.edit {
   background-color: rgba(40, 167, 69, 0.1);
   color: var(--success-color);
 }
 
-.action-btn.delete {
+.dashboard-action.delete {
   background-color: rgba(220, 53, 69, 0.1);
   color: var(--error-color);
 }
 
-.action-btn:hover {
+.dashboard-action:hover {
   opacity: 0.8;
   transform: translateY(-2px);
 }

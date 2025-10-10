@@ -145,8 +145,8 @@ require_once __DIR__ . '/../conexion.php';
                                     <td>$89.90</td>
                                     <td><span class="status-badge processing">En proceso</span></td>
                                     <td>
-                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
-                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="dashboard-action view"><i class="fas fa-eye"></i></button>
+                                        <button class="dashboard-action edit"><i class="fas fa-edit"></i></button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -156,8 +156,8 @@ require_once __DIR__ . '/../conexion.php';
                                     <td>$124.50</td>
                                     <td><span class="status-badge shipped">En camino</span></td>
                                     <td>
-                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
-                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="dashboard-action view"><i class="fas fa-eye"></i></button>
+                                        <button class="dashboard-action edit"><i class="fas fa-edit"></i></button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -167,8 +167,8 @@ require_once __DIR__ . '/../conexion.php';
                                     <td>$56.70</td>
                                     <td><span class="status-badge delivered">Entregado</span></td>
                                     <td>
-                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
-                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="dashboard-action view"><i class="fas fa-eye"></i></button>
+                                        <button class="dashboard-action edit"><i class="fas fa-edit"></i></button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -178,8 +178,8 @@ require_once __DIR__ . '/../conexion.php';
                                     <td>$210.30</td>
                                     <td><span class="status-badge pending">Pendiente</span></td>
                                     <td>
-                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
-                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="dashboard-action view"><i class="fas fa-eye"></i></button>
+                                        <button class="dashboard-action edit"><i class="fas fa-edit"></i></button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -189,8 +189,8 @@ require_once __DIR__ . '/../conexion.php';
                                     <td>$78.20</td>
                                     <td><span class="status-badge cancelled">Cancelado</span></td>
                                     <td>
-                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
-                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="dashboard-action view"><i class="fas fa-eye"></i></button>
+                                        <button class="dashboard-action edit"><i class="fas fa-edit"></i></button>
                                     </td>
                                 </tr>
                             </tbody>

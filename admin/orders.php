@@ -103,8 +103,8 @@ $paymentMethods = [
                             <i class="fas fa-sliders-h"></i>
                             <h3>Filtros de búsqueda</h3>
                         </div>
-                        <button type="button" class="filters-toggle" id="toggle-filters" aria-label="Mostrar/Ocultar filtros">
-                            <i class="fas fa-chevron-up"></i>
+                        <button type="button" class="filters-toggle collapsed" id="toggle-filters" aria-label="Mostrar/Ocultar filtros">
+                            <i class="fas fa-chevron-down"></i>
                         </button>
                     </div>
 
@@ -131,7 +131,7 @@ $paymentMethods = [
                         </div>
 
                         <!-- Filtros avanzados -->
-                        <div class="filters-advanced" id="advanced-filters">
+                        <div class="filters-advanced" id="advanced-filters" style="display: none;">
                             <div class="filters-row">
                                 <div class="filter-group">
                                     <label for="status-filter" class="filter-label">
