@@ -59,10 +59,7 @@ $paymentStatuses = [
 
 
 $paymentMethods = [
-    'transferencia' => 'Transferencia',
-    'contra_entrega' => 'Contra entrega',
-    'pse' => 'PSE',
-    'efectivo' => 'Efectivo'
+    'transferencia' => 'Transferencia'
 ];
 
 
@@ -101,17 +98,19 @@ $paymentMethods = [
 
                 <!-- Filtros y búsqueda -->
                 <div class="card filters-card">
-                    <form id="search-orders-form">
-                        <div class="filter-row">
-                            <div class="filter-group">
-                                <input type="text" id="search-input" name="search" placeholder="Buscar órdenes..." class="form-control">
-                                <button type="submit" class="btn btn-search">
+                    <form id="search-orders-form" class="filters-form">
+                        <div class="filters-grid">
+                            <div class="filters-field filters-field--search">
+                                <label for="search-input" class="sr-only">Buscar órdenes</label>
+                                <input type="text" id="search-input" name="search" placeholder="Buscar órdenes..." class="filters-control form-control">
+                                <button type="submit" class="filters-search-btn" aria-label="Buscar">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
 
-                            <div class="filter-group">
-                                <select name="status" id="status-filter" class="form-control">
+                            <div class="filters-field">
+                                <label for="status-filter" class="sr-only">Estado de la orden</label>
+                                <select name="status" id="status-filter" class="filters-control form-control">
                                     <option value="">Todos los estados</option>
                                     <?php foreach ($statuses as $value => $label): ?>
                                         <option value="<?= $value ?>"><?= htmlspecialchars($label) ?></option>
@@ -119,8 +118,9 @@ $paymentMethods = [
                                 </select>
                             </div>
 
-                            <div class="filter-group">
-                                <select name="payment_status" id="payment-status-filter" class="form-control">
+                            <div class="filters-field">
+                                <label for="payment-status-filter" class="sr-only">Estado del pago</label>
+                                <select name="payment_status" id="payment-status-filter" class="filters-control form-control">
                                     <option value="">Todos los estados de pago</option>
                                     <?php foreach ($paymentStatuses as $value => $label): ?>
                                         <option value="<?= $value ?>"><?= htmlspecialchars($label) ?></option>
@@ -128,29 +128,24 @@ $paymentMethods = [
                                 </select>
                             </div>
 
-                            <div class="filter-group">
-                                <select name="payment_method" id="payment-method-filter" class="form-control">
-                                    <option value="">Todos los métodos de pago</option>
-                                    <?php foreach ($paymentMethods as $value => $label): ?>
-                                        <option value="<?= $value ?>"><?= htmlspecialchars($label) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
+                            <div class="filters-field">
+                                <label for="from-date" class="sr-only">Fecha desde</label>
+                                <input type="date" name="from_date" id="from-date" class="filters-control form-control" placeholder="Desde">
+                            </div>
+                        </div>
+
+                        <div class="filters-footer">
+                            <div class="filters-field">
+                                <label for="to-date" class="sr-only">Fecha hasta</label>
+                                <input type="date" name="to_date" id="to-date" class="filters-control form-control" placeholder="Hasta">
                             </div>
 
-                            <div class="filter-group">
-                                <input type="date" name="from_date" id="from-date" class="form-control" placeholder="Desde">
-                            </div>
-
-                            <div class="filter-group">
-                                <input type="date" name="to_date" id="to-date" class="form-control" placeholder="Hasta">
-                            </div>
-
-                            <div class="filcen">
-                                <button type="submit" class="btn btn-primary">
+                            <div class="filters-actions">
+                                <button type="submit" class="btn btn-primary filters-btn">
                                     <i class="fas fa-filter"></i> Filtrar
                                 </button>
 
-                                <a href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" class="btn btn-secondary">
+                                <a href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" class="btn btn-secondary filters-btn">
                                     <i class="fas fa-sync-alt"></i> Limpiar
                                 </a>
                             </div>
