@@ -208,13 +208,18 @@ $paymentMethods = [
 
                 <!-- Resumen de resultados -->
                 <div class="results-summary">
-                    <p id="results-count">Cargando órdenes...</p>
+                    <div class="results-info">
+                        <i class="fas fa-list-ul"></i>
+                        <p id="results-count">Cargando órdenes...</p>
+                    </div>
                     <div class="quick-actions">
-                        <button class="btn btn-icon" id="export-orders">
-                            <i class="fas fa-file-export"></i> Exportar
+                        <button class="btn-action btn-export" id="export-orders">
+                            <i class="fas fa-file-export"></i>
+                            <span>Exportar</span>
                         </button>
-                        <button class="btn btn-icon" id="bulk-actions">
-                            <i class="fas fa-tasks"></i> Acciones masivas
+                        <button class="btn-action btn-bulk" id="bulk-actions">
+                            <i class="fas fa-tasks"></i>
+                            <span>Acciones masivas</span>
                         </button>
                     </div>
                 </div>
