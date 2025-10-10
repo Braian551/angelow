@@ -623,6 +623,40 @@
 }
 
 /* ===== PAGINACIÓN ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 119, 182, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(0, 119, 182, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 119, 182, 0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 #pagination-container {
   display: flex;
   justify-content: center;
@@ -630,61 +664,102 @@
   gap: 6px;
   margin-top: 2rem;
   padding: 1rem 1.5rem;
-  background: #f8fafc;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.6s ease-out;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .pagination-inner {
   display: flex;
   align-items: center;
   gap: 8px;
+  animation: scaleIn 0.3s ease-out;
 }
 
 .page-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  height: 40px;
-  padding: 0 12px;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 14px;
   font-size: 15px;
   font-weight: 500;
   color: #4b5563;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.9);
   border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   outline: none;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+}
+
+.page-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.page-btn:hover::before {
+  left: 100%;
 }
 
 .page-btn:hover {
   background: #f0f9ff;
   border-color: #0077b6;
   color: #0077b6;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 119, 182, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 119, 182, 0.15);
 }
 
 .page-btn.active {
-  background: #0077b6;
+  background: linear-gradient(145deg, #0077b6, #0369a1);
   color: white;
-  border-color: #0077b6;
+  border: none;
   font-weight: 600;
   transform: none;
-  box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.2);
+  animation: pulse 2s infinite;
+}
+
+.page-btn:active {
+  transform: scale(0.95);
+  transition: transform 0.1s;
 }
 
 .page-btn i {
   font-size: 16px;
   line-height: 1;
+  transition: transform 0.3s ease;
 }
 
 /* Botones de navegación (anterior/siguiente) */
 .page-btn i.fa-chevron-right,
 .page-btn i.fa-chevron-left {
   font-weight: bold;
+}
+
+.page-btn:hover i.fa-chevron-right {
+  transform: translateX(3px);
+}
+
+.page-btn:hover i.fa-chevron-left {
+  transform: translateX(-3px);
 }
 
 #pagination-container a.pagination-item,
@@ -798,6 +873,7 @@
   #pagination-container {
     padding: 0.75rem;
     gap: 4px;
+    border-radius: 12px;
   }
 
   .pagination-inner {
@@ -805,14 +881,47 @@
   }
 
   .page-btn {
-    min-width: 36px;
-    height: 36px;
-    padding: 0 8px;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 10px;
     font-size: 14px;
+    border-radius: 10px;
   }
 
   .page-btn i {
     font-size: 14px;
+  }
+
+  .page-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  @keyframes pulseSmall {
+    0% {
+      box-shadow: 0 0 0 0 rgba(0, 119, 182, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 4px rgba(0, 119, 182, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(0, 119, 182, 0);
+    }
+  }
+
+  .page-btn.active {
+    animation: pulseSmall 2s infinite;
+  }
+}
+
+/* Efectos de hover para dispositivos que lo soportan */
+@media (hover: hover) {
+  .page-btn:hover {
+    transform: translateY(-3px);
+  }
+  
+  .page-btn.active:hover {
+    transform: none;
+    box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.3);
   }
 }
 
