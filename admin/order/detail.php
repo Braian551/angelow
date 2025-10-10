@@ -41,14 +41,11 @@ try {
     // Consulta para obtener los detalles principales de la orden
     $orderQuery = "SELECT 
         o.*, 
-        CONCAT(u.name) AS user_name,
+        u.name AS user_name,
         u.email AS user_email,
         u.phone AS user_phone,
         u.identification_number,
-        u.identification_type,
-        u.address,
-        u.neighborhood,
-        u.address_details
+        u.identification_type
     FROM orders o
     LEFT JOIN users u ON o.user_id = u.id
     WHERE o.id = ?";
@@ -85,7 +82,7 @@ try {
     
 } catch (PDOException $e) {
     error_log("Error al obtener detalles de la orden: " . $e->getMessage());
-    $_SESSION['alert'] = ['type' => 'error', 'message' => 'Error al cargar los detalles de la orden'];
+    $_SESSION['alert'] = ['type' => 'error', 'message' => 'Error al cargar los detalles de la orden: ' . $e->getMessage()];
     header("Location: " . BASE_URL . "/admin/orders.php");
     exit();
 }
@@ -262,11 +259,11 @@ function getIdentificationType($type) {
                             <h3>Dirección de Envío</h3>
                         </div>
                         <div class="card-body">
-                            <?php if ($order['shipping_address'] || $order['address']): ?>
-                                <p><?= nl2br(htmlspecialchars($order['shipping_address'] ?: $order['address'])) ?></p>
-                                <p><strong>Ciudad:</strong> <?= $order['shipping_city'] ?: 'Medellín' ?></p>
-                                <p><strong>Barrio:</strong> <?= $order['neighborhood'] ?: 'N/A' ?></p>
-                                <p><strong>Detalles:</strong> <?= $order['address_details'] ?: 'N/A' ?></p>
+                            <?php if ($order['shipping_address']): ?>
+                                <p><strong>Dirección:</strong> <?= nl2br(htmlspecialchars($order['shipping_address'])) ?></p>
+                                <?php if ($order['shipping_city']): ?>
+                                    <p><strong>Ciudad:</strong> <?= htmlspecialchars($order['shipping_city']) ?></p>
+                                <?php endif; ?>
                                 <?php if ($order['delivery_notes']): ?>
                                     <div class="delivery-notes">
                                         <h4>Notas de Entrega:</h4>
@@ -351,10 +348,6 @@ function getIdentificationType($type) {
                                         <h4>Transacción #<?= $tx['id'] ?></h4>
                                         <div class="payment-details-grid">
                                             <div class="info-group">
-                                                <label>Método:</label>
-                                                <span><?= ucfirst(str_replace('_', ' ', $tx['payment_method'])) ?></span>
-                                            </div>
-                                            <div class="info-group">
                                                 <label>Monto:</label>
                                                 <span><?= formatCurrency($tx['amount']) ?></span>
                                             </div>
@@ -366,26 +359,26 @@ function getIdentificationType($type) {
                                                 <label>Fecha:</label>
                                                 <span><?= formatDate($tx['created_at']) ?></span>
                                             </div>
-                                            <?php if ($tx['payment_method'] === 'transferencia'): ?>
+                                            <?php if ($tx['reference_number']): ?>
                                                 <div class="info-group">
-                                                    <label>Banco:</label>
-                                                    <span><?= $tx['bank_name'] ?: 'N/A' ?></span>
+                                                    <label>N° de Referencia:</label>
+                                                    <span><?= htmlspecialchars($tx['reference_number']) ?></span>
+                                                </div>
+                                            <?php endif; ?>
+                                            <?php if ($tx['verified_by']): ?>
+                                                <div class="info-group">
+                                                    <label>Verificado por:</label>
+                                                    <span><?= htmlspecialchars($tx['verified_by']) ?></span>
                                                 </div>
                                                 <div class="info-group">
-                                                    <label>N° Cuenta:</label>
-                                                    <span><?= $tx['account_number'] ?: 'N/A' ?></span>
+                                                    <label>Fecha de verificación:</label>
+                                                    <span><?= formatDate($tx['verified_at']) ?></span>
                                                 </div>
-                                                <div class="info-group">
-                                                    <label>Tipo Cuenta:</label>
-                                                    <span><?= $tx['account_type'] === 'ahorros' ? 'Ahorros' : 'Corriente' ?></span>
-                                                </div>
-                                                <div class="info-group">
-                                                    <label>Titular:</label>
-                                                    <span><?= $tx['account_holder'] ?: 'N/A' ?></span>
-                                                </div>
-                                                <div class="info-group">
-                                                    <label>Referencia:</label>
-                                                    <span><?= $tx['reference_number'] ?: 'N/A' ?></span>
+                                            <?php endif; ?>
+                                            <?php if ($tx['admin_notes']): ?>
+                                                <div class="info-group" style="grid-column: 1 / -1;">
+                                                    <label>Notas del administrador:</label>
+                                                    <span><?= nl2br(htmlspecialchars($tx['admin_notes'])) ?></span>
                                                 </div>
                                             <?php endif; ?>
                                         </div>
@@ -393,7 +386,6 @@ function getIdentificationType($type) {
                                         <?php if ($tx['payment_proof']): ?>
                                             <div class="proof-image-container">
                                                 <h5>Comprobante de Pago:</h5>
-                                                <p><?= $tx['notes'] ? nl2br(htmlspecialchars($tx['notes'])) : 'Sin notas adicionales' ?></p>
                                                 <img src="<?= BASE_URL . '/' . $tx['payment_proof'] ?>" alt="Comprobante de pago" class="proof-image" onclick="openModal('<?= BASE_URL . '/' . $tx['payment_proof'] ?>')">
                                                 <p class="text-muted">Haz clic en la imagen para ampliar</p>
                                             </div>
