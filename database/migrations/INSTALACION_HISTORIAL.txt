@@ -1,0 +1,333 @@
+╔════════════════════════════════════════════════════════════════╗
+║       SISTEMA DE HISTORIAL DE ÓRDENES - IMPLEMENTACIÓN        ║
+║                    Angelow E-commerce                          ║
+╚════════════════════════════════════════════════════════════════╝
+
+📦 ARCHIVOS CREADOS/MODIFICADOS:
+═══════════════════════════════════════════════════════════════
+
+1. 📄 database/migrations/add_order_history.sql
+   ✅ Tabla: order_status_history
+   ✅ Triggers automáticos (INSERT/UPDATE)
+   ✅ Procedimiento: GetOrderHistory()
+   ✅ Vista: v_order_history_summary
+   ✅ Función: GetLastOrderChange()
+   ✅ Migración de datos existentes
+
+2. 📄 admin/order/edit.php
+   ✅ Integración con sistema de historial
+   ✅ Variables de sesión MySQL (@current_user_id, etc.)
+   ✅ Registro automático de cambios al editar
+
+3. 📄 admin/order/detail.php
+   ✅ Consulta de historial mejorada
+   ✅ Timeline visual con glassmorphism
+   ✅ Funciones helper (getChangeTypeIcon, getChangeTypeColor, getRoleBadge)
+   ✅ Visualización completa de cambios
+
+4. 📄 css/admin/orders/detail.css
+   ✅ Estilos del timeline moderno
+   ✅ Colores por tipo de cambio
+   ✅ Animaciones y transiciones
+   ✅ Responsive design completo
+
+5. 📄 database/migrations/HISTORIAL_ORDENES_README.md
+   ✅ Documentación completa
+   ✅ Ejemplos de uso
+   ✅ Guía de instalación
+   ✅ Troubleshooting
+
+
+🎨 CARACTERÍSTICAS VISUALES:
+═══════════════════════════════════════════════════════════════
+
+✨ Timeline Vertical con Línea de Tiempo
+   • Puntos de color por tipo de cambio
+   • Iconos Font Awesome específicos
+   • Efecto glassmorphism en cards
+
+🎨 Colores por Tipo de Cambio:
+   🟢 Created (Verde) - #22c55e
+   🔵 Status (Azul) - #0077b6
+   💚 Payment Status (Verde esmeralda) - #10b981
+   🟠 Shipping (Naranja) - #f59e0b
+   🟣 Address (Morado) - #8b5cf6
+   🔷 Notes (Índigo) - #6366f1
+   🔴 Cancelled (Rojo) - #ef4444
+   🧡 Refunded (Naranja oscuro) - #f97316
+   🩷 Items (Rosa) - #ec4899
+   ⚪ Other (Gris) - #64748b
+
+🏷️ Badges de Roles:
+   🔴 Admin (Rojo degradado)
+   🔵 Cliente (Azul degradado)
+   🟠 Repartidor (Naranja degradado)
+   ⚪ Sistema (Gris degradado)
+
+📊 Información Mostrada:
+   • Descripción del cambio
+   • Fecha y hora
+   • Usuario que hizo el cambio
+   • Rol del usuario
+   • Valor anterior vs nuevo
+   • IP del usuario (opcional)
+
+
+📋 TIPOS DE CAMBIOS REGISTRADOS:
+═══════════════════════════════════════════════════════════════
+
+1. 📝 CREATED - Orden creada
+   "Orden #ORD202510090588A9 creada con total de $43,000"
+
+2. 📊 STATUS - Cambio de estado
+   "Estado cambiado de 'Pendiente' a 'En proceso'"
+   
+   Estados posibles:
+   • pending → Pendiente
+   • processing → En proceso
+   • shipped → Enviado
+   • delivered → Entregado
+   • cancelled → Cancelado
+   • refunded → Reembolsado
+
+3. 💳 PAYMENT_STATUS - Estado de pago
+   "Estado de pago cambiado de 'Pendiente' a 'Pagado'"
+   
+   Estados de pago:
+   • pending → Pendiente
+   • paid → Pagado ✅
+   • failed → Fallido
+   • refunded → Reembolsado
+
+4. 🚚 SHIPPING - Ciudad de envío
+   "Ciudad de envío cambiada de 'Medellín' a 'Bogotá'"
+
+5. 📍 ADDRESS - Dirección de envío
+   "Dirección de envío actualizada"
+
+6. 📝 NOTES - Notas
+   • delivery_notes → "Notas de entrega actualizadas"
+   • notes → "Notas administrativas actualizadas"
+
+7. 💰 ITEMS - Cambio de total
+   "Total actualizado de $100,000 a $150,000"
+
+8. ❌ CANCELLED - Orden cancelada
+
+9. 🔄 REFUNDED - Orden reembolsada
+
+10. 📝 OTHER - Otros cambios
+
+
+🔧 INSTALACIÓN:
+═══════════════════════════════════════════════════════════════
+
+PASO 1: Ejecutar SQL
+──────────────────────────────────────────────────────────────
+MySQL Workbench / phpMyAdmin:
+    
+    1. Abrir: database/migrations/add_order_history.sql
+    2. Seleccionar base de datos: USE angelow;
+    3. Ejecutar todo el script (F5)
+    4. Verificar: SELECT * FROM order_status_history;
+
+
+Desde Terminal:
+──────────────────────────────────────────────────────────────
+cd c:\xampp\htdocs\angelow\database\migrations
+mysql -u root -p angelow < add_order_history.sql
+
+
+PASO 2: Verificar Instalación
+──────────────────────────────────────────────────────────────
+-- Ver tabla creada
+SHOW TABLES LIKE 'order_status_history';
+
+-- Ver triggers
+SHOW TRIGGERS WHERE `Table` = 'orders';
+
+-- Ver procedimiento
+SHOW PROCEDURE STATUS WHERE Db = 'angelow';
+
+-- Ver datos migrados
+SELECT COUNT(*) FROM order_status_history;
+
+
+PASO 3: Listo para Usar
+──────────────────────────────────────────────────────────────
+✅ Los archivos PHP ya están actualizados
+✅ Los estilos CSS ya están aplicados
+✅ Los triggers registrarán cambios automáticamente
+
+
+💡 USO:
+═══════════════════════════════════════════════════════════════
+
+1. Editar una Orden:
+   • Ir a: /admin/order/edit.php?id=X
+   • Cambiar estado, pago, dirección, etc.
+   • Guardar cambios
+   • ✅ El historial se registra automáticamente
+
+2. Ver Historial:
+   • Ir a: /admin/order/detail.php?id=X
+   • Scroll hasta "Historial de Cambios"
+   • Ver timeline completo con todos los cambios
+
+3. Ejemplos de Cambios que se Registran:
+   
+   ✏️ Cambiar estado de "Pendiente" a "Enviado"
+      → "Estado cambiado de 'Pendiente' a 'Enviado'"
+   
+   ✏️ Aprobar pago
+      → "Estado de pago cambiado de 'Pendiente' a 'Pagado'"
+   
+   ✏️ Actualizar dirección
+      → "Dirección de envío actualizada"
+   
+   ✏️ Agregar notas de entrega
+      → "Notas de entrega actualizadas"
+   
+   ✏️ Modificar total
+      → "Total actualizado de $100,000 a $150,000"
+
+
+📊 CONSULTAS ÚTILES:
+═══════════════════════════════════════════════════════════════
+
+-- Ver historial de una orden específica
+SELECT * FROM order_status_history 
+WHERE order_id = 15 
+ORDER BY created_at DESC;
+
+-- Ver solo cambios de pago
+SELECT * FROM order_status_history 
+WHERE order_id = 15 AND change_type = 'payment_status';
+
+-- Ver quién hizo más cambios
+SELECT changed_by_name, COUNT(*) as total 
+FROM order_status_history 
+GROUP BY changed_by_name 
+ORDER BY total DESC;
+
+-- Cambios de los últimos 7 días
+SELECT o.order_number, osh.description, osh.created_at
+FROM order_status_history osh
+INNER JOIN orders o ON osh.order_id = o.id
+WHERE osh.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+ORDER BY osh.created_at DESC;
+
+-- Órdenes con más cambios
+SELECT o.order_number, COUNT(osh.id) as cambios
+FROM orders o
+LEFT JOIN order_status_history osh ON o.id = osh.order_id
+GROUP BY o.id
+ORDER BY cambios DESC
+LIMIT 10;
+
+
+🎯 EJEMPLO COMPLETO:
+═══════════════════════════════════════════════════════════════
+
+Orden #ORD202510090588A9
+
+┌─────────────────────────────────────────────────────────────┐
+│ 🟢 Orden creada                                             │
+│ 👤 Braian (Cliente)                    🕐 09/10/2025 12:47  │
+│ Orden #ORD202510090588A9 creada con total de $43,000       │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ 💚 Estado de pago actualizado                               │
+│ 👤 Admin (Administrador)               🕐 09/10/2025 13:15  │
+│ Anterior: Pendiente → Nuevo: Pagado ✅                      │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ 🔵 Estado de orden actualizado                              │
+│ 👤 Admin (Administrador)               🕐 09/10/2025 14:20  │
+│ Anterior: Pendiente → Nuevo: En proceso                     │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ 🟠 Enviado                                                  │
+│ 👤 Admin (Administrador)               🕐 09/10/2025 16:30  │
+│ Anterior: En proceso → Nuevo: Enviado                       │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ 🔵 Entregado                                                │
+│ 👤 Repartidor (Delivery)               🕐 10/10/2025 10:15  │
+│ Anterior: Enviado → Nuevo: Entregado ✅                     │
+└─────────────────────────────────────────────────────────────┘
+
+
+✅ VENTAJAS DEL SISTEMA:
+═══════════════════════════════════════════════════════════════
+
+1. ✨ Auditoría Completa
+   • Quién hizo el cambio
+   • Cuándo lo hizo
+   • Desde dónde (IP)
+   • Qué cambió exactamente
+
+2. 🎨 Diseño Profesional
+   • Timeline visual moderno
+   • Colores distintivos
+   • Animaciones suaves
+   • Responsive
+
+3. ⚡ Automático
+   • No requiere código adicional
+   • Los triggers hacen todo
+   • Registro en tiempo real
+
+4. 🔒 Seguro
+   • Historial inmutable
+   • Foreign keys protegen integridad
+   • Roles identificados
+
+5. 📊 Analítico
+   • Estadísticas de cambios
+   • Identificar patrones
+   • Auditorías de compliance
+
+
+🐛 TROUBLESHOOTING:
+═══════════════════════════════════════════════════════════════
+
+❌ Problema: "Table doesn't exist"
+   Solución: Ejecutar add_order_history.sql
+
+❌ Problema: "Trigger already exists"
+   Solución: DROP TRIGGER IF EXISTS antes de crear
+
+❌ Problema: "No se registran cambios"
+   Solución: Verificar variables @current_user_id
+
+❌ Problema: "Foreign key constraint"
+   Solución: Verificar que usuario existe en users
+
+❌ Problema: "No aparece el historial"
+   Solución: Verificar consulta en detail.php
+
+
+📞 SOPORTE:
+═══════════════════════════════════════════════════════════════
+
+📧 Email: soporte@angelow.com
+📱 WhatsApp: +57 301 363 6902
+🌐 Web: www.angelow.com
+📂 Documentación: /database/migrations/HISTORIAL_ORDENES_README.md
+
+
+═══════════════════════════════════════════════════════════════
+                    ✅ SISTEMA COMPLETO Y LISTO
+═══════════════════════════════════════════════════════════════
+
+Última actualización: 11 de Octubre, 2025
+Versión: 1.0.0
+Desarrollado para: Angelow E-commerce
+Compatible con: MySQL 5.7+, PHP 7.4+
+
+═══════════════════════════════════════════════════════════════

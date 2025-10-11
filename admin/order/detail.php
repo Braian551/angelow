@@ -80,6 +80,20 @@ try {
     $stmt->execute([$orderId]);
     $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
+    // Consulta para obtener el historial de cambios
+    $historyQuery = "SELECT 
+        osh.*,
+        u.name as changed_by_full_name,
+        u.role as changed_by_role,
+        u.email as changed_by_email
+    FROM order_status_history osh
+    LEFT JOIN users u ON osh.changed_by = u.id
+    WHERE osh.order_id = ?
+    ORDER BY osh.created_at DESC, osh.id DESC";
+    $stmt = $conn->prepare($historyQuery);
+    $stmt->execute([$orderId]);
+    $orderHistory = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
 } catch (PDOException $e) {
     error_log("Error al obtener detalles de la orden: " . $e->getMessage());
     $_SESSION['alert'] = ['type' => 'error', 'message' => 'Error al cargar los detalles de la orden: ' . $e->getMessage()];
@@ -141,6 +155,50 @@ function getIdentificationType($type) {
         'pasaporte' => 'Pasaporte'
     ];
     return $types[$type] ?? $type;
+}
+
+function getChangeTypeIcon($changeType) {
+    $icons = [
+        'status' => 'fas fa-info-circle',
+        'payment_status' => 'fas fa-credit-card',
+        'shipping' => 'fas fa-truck',
+        'address' => 'fas fa-map-marker-alt',
+        'notes' => 'fas fa-sticky-note',
+        'created' => 'fas fa-plus-circle',
+        'cancelled' => 'fas fa-ban',
+        'refunded' => 'fas fa-undo',
+        'items' => 'fas fa-shopping-cart',
+        'other' => 'fas fa-edit'
+    ];
+    return $icons[$changeType] ?? 'fas fa-edit';
+}
+
+function getChangeTypeColor($changeType) {
+    $colors = [
+        'status' => '#0077b6',
+        'payment_status' => '#10b981',
+        'shipping' => '#f59e0b',
+        'address' => '#8b5cf6',
+        'notes' => '#6366f1',
+        'created' => '#22c55e',
+        'cancelled' => '#ef4444',
+        'refunded' => '#f97316',
+        'items' => '#ec4899',
+        'other' => '#64748b'
+    ];
+    return $colors[$changeType] ?? '#64748b';
+}
+
+function getRoleBadge($role) {
+    $roles = [
+        'admin' => ['label' => 'Administrador', 'class' => 'badge-admin'],
+        'customer' => ['label' => 'Cliente', 'class' => 'badge-customer'],
+        'delivery' => ['label' => 'Repartidor', 'class' => 'badge-delivery'],
+        'system' => ['label' => 'Sistema', 'class' => 'badge-system']
+    ];
+    
+    $roleInfo = $roles[$role] ?? ['label' => ucfirst($role), 'class' => 'badge-light'];
+    return '<span class="role-badge ' . $roleInfo['class'] . '">' . $roleInfo['label'] . '</span>';
 }
 ?>
 <!DOCTYPE html>
@@ -399,27 +457,67 @@ function getIdentificationType($type) {
                     <!-- Historial de cambios de estado -->
                     <div class="order-history-card">
                         <div class="card-header">
-                            <h3>Historial de la Orden</h3>
+                            <h3>
+                                <i class="fas fa-history"></i> 
+                                Historial de Cambios
+                            </h3>
                         </div>
                         <div class="card-body">
-                            <div class="timeline">
-                                <div class="timeline-item">
-                                    <div class="timeline-point"></div>
-                                    <div class="timeline-content">
-                                        <h4>Orden creada</h4>
-                                        <p><?= formatDate($order['created_at']) ?></p>
-                                    </div>
-                                </div>
-                                <?php if ($order['updated_at'] && $order['updated_at'] != $order['created_at']): ?>
-                                    <div class="timeline-item">
-                                        <div class="timeline-point"></div>
-                                        <div class="timeline-content">
-                                            <h4>Última actualización</h4>
-                                            <p><?= formatDate($order['updated_at']) ?></p>
+                            <?php if (!empty($orderHistory)): ?>
+                                <div class="timeline">
+                                    <?php foreach ($orderHistory as $history): ?>
+                                        <div class="timeline-item" data-change-type="<?= $history['change_type'] ?>">
+                                            <div class="timeline-point" style="background: <?= getChangeTypeColor($history['change_type']) ?>;">
+                                                <i class="<?= getChangeTypeIcon($history['change_type']) ?>"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <div class="timeline-header">
+                                                    <h4><?= htmlspecialchars($history['description']) ?></h4>
+                                                    <span class="timeline-date">
+                                                        <i class="fas fa-clock"></i>
+                                                        <?= formatDate($history['created_at']) ?>
+                                                    </span>
+                                                </div>
+                                                <div class="timeline-details">
+                                                    <div class="timeline-user">
+                                                        <i class="fas fa-user"></i>
+                                                        <span><?= htmlspecialchars($history['changed_by_name'] ?: 'Sistema') ?></span>
+                                                        <?php if ($history['changed_by_role']): ?>
+                                                            <?= getRoleBadge($history['changed_by_role']) ?>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    
+                                                    <?php if ($history['old_value'] && $history['new_value']): ?>
+                                                        <div class="timeline-change-values">
+                                                            <div class="change-value old-value">
+                                                                <span class="value-label">Anterior:</span>
+                                                                <span class="value-content"><?= htmlspecialchars($history['old_value']) ?></span>
+                                                            </div>
+                                                            <i class="fas fa-arrow-right change-arrow"></i>
+                                                            <div class="change-value new-value">
+                                                                <span class="value-label">Nuevo:</span>
+                                                                <span class="value-content"><?= htmlspecialchars($history['new_value']) ?></span>
+                                                            </div>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    
+                                                    <?php if ($history['ip_address']): ?>
+                                                        <div class="timeline-metadata">
+                                                            <i class="fas fa-network-wired"></i>
+                                                            <span>IP: <?= htmlspecialchars($history['ip_address']) ?></span>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="empty-history">
+                                    <i class="fas fa-history"></i>
+                                    <p>No hay historial de cambios para esta orden</p>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
