@@ -60,6 +60,12 @@ document.addEventListener('DOMContentLoaded', function() {
     cancelStatusChangeBtn.addEventListener('click', closeStatusChangeModal);
     confirmStatusChangeBtn.addEventListener('click', confirmStatusChange);
 
+    // Cerrar modal con el botón X
+    const modalCloseBtn = statusChangeModal.querySelector('.modal-close');
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', closeStatusChangeModal);
+    }
+
     // Cerrar modal al hacer clic fuera del contenido
     statusChangeModal.addEventListener('click', function(e) {
         if (e.target === this) {

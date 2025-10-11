@@ -152,7 +152,7 @@ function getIdentificationType($type) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/verdetailorden.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/orders/detail.css">
   
 </head>
 
@@ -439,36 +439,106 @@ function getIdentificationType($type) {
     <script src="<?= BASE_URL ?>/js/dashboardadmin.js"></script>
     <script src="<?= BASE_URL ?>/js/alerta.js"></script>
     <script>
-        // Función para cambiar el estado de la orden
+        // Función para cambiar el estado de la orden con modal moderno
         function changeOrderStatus(orderId) {
-            const newStatus = prompt('Ingrese el nuevo estado de la orden (pending, processing, shipped, delivered, cancelled, refunded):');
+            // Crear el modal dinámicamente
+            const modalHTML = `
+                <div class="modal" id="status-modal" style="display: flex; align-items: center; justify-content: center; padding: 20px;">
+                    <div class="status-modal-content" style="max-width: 520px; width: 100%; background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-radius: 20px; border: 1px solid rgba(0, 119, 182, 0.18); box-shadow: 0 8px 32px rgba(0, 119, 182, 0.15), 0 20px 60px rgba(0, 0, 0, 0.15); position: relative; animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                        <div class="card-header" style="padding: 2rem 4.5rem 2rem 2.5rem; background: rgba(255, 255, 255, 0.5); border-bottom: 1px solid rgba(0, 119, 182, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 20px 20px 0 0; position: relative;">
+                            <span class="close-modal" onclick="closeStatusModal()" style="cursor: pointer; font-size: 0; color: #64748b; position: absolute; top: 20px; right: 20px; width: 38px; height: 38px; border-radius: 50%; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.3s; z-index: 10; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(100, 116, 139, 0.2);"></span>
+                            <h3 style="margin: 0; font-size: 1.8rem; color: #334155; font-weight: 600; line-height: 1.2; display: flex; align-items: center; gap: 0.8rem; position: relative; z-index: 1;">
+                                <i class="fas fa-sync-alt" style="color: #0077b6; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(0, 119, 182, 0.12); border-radius: 10px; padding: 8px; flex-shrink: 0;"></i>
+                                <span>Cambiar Estado</span>
+                            </h3>
+                        </div>
+                        <div class="card-body" style="padding: 2.5rem; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 0 0 20px 20px;">
+                            <div style="margin-bottom: 1.8rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem; font-weight: 600; color: #475569; margin-bottom: 0.8rem;">
+                                    <i class="fas fa-tag" style="color: #0077b6;"></i>
+                                    Nuevo Estado
+                                </label>
+                                <select id="new-status" style="width: 100%; height: 50px; padding: 0 1.4rem; border: 2px solid rgba(0, 119, 182, 0.15); border-radius: 12px; font-size: 15px; color: #334155; background: rgba(255, 255, 255, 0.95); cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: all 0.3s; outline: none;">
+                                    <option value="pending">Pendiente</option>
+                                    <option value="processing">En proceso</option>
+                                    <option value="shipped">Enviado</option>
+                                    <option value="delivered">Entregado</option>
+                                    <option value="cancelled">Cancelado</option>
+                                    <option value="refunded">Reembolsado</option>
+                                </select>
+                            </div>
+                            <div style="margin-bottom: 2rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem; font-weight: 600; color: #475569; margin-bottom: 0.8rem;">
+                                    <i class="fas fa-sticky-note" style="color: #0077b6;"></i>
+                                    Notas (Opcional)
+                                </label>
+                                <textarea id="status-notes" rows="3" style="width: 100%; padding: 1.2rem; border: 2px solid rgba(0, 119, 182, 0.15); border-radius: 12px; font-size: 14.5px; color: #334155; background: rgba(255, 255, 255, 0.95); font-family: inherit; resize: vertical; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: all 0.3s; outline: none; line-height: 1.5;" placeholder="Agrega notas sobre el cambio de estado..."></textarea>
+                            </div>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <button onclick="closeStatusModal()" style="flex: 1; min-width: 140px; padding: 1rem 1.8rem; border-radius: 12px; font-size: 1.4rem; font-weight: 600; border: 2px solid rgba(0, 119, 182, 0.15); background: rgba(248, 250, 252, 0.85); color: #64748b; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                                <button onclick="confirmStatusChange(${orderId})" style="flex: 1; min-width: 140px; padding: 1rem 1.8rem; border-radius: 12px; font-size: 1.4rem; font-weight: 600; border: 2px solid rgba(0, 119, 182, 0.3); background: rgba(0, 119, 182, 0.9); color: white; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+                                    <i class="fas fa-check"></i> Confirmar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
             
-            if (newStatus && ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'].includes(newStatus)) {
-                fetch(`${BASE_URL}/admin/order/update_status.php`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        order_ids: [orderId],
-                        new_status: newStatus
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showAlert('Estado de la orden actualizado correctamente', 'success');
-                        setTimeout(() => location.reload(), 1500);
-                    } else {
-                        throw new Error(data.message || 'Error al actualizar estado');
-                    }
-                })
-                .catch(error => {
-                    showAlert(error.message, 'error');
-                });
-            } else if (newStatus !== null) {
-                showAlert('Estado no válido', 'error');
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Cerrar al hacer clic fuera
+            const modal = document.getElementById('status-modal');
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeStatusModal();
+                }
+            });
+        }
+        
+        function closeStatusModal() {
+            const modal = document.getElementById('status-modal');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => modal.remove(), 300);
             }
+        }
+        
+        function confirmStatusChange(orderId) {
+            const newStatus = document.getElementById('new-status').value;
+            const notes = document.getElementById('status-notes').value;
+            
+            if (!newStatus) {
+                showAlert('Por favor selecciona un estado', 'warning');
+                return;
+            }
+            
+            fetch('<?= BASE_URL ?>/admin/order/update_status.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    order_ids: [orderId],
+                    new_status: newStatus,
+                    notes: notes || null
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Estado de la orden actualizado correctamente', 'success');
+                    closeStatusModal();
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    throw new Error(data.message || 'Error al actualizar estado');
+                }
+            })
+            .catch(error => {
+                showAlert(error.message, 'error');
+            });
         }
 
         // Funciones para el modal de imagen
@@ -477,19 +547,429 @@ function getIdentificationType($type) {
             const modalImg = document.getElementById('modalImage');
             modal.style.display = 'block';
             modalImg.src = imageSrc;
+            modalImg.classList.remove('zoomed');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'none';
+            modalImg.classList.remove('zoomed');
+            document.body.style.overflow = '';
         }
+
+        // Sistema de zoom y desplazamiento mejorado y sin bugs
+        (function() {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalContent = document.querySelector('#imageModal .modal-content');
+            
+            let isZoomed = false;
+            let isDragging = false;
+            let dragStarted = false;
+            let startX = 0, startY = 0;
+            let currentX = 0, currentY = 0;
+            let clickTimeout = null;
+
+            // Función para aplicar zoom
+            function applyZoom() {
+                if (isZoomed) return;
+                
+                isZoomed = true;
+                modalImage.classList.add('zoomed');
+                modalImage.style.cursor = 'grab';
+                currentX = 0;
+                currentY = 0;
+                updateImagePosition();
+            }
+
+            // Función para quitar zoom
+            function removeZoom() {
+                if (!isZoomed) return;
+                
+                isZoomed = false;
+                isDragging = false;
+                dragStarted = false;
+                modalImage.classList.remove('zoomed');
+                modalImage.style.cursor = 'zoom-in';
+                modalImage.style.transform = '';
+                currentX = 0;
+                currentY = 0;
+            }
+
+            // Actualizar posición de la imagen
+            function updateImagePosition() {
+                if (!isZoomed) return;
+                
+                // Usar translate + scale para mejor rendimiento
+                modalImage.style.transform = `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px)) scale(1.8)`;
+            }
+
+            // Manejar mousedown
+            modalImage.addEventListener('mousedown', function(e) {
+                if (e.button !== 0) return; // Solo botón izquierdo
+                
+                e.preventDefault();
+                
+                if (isZoomed) {
+                    isDragging = true;
+                    dragStarted = false;
+                    startX = e.clientX - currentX;
+                    startY = e.clientY - currentY;
+                    modalImage.style.cursor = 'grabbing';
+                }
+            });
+
+            // Manejar mousemove global
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                e.preventDefault();
+                
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                // Si se movió más de 3px, es un drag real
+                if (!dragStarted && (Math.abs(deltaX - currentX) > 3 || Math.abs(deltaY - currentY) > 3)) {
+                    dragStarted = true;
+                }
+                
+                // Actualizar posición
+                currentX = deltaX;
+                currentY = deltaY;
+                updateImagePosition();
+            });
+
+            // Manejar mouseup global
+            document.addEventListener('mouseup', function(e) {
+                if (!isDragging && !isZoomed && e.target === modalImage) {
+                    // Click para hacer zoom
+                    clearTimeout(clickTimeout);
+                    clickTimeout = setTimeout(() => {
+                        applyZoom();
+                    }, 10);
+                } else if (isDragging) {
+                    // Terminar drag
+                    const wasDragging = dragStarted;
+                    isDragging = false;
+                    
+                    if (isZoomed) {
+                        modalImage.style.cursor = 'grab';
+                        
+                        // Si NO se arrastró (click simple mientras está en zoom), hacer zoom out
+                        if (!wasDragging) {
+                            clearTimeout(clickTimeout);
+                            clickTimeout = setTimeout(() => {
+                                removeZoom();
+                            }, 10);
+                        }
+                    }
+                    
+                    dragStarted = false;
+                }
+            });
+
+            // Prevenir comportamientos por defecto
+            modalImage.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+            });
+
+            modalImage.addEventListener('contextmenu', function(e) {
+                if (isZoomed) {
+                    e.preventDefault();
+                }
+            });
+
+            // Doble click para zoom/unzoom
+            modalImage.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                clearTimeout(clickTimeout);
+                
+                if (isZoomed) {
+                    removeZoom();
+                } else {
+                    applyZoom();
+                }
+            });
+
+            // Tecla ESC para salir del zoom
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && isZoomed) {
+                    removeZoom();
+                }
+            });
+
+            // Limpiar estado cuando se cierra el modal
+            window.closeModalOriginal = window.closeModal;
+            window.closeModal = function() {
+                removeZoom();
+                if (window.closeModalOriginal) {
+                    window.closeModalOriginal();
+                } else {
+                    const modal = document.getElementById('imageModal');
+                    const modalImg = document.getElementById('modalImage');
+                    modal.style.display = 'none';
+                    modalImg.classList.remove('zoomed');
+                    document.body.style.overflow = '';
+                }
+            };
+        })();
 
         // Cerrar modal al hacer clic fuera de la imagen
         window.onclick = function(event) {
             const modal = document.getElementById('imageModal');
             if (event.target == modal) {
-                modal.style.display = 'none';
+                closeModal();
             }
         }
+        
+        // Cerrar modal con tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const imageModal = document.getElementById('imageModal');
+                const statusModal = document.getElementById('status-modal');
+                if (imageModal && imageModal.style.display === 'block') {
+                    closeModal();
+                }
+                if (statusModal) {
+                    closeStatusModal();
+                }
+            }
+        });
+        
+        // Animación de scroll suave
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Añadir animación de carga completada
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+        });
     </script>
+    
+    <style>
+        /* Animación adicional para el modal de estado */
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        
+        /* Estilos específicos para el modal de estado */
+        #status-modal {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #status-modal .status-modal-content {
+            position: relative;
+            margin: 0;
+            top: auto;
+            transform: none;
+        }
+        
+        /* Sobrescribir el h3::before para este modal */
+        #status-modal .card-header h3::before {
+            display: none !important;
+        }
+        
+        /* Estilos específicos para el botón de cerrar del modal de estado */
+        #status-modal .close-modal {
+            position: absolute !important;
+            top: 20px !important;
+            right: 20px !important;
+            width: 38px !important;
+            height: 38px !important;
+            background: rgba(248, 250, 252, 0.8) !important;
+            border: 2px solid rgba(100, 116, 139, 0.2) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        #status-modal .close-modal::before {
+            content: '×' !important;
+            font-size: 32px !important;
+            color: #64748b !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            height: 100% !important;
+            line-height: 0 !important;
+            margin: 0 !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+        }
+        
+        #status-modal .close-modal:hover {
+            background: rgba(220, 38, 38, 0.2) !important;
+            border-color: rgba(239, 68, 68, 0.5) !important;
+            transform: rotate(90deg) scale(1.05) !important;
+        }
+        
+        #status-modal .close-modal:hover::before {
+            color: #ef4444 !important;
+            transform: translate(-50%, -50%) !important;
+        }
+        
+        #status-modal .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 119, 182, 0.02);
+            pointer-events: none;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Hover effects para botones en el modal */
+        .modal button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 119, 182, 0.15);
+        }
+        
+        .modal button:active {
+            transform: translateY(0);
+        }
+        
+        .modal select:hover,
+        .modal textarea:hover {
+            border-color: rgba(0, 119, 182, 0.3);
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        .modal select:focus,
+        .modal textarea:focus {
+            border-color: rgba(0, 119, 182, 0.5);
+            box-shadow: 0 0 0 4px rgba(0, 119, 182, 0.1);
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        /* Responsive para el modal */
+        @media (max-width: 600px) {
+            #status-modal .status-modal-content {
+                max-width: 90% !important;
+            }
+            
+            #status-modal .card-header {
+                padding: 1.8rem 4rem 1.8rem 2rem !important;
+            }
+            
+            #status-modal h3 {
+                font-size: 1.6rem !important;
+            }
+            
+            #status-modal h3 i {
+                width: 32px !important;
+                height: 32px !important;
+            }
+            
+            #status-modal .close-modal {
+                width: 34px !important;
+                height: 34px !important;
+                top: 16px !important;
+                right: 16px !important;
+            }
+            
+            #status-modal .close-modal span {
+                font-size: 28px !important;
+            }
+            
+            #status-modal .card-body {
+                padding: 2rem !important;
+            }
+            
+            #status-modal button {
+                font-size: 1.3rem !important;
+                padding: 0.85rem 1.4rem !important;
+            }
+            
+            #status-modal select {
+                height: 48px !important;
+                font-size: 14px !important;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            #status-modal .status-modal-content {
+                max-width: 95% !important;
+            }
+            
+            #status-modal .card-body {
+                padding: 1.5rem !important;
+            }
+            
+            #status-modal .card-header {
+                padding: 1.5rem 3.5rem 1.5rem 1.8rem !important;
+            }
+            
+            #status-modal h3 {
+                font-size: 1.5rem !important;
+                gap: 0.6rem !important;
+            }
+            
+            #status-modal h3 i {
+                width: 30px !important;
+                height: 30px !important;
+            }
+        }
+        
+        /* Efecto de carga inicial */
+        body:not(.loaded) .order-detail-container {
+            opacity: 0;
+        }
+        
+        body.loaded .order-detail-container {
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        /* Mejora de sombras y glassmorphism */
+        .modal {
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+        }
+        
+        /* Animaciones suaves para cards */
+        @keyframes cardPulse {
+            0%, 100% {
+                box-shadow: 0 8px 32px rgba(0, 119, 182, 0.08);
+            }
+            50% {
+                box-shadow: 0 12px 40px rgba(0, 119, 182, 0.12);
+            }
+        }
+    </style>
 </body>
 </html>

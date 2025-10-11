@@ -325,9 +325,8 @@ exportBtn.addEventListener('click', function() {
                     <td>${formattedTotal}</td>
                     <td><span class="status-badge ${order.status}">${getStatusLabel(order.status)}</span></td>
                     <td>
-                        <span class="payment-status ${order.payment_status}">
+                        <span class="payment-badge ${order.payment_status}">
                             ${getPaymentStatusLabel(order.payment_status)}
-                            ${order.payment_method ? `(${getPaymentMethodLabel(order.payment_method)})` : ''}
                         </span>
                     </td>
                     <td>

@@ -55,6 +55,12 @@ document.addEventListener('DOMContentLoaded', function() {
     cancelDeleteOrderBtn.addEventListener('click', closeDeleteOrderModal);
     confirmDeleteOrderBtn.addEventListener('click', confirmDeleteOrder);
 
+    // Cerrar modal con el botón X
+    const modalCloseBtn = deleteOrderModal.querySelector('.modal-close');
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', closeDeleteOrderModal);
+    }
+
     // Cerrar modal al hacer clic fuera del contenido
     deleteOrderModal.addEventListener('click', function(e) {
         if (e.target === this) {

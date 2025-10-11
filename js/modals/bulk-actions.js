@@ -93,6 +93,12 @@ document.addEventListener('DOMContentLoaded', function() {
     cancelBulkActionBtn.addEventListener('click', closeBulkActionsModal);
     confirmBulkActionBtn.addEventListener('click', confirmBulkAction);
 
+    // Cerrar modal con el botón X
+    const modalCloseBtn = bulkActionsModal.querySelector('.modal-close');
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', closeBulkActionsModal);
+    }
+
     // Cerrar modal al hacer clic fuera del contenido
     bulkActionsModal.addEventListener('click', function(e) {
         if (e.target === this) {
