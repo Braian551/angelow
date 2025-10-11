@@ -219,7 +219,16 @@ exportBtn.addEventListener('click', function() {
         ordersContainer.innerHTML = `
             <tr>
                 <td colspan="8" class="loading-row">
-                    <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando órdenes...</div>
+                    <div class="loading-spinner">
+                        <div class="loading-spinner-text">
+                            Cargando órdenes
+                            <span class="loading-spinner-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </span>
+                        </div>
+                    </div>
                 </td>
             </tr>
         `;
