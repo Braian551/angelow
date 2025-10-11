@@ -259,7 +259,7 @@ exportBtn.addEventListener('click', function() {
                 if (data.success) {
                     renderOrders(data.orders);
                     renderPagination(data.meta);
-                    updateResultsCount(data.meta.total);
+                    updateResultsCount(data.meta);
                 } else {
                     throw new Error(data.error || 'Error desconocido');
                 }
@@ -393,8 +393,18 @@ exportBtn.addEventListener('click', function() {
     }
 
     // Función para actualizar el contador de resultados
-    function updateResultsCount(total) {
-        resultsCount.textContent = `${total} ${total === 1 ? 'orden encontrada' : 'órdenes encontradas'}`;
+    function updateResultsCount(meta) {
+        const { total, page, per_page, total_pages } = meta;
+        const start = total > 0 ? ((page - 1) * per_page) + 1 : 0;
+        const end = Math.min(page * per_page, total);
+        
+        if (total === 0) {
+            resultsCount.innerHTML = '<i class="fas fa-info-circle"></i> No se encontraron órdenes';
+        } else if (total_pages === 1) {
+            resultsCount.textContent = `${total} ${total === 1 ? 'orden encontrada' : 'órdenes encontradas'}`;
+        } else {
+            resultsCount.textContent = `${start}-${end} de ${total} ${total === 1 ? 'orden' : 'órdenes'}`;
+        }
     }
 
     // Funciones globales accesibles desde HTML

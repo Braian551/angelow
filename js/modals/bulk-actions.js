@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         bulkStatusContainer.style.display = 'none';
         bulkDeleteContainer.style.display = 'none';
         confirmBulkActionBtn.disabled = true;
-        confirmBulkActionBtn.textContent = 'Confirmar';
+        confirmBulkActionBtn.innerHTML = '<i class="fas fa-check"></i><span>Confirmar</span>';
         confirmBulkActionBtn.classList.remove('btn-danger');
 
         bulkActionsModal.classList.add('active');
@@ -43,21 +43,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // Manejar cambio en el tipo de acción masiva
     bulkActionTypeSelect.addEventListener('change', function() {
         const actionType = this.value;
-        bulkStatusContainer.style.display = 'none';
-        bulkDeleteContainer.style.display = 'none';
-        confirmBulkActionBtn.disabled = true;
-        confirmBulkActionBtn.classList.remove('btn-danger');
+        
+        // Ocultar todos los contenedores con animación
+        bulkStatusContainer.style.opacity = '0';
+        bulkDeleteContainer.style.opacity = '0';
+        
+        setTimeout(() => {
+            bulkStatusContainer.style.display = 'none';
+            bulkDeleteContainer.style.display = 'none';
+            confirmBulkActionBtn.disabled = true;
+            confirmBulkActionBtn.classList.remove('btn-danger');
 
-        if (actionType === 'status') {
-            bulkStatusContainer.style.display = 'block';
-            confirmBulkActionBtn.disabled = false;
-            confirmBulkActionBtn.textContent = 'Cambiar estado';
-        } else if (actionType === 'delete') {
-            bulkDeleteContainer.style.display = 'block';
-            confirmBulkActionBtn.disabled = false;
-            confirmBulkActionBtn.textContent = 'Eliminar';
-            confirmBulkActionBtn.classList.add('btn-danger');
-        }
+            if (actionType === 'status') {
+                bulkStatusContainer.style.display = 'block';
+                setTimeout(() => {
+                    bulkStatusContainer.style.opacity = '1';
+                }, 10);
+                confirmBulkActionBtn.disabled = false;
+                confirmBulkActionBtn.innerHTML = '<i class="fas fa-sync-alt"></i><span>Cambiar estado</span>';
+            } else if (actionType === 'delete') {
+                bulkDeleteContainer.style.display = 'block';
+                setTimeout(() => {
+                    bulkDeleteContainer.style.opacity = '1';
+                }, 10);
+                confirmBulkActionBtn.disabled = false;
+                confirmBulkActionBtn.innerHTML = '<i class="fas fa-trash-alt"></i><span>Eliminar</span>';
+                confirmBulkActionBtn.classList.add('btn-danger');
+            } else {
+                confirmBulkActionBtn.innerHTML = '<i class="fas fa-check"></i><span>Confirmar</span>';
+            }
+        }, 200);
     });
 
     // Función para confirmar acción masiva
