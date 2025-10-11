@@ -216,42 +216,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ===== PREVENIR ENVÍO DE FORMULARIO VACÍO =====
-    if (filterForm) {
-        filterForm.addEventListener('submit', function(e) {
-            const formData = new FormData(this);
-            let hasValue = false;
-            
-            for (let [key, value] of formData.entries()) {
-                if (value && value.trim() !== '') {
-                    hasValue = true;
-                    break;
-                }
-            }
-            
-            if (!hasValue) {
-                e.preventDefault();
-                showNotification('Por favor, ingrese al menos un criterio de búsqueda', 'warning');
-            }
-        });
-    }
-
-    // ===== AUTOCOMPLETADO Y SUGERENCIAS (opcional) =====
-    if (searchInput) {
+    // ===== BÚSQUEDA EN TIEMPO REAL =====
+    if (searchInput && filterForm) {
         let searchTimeout;
+        
+        // Crear indicador de búsqueda
+        const searchIndicator = document.createElement('div');
+        searchIndicator.className = 'search-indicator';
+        searchIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+        searchIndicator.style.display = 'none';
+        searchInput.parentElement.appendChild(searchIndicator);
         
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             
             const query = this.value.trim();
             
-            if (query.length >= 3) {
-                searchTimeout = setTimeout(() => {
-                    // Aquí puedes implementar AJAX para buscar sugerencias
-                    console.log('Buscando:', query);
-                    // fetchSearchSuggestions(query);
-                }, 500);
-            }
+            // Mostrar indicador
+            searchIndicator.style.display = 'flex';
+            
+            // Buscar después de 500ms sin escribir
+            searchTimeout = setTimeout(() => {
+                console.log('Buscando:', query || '(todas las órdenes)');
+                filterForm.dispatchEvent(new Event('submit'));
+                
+                // Ocultar indicador después de un momento
+                setTimeout(() => {
+                    searchIndicator.style.display = 'none';
+                }, 300);
+            }, 500);
         });
     }
 
@@ -310,6 +303,41 @@ style.textContent = `
         to {
             transform: scale(4);
             opacity: 0;
+        }
+    }
+    
+    /* Indicador de búsqueda */
+    .search-indicator {
+        position: absolute;
+        right: 4rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 1rem;
+        background: rgba(0, 119, 182, 0.1);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: var(--primary-color);
+        font-weight: 500;
+        animation: fadeIn 0.2s ease-in;
+        z-index: 10;
+    }
+    
+    .search-indicator i {
+        font-size: 0.9rem;
+        color: var(--primary-color);
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-50%) scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
         }
     }
 `;

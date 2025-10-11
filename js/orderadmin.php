@@ -42,6 +42,49 @@
         loadOrders();
     });
 
+    // ===== BÚSQUEDA EN TIEMPO REAL =====
+    const searchInput = document.getElementById('search-input');
+    let searchTimeout;
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            
+            const query = this.value.trim();
+            
+            // Buscar después de 500ms sin escribir
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                currentFilters.search = query;
+                loadOrders();
+            }, 500);
+        });
+    }
+
+    // Auto-submit cuando cambian los filtros
+    const statusFilter = document.getElementById('status-filter');
+    const paymentStatusFilter = document.getElementById('payment-status-filter');
+    const paymentMethodFilter = document.getElementById('payment-method-filter');
+    const fromDateFilter = document.getElementById('from-date');
+    const toDateFilter = document.getElementById('to-date');
+
+    [statusFilter, paymentStatusFilter, paymentMethodFilter, fromDateFilter, toDateFilter].forEach(filter => {
+        if (filter) {
+            filter.addEventListener('change', function() {
+                currentPage = 1;
+                currentFilters = {
+                    search: searchInput.value,
+                    status: statusFilter.value,
+                    payment_status: paymentStatusFilter.value,
+                    payment_method: paymentMethodFilter.value,
+                    from_date: fromDateFilter.value,
+                    to_date: toDateFilter.value
+                };
+                loadOrders();
+            });
+        }
+    });
+
     // Manejar clic en "Limpiar"
     const clearBtn = searchForm.querySelector('a[href$="orders.php"]');
     if (clearBtn) {
@@ -227,6 +270,9 @@ exportBtn.addEventListener('click', function() {
 
     // Función para renderizar órdenes
     function renderOrders(orders) {
+        const quickActions = document.querySelector('.quick-actions');
+        const selectAllCheckbox = document.getElementById('select-all');
+        
         if (orders.length === 0) {
             ordersContainer.innerHTML = `
                 <tr>
@@ -235,8 +281,15 @@ exportBtn.addEventListener('click', function() {
                     </td>
                 </tr>
             `;
+            // Ocultar botones de acción cuando no hay órdenes
+            if (quickActions) quickActions.style.display = 'none';
+            if (selectAllCheckbox) selectAllCheckbox.disabled = true;
             return;
         }
+
+        // Mostrar botones de acción cuando hay órdenes
+        if (quickActions) quickActions.style.display = 'flex';
+        if (selectAllCheckbox) selectAllCheckbox.disabled = false;
 
         let html = '';
 
@@ -295,9 +348,11 @@ exportBtn.addEventListener('click', function() {
     function renderPagination(meta) {
         if (meta.total_pages <= 1) {
             paginationContainer.innerHTML = '';
+            paginationContainer.style.display = 'none';
             return;
         }
 
+        paginationContainer.style.display = 'block';
         let html = '<div class="pagination-inner">';
 
         // Botón anterior
