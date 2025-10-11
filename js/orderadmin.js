@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
         searchIndicator.className = 'search-indicator';
         searchIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
         searchIndicator.style.display = 'none';
-        searchInput.parentElement.appendChild(searchIndicator);
+        document.body.appendChild(searchIndicator);
         
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
@@ -277,17 +277,8 @@ style.textContent = `
     }
     
     .active-filters.has-filters {
-        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-        animation: pulse 2s ease-in-out infinite;
-    }
-    
-    @keyframes pulse {
-        0%, 100% {
-            transform: scale(1);
-        }
-        50% {
-            transform: scale(1.02);
-        }
+        background: rgba(219, 234, 254, 0.7);
+        border-color: rgba(0, 119, 182, 0.25);
     }
     
     .ripple-effect {
@@ -303,41 +294,6 @@ style.textContent = `
         to {
             transform: scale(4);
             opacity: 0;
-        }
-    }
-    
-    /* Indicador de búsqueda */
-    .search-indicator {
-        position: absolute;
-        right: 4rem;
-        top: 50%;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.4rem 1rem;
-        background: rgba(0, 119, 182, 0.1);
-        border-radius: 20px;
-        font-size: 0.85rem;
-        color: var(--primary-color);
-        font-weight: 500;
-        animation: fadeIn 0.2s ease-in;
-        z-index: 10;
-    }
-    
-    .search-indicator i {
-        font-size: 0.9rem;
-        color: var(--primary-color);
-    }
-    
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-50%) scale(0.8);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(-50%) scale(1);
         }
     }
 `;
