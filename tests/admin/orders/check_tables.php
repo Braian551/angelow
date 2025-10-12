@@ -1,5 +1,5 @@
 <?php
-require 'conexion.php';
+require __DIR__ . '/../../../conexion.php';
 
 echo "=== ESTRUCTURA TABLA USERS ===\n";
 $stmt = $conn->query('DESCRIBE users');

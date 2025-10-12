@@ -5,7 +5,7 @@
  */
 
 session_start();
-require_once __DIR__ . '/conexion.php';
+require_once __DIR__ . '/../../../conexion.php';
 
 echo "===========================================\n";
 echo "PRUEBA: Actualización masiva de órdenes\n";

@@ -38,17 +38,19 @@ El error de **foreign key constraint violation** al hacer actualización masiva 
 
 ### Archivos de Documentación (MANTENER)
 
-4. **`FIX_HISTORIAL_ORDENES.md`** 📄 NUEVO
+4. **`docs/admin/orders/FIX_HISTORIAL_ORDENES.md`** 📄 NUEVO
    - Documentación completa del problema y solución
 
-### Archivos de Prueba (PUEDEN ELIMINARSE)
+5. **`docs/admin/orders/SOLUCION_APLICADA.md`** 📄 NUEVO (este archivo)
+   - Guía de uso y verificación
 
-- `check_tables.php`
-- `check_collations.php`
-- `check_collations.sql`
-- `verify_triggers.php`
-- `test_bulk_update.php`
-- `test_complete.php`
+### Archivos de Prueba (ORGANIZADOS en `tests/admin/orders/`)
+
+- `tests/admin/orders/check_tables.php`
+- `tests/admin/orders/check_collations.php`
+- `tests/admin/orders/check_collations.sql`
+- `tests/admin/orders/verify_triggers.php`
+- `tests/admin/orders/test_bulk_update.php`
 
 ## 🚀 Cómo Usar Ahora
 
@@ -71,10 +73,10 @@ Si quieres verificar que todo está bien configurado:
 
 ```bash
 cd c:\laragon\www\angelow
-php test_complete.php
+php tests/admin/orders/test_bulk_update.php
 ```
 
-Deberías ver: `✅ TODOS LOS TESTS PASARON`
+Deberías ver: `✅ PRUEBA COMPLETADA EXITOSAMENTE`
 
 ## 🔍 Qué se Solucionó
 
@@ -124,17 +126,11 @@ FOREIGN KEY (`changed_by`) REFERENCES `users` (`id`))
 
 1. **Probar en producción** (si aplica)
    - Ejecuta `php database/migrations/run_fix_triggers.php` en el servidor de producción
-   - Verifica con `php test_complete.php`
+   - Verifica con `php tests/admin/orders/test_bulk_update.php`
 
-2. **Eliminar archivos de prueba** (opcional)
-   ```bash
-   del check_tables.php
-   del check_collations.php
-   del check_collations.sql
-   del verify_triggers.php
-   del test_bulk_update.php
-   del test_complete.php
-   ```
+2. **Scripts de prueba disponibles**
+   - Todos los tests están organizados en `tests/admin/orders/`
+   - Ver `tests/admin/orders/README.md` para documentación de cada test
 
 3. **Monitorear logs**
    - Los logs ahora muestran información detallada
@@ -162,9 +158,10 @@ No, los cambios solo afectan:
 ## 📞 Soporte
 
 Si tienes problemas:
-1. Ejecuta `php test_complete.php` y comparte el resultado
-2. Revisa `FIX_HISTORIAL_ORDENES.md` para más detalles técnicos
+1. Ejecuta `php tests/admin/orders/test_bulk_update.php` y comparte el resultado
+2. Revisa `docs/admin/orders/FIX_HISTORIAL_ORDENES.md` para más detalles técnicos
 3. Verifica los logs de PHP para mensajes con "BULK_UPDATE"
+4. Consulta `tests/admin/orders/README.md` para otros tests de diagnóstico
 
 ---
 
