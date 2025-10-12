@@ -4,18 +4,96 @@
  * Devuelve órdenes según diferentes categorías (tabs)
  */
 
-header('Content-Type: application/json');
+// Deshabilitar reporte de errores en HTML
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
+// Iniciar sesión PRIMERO
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Prevenir cualquier salida antes del JSON
+ob_start();
+
+// Configurar headers
+header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-cache, must-revalidate');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
 
-session_start();
+// Limpiar cualquier salida previa
+ob_clean();
 
 // Verificar autenticación
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'delivery') {
+if (!isset($_SESSION['user_id'])) {
+    ob_clean();
     http_response_code(401);
     echo json_encode([
         'success' => false,
-        'error' => 'No autorizado'
+        'error' => 'Sesión no iniciada. Por favor inicia sesión.',
+        'debug' => [
+            'session_id' => session_id(),
+            'session_data' => array_keys($_SESSION)
+        ]
+    ]);
+    exit;
+}
+
+// Debug: registrar información de sesión
+error_log("API get_orders - User ID: " . $_SESSION['user_id'] . ", Role: " . ($_SESSION['role'] ?? $_SESSION['user_role'] ?? 'no role'));
+
+// Obtener rol del usuario desde la base de datos si no está en sesión
+$userRole = null;
+if (isset($_SESSION['role'])) {
+    $userRole = $_SESSION['role'];
+} elseif (isset($_SESSION['user_role'])) {
+    $userRole = $_SESSION['user_role'];
+} else {
+    // Consultar rol desde la base de datos
+    try {
+        $stmt = $conn->prepare("SELECT role FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($userData) {
+            $userRole = $userData['role'];
+            $_SESSION['role'] = $userRole; // Guardar en sesión para futuras peticiones
+        }
+    } catch (PDOException $e) {
+        error_log("Error al obtener rol del usuario: " . $e->getMessage());
+    }
+}
+
+if (!$userRole) {
+    ob_clean();
+    http_response_code(403);
+    echo json_encode([
+        'success' => false,
+        'error' => 'No se ha establecido un rol para el usuario.',
+        'debug' => [
+            'user_id' => $_SESSION['user_id'],
+            'session_keys' => array_keys($_SESSION)
+        ]
+    ]);
+    exit;
+}
+
+if ($userRole !== 'delivery') {
+    ob_clean();
+    http_response_code(403);
+    echo json_encode([
+        'success' => false,
+        'error' => 'No tienes permisos para acceder a esta sección.',
+        'debug' => [
+            'current_role' => $userRole,
+            'required_role' => 'delivery',
+            'user_id' => $_SESSION['user_id']
+        ]
     ]);
     exit;
 }
@@ -31,6 +109,14 @@ $search = $_GET['search'] ?? '';
 $offset = ($page - 1) * $perPage;
 
 try {
+    // Verificar que $driverId esté disponible
+    if (empty($driverId)) {
+        throw new Exception("ID de transportista no válido");
+    }
+    
+    // Log para debug
+    error_log("get_orders.php - Driver ID: " . $driverId . ", Tab: " . $tab);
+    
     // ====================================
     // CONSTRUIR QUERY SEGÚN LA PESTAÑA
     // ====================================
@@ -46,7 +132,7 @@ try {
             o.created_at,
             o.status as order_status,
             o.payment_status,
-            CONCAT(u.name, ' ', COALESCE(u.apellido, '')) as customer_name,
+            u.name as customer_name,
             u.phone as customer_phone,
             u.email as customer_email,
             od.id as delivery_id,
@@ -75,7 +161,7 @@ try {
                     o.created_at,
                     o.status as order_status,
                     o.payment_status,
-                    CONCAT(u.name, ' ', COALESCE(u.apellido, '')) as customer_name,
+                    u.name as customer_name,
                     u.phone as customer_phone,
                     u.email as customer_email,
                     NULL as delivery_id,
@@ -146,7 +232,7 @@ try {
             o.order_number LIKE ?
             OR o.shipping_address LIKE ?
             OR o.shipping_city LIKE ?
-            OR CONCAT(u.name, ' ', COALESCE(u.apellido, '')) LIKE ?
+            OR u.name LIKE ?
         )";
         $searchTerm = "%$search%";
         $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm]);
@@ -173,9 +259,7 @@ try {
     // ====================================
     // OBTENER REGISTROS CON PAGINACIÓN
     // ====================================
-    $query .= " LIMIT ? OFFSET ?";
-    $params[] = $perPage;
-    $params[] = $offset;
+    $query .= " LIMIT $perPage OFFSET $offset";
     
     $stmt = $conn->prepare($query);
     $stmt->execute($params);
@@ -235,6 +319,8 @@ try {
     // ====================================
     $totalPages = ceil($total / $perPage);
     
+    // Limpiar buffer y enviar JSON limpio
+    ob_clean();
     echo json_encode([
         'success' => true,
         'orders' => $orders,
@@ -253,17 +339,36 @@ try {
     ]);
     
 } catch (PDOException $e) {
-    error_log("Error en get_orders.php: " . $e->getMessage());
+    error_log("Error PDO en get_orders.php: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    ob_clean();
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => 'Error al obtener órdenes',
-        'debug' => $e->getMessage()
+        'error' => 'Error de base de datos al obtener órdenes',
+        'debug' => DEBUG_MODE ? [
+            'message' => $e->getMessage(),
+            'code' => $e->getCode(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ] : null
     ]);
 } catch (Exception $e) {
+    error_log("Error general en get_orders.php: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    ob_clean();
     http_response_code(400);
     echo json_encode([
         'success' => false,
-        'error' => $e->getMessage()
+        'error' => $e->getMessage(),
+        'debug' => DEBUG_MODE ? [
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ] : null
     ]);
 }
+
+// Limpiar y terminar
+ob_end_flush();
+exit;

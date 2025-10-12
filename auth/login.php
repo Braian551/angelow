@@ -59,6 +59,17 @@ function createUserSession($userId, $conn = null) {
     $_SESSION['last_activity'] = time();
     
     if ($conn) {
+        // Obtener y guardar el rol del usuario en la sesión
+        $stmt = $conn->prepare("SELECT role FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($userData) {
+            $_SESSION['role'] = $userData['role'];
+            $_SESSION['user_role'] = $userData['role']; // Mantener compatibilidad
+        }
+        
+        // Actualizar último acceso
         $stmt = $conn->prepare("UPDATE users SET last_access = NOW() WHERE id = ?");
         $stmt->execute([$userId]);
     }

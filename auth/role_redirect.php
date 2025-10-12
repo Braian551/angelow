@@ -157,6 +157,10 @@ function requireRole($requiredRoles) {
             exit();
         }
         
+        // Guardar el rol en la sesión para uso futuro (con ambas claves para compatibilidad)
+        $_SESSION['role'] = $user['role'];
+        $_SESSION['user_role'] = $user['role'];
+        
         return $user['role'];
         
     } catch (PDOException $e) {
