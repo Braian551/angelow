@@ -57,6 +57,7 @@ try {
         o.id, 
         o.order_number, 
         u.name AS user_name,
+        u.email AS user_email,
         o.created_at,
         o.total,
         o.status,
@@ -70,7 +71,7 @@ try {
 
     // Aplicar filtros
     if (!empty($search)) {
-        $query .= " AND (o.order_number LIKE :search OR u.name LIKE :search)";
+        $query .= " AND (o.order_number LIKE :search OR u.name LIKE :search OR u.email LIKE :search)";
         $params[':search'] = "%$search%";
     }
 

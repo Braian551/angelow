@@ -98,14 +98,15 @@
 
         // Obtener filtros del formulario
         currentFilters = {
-            search: document.getElementById('search-input').value,
-            status: document.getElementById('status-filter').value,
-            payment_status: document.getElementById('payment-status-filter').value,
-            payment_method: document.getElementById('payment-method-filter').value,
-            from_date: document.getElementById('from-date').value,
-            to_date: document.getElementById('to-date').value
+            search: document.getElementById('search-input')?.value || '',
+            status: document.getElementById('status-filter')?.value || '',
+            payment_status: document.getElementById('payment-status-filter')?.value || '',
+            payment_method: document.getElementById('payment-method-filter')?.value || '',
+            from_date: document.getElementById('from-date')?.value || '',
+            to_date: document.getElementById('to-date')?.value || ''
         };
 
+        console.log('Aplicando filtros:', currentFilters);
         loadOrders();
     });
 
@@ -140,13 +141,15 @@
             filter.addEventListener('change', function() {
                 currentPage = 1;
                 currentFilters = {
-                    search: searchInput.value,
-                    status: statusFilter.value,
-                    payment_status: paymentStatusFilter.value,
-                    payment_method: paymentMethodFilter.value,
-                    from_date: fromDateFilter.value,
-                    to_date: toDateFilter.value
+                    search: searchInput?.value || '',
+                    status: statusFilter?.value || '',
+                    payment_status: paymentStatusFilter?.value || '',
+                    payment_method: paymentMethodFilter?.value || '',
+                    from_date: fromDateFilter?.value || '',
+                    to_date: toDateFilter?.value || ''
                 };
+                console.log('Filtro cambiado:', this.id, 'valor:', this.value);
+                console.log('Aplicando filtros:', currentFilters);
                 loadOrders();
             });
         }

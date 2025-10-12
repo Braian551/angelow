@@ -120,8 +120,24 @@ document.addEventListener('DOMContentLoaded', function() {
             // Actualizar contador
             updateActiveFiltersCount();
             
-            // Opcional: enviar formulario para actualizar resultados
-            // filterForm.submit();
+            // Disparar evento de submit para recargar las órdenes
+            console.log('Limpiando todos los filtros');
+            
+            // Si existe la función loadOrders global, usarla
+            if (typeof window.loadOrders === 'function') {
+                // Limpiar filtros actuales
+                if (window.currentFilters) {
+                    window.currentFilters = {};
+                }
+                // Resetear página
+                if (window.currentPage) {
+                    window.currentPage = 1;
+                }
+                window.loadOrders();
+            } else {
+                // Enviar formulario para actualizar resultados
+                filterForm.dispatchEvent(new Event('submit'));
+            }
         });
     }
 
@@ -238,13 +254,37 @@ document.addEventListener('DOMContentLoaded', function() {
             // Buscar después de 500ms sin escribir
             searchTimeout = setTimeout(() => {
                 console.log('Buscando:', query || '(todas las órdenes)');
-                filterForm.dispatchEvent(new Event('submit'));
+                
+                // Si existe la función loadOrders global, usarla
+                if (typeof window.loadOrders === 'function') {
+                    // Actualizar filtros actuales con la búsqueda
+                    if (window.currentFilters) {
+                        window.currentFilters.search = query;
+                    }
+                    // Resetear página
+                    if (window.currentPage) {
+                        window.currentPage = 1;
+                    }
+                    window.loadOrders();
+                } else {
+                    filterForm.dispatchEvent(new Event('submit'));
+                }
                 
                 // Ocultar indicador después de un momento
                 setTimeout(() => {
                     searchIndicator.style.display = 'none';
                 }, 300);
             }, 500);
+        });
+    }
+
+    // ===== BOTÓN APLICAR FILTROS =====
+    const applyFiltersBtn = document.querySelector('.btn-apply-filters');
+    if (applyFiltersBtn && filterForm) {
+        applyFiltersBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Aplicando filtros manualmente');
+            filterForm.dispatchEvent(new Event('submit'));
         });
     }
 
