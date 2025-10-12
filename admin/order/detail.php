@@ -224,6 +224,7 @@ function translateValue($value, $field = '') {
     // Traducir métodos de pago
     $paymentMethods = [
         'bank_transfer' => 'Transferencia Bancaria',
+        'transfer' => 'Transferencia',
         'cash' => 'Efectivo',
         'credit_card' => 'Tarjeta de Crédito',
         'debit_card' => 'Tarjeta de Débito',
@@ -364,7 +365,7 @@ function translateValue($value, $field = '') {
                                 </div>
                                 <div class="info-group">
                                     <label>Método de Pago:</label>
-                                    <span><?= $order['payment_method'] ? ucfirst(str_replace('_', ' ', $order['payment_method'])) : 'N/A' ?></span>
+                                    <span><?= $order['payment_method'] ? translateValue($order['payment_method'], 'payment_method') : 'N/A' ?></span>
                                 </div>
                                 <div class="info-group">
                                     <label>Estado de Pago:</label>
@@ -377,10 +378,6 @@ function translateValue($value, $field = '') {
                                 <div class="info-group">
                                     <label>Envío:</label>
                                     <span><?= formatCurrency($order['shipping_cost']) ?></span>
-                                </div>
-                                <div class="info-group">
-                                    <label>Impuestos:</label>
-                                    <span><?= formatCurrency($order['tax']) ?></span>
                                 </div>
                                 <div class="info-group total">
                                     <label>Total:</label>
@@ -459,10 +456,6 @@ function translateValue($value, $field = '') {
                                     <tr>
                                         <td colspan="4" class="text-right"><strong>Envío:</strong></td>
                                         <td><?= formatCurrency($order['shipping_cost']) ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4" class="text-right"><strong>Impuestos:</strong></td>
-                                        <td><?= formatCurrency($order['tax']) ?></td>
                                     </tr>
                                     <tr>
                                         <td colspan="4" class="text-right"><strong>Total:</strong></td>

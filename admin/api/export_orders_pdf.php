@@ -48,9 +48,8 @@ try {
     // Obtener información de las órdenes seleccionadas
     $ordersStmt = $conn->prepare("
         SELECT o.*, u.name as client_name, u.email as client_email, 
-               u.phone as client_phone, u.identification_type, u.identification_number,
+               u.phone, u.identification_type, u.identification_number,
                u.address, u.neighborhood, u.address_details,
-               o.client_identification, o.client_phone as order_client_phone,
                o.shipping_address, o.shipping_city,
                pt.reference_number, pt.bank_name, pt.account_number, pt.account_type,
                DATE_FORMAT(o.created_at, '%d/%m/%Y %H:%i') as formatted_date
@@ -382,7 +381,7 @@ try {
             </tr>
             <tr>
                 <td><span class="label">Documento:</span></td>
-                <td class="value">' . htmlspecialchars(($order['client_identification'] ?? $order['identification_number'] ?? 'N/A')) . 
+                <td class="value">' . htmlspecialchars($order['identification_number'] ?? 'N/A') . 
                   ' (' . htmlspecialchars(($order['identification_type'] ?? 'CC')) . ')</td>
             </tr>
             <tr>
@@ -397,7 +396,7 @@ try {
             </tr>
             <tr>
                 <td><span class="label">Teléfono:</span></td>
-                <td class="value">' . htmlspecialchars($order['client_phone'] ?? $order['order_client_phone'] ?? 'N/A') . '</td>
+                <td class="value">' . htmlspecialchars($order['phone'] ?? 'N/A') . '</td>
             </tr>
             <tr>
                 <td><span class="label">Email:</span></td>
@@ -452,18 +451,7 @@ try {
                         <tr>
                             <td><span class="label">Envío:</span></td>
                             <td class="text-right">$' . number_format($order['shipping_cost'], 2, ',', '.') . '</td>
-                        </tr>';
-        
-        // Si hay impuestos
-        if ($order['tax'] > 0) {
-            $html .= '
-                        <tr>
-                            <td><span class="label">IVA:</span></td>
-                            <td class="text-right">$' . number_format($order['tax'], 2, ',', '.') . '</td>
-                        </tr>';
-        }
-        
-        $html .= '
+                        </tr>
                         <tr class="total-row">
                             <td><strong>TOTAL:</strong></td>
                             <td class="text-right" style="font-weight: bold; font-size: 11pt;">$' . number_format($order['total'], 2, ',', '.') . '</td>

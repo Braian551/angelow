@@ -28,9 +28,8 @@ try {
     // Obtener información del pedido con todos los campos necesarios
     $orderStmt = $conn->prepare("
         SELECT o.*, u.name as client_name, u.email as client_email, 
-               u.phone as client_phone, u.identification_type, u.identification_number,
+               u.phone, u.identification_type, u.identification_number,
                u.address, u.neighborhood, u.address_details,
-               o.client_identification, o.client_phone as order_client_phone,
                o.shipping_address, o.shipping_city,
                pt.reference_number, pt.bank_name, pt.account_number, pt.account_type,
                DATE_FORMAT(o.created_at, '%d/%m/%Y %H:%i') as formatted_date
@@ -146,13 +145,13 @@ try {
             <td width="50%" valign="top">
                 <h3>CLIENTE</h3>
                 <p><strong>' . htmlspecialchars($order['client_name']) . '</strong></p>
-                <p>Documento: ' . ($order['client_identification'] ?? $order['identification_number'] ?? 'Consumidor final') . ' (' . 
+                <p>Documento: ' . ($order['identification_number'] ?? 'Consumidor final') . ' (' . 
                   ($order['identification_type'] ?? 'CC') . ')</p>
                 <p>Dirección: ' . htmlspecialchars($order['shipping_address'] ?? $order['address'] ?? 'No especificada') . 
                   (isset($order['neighborhood']) ? ', ' . htmlspecialchars($order['neighborhood']) : '') . 
                   (isset($order['address_details']) ? ' - ' . htmlspecialchars($order['address_details']) : '') . '</p>
                 <p>Ciudad: ' . htmlspecialchars($order['shipping_city'] ?? 'Medellín') . '</p>
-                <p>Teléfono: ' . ($order['client_phone'] ?? $order['order_client_phone'] ?? 'No especificado') . '</p>
+                <p>Teléfono: ' . ($order['phone'] ?? 'No especificado') . '</p>
                 <p>Email: ' . htmlspecialchars($order['client_email'] ?? 'No especificado') . '</p>
             </td>
         </tr>
@@ -204,18 +203,7 @@ try {
                     <tr>
                         <td><strong>Envío:</strong></td>
                         <td style="text-align: right;">$' . number_format($order['shipping_cost'], 2, ',', '.') . '</td>
-                    </tr>';
-    
-    // Si hay impuestos
-    if ($order['tax'] > 0) {
-        $html .= '
-                    <tr>
-                        <td><strong>IVA (19%):</strong></td>
-                        <td style="text-align: right;">$' . number_format($order['tax'], 2, ',', '.') . '</td>
-                    </tr>';
-    }
-    
-    $html .= '
+                    </tr>
                     <tr style="font-weight: bold; font-size: 1.1em;">
                         <td><strong>TOTAL:</strong></td>
                         <td style="text-align: right;">$' . number_format($order['total'], 2, ',', '.') . '</td>

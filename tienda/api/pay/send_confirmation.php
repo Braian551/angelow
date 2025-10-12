@@ -102,7 +102,6 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
         $subtotal = $order['subtotal'] ?? array_sum(array_column($orderItems, 'total'));
         $shippingCost = $order['shipping_cost'] ?? 0;
         $discountAmount = $order['discount_amount'] ?? 0;
-        $tax = $order['tax'] ?? 0;
 
         $body = '<!DOCTYPE html>
 <html lang="es">
@@ -243,13 +242,6 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
                     $body .= '<div class="summary-row" style="color: #10b981;">
                         <span>Costo de Envío:</span>
                         <span>¡GRATIS!</span>
-                    </div>';
-                }
-                
-                if ($tax > 0) {
-                    $body .= '<div class="summary-row">
-                        <span>Impuestos:</span>
-                        <span>$' . number_format($tax, 0, ',', '.') . '</span>
                     </div>';
                 }
                 

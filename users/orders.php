@@ -239,10 +239,6 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                                     <span>Envío:</span>
                                     <span>$<?= number_format($orderDetails['order']['shipping_cost'], 0, ',', '.') ?></span>
                                 </div>
-                                <div class="info-row">
-                                    <span>Impuestos:</span>
-                                    <span>$<?= number_format($orderDetails['order']['tax'], 0, ',', '.') ?></span>
-                                </div>
                                 <div class="info-row total">
                                     <span>Total:</span>
                                     <span>$<?= number_format($orderDetails['order']['total'], 0, ',', '.') ?></span>

@@ -697,10 +697,6 @@ try {
                                     <span>Envío:</span>
                                     <span><?= formatCurrency($order['shipping_cost']) ?></span>
                                 </div>
-                                <div class="totals-row">
-                                    <span>Impuestos:</span>
-                                    <span><?= formatCurrency($order['tax']) ?></span>
-                                </div>
                                 <?php if ($order['discount_amount'] > 0): ?>
                                     <div class="totals-row">
                                         <span>Descuento:</span>
