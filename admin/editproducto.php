@@ -3,6 +3,7 @@ ob_start();
 session_start();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
+require_once __DIR__ . '/../auth/role_redirect.php';
 require_once __DIR__ . '/../alertas/alerta1.php';
 
 // Función para redireccionar con mensaje JSON
@@ -17,22 +18,8 @@ function jsonRedirect($message, $redirectUrl)
     exit();
 }
 
-// Verificar si el usuario está logueado
-if (!isset($_SESSION['user_id'])) {
-    jsonRedirect('Debe iniciar sesión para acceder a esta página.', BASE_URL . '/auth/login.php');
-}
-
-// Obtener información del usuario
-$userId = $_SESSION['user_id'];
-$query = "SELECT role FROM users WHERE id = ?";
-$stmt = $conn->prepare($query);
-$stmt->execute([$userId]);
-$userData = $stmt->fetch(PDO::FETCH_ASSOC);
-
-// Verificar si es administrador
-if (!$userData || $userData['role'] !== 'admin') {
-    jsonRedirect('No tiene permisos para acceder a esta página.', BASE_URL . '/index.php');
-}
+// Verificar que el usuario tenga rol de admin
+requireRole('admin');
 
 // Obtener categorías, tallas y colores para los select
 $categoriesQuery = "SELECT id, name FROM categories WHERE is_active = 1 ORDER BY name";

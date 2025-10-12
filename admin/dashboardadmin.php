@@ -2,8 +2,10 @@
 session_start();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
+require_once __DIR__ . '/../auth/role_redirect.php';
 
-
+// Verificar que el usuario tenga rol de admin
+requireRole('admin');
 
 ?>
 <!DOCTYPE html>

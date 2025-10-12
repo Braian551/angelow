@@ -148,15 +148,27 @@ function handleLogin($conn) {
         );
     }
 
-    // Redirigir según el rol del usuario o página anterior
+    // Redirigir según el rol del usuario
+    require_once __DIR__ . '/role_redirect.php';
+    
+    // Si hay una página de redirección específica y el usuario tiene acceso, usarla
     if (isset($_SESSION['redirect_to'])) {
         $redirect = $_SESSION['redirect_to'];
         unset($_SESSION['redirect_to']);
-        header("Location: " . $redirect);
-    } else {
-        header("Location: " . BASE_URL . "/users/dashboarduser.php");
+        
+        // Obtener rol del usuario
+        $stmt = $conn->prepare("SELECT role FROM users WHERE id = ?");
+        $stmt->execute([$user['id']]);
+        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($userData && checkRoleAccess($userData['role'], $redirect)) {
+            header("Location: " . $redirect);
+            exit();
+        }
     }
-    exit();
+    
+    // Redirigir al dashboard correspondiente según el rol
+    redirectToDashboard($user['id'], $conn);
 }
 
 // Función para registrar intentos fallidos

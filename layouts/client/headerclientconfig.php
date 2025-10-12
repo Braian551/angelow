@@ -5,32 +5,10 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../../conexion.php';
 require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../auth/role_redirect.php';
 
-if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
-    $userId = $_SESSION['user_id'];
-
-    try {
-        $stmt = $conn->prepare("SELECT role FROM users WHERE id = :user_id");
-        $stmt->bindParam(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->execute();
-
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($user && $user['role'] === 'admin') {
-            $current_page = basename($_SERVER['PHP_SELF']);
-            if ($current_page !== 'dashboardadmin.php') {
-                $redirect_url = defined('BASE_URL')
-                    ? BASE_URL . '/admin/dashboardadmin.php'
-                    : '/admin/dashboardadmin.php';
-
-                header("Location: $redirect_url");
-                exit();
-            }
-        }
-    } catch (PDOException $e) {
-        error_log('Error al verificar rol de usuario: ' . $e->getMessage());
-    }
-}
+// Aplicar control de acceso basado en roles
+enforceRoleAccess();
 
 // Obtener el conteo del carrito si no está en sesión
 if (!isset($_SESSION['cart_count'])) {

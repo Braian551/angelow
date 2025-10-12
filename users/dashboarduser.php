@@ -2,7 +2,11 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
 require_once __DIR__ . '/../layouts/functions.php';
+require_once __DIR__ . '/../auth/role_redirect.php';
 require_once __DIR__ . '/../layouts/client/headerclientconfig.php';
+
+// Verificar que el usuario tenga rol de user o customer
+requireRole(['user', 'customer']);
 
 ?>
 

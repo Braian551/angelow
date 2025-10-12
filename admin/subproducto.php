@@ -2,31 +2,11 @@
 session_start();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
+require_once __DIR__ . '/../auth/role_redirect.php';
 require_once __DIR__ . '/../alertas/alerta1.php';
 
-// Verificar autenticación y permisos
-if (!isset($_SESSION['user_id'])) {
-    $_SESSION['alert'] = ['type' => 'error', 'message' => 'Debes iniciar sesión para acceder a esta página'];
-    header("Location: " . BASE_URL . "/auth/login.php");
-    exit();
-}
-
-try {
-    $stmt = $conn->prepare("SELECT role FROM users WHERE id = ?");
-    $stmt->execute([$_SESSION['user_id']]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$user || $user['role'] !== 'admin') {
-        $_SESSION['alert'] = ['type' => 'error', 'message' => 'No tienes permisos para acceder a esta área'];
-        header("Location: " . BASE_URL . "/index.php");
-        exit();
-    }
-} catch (PDOException $e) {
-    error_log("Error de permisos: " . $e->getMessage());
-    $_SESSION['alert'] = ['type' => 'error', 'message' => 'Error al verificar permisos. Por favor intenta nuevamente.'];
-    header("Refresh:0");
-    exit();
-}
+// Verificar que el usuario tenga rol de admin
+requireRole('admin');
 
 // Obtener datos para formulario
 try {
