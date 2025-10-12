@@ -694,28 +694,131 @@
 }
 
 /* ===== DIRECCIÓN ===== */
+.order-address-card .card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.order-address-card .card-body p {
+  margin: 0;
+  padding: 1.2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0, 119, 182, 0.1);
+  box-shadow: 
+    0 2px 8px rgba(0, 119, 182, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+  font-size: 1.4rem;
+  color: var(--text-medium);
+  line-height: 1.6;
+  animation: fadeInUp 0.5s ease-out backwards;
+}
+
+.order-address-card .card-body p:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.order-address-card .card-body p:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.order-address-card .card-body p:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 119, 182, 0.2);
+  transform: translateX(3px);
+  box-shadow: 
+    0 4px 12px rgba(0, 119, 182, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.order-address-card .card-body p strong {
+  color: var(--primary-color);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  display: inline-block;
+  min-width: 100px;
+}
+
 .delivery-notes {
-  margin-top: 1.5rem;
-  padding: 1.5rem;
-  background: rgba(219, 234, 254, 0.4);
+  margin-top: 0.8rem;
+  padding: 1.5rem 1.8rem;
+  background: rgba(219, 234, 254, 0.35);
   border-left: 4px solid rgba(0, 119, 182, 0.6);
   border-radius: var(--radius-md);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 119, 182, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 119, 182, 0.15);
   border-left: 4px solid rgba(0, 119, 182, 0.6);
+  box-shadow: 
+    0 2px 8px rgba(0, 119, 182, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.5s ease-out 0.2s backwards;
+}
+
+.delivery-notes:hover {
+  background: rgba(219, 234, 254, 0.45);
+  border-color: rgba(0, 119, 182, 0.25);
+  border-left-color: rgba(0, 119, 182, 0.8);
+  transform: translateX(3px);
+  box-shadow: 
+    0 4px 12px rgba(0, 119, 182, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .delivery-notes h4 {
-  margin: 0 0 0.8rem 0;
-  font-size: 1.4rem;
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
   color: var(--primary-color);
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.delivery-notes h4::before {
+  content: '📝';
+  font-size: 1.6rem;
 }
 
 .delivery-notes p {
   margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
   color: var(--text-medium);
-  line-height: 1.6;
+  line-height: 1.7;
+  font-size: 1.4rem;
+  animation: none;
+}
+
+.delivery-notes p:hover {
+  background: none;
+  border: none;
+  transform: none;
+  box-shadow: none;
+}
+
+.text-muted {
+  color: var(--text-lighter);
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+  background: rgba(248, 250, 252, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-md);
+  border: 1px dashed rgba(0, 119, 182, 0.15);
+  font-size: 1.4rem;
 }
 
 /* ===== TABLA DE PRODUCTOS ===== */
@@ -2239,11 +2342,6 @@
   }
 }
 
-.text-muted {
-  color: var(--text-light);
-  font-style: italic;
-}
-
 /* Indicador de zoom disponible */
 .proof-image-container .text-muted {
   display: flex;
@@ -2252,6 +2350,9 @@
   font-size: 1.2rem;
   margin-top: 0.5rem;
   color: var(--text-lighter);
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 /* Estilos responsive para el zoom */
