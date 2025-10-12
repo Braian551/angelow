@@ -4,6 +4,25 @@ Documentación del módulo de administración del sistema Angelow.
 
 ## 📁 Submódulos
 
+### 📦 Orders Badge (Badge de Notificaciones)
+Sistema de notificaciones para mostrar órdenes nuevas en el sidebar.
+
+- **Ubicación**: `admin/api/`, `js/admin/orders-badge.js`
+- **Documentos**: 2 archivos
+- **Estado**: ✅ Documentado y Funcional
+
+**Documentos principales:**
+- [README.md](orders_badge/README.md) - Documentación técnica completa
+- [INSTALACION.md](orders_badge/INSTALACION.md) - Guía rápida de instalación
+
+**Características:**
+- ✨ Badge dinámico con contador de órdenes nuevas
+- ✨ Marcado automático al visualizar órdenes
+- ✨ Actualización en tiempo real cada 30 segundos
+- ✨ Soporte multi-usuario
+
+---
+
 ### 📦 Orders (Órdenes)
 Gestión de órdenes, actualización masiva de estados, historial de cambios.
 
@@ -35,6 +54,8 @@ Gestión de usuarios administrativos, permisos.
 
 - ⬆️ [Volver a Documentación Principal](../README.md)
 - 🧪 [Ver Tests del Módulo Admin](../../tests/admin/README.md)
+
+---
 
 ---
 

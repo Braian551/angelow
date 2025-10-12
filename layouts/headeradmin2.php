@@ -26,6 +26,18 @@ try {
         header('Location: ' . BASE_URL . '/users/formuser.php');
         exit();
     }
+
+    // Contar órdenes nuevas (no vistas por este admin)
+    $newOrdersQuery = "
+        SELECT COUNT(*) as new_orders
+        FROM orders o
+        LEFT JOIN order_views ov ON o.id = ov.order_id AND ov.user_id = ?
+        WHERE ov.id IS NULL
+    ";
+    $stmtOrders = $conn->prepare($newOrdersQuery);
+    $stmtOrders->execute([$userId]);
+    $newOrdersCount = $stmtOrders->fetch(PDO::FETCH_ASSOC)['new_orders'];
+
 } catch (PDOException $e) {
     error_log("Error de base de datos: " . $e->getMessage());
     header('Location: ' . BASE_URL . '/error.php');
@@ -68,7 +80,9 @@ try {
                 <a href="<?= BASE_URL ?>/admin/orders.php">
                     <i class="fas fa-shopping-bag"></i>
                     <span>Órdenes</span>
-                    <span class="badge">15</span>
+                    <?php if ($newOrdersCount > 0): ?>
+                        <span class="badge" id="orders-badge"><?= $newOrdersCount ?></span>
+                    <?php endif; ?>
                 </a>
             </li>
 
@@ -311,3 +325,6 @@ try {
         setupMobileInteractions();
     });
 </script>
+
+<!-- Script para el badge de órdenes -->
+<script src="<?= BASE_URL ?>/js/admin/orders-badge.js"></script>
