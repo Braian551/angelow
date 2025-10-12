@@ -6,14 +6,20 @@
             <button class="modal-close">&times;</button>
         </div>
         <div class="modal-body">
-            <div class="alert-icon-container">
-                <div class="alert-icon error">!</div>
+            <div class="alert-icon-container error">
+                <i class="fas fa-exclamation-triangle alert-icon"></i>
             </div>
-            <p id="delete-message">¿Estás seguro que deseas eliminar esta orden? Esta acción no se puede deshacer.</p>
+            <p id="delete-message" class="delete-message">¿Estás seguro que deseas eliminar esta orden? Esta acción no se puede deshacer.</p>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-secondary" id="cancel-delete-order">Cancelar</button>
-            <button class="btn btn-danger" id="confirm-delete-order">Eliminar</button>
+            <button class="btn btn-secondary" id="cancel-delete-order">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </button>
+            <button class="btn btn-danger" id="confirm-delete-order">
+                <i class="fas fa-trash-alt"></i>
+                Eliminar
+            </button>
         </div>
     </div>
 </div>

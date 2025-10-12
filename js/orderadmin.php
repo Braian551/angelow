@@ -21,6 +21,73 @@
         return;
     }
 
+    // Función para cargar órdenes (definida primero para evitar problemas de hoisting)
+    function loadOrders() {
+        // Mostrar estado de carga
+        ordersContainer.innerHTML = `
+            <tr>
+                <td colspan="8" class="loading-row">
+                    <div class="loading-spinner">
+                        <div class="loading-spinner-text">
+                            Cargando órdenes
+                            <span class="loading-spinner-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        // Construir URL con parámetros
+        const params = new URLSearchParams();
+        params.append('page', currentPage);
+        params.append('per_page', perPage);
+
+        // Agregar filtros
+        for (const [key, value] of Object.entries(currentFilters)) {
+            if (value) params.append(key, value);
+        }
+
+        // Realizar petición AJAX
+        fetch(`<?= BASE_URL ?>/admin/order/search.php?${params.toString()}`)
+            .then(response => {
+                // Verificar si la respuesta es JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(text => {
+                        throw new Error('La respuesta no es JSON válido: ' + text.substring(0, 100));
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    renderOrders(data.orders);
+                    renderPagination(data.meta);
+                    updateResultsCount(data.meta);
+                } else {
+                    throw new Error(data.error || 'Error desconocido');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                ordersContainer.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="error-row">
+                            <i class="fas fa-exclamation-circle"></i> Error al cargar órdenes. Por favor recarga la página.
+                        </td>
+                    </tr>
+                `;
+                showAlert('Error al cargar órdenes. Por favor intenta nuevamente.', 'error');
+            });
+    }
+    
+    // Hacer la función accesible globalmente
+    window.loadOrders = loadOrders;
+
     // Cargar órdenes al iniciar
     loadOrders();
 
@@ -212,70 +279,6 @@ exportBtn.addEventListener('click', function() {
     bulkActionsBtn.addEventListener('click', function() {
         openBulkActionsModal();
     });
-
-    // Función para cargar órdenes
-    function loadOrders() {
-        // Mostrar estado de carga
-        ordersContainer.innerHTML = `
-            <tr>
-                <td colspan="8" class="loading-row">
-                    <div class="loading-spinner">
-                        <div class="loading-spinner-text">
-                            Cargando órdenes
-                            <span class="loading-spinner-dots">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </span>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        `;
-
-        // Construir URL con parámetros
-        const params = new URLSearchParams();
-        params.append('page', currentPage);
-        params.append('per_page', perPage);
-
-        // Agregar filtros
-        for (const [key, value] of Object.entries(currentFilters)) {
-            if (value) params.append(key, value);
-        }
-
-        // Realizar petición AJAX
-        fetch(`<?= BASE_URL ?>/admin/order/search.php?${params.toString()}`)
-            .then(response => {
-                // Verificar si la respuesta es JSON
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    return response.text().then(text => {
-                        throw new Error('La respuesta no es JSON válido: ' + text.substring(0, 100));
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    renderOrders(data.orders);
-                    renderPagination(data.meta);
-                    updateResultsCount(data.meta);
-                } else {
-                    throw new Error(data.error || 'Error desconocido');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                ordersContainer.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="error-row">
-                            <i class="fas fa-exclamation-circle"></i> Error al cargar órdenes. Por favor recarga la página.
-                        </td>
-                    </tr>
-                `;
-                showAlert('Error al cargar órdenes. Por favor intenta nuevamente.', 'error');
-            });
-    }
 
     // Función para renderizar órdenes
     function renderOrders(orders) {
