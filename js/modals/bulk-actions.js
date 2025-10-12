@@ -76,18 +76,121 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Función para confirmar acción masiva
- function confirmBulkAction() {
-    const actionType = bulkActionTypeSelect.value;
+    function confirmBulkAction() {
+        const actionType = bulkActionTypeSelect.value;
 
-    if (actionType === 'status') {
-        const newStatus = bulkNewStatusSelect.value;
-        updateOrdersStatus(window.selectedOrders, newStatus);
-    } else if (actionType === 'delete') {
-        deleteOrders(window.selectedOrders);
+        if (!window.selectedOrders || window.selectedOrders.length === 0) {
+            showAlert('No hay órdenes seleccionadas', 'warning');
+            closeBulkActionsModal();
+            return;
+        }
+
+        if (actionType === 'status') {
+            const newStatus = bulkNewStatusSelect.value;
+            updateOrdersStatusBulk(window.selectedOrders, newStatus);
+        } else if (actionType === 'delete') {
+            deleteOrdersBulk(window.selectedOrders);
+        }
+
+        closeBulkActionsModal();
     }
 
-    closeBulkActionsModal();
-}
+    // Función para actualizar estado de múltiples órdenes
+    function updateOrdersStatusBulk(orderIds, newStatus) {
+        const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
+        
+        // Mostrar indicador de carga
+        showAlert(`Actualizando estado de ${orderIds.length} ${orderIds.length === 1 ? 'orden' : 'órdenes'}...`, 'info');
+        
+        fetch(`${baseUrl}/admin/order/bulk_update_status.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                order_ids: orderIds,
+                new_status: newStatus
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert(data.message, 'success');
+                
+                // Recargar órdenes si la función está disponible
+                if (typeof window.loadOrders === 'function') {
+                    window.loadOrders();
+                } else {
+                    location.reload();
+                }
+                
+                // Limpiar selección
+                window.selectedOrders = [];
+                const selectAllCheckbox = document.getElementById('select-all');
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = false;
+                }
+                
+                // Desmarcar checkboxes
+                const checkboxes = document.querySelectorAll('.order-checkbox');
+                checkboxes.forEach(cb => cb.checked = false);
+            } else {
+                showAlert(data.message || 'Error al actualizar estado de las órdenes', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Error de conexión al actualizar estado de las órdenes', 'error');
+        });
+    }
+
+    // Función para eliminar múltiples órdenes
+    function deleteOrdersBulk(orderIds) {
+        const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
+        
+        // Mostrar indicador de carga
+        showAlert(`Eliminando ${orderIds.length} ${orderIds.length === 1 ? 'orden' : 'órdenes'}...`, 'info');
+        
+        fetch(`${baseUrl}/admin/order/bulk_delete.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                order_ids: orderIds
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert(data.message, 'success');
+                
+                // Recargar órdenes si la función está disponible
+                if (typeof window.loadOrders === 'function') {
+                    window.loadOrders();
+                } else {
+                    location.reload();
+                }
+                
+                // Limpiar selección
+                window.selectedOrders = [];
+                const selectAllCheckbox = document.getElementById('select-all');
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = false;
+                }
+                
+                // Desmarcar checkboxes
+                const checkboxes = document.querySelectorAll('.order-checkbox');
+                checkboxes.forEach(cb => cb.checked = false);
+            } else {
+                showAlert(data.message || 'Error al eliminar las órdenes', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Error de conexión al eliminar las órdenes', 'error');
+        });
+    }
 
     // Event listeners
     cancelBulkActionBtn.addEventListener('click', closeBulkActionsModal);

@@ -652,8 +652,14 @@ try {
                         <div class="order-date" style="color: #ffffff; font-size: 12px;">Fecha: ' . htmlspecialchars($order['formatted_date']) . '</div>
                     </div>
                     <div class="order-header-col status-badges">
-                        <span class="status-badge" style="color: #ffffff; background: rgba(255,255,255,0.25); padding: 6px 12px; border-radius: 15px; font-size: 10px; font-weight: bold;">' . htmlspecialchars($statusTranslations[$order['status']] ?? ucfirst($order['status'])) . '</span><br>
-                        <span class="status-badge" style="margin-top: 5px; color: #ffffff; background: rgba(255,255,255,0.25); padding: 6px 12px; border-radius: 15px; font-size: 10px; font-weight: bold;">' . htmlspecialchars($paymentStatusTranslations[$order['payment_status']] ?? ucfirst($order['payment_status'])) . '</span>
+                        <div style="margin-bottom: 5px;">
+                            <strong style="color: #ffffff; font-size: 9px;">ESTADO DE LA ORDEN:</strong><br>
+                            <span class="status-badge" style="color: #ffffff; background: rgba(255,255,255,0.25); padding: 6px 12px; border-radius: 15px; font-size: 10px; font-weight: bold; margin-top: 3px; display: inline-block;">' . htmlspecialchars($statusTranslations[$order['status']] ?? ucfirst($order['status'])) . '</span>
+                        </div>
+                        <div>
+                            <strong style="color: #ffffff; font-size: 9px;">ESTADO DEL PAGO:</strong><br>
+                            <span class="status-badge" style="color: #ffffff; background: rgba(255,255,255,0.25); padding: 6px 12px; border-radius: 15px; font-size: 10px; font-weight: bold; margin-top: 3px; display: inline-block;">' . htmlspecialchars($paymentStatusTranslations[$order['payment_status']] ?? ucfirst($order['payment_status'])) . '</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -826,7 +832,20 @@ try {
                 </div>
                 <div class="info-item">
                     <span class="info-label">Estado del Pago:</span>
-                    <span class="info-value" style="font-weight: bold; color: ' . ($order['payment_status'] === 'paid' ? '#28a745' : '#ffc107') . ';">' . htmlspecialchars($paymentStatusTranslations[$order['payment_status']] ?? ucfirst($order['payment_status'])) . '</span>
+                    <span class="info-value" style="font-weight: bold; color: ' . ($order['payment_status'] === 'paid' ? '#28a745' : ($order['payment_status'] === 'pending' ? '#ffc107' : '#dc3545')) . ';">';
+        
+        // Mostrar el estado del pago de forma más descriptiva
+        if ($order['payment_status'] === 'paid') {
+            $html .= 'PAGADO - Confirmado';
+        } elseif ($order['payment_status'] === 'pending') {
+            $html .= 'PENDIENTE - En verificacion';
+        } elseif ($order['payment_status'] === 'failed') {
+            $html .= 'FALLIDO - No procesado';
+        } else {
+            $html .= htmlspecialchars($paymentStatusTranslations[$order['payment_status']] ?? ucfirst($order['payment_status']));
+        }
+        
+        $html .= '</span>
                 </div>';
         
         if (!empty($order['reference_number'])) {
@@ -841,7 +860,7 @@ try {
             $html .= '
                 <div class="info-item">
                     <span class="info-label">Comprobante:</span>
-                    <span class="info-value">Archivo adjunto: ' . htmlspecialchars(basename($order['payment_proof'])) . '</span>
+                    <span class="info-value" style="color: #28a745; font-weight: bold;">Adjunto</span>
                 </div>';
         }
         
@@ -865,7 +884,7 @@ try {
             <!-- Pie de página -->
             <div class="footer">
                 <strong style="font-size: 11px; color: #006699;">ANGELOW ROPA INFANTIL</strong><br>
-                <span style="font-style: italic; color: #888;">Moda infantil de calidad para tus pequenos</span><br><br>
+                <span style="font-style: italic; color: #888;">Moda infantil de calidad para tus pequeños</span><br><br>
                 Documento generado el <strong>' . date('d/m/Y') . '</strong> a las <strong>' . date('H:i') . '</strong><br>
                 Para consultas: <strong>contacto@angelow.com</strong> | Tel: <strong>+57 604 1234567</strong><br>
                 Visitanos en: <strong style="color: #006699;">www.angelow.com</strong>

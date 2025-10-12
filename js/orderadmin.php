@@ -187,10 +187,19 @@
     // Manejar selección de todas las órdenes
     selectAllCheckbox.addEventListener('change', function() {
         const checkboxes = document.querySelectorAll('.order-checkbox');
+        window.selectedOrders = []; // Limpiar selección actual
+        
         checkboxes.forEach(checkbox => {
             checkbox.checked = selectAllCheckbox.checked;
-            updateSelectedOrders(checkbox);
+            if (selectAllCheckbox.checked) {
+                const orderId = checkbox.value;
+                if (!window.selectedOrders.includes(orderId)) {
+                    window.selectedOrders.push(orderId);
+                }
+            }
         });
+        
+        updateSelectionCount();
     });
 
     // Manejar exportación de órdenes
@@ -461,14 +470,39 @@ exportBtn.addEventListener('click', function() {
         const orderId = checkbox.value;
 
         if (checkbox.checked) {
-            if (!selectedOrders.includes(orderId)) {
-                selectedOrders.push(orderId);
+            if (!window.selectedOrders.includes(orderId)) {
+                window.selectedOrders.push(orderId);
             }
         } else {
-            selectedOrders = selectedOrders.filter(id => id !== orderId);
+            window.selectedOrders = window.selectedOrders.filter(id => id !== orderId);
             selectAllCheckbox.checked = false;
         }
+        
+        // Actualizar contador visual si existe
+        updateSelectionCount();
     };
+    
+    // Función para actualizar contador de selección
+    function updateSelectionCount() {
+        const count = window.selectedOrders.length;
+        const bulkActionsBtn = document.getElementById('bulk-actions');
+        
+        if (bulkActionsBtn) {
+            if (count > 0) {
+                bulkActionsBtn.innerHTML = `
+                    <i class="fas fa-tasks"></i>
+                    <span>Acciones masivas (${count})</span>
+                `;
+                bulkActionsBtn.classList.add('has-selection');
+            } else {
+                bulkActionsBtn.innerHTML = `
+                    <i class="fas fa-tasks"></i>
+                    <span>Acciones masivas</span>
+                `;
+                bulkActionsBtn.classList.remove('has-selection');
+            }
+        }
+    }
 
     window.editOrder = function(orderId) {
         window.location.href = `<?= BASE_URL ?>/admin/order/edit.php?id=${orderId}`;
@@ -504,8 +538,8 @@ exportBtn.addEventListener('click', function() {
         } [method] || method;
     }
 
-    // Función para actualizar estado de órdenes
-    function updateOrdersStatus(orderIds, newStatus) {
+    // Función para actualizar estado de órdenes (individual)
+    window.updateOrdersStatus = function(orderIds, newStatus) {
         fetch(`<?= BASE_URL ?>/admin/order/update_status.php`, {
                 method: 'POST',
                 headers: {
@@ -521,8 +555,12 @@ exportBtn.addEventListener('click', function() {
                 if (data.success) {
                     showAlert(`Estado de ${orderIds.length} órdenes actualizado correctamente`, 'success');
                     loadOrders();
-                    selectedOrders = [];
+                    window.selectedOrders = [];
                     selectAllCheckbox.checked = false;
+                    
+                    // Desmarcar checkboxes
+                    const checkboxes = document.querySelectorAll('.order-checkbox');
+                    checkboxes.forEach(cb => cb.checked = false);
                 } else {
                     throw new Error(data.message || 'Error al actualizar estado');
                 }
@@ -530,10 +568,10 @@ exportBtn.addEventListener('click', function() {
             .catch(error => {
                 showAlert(error.message, 'error');
             });
-    }
+    };
 
-    // Función para eliminar órdenes
-    function deleteOrders(orderIds) {
+    // Función para eliminar órdenes (individual)
+    window.deleteOrders = function(orderIds) {
         fetch(`<?= BASE_URL ?>/admin/order/delete.php`, {
                 method: 'POST',
                 headers: {
@@ -548,8 +586,12 @@ exportBtn.addEventListener('click', function() {
                 if (data.success) {
                     showAlert(`${orderIds.length} órdenes eliminadas correctamente`, 'success');
                     loadOrders();
-                    selectedOrders = [];
+                    window.selectedOrders = [];
                     selectAllCheckbox.checked = false;
+                    
+                    // Desmarcar checkboxes
+                    const checkboxes = document.querySelectorAll('.order-checkbox');
+                    checkboxes.forEach(cb => cb.checked = false);
                 } else {
                     throw new Error(data.message || 'Error al eliminar órdenes');
                 }
@@ -557,7 +599,7 @@ exportBtn.addEventListener('click', function() {
             .catch(error => {
                 showAlert(error.message, 'error');
             });
-    }
+    };
 
     // ===== INYECTAR ESTILOS CSS PARA BOTONES DE ACCIÓN =====
     const actionButtonsStyles = document.createElement('style');
@@ -664,6 +706,28 @@ exportBtn.addEventListener('click', function() {
             color: #B91C1C !important;
             transform: translateY(-2px) scale(1.1) !important;
             box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25) !important;
+        }
+        
+        /* Botón de acciones masivas con selección activa */
+        .btn-bulk.has-selection {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+            animation: pulse-selection 2s infinite !important;
+        }
+        
+        .btn-bulk.has-selection:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4) !important;
+        }
+        
+        @keyframes pulse-selection {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(37, 99, 235, 0.5);
+            }
         }
     `;
     document.head.appendChild(actionButtonsStyles);
