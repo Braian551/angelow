@@ -35,6 +35,7 @@ if (!isset($data['order_ids']) || !isset($data['new_status'])) {
 
 $orderIds = $data['order_ids'];
 $newStatus = $data['new_status'];
+$notes = isset($data['notes']) ? $data['notes'] : null;
 
 // Validar estado
 $validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
@@ -43,35 +44,123 @@ if (!in_array($newStatus, $validStatuses)) {
     exit();
 }
 
+// Función para obtener la IP real del usuario
+function getRealUserIP() {
+    // Verificar diferentes headers que pueden contener la IP real
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        // Puede contener múltiples IPs, obtener la primera
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        $ip = trim($ips[0]);
+    } elseif (!empty($_SERVER['HTTP_X_REAL_IP'])) {
+        $ip = $_SERVER['HTTP_X_REAL_IP'];
+    } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    
+    // Normalizar IPv6 localhost a un formato más legible
+    if ($ip === '::1') {
+        $ip = '127.0.0.1 (localhost)';
+    } elseif ($ip === '127.0.0.1' || strpos($ip, '127.0.') === 0) {
+        $ip = $ip . ' (localhost)';
+    }
+    
+    return $ip;
+}
+
 // Actualizar estado de las órdenes
 try {
-    // Crear marcadores de posición para la consulta IN
-    $placeholders = implode(',', array_fill(0, count($orderIds), '?'));
+    // Obtener información del usuario actual
+    $stmt = $conn->prepare("SELECT id, name FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $currentUser = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    $query = "UPDATE orders SET status = ?, updated_at = NOW() WHERE id IN ($placeholders)";
-    $stmt = $conn->prepare($query);
+    if (!$currentUser) {
+        echo json_encode(['success' => false, 'message' => 'Usuario no encontrado']);
+        exit();
+    }
     
-    // Los parámetros son: nuevo estado + IDs de órdenes
-    $params = array_merge([$newStatus], $orderIds);
-    $stmt->execute($params);
+    // Obtener IP del usuario
+    $userIp = getRealUserIP();
     
-    $affectedRows = $stmt->rowCount();
+    // Establecer variables de sesión MySQL para los triggers
+    $conn->exec("SET @current_user_id = {$currentUser['id']}");
+    $conn->exec("SET @current_user_name = " . $conn->quote($currentUser['name']));
+    $conn->exec("SET @current_user_ip = " . $conn->quote($userIp));
+    
+    // Iniciar transacción
+    $conn->beginTransaction();
+    
+    $affectedRows = 0;
+    
+    // Actualizar cada orden individualmente para que los triggers funcionen correctamente
+    foreach ($orderIds as $orderId) {
+        // Obtener el estado actual antes de actualizar
+        $stmt = $conn->prepare("SELECT status FROM orders WHERE id = ?");
+        $stmt->execute([$orderId]);
+        $currentOrder = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($currentOrder && $currentOrder['status'] !== $newStatus) {
+            // Actualizar el estado de la orden (el trigger registrará el cambio)
+            $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?");
+            $stmt->execute([$newStatus, $orderId]);
+            
+            if ($stmt->rowCount() > 0) {
+                $affectedRows++;
+                
+                // Si hay notas adicionales, registrarlas como un cambio separado
+                if ($notes && trim($notes) !== '') {
+                    $stmt = $conn->prepare("
+                        INSERT INTO order_status_history 
+                        (order_id, changed_by, changed_by_name, change_type, field_changed, description, ip_address, created_at)
+                        VALUES (?, ?, ?, 'notes', 'admin_notes', ?, ?, NOW())
+                    ");
+                    $stmt->execute([
+                        $orderId,
+                        $currentUser['id'],
+                        $currentUser['name'],
+                        "Nota del administrador: " . $notes,
+                        $userIp
+                    ]);
+                }
+            }
+        }
+    }
+    
+    // Confirmar transacción
+    $conn->commit();
+    
+    // Limpiar variables de sesión MySQL
+    $conn->exec("SET @current_user_id = NULL");
+    $conn->exec("SET @current_user_name = NULL");
+    $conn->exec("SET @current_user_ip = NULL");
     
     if ($affectedRows > 0) {
         echo json_encode([
             'success' => true,
-            'message' => "Estado de $affectedRows órdenes actualizado correctamente"
+            'message' => "Estado de $affectedRows orden(es) actualizado correctamente"
         ]);
     } else {
         echo json_encode([
             'success' => false,
-            'message' => 'No se encontraron órdenes para actualizar'
+            'message' => 'No se encontraron órdenes para actualizar o ya tenían ese estado'
         ]);
     }
 } catch (PDOException $e) {
+    // Revertir transacción en caso de error
+    if ($conn->inTransaction()) {
+        $conn->rollBack();
+    }
+    
+    // Limpiar variables de sesión MySQL
+    $conn->exec("SET @current_user_id = NULL");
+    $conn->exec("SET @current_user_name = NULL");
+    $conn->exec("SET @current_user_ip = NULL");
+    
     error_log("Error al actualizar estado de órdenes: " . $e->getMessage());
     echo json_encode([
         'success' => false,
-        'message' => 'Error al actualizar estado de las órdenes'
+        'message' => 'Error al actualizar estado de las órdenes: ' . $e->getMessage()
     ]);
 }
