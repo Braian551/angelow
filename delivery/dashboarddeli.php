@@ -6,24 +6,6 @@ require_once __DIR__ . '/../auth/role_redirect.php';
 // Verificar que el usuario tenga rol de delivery
 requireRole('delivery');
 
-// Obtener información del usuario actual
-try {
-    $userId = $_SESSION['user_id'];
-    $query = "SELECT id, name, email, image, phone, role FROM users WHERE id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->execute([$userId]);
-    $userData = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$userData) {
-        header('Location: ' . BASE_URL . '/auth/login.php');
-        exit();
-    }
-} catch (PDOException $e) {
-    error_log("Error de base de datos: " . $e->getMessage());
-    header('Location: ' . BASE_URL . '/error.php');
-    exit();
-}
-
 // Obtener órdenes asignadas al transportista (solo las que están en estado 'processing' o 'shipped')
 try {
     $query = "
@@ -89,64 +71,12 @@ try {
 <body>
     <div class="delivery-container">
         <!-- Sidebar -->
-        <aside class="delivery-sidebar">
-            <div class="profile-summary">
-                <div class="avatar">
-                    <img src="<?= BASE_URL ?>/<?= !empty($userData['image']) ? htmlspecialchars($userData['image']) : 'images/default-avatar.png' ?>" alt="Foto de perfil">
-                </div>
-                <div class="info">
-                    <h3><?= htmlspecialchars($userData['name']) ?></h3>
-                    <p>Transportista</p>
-                    <p><i class="fas fa-phone"></i> <?= htmlspecialchars($userData['phone'] ?? 'No registrado') ?></p>
-                </div>
-            </div>
-
-            <nav class="delivery-menu">
-                <ul>
-                    <li class="active">
-                        <a href="<?= BASE_URL ?>/delivery/dashboarddeli.php">
-                            <i class="fas fa-tachometer-alt"></i> Resumen
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?= BASE_URL ?>/delivery/orders.php">
-                            <i class="fas fa-shopping-bag"></i> Órdenes
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?= BASE_URL ?>/delivery/history.php">
-                            <i class="fas fa-history"></i> Historial
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?= BASE_URL ?>/delivery/settings.php">
-                            <i class="fas fa-user-cog"></i> Mi Cuenta
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?= BASE_URL ?>/auth/logout.php">
-                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+        <?php require_once __DIR__ . '/../layouts/delivery/asidedelivery.php'; ?>
 
         <!-- Main Content -->
         <main class="delivery-content">
-            <header class="delivery-header">
-                <h1>Panel de Transportista</h1>
-                <div class="header-actions">
-                    <div class="status-indicator">
-                        <span class="status-dot online"></span>
-                        <span>Disponible</span>
-                    </div>
-                    <button class="notifications-btn">
-                        <i class="fas fa-bell"></i>
-                        <span class="badge">2</span>
-                    </button>
-                </div>
-            </header>
+            <!-- Header -->
+            <?php require_once __DIR__ . '/../layouts/delivery/headerdelivery.php'; ?>
 
             <!-- Stats Summary -->
             <section class="stats-summary">
