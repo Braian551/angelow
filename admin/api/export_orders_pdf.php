@@ -1,27 +1,62 @@
 <?php
 // admin/api/export_orders_pdf.php
 
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../conexion.php';
-require_once __DIR__ . '/../../vendor/autoload.php';
+// Inicializar sesión primero
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Función para enviar error en formato JSON
+function sendJsonError($message, $code = 500) {
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    http_response_code($code);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'error' => $message
+    ]);
+    exit();
+}
+
+// Verificar archivos requeridos
+$configPath = __DIR__ . '/../../config.php';
+$autoloadPath = __DIR__ . '/../../vendor/autoload.php';
+
+if (!file_exists($configPath)) {
+    sendJsonError('Archivo config.php no encontrado');
+}
+
+if (!file_exists($autoloadPath)) {
+    sendJsonError('Dependencias de Composer no instaladas. Por favor ejecuta: composer install', 500);
+}
+
+require_once $configPath;
+require_once $autoloadPath;
+
+// Verificar que TCPDF esté disponible
+if (!class_exists('TCPDF')) {
+    sendJsonError('La librería TCPDF no está disponible. Ejecuta: composer install', 500);
+}
+
+// También verificar Dompdf (opcional, pero bueno tenerlo)
+$hasDompdf = class_exists('Dompdf\Dompdf');
 
 // Configurar manejo de errores
 set_error_handler(function($severity, $message, $file, $line) {
     throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
-// Inicializar sesión si no está iniciada
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Configurar headers para JSON por defecto
-header('Content-Type: application/json');
-
 try {
     // Verificar autenticación y permisos
     if (!isset($_SESSION['user_id'])) {
         throw new Exception("Usuario no autenticado");
+    }
+
+    // Verificar conexión a base de datos
+    if (!isset($conn)) {
+        throw new Exception("No hay conexión a la base de datos");
     }
 
     // Verificar rol de admin
@@ -123,13 +158,7 @@ try {
         ob_end_clean();
     }
 
-    // Cambiar headers para descarga de PDF
-    header('Content-Type: application/pdf');
-    header('Content-Disposition: attachment; filename="reporte_ordenes_' . date('Ymd_His') . '.pdf"');
-    header('Cache-Control: private, max-age=0, must-revalidate');
-    header('Pragma: public');
-
-    // Crear nuevo documento PDF
+    // Crear nuevo documento PDF primero
     $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
     
     // Configuración del documento
@@ -165,6 +194,9 @@ try {
     foreach ($orders as $order) {
         $pdf->AddPage();
         
+        // Obtener items de esta orden
+        $items = $itemsByOrder[$order['id']] ?? [];
+        
         // Encabezado con logo y datos del reporte
         $html = '
         <style>
@@ -180,8 +212,8 @@ try {
                 margin-top: 0;
             }
             .section-title {
-             
-                color:rgb(0, 0, 0);
+                background-color: #E6F2FF;
+                color: #006699;
                 padding: 6px 8px;
                 font-size: 11pt;
                 font-weight: bold;
@@ -419,7 +451,6 @@ try {
             <tbody>';
         
         // Agregar items de esta orden
-        $items = $itemsByOrder[$order['id']] ?? [];
         foreach ($items as $item) {
             $html .= '
                 <tr>
@@ -509,6 +540,12 @@ try {
     // Generar nombre del archivo
     $filename = 'reporte_ordenes_' . date('Ymd_His') . '.pdf';
     
+    // Configurar headers para descarga de PDF
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: private, max-age=0, must-revalidate');
+    header('Pragma: public');
+    
     // Salida del PDF
     $pdf->Output($filename, 'D');
     exit();
@@ -521,23 +558,25 @@ try {
     
     // Registrar error detallado
     $errorMsg = "[" . date('Y-m-d H:i:s') . "] Error al generar reporte PDF: " . $e->getMessage() . 
-                " en " . $e->getFile() . " línea " . $e->getLine() . "\n";
+                " en " . $e->getFile() . " línea " . $e->getLine() . "\n" .
+                "Stack trace: " . $e->getTraceAsString() . "\n";
     
     // Intentar escribir al log
     $logPath = __DIR__ . '/../../php_errors.log';
-    if (is_writable(dirname($logPath))) {
-        error_log($errorMsg, 3, $logPath);
-    } else {
-        error_log($errorMsg); // Log al sistema
-    }
+    @error_log($errorMsg, 3, $logPath);
     
-    // Responder con error
+    // También al log del sistema
+    error_log($errorMsg);
+    
+    // Responder con error detallado
     header('Content-Type: application/json');
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => 'Ocurrió un error al generar el reporte PDF.',
-        'debug' => defined('DEBUG_MODE') && DEBUG_MODE ? $e->getMessage() : null
+        'error' => $e->getMessage(),
+        'file' => basename($e->getFile()),
+        'line' => $e->getLine(),
+        'debug_mode' => defined('DEBUG_MODE') ? DEBUG_MODE : false
     ]);
     exit();
 }

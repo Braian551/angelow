@@ -224,16 +224,22 @@ exportBtn.addEventListener('click', function() {
     .then(response => {
         // Verificar si la respuesta es exitosa
         if (!response.ok) {
-            // Si es un error 500, intentar obtener el mensaje JSON
-            if (response.status === 500) {
-                return response.json().then(err => {
-                    throw new Error(err.error || 'Error interno del servidor');
-                }).catch(() => {
-                    throw new Error('Error interno del servidor (500)');
-                });
-            } else {
-                throw new Error(`Error del servidor: ${response.status}`);
-            }
+            // Intentar obtener el error como JSON
+            return response.text().then(text => {
+                console.error('Error response text:', text);
+                try {
+                    const errorData = JSON.parse(text);
+                    const errorMsg = errorData.error || 'Error interno del servidor';
+                    const debugInfo = errorData.file ? ` (${errorData.file}:${errorData.line})` : '';
+                    throw new Error(errorMsg + debugInfo);
+                } catch (e) {
+                    // Si no es JSON válido, mostrar el texto
+                    if (text.includes('composer install')) {
+                        throw new Error('Faltan dependencias. Ejecuta: composer install');
+                    }
+                    throw new Error(`Error del servidor (${response.status}): ${text.substring(0, 100)}`);
+                }
+            });
         }
         
         // Verificar si la respuesta es un PDF
