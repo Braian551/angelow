@@ -1,26 +1,10 @@
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     // Variables para el modal de eliminación
     let currentOrderIdForDelete = null;
     const deleteOrderModal = document.getElementById('delete-order-modal');
     const cancelDeleteOrderBtn = document.getElementById('cancel-delete-order');
     const confirmDeleteOrderBtn = document.getElementById('confirm-delete-order');
-
-    // Obtener la URL base desde el meta tag
-    const metaBaseUrl = document.querySelector('meta[name="base-url"]');
-    let baseUrl = '';
-    
-    if (metaBaseUrl && metaBaseUrl.content) {
-        baseUrl = metaBaseUrl.content;
-    } else {
-        // Fallback: calcular desde la URL actual
-        // Si estamos en /admin/orders.php, la base es dos niveles arriba
-        const pathArray = window.location.pathname.split('/');
-        pathArray.pop(); // quitar orders.php
-        pathArray.pop(); // quitar admin
-        baseUrl = window.location.origin + pathArray.join('/');
-    }
-    
-    console.log('Base URL para delete:', baseUrl);
 
     // Función para abrir modal de eliminación
     window.openDeleteOrderModal = function(orderId) {
@@ -46,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmDeleteOrderBtn.disabled = true;
         confirmDeleteOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
 
-        const deleteUrl = `${baseUrl}/admin/order/delete.php`;
+        const deleteUrl = '<?= BASE_URL ?>/admin/order/delete.php';
         console.log('Enviando solicitud DELETE a:', deleteUrl);
         console.log('Order ID:', currentOrderIdForDelete);
 
@@ -61,7 +45,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
                 
                 if (!response.ok) {
                     if (response.status === 403) {
@@ -77,7 +60,16 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 console.log('Response data:', data);
                 if (data.success) {
+                    // Cerrar el modal
+                    closeDeleteOrderModal();
+                    
+                    // Rehabilitar botón antes de cerrar
+                    confirmDeleteOrderBtn.disabled = false;
+                    confirmDeleteOrderBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Eliminar';
+                    
+                    // Mostrar alerta de éxito
                     showAlert('Orden eliminada correctamente', 'success');
+                    
                     // Recargar órdenes si la función existe
                     if (typeof window.loadOrders === 'function') {
                         window.loadOrders();
@@ -94,15 +86,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error al eliminar orden:', error);
                 showAlert(error.message || 'Error al eliminar la orden', 'error');
-                // Rehabilitar botón
+                
+                // Rehabilitar botón en caso de error
                 confirmDeleteOrderBtn.disabled = false;
                 confirmDeleteOrderBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Eliminar';
-            })
-            .finally(() => {
-                // Solo cerrar el modal si la eliminación fue exitosa
-                if (!confirmDeleteOrderBtn.disabled) {
-                    closeDeleteOrderModal();
-                }
             });
     }
 
@@ -139,3 +126,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('✓ Modal de eliminación de órdenes inicializado correctamente');
 });
+</script>

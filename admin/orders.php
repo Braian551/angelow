@@ -278,13 +278,12 @@ $paymentMethods = [
     <?php include __DIR__ . '/modals/modal-delete-order.php'; ?>
     <?php include __DIR__ . '/modals/modal-bulk-actions.php'; ?>
     <?php require_once __DIR__ . '/../js/orderadmin.php'; ?>
-
+    <?php require_once __DIR__ . '/../js/modals/delete-order.php'; ?>
 
     <script src="<?= BASE_URL ?>/js/dashboardadmin.js"></script>
     <script src="<?= BASE_URL ?>/js/alerta.js"></script>
     <script src="<?= BASE_URL ?>/js/orderadmin.js"></script>
     <script src="<?= BASE_URL ?>/js/modals/status-change.js"></script>
-    <script src="<?= BASE_URL ?>/js/modals/delete-order.js"></script>
     <script src="<?= BASE_URL ?>/js/modals/bulk-actions.js"></script>
 </body>
 

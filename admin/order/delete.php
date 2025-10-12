@@ -1,12 +1,21 @@
 <?php
-session_start();
+// Iniciar la sesión solo si no está iniciada
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
 
 header('Content-Type: application/json');
 
+// Log para debugging (remover en producción)
+error_log("DELETE.PHP - Usuario en sesión: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NO'));
+error_log("DELETE.PHP - Método: " . $_SERVER['REQUEST_METHOD']);
+
 // Verificar autenticación y permisos
 if (!isset($_SESSION['user_id'])) {
+    http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Debes iniciar sesión para realizar esta acción']);
     exit();
 }
@@ -16,12 +25,16 @@ try {
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    error_log("DELETE.PHP - Role del usuario: " . ($user ? $user['role'] : 'NO ENCONTRADO'));
+
     if (!$user || $user['role'] !== 'admin') {
+        http_response_code(403);
         echo json_encode(['success' => false, 'message' => 'No tienes permisos para realizar esta acción']);
         exit();
     }
 } catch (PDOException $e) {
     error_log("Error de permisos: " . $e->getMessage());
+    http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Error al verificar permisos']);
     exit();
 }
@@ -29,7 +42,10 @@ try {
 // Obtener datos del cuerpo de la solicitud
 $data = json_decode(file_get_contents('php://input'), true);
 
+error_log("DELETE.PHP - Datos recibidos: " . json_encode($data));
+
 if (!isset($data['order_ids'])) {
+    http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Datos incompletos']);
     exit();
 }
