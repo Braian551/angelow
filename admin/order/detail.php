@@ -200,6 +200,85 @@ function getRoleBadge($role) {
     $roleInfo = $roles[$role] ?? ['label' => ucfirst($role), 'class' => 'badge-light'];
     return '<span class="role-badge ' . $roleInfo['class'] . '">' . $roleInfo['label'] . '</span>';
 }
+
+function translateValue($value, $field = '') {
+    // Traducir estados de orden
+    $orderStatuses = [
+        'pending' => 'Pendiente',
+        'processing' => 'En Proceso',
+        'shipped' => 'Enviado',
+        'delivered' => 'Entregado',
+        'cancelled' => 'Cancelado',
+        'refunded' => 'Reembolsado'
+    ];
+    
+    // Traducir estados de pago
+    $paymentStatuses = [
+        'pending' => 'Pendiente',
+        'paid' => 'Pagado',
+        'failed' => 'Fallido',
+        'refunded' => 'Reembolsado',
+        'partial' => 'Pago Parcial'
+    ];
+    
+    // Traducir métodos de pago
+    $paymentMethods = [
+        'bank_transfer' => 'Transferencia Bancaria',
+        'cash' => 'Efectivo',
+        'credit_card' => 'Tarjeta de Crédito',
+        'debit_card' => 'Tarjeta de Débito',
+        'paypal' => 'PayPal',
+        'mercadopago' => 'Mercado Pago',
+        'other' => 'Otro'
+    ];
+    
+    // Traducir tipos de cambio
+    $changeTypes = [
+        'status' => 'Estado de Orden',
+        'payment_status' => 'Estado de Pago',
+        'shipping' => 'Envío',
+        'address' => 'Dirección',
+        'notes' => 'Notas',
+        'created' => 'Creación',
+        'cancelled' => 'Cancelación',
+        'refunded' => 'Reembolso',
+        'items' => 'Productos',
+        'other' => 'Otro'
+    ];
+    
+    // Si no hay valor, retornar N/A
+    if (empty($value) || $value === null) {
+        return 'N/A';
+    }
+    
+    // Convertir a minúsculas para comparación
+    $valueLower = strtolower(trim($value));
+    
+    // Intentar traducir según el campo
+    if ($field === 'status' || $field === 'order_status') {
+        return $orderStatuses[$valueLower] ?? ucfirst($value);
+    } elseif ($field === 'payment_status') {
+        return $paymentStatuses[$valueLower] ?? ucfirst($value);
+    } elseif ($field === 'payment_method') {
+        return $paymentMethods[$valueLower] ?? ucfirst(str_replace('_', ' ', $value));
+    } elseif ($field === 'change_type') {
+        return $changeTypes[$valueLower] ?? ucfirst($value);
+    }
+    
+    // Intentar todas las traducciones si no se especificó campo
+    if (isset($orderStatuses[$valueLower])) {
+        return $orderStatuses[$valueLower];
+    } elseif (isset($paymentStatuses[$valueLower])) {
+        return $paymentStatuses[$valueLower];
+    } elseif (isset($paymentMethods[$valueLower])) {
+        return $paymentMethods[$valueLower];
+    } elseif (isset($changeTypes[$valueLower])) {
+        return $changeTypes[$valueLower];
+    }
+    
+    // Si no se encontró traducción, retornar el valor capitalizado
+    return ucfirst(str_replace('_', ' ', $value));
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -491,12 +570,12 @@ function getRoleBadge($role) {
                                                         <div class="timeline-change-values">
                                                             <div class="change-value old-value">
                                                                 <span class="value-label">Anterior:</span>
-                                                                <span class="value-content"><?= htmlspecialchars($history['old_value']) ?></span>
+                                                                <span class="value-content"><?= htmlspecialchars(translateValue($history['old_value'], $history['field_changed'])) ?></span>
                                                             </div>
                                                             <i class="fas fa-arrow-right change-arrow"></i>
                                                             <div class="change-value new-value">
                                                                 <span class="value-label">Nuevo:</span>
-                                                                <span class="value-content"><?= htmlspecialchars($history['new_value']) ?></span>
+                                                                <span class="value-content"><?= htmlspecialchars(translateValue($history['new_value'], $history['field_changed'])) ?></span>
                                                             </div>
                                                         </div>
                                                     <?php endif; ?>
