@@ -307,6 +307,7 @@
   gap: 0.8rem;
   position: relative;
   z-index: 1;
+  flex: 1;
 }
 
 .card-header h3::before {
@@ -315,6 +316,71 @@
   height: 24px;
   background: rgba(0, 119, 182, 0.6);
   border-radius: var(--radius-full);
+}
+
+.history-count {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--text-light);
+  background: rgba(0, 119, 182, 0.1);
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  margin-left: 0.5rem;
+}
+
+.btn-toggle-history {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-md);
+  font-size: 1.3rem;
+  font-weight: 600;
+  border: 2px solid rgba(0, 119, 182, 0.15);
+  background: rgba(248, 250, 252, 0.85);
+  color: #0077b6;
+  cursor: pointer;
+  transition: var(--transition-bounce);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.btn-toggle-history::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 119, 182, 0.1);
+  transition: left 0.4s ease;
+}
+
+.btn-toggle-history:hover {
+  background: rgba(0, 119, 182, 0.12);
+  border-color: rgba(0, 119, 182, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 119, 182, 0.15);
+}
+
+.btn-toggle-history:hover::before {
+  left: 100%;
+}
+
+.btn-toggle-history i {
+  transition: var(--transition);
+  font-size: 1.2rem;
+}
+
+.btn-toggle-history.btn-expanded {
+  background: rgba(0, 119, 182, 0.15);
+  border-color: rgba(0, 119, 182, 0.25);
+}
+
+.btn-toggle-history:active {
+  transform: translateY(0);
 }
 
 .card-body {
@@ -1095,6 +1161,21 @@
     align-items: flex-start;
     gap: 1rem;
   }
+  
+  .card-header h3 {
+    flex-wrap: wrap;
+  }
+  
+  .history-count {
+    font-size: 1.3rem;
+    padding: 0.25rem 0.7rem;
+  }
+  
+  .btn-toggle-history {
+    align-self: flex-start;
+    font-size: 1.25rem;
+    padding: 0.6rem 1.2rem;
+  }
 
   .order-actions {
     width: 100%;
@@ -1239,6 +1320,23 @@
   position: relative;
   padding-bottom: 2.5rem;
   animation: timelineFade 0.6s ease-out backwards;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.timeline-item-hidden {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  transform: translateX(-20px);
+  pointer-events: none;
+}
+
+.timeline-item-visible {
+  max-height: 1000px;
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .timeline-item:nth-child(1) {

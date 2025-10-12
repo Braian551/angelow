@@ -539,13 +539,20 @@ function translateValue($value, $field = '') {
                             <h3>
                                 <i class="fas fa-history"></i> 
                                 Historial de Cambios
+                                <span class="history-count">(<?= count($orderHistory) ?>)</span>
                             </h3>
+                            <?php if (count($orderHistory) > 1): ?>
+                                <button class="btn btn-toggle-history" onclick="toggleHistoryExpansion()">
+                                    <i class="fas fa-chevron-down"></i>
+                                    <span class="toggle-text">Ver todos (<?= count($orderHistory) - 1 ?> más)</span>
+                                </button>
+                            <?php endif; ?>
                         </div>
                         <div class="card-body">
                             <?php if (!empty($orderHistory)): ?>
                                 <div class="timeline">
-                                    <?php foreach ($orderHistory as $history): ?>
-                                        <div class="timeline-item" data-change-type="<?= $history['change_type'] ?>">
+                                    <?php foreach ($orderHistory as $index => $history): ?>
+                                        <div class="timeline-item <?= $index >= 1 ? 'timeline-item-hidden' : '' ?>" data-change-type="<?= $history['change_type'] ?>">
                                             <div class="timeline-point" style="background: <?= getChangeTypeColor($history['change_type']) ?>;">
                                                 <i class="<?= getChangeTypeIcon($history['change_type']) ?>"></i>
                                             </div>
@@ -934,6 +941,54 @@ function translateValue($value, $field = '') {
         window.addEventListener('load', function() {
             document.body.classList.add('loaded');
         });
+        
+        // Función para expandir/contraer historial
+        function toggleHistoryExpansion() {
+            const timeline = document.querySelector('.timeline');
+            const hiddenItems = document.querySelectorAll('.timeline-item-hidden');
+            const button = document.querySelector('.btn-toggle-history');
+            const icon = button.querySelector('i');
+            const text = button.querySelector('.toggle-text');
+            const totalItems = document.querySelectorAll('.timeline-item').length;
+            const hiddenCount = totalItems - 1;
+            
+            timeline.classList.toggle('timeline-expanded');
+            
+            if (timeline.classList.contains('timeline-expanded')) {
+                // Expandir
+                hiddenItems.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.add('timeline-item-visible');
+                        item.classList.remove('timeline-item-hidden');
+                    }, index * 80);
+                });
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+                text.textContent = 'Ver menos';
+                button.classList.add('btn-expanded');
+            } else {
+                // Contraer
+                const itemsToHide = Array.from(document.querySelectorAll('.timeline-item')).slice(1);
+                itemsToHide.reverse().forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.remove('timeline-item-visible');
+                        item.classList.add('timeline-item-hidden');
+                    }, index * 60);
+                });
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+                text.textContent = `Ver todos (${hiddenCount} más)`;
+                button.classList.remove('btn-expanded');
+                
+                // Scroll suave hacia el historial
+                setTimeout(() => {
+                    document.querySelector('.order-history-card').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest'
+                    });
+                }, 400);
+            }
+        }
     </script>
     
     <style>
