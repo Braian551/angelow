@@ -23,18 +23,23 @@
 
     // Función para cargar órdenes (definida primero para evitar problemas de hoisting)
     function loadOrders() {
-        // Mostrar estado de carga
+        // Mostrar estado de carga mejorado
         ordersContainer.innerHTML = `
             <tr>
                 <td colspan="8" class="loading-row">
-                    <div class="loading-spinner">
-                        <div class="loading-spinner-text">
-                            Cargando órdenes
-                            <span class="loading-spinner-dots">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </span>
+                    <div class="loading-container">
+                        <div class="loading-spinner-icon">
+                            <div class="spinner-ring"></div>
+                            <div class="spinner-ring"></div>
+                            <div class="spinner-ring"></div>
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="loading-content">
+                            <h3 class="loading-title">Cargando órdenes</h3>
+                            <p class="loading-subtitle">Por favor espera un momento...</p>
+                            <div class="loading-progress">
+                                <div class="loading-progress-bar"></div>
+                            </div>
                         </div>
                     </div>
                 </td>
@@ -77,7 +82,19 @@
                 ordersContainer.innerHTML = `
                     <tr>
                         <td colspan="8" class="error-row">
-                            <i class="fas fa-exclamation-circle"></i> Error al cargar órdenes. Por favor recarga la página.
+                            <div class="error-container">
+                                <div class="error-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="error-content">
+                                    <h3 class="error-title">Error al cargar órdenes</h3>
+                                    <p class="error-message">No se pudieron cargar las órdenes. Por favor, recarga la página o intenta nuevamente.</p>
+                                    <button onclick="window.loadOrders()" class="btn-retry">
+                                        <i class="fas fa-redo-alt"></i>
+                                        Reintentar
+                                    </button>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -292,7 +309,19 @@ exportBtn.addEventListener('click', function() {
             ordersContainer.innerHTML = `
                 <tr>
                     <td colspan="8" class="empty-row">
-                        <i class="fas fa-info-circle"></i> No se encontraron órdenes
+                        <div class="empty-container">
+                            <div class="empty-icon">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <div class="empty-content">
+                                <h3 class="empty-title">No se encontraron órdenes</h3>
+                                <p class="empty-message">No hay órdenes que coincidan con los filtros aplicados.</p>
+                                <button onclick="document.getElementById('clear-all-filters').click()" class="btn-clear-search">
+                                    <i class="fas fa-filter"></i>
+                                    Limpiar filtros
+                                </button>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             `;
