@@ -97,23 +97,36 @@ try {
     $stmt->execute([$_SESSION['user_id']]);
     $currentUser = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    // Si el usuario no existe, usar NULL para changed_by (permitido por la FK)
+    // Validar que el usuario existe en la base de datos
     if (!$currentUser) {
-        error_log("BULK_UPDATE - Usuario en sesión no existe en BD: " . $_SESSION['user_id']);
-        $userIdForHistory = null; // NULL es válido gracias a ON DELETE SET NULL
+        error_log("BULK_UPDATE - ERROR CRÍTICO: Usuario en sesión no existe en BD: " . $_SESSION['user_id']);
+        // Usuario no existe, usar NULL para changed_by (permitido por la FK con ON DELETE SET NULL)
+        $userIdForHistory = null;
         $userNameForHistory = 'Usuario desconocido (ID: ' . $_SESSION['user_id'] . ')';
     } else {
-        // Usuario válido encontrado
+        // Usuario válido encontrado - usar su ID real
         $userIdForHistory = $currentUser['id'];
         $userNameForHistory = $currentUser['name'];
     }
     
     error_log("BULK_UPDATE - Usuario para historial: ID=" . ($userIdForHistory ?? 'NULL') . ", Nombre={$userNameForHistory}");
     
-    error_log("BULK_UPDATE - Usuario para historial: ID={$userIdForHistory}, Nombre={$userNameForHistory}");
-    
     // Obtener IP del usuario
     $userIp = getRealUserIP();
+    
+    // Establecer variables de sesión MySQL para los triggers
+    // Los triggers usan estas variables para saber quién hizo el cambio
+    if ($userIdForHistory !== null) {
+        $conn->exec("SET @current_user_id = " . $conn->quote($userIdForHistory));
+        $conn->exec("SET @current_user_name = " . $conn->quote($userNameForHistory));
+    } else {
+        // Si el usuario no existe, establecer NULL para que el trigger no falle
+        $conn->exec("SET @current_user_id = NULL");
+        $conn->exec("SET @current_user_name = " . $conn->quote($userNameForHistory));
+    }
+    $conn->exec("SET @current_user_ip = " . $conn->quote($userIp));
+    
+    error_log("BULK_UPDATE - Variables MySQL establecidas: @current_user_id=" . ($userIdForHistory ?? 'NULL'));
     
     // Iniciar transacción
     $conn->beginTransaction();
@@ -165,6 +178,9 @@ try {
                     $hasNewValue = in_array('new_value', $columns);
                     
                     // Construir la consulta según las columnas disponibles
+                    // Log para debugging del valor que se va a insertar
+                    error_log("BULK_UPDATE - Insertando historial con changed_by: " . var_export($userIdForHistory, true) . " (tipo: " . gettype($userIdForHistory) . ")");
+                    
                     if ($hasOldValue && $hasNewValue) {
                         // Tabla completa con old_value y new_value
                         $stmt = $conn->prepare("
@@ -173,15 +189,19 @@ try {
                              old_value, new_value, description, ip_address, created_at)
                             VALUES (?, ?, ?, 'bulk_status_change', 'status', ?, ?, ?, ?, NOW())
                         ");
-                        $stmt->execute([
+                        
+                        $params = [
                             $orderId,
-                            $userIdForHistory, // VARCHAR(20) compatible
+                            $userIdForHistory, // Puede ser NULL si el usuario no existe
                             $userNameForHistory,
                             $currentOrder['status'],
                             $newStatus,
                             "Actualización masiva de estado desde panel admin",
                             $userIp
-                        ]);
+                        ];
+                        
+                        error_log("BULK_UPDATE - Parámetros del INSERT: " . json_encode($params));
+                        $stmt->execute($params);
                     } else {
                         // Tabla simplificada sin old_value y new_value
                         $stmt = $conn->prepare("
@@ -190,13 +210,17 @@ try {
                              description, ip_address, created_at)
                             VALUES (?, ?, ?, 'bulk_status_change', 'status', ?, ?, NOW())
                         ");
-                        $stmt->execute([
+                        
+                        $params = [
                             $orderId,
-                            $userIdForHistory, // VARCHAR(20) compatible
+                            $userIdForHistory, // Puede ser NULL si el usuario no existe
                             $userNameForHistory,
                             "Actualización masiva: {$currentOrder['status']} → {$newStatus}",
                             $userIp
-                        ]);
+                        ];
+                        
+                        error_log("BULK_UPDATE - Parámetros del INSERT: " . json_encode($params));
+                        $stmt->execute($params);
                     }
                     
                     error_log("BULK_UPDATE - Historial registrado para orden {$currentOrder['order_number']}");
