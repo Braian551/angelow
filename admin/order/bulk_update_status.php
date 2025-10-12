@@ -92,24 +92,28 @@ function getRealUserIP() {
 
 // Actualizar estado de órdenes en masa
 try {
-    // Obtener información del usuario actual
-    $stmt = $conn->prepare("SELECT id, name FROM users WHERE id = ?");
+    // Obtener información del usuario actual con validación robusta
+    $stmt = $conn->prepare("SELECT id, name FROM users WHERE id = ? LIMIT 1");
     $stmt->execute([$_SESSION['user_id']]);
     $currentUser = $stmt->fetch(PDO::FETCH_ASSOC);
     
+    // Si el usuario no existe, usar NULL para changed_by (permitido por la FK)
     if (!$currentUser) {
-        http_response_code(404);
-        echo json_encode(['success' => false, 'message' => 'Usuario no encontrado']);
-        exit();
+        error_log("BULK_UPDATE - Usuario en sesión no existe en BD: " . $_SESSION['user_id']);
+        $userIdForHistory = null; // NULL es válido gracias a ON DELETE SET NULL
+        $userNameForHistory = 'Usuario desconocido (ID: ' . $_SESSION['user_id'] . ')';
+    } else {
+        // Usuario válido encontrado
+        $userIdForHistory = $currentUser['id'];
+        $userNameForHistory = $currentUser['name'];
     }
+    
+    error_log("BULK_UPDATE - Usuario para historial: ID=" . ($userIdForHistory ?? 'NULL') . ", Nombre={$userNameForHistory}");
+    
+    error_log("BULK_UPDATE - Usuario para historial: ID={$userIdForHistory}, Nombre={$userNameForHistory}");
     
     // Obtener IP del usuario
     $userIp = getRealUserIP();
-    
-    // Establecer variables de sesión MySQL para los triggers
-    $conn->exec("SET @current_user_id = {$currentUser['id']}");
-    $conn->exec("SET @current_user_name = " . $conn->quote($currentUser['name']));
-    $conn->exec("SET @current_user_ip = " . $conn->quote($userIp));
     
     // Iniciar transacción
     $conn->beginTransaction();
@@ -137,13 +141,102 @@ try {
             continue;
         }
         
-        // Actualizar el estado de la orden (el trigger registrará el cambio)
+        // Actualizar el estado de la orden
         $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?");
         $stmt->execute([$newStatus, $orderId]);
         
         if ($stmt->rowCount() > 0) {
             $affectedRows++;
             $updatedOrders[] = $currentOrder['order_number'];
+            
+            // Registrar el cambio en el historial (si la tabla existe)
+            try {
+                // Primero, verificar si la tabla order_status_history existe
+                $tableCheck = $conn->query("SHOW TABLES LIKE 'order_status_history'");
+                
+                if ($tableCheck && $tableCheck->rowCount() > 0) {
+                    // Verificar la estructura de la tabla para saber qué columnas tiene
+                    $columnsCheck = $conn->query("SHOW COLUMNS FROM order_status_history");
+                    $columns = $columnsCheck->fetchAll(PDO::FETCH_COLUMN);
+                    
+                    // Verificar si changed_by es nullable o si debemos usar NULL
+                    $hasChangedBy = in_array('changed_by', $columns);
+                    $hasOldValue = in_array('old_value', $columns);
+                    $hasNewValue = in_array('new_value', $columns);
+                    
+                    // Construir la consulta según las columnas disponibles
+                    if ($hasOldValue && $hasNewValue) {
+                        // Tabla completa con old_value y new_value
+                        $stmt = $conn->prepare("
+                            INSERT INTO order_status_history 
+                            (order_id, changed_by, changed_by_name, change_type, field_changed, 
+                             old_value, new_value, description, ip_address, created_at)
+                            VALUES (?, ?, ?, 'bulk_status_change', 'status', ?, ?, ?, ?, NOW())
+                        ");
+                        $stmt->execute([
+                            $orderId,
+                            $userIdForHistory, // VARCHAR(20) compatible
+                            $userNameForHistory,
+                            $currentOrder['status'],
+                            $newStatus,
+                            "Actualización masiva de estado desde panel admin",
+                            $userIp
+                        ]);
+                    } else {
+                        // Tabla simplificada sin old_value y new_value
+                        $stmt = $conn->prepare("
+                            INSERT INTO order_status_history 
+                            (order_id, changed_by, changed_by_name, change_type, field_changed, 
+                             description, ip_address, created_at)
+                            VALUES (?, ?, ?, 'bulk_status_change', 'status', ?, ?, NOW())
+                        ");
+                        $stmt->execute([
+                            $orderId,
+                            $userIdForHistory, // VARCHAR(20) compatible
+                            $userNameForHistory,
+                            "Actualización masiva: {$currentOrder['status']} → {$newStatus}",
+                            $userIp
+                        ]);
+                    }
+                    
+                    error_log("BULK_UPDATE - Historial registrado para orden {$currentOrder['order_number']}");
+                }
+            } catch (PDOException $e) {
+                // Registrar el error específico para debugging
+                error_log("BULK_UPDATE - Error al insertar en historial: " . $e->getMessage());
+                error_log("BULK_UPDATE - SQL State: " . $e->getCode());
+                error_log("BULK_UPDATE - User ID: {$userIdForHistory}, Order ID: {$orderId}");
+                
+                // Si falla por foreign key, verificar si el usuario existe
+                if (strpos($e->getMessage(), 'foreign key constraint') !== false) {
+                    error_log("BULK_UPDATE - Error de foreign key. Verificando usuario...");
+                    $userCheck = $conn->prepare("SELECT id FROM users WHERE id = ?");
+                    $userCheck->execute([$userIdForHistory]);
+                    $userExists = $userCheck->fetch();
+                    
+                    if (!$userExists) {
+                        error_log("BULK_UPDATE - ERROR: Usuario ID {$userIdForHistory} no existe en la tabla users");
+                        // Intentar insertar sin changed_by (como NULL)
+                        try {
+                            $stmt = $conn->prepare("
+                                INSERT INTO order_status_history 
+                                (order_id, changed_by, changed_by_name, change_type, field_changed, 
+                                 description, ip_address, created_at)
+                                VALUES (?, NULL, ?, 'status_change', 'status', ?, ?, NOW())
+                            ");
+                            $stmt->execute([
+                                $orderId,
+                                $userNameForHistory,
+                                "Actualización masiva: {$currentOrder['status']} → {$newStatus}",
+                                $userIp
+                            ]);
+                            error_log("BULK_UPDATE - Historial registrado con changed_by = NULL");
+                        } catch (PDOException $e2) {
+                            error_log("BULK_UPDATE - Tampoco se pudo insertar con NULL: " . $e2->getMessage());
+                        }
+                    }
+                }
+            }
             
             // Si hay notas adicionales, registrarlas como un cambio separado
             if ($notes && trim($notes) !== '') {
@@ -155,14 +248,29 @@ try {
                     ");
                     $stmt->execute([
                         $orderId,
-                        $currentUser['id'],
-                        $currentUser['name'],
+                        $userIdForHistory,
+                        $userNameForHistory,
                         "Nota de actualización masiva: " . $notes,
                         $userIp
                     ]);
                 } catch (PDOException $e) {
-                    // Si la tabla no existe, continuar sin error
                     error_log("No se pudo insertar nota en historial: " . $e->getMessage());
+                    // Intentar con changed_by NULL
+                    try {
+                        $stmt = $conn->prepare("
+                            INSERT INTO order_status_history 
+                            (order_id, changed_by, changed_by_name, change_type, field_changed, description, ip_address, created_at)
+                            VALUES (?, NULL, ?, 'notes', 'admin_notes', ?, ?, NOW())
+                        ");
+                        $stmt->execute([
+                            $orderId,
+                            $userNameForHistory,
+                            "Nota de actualización masiva: " . $notes,
+                            $userIp
+                        ]);
+                    } catch (PDOException $e2) {
+                        error_log("Tampoco se pudo insertar nota con NULL: " . $e2->getMessage());
+                    }
                 }
             }
             
@@ -172,11 +280,6 @@ try {
     
     // Confirmar transacción
     $conn->commit();
-    
-    // Limpiar variables de sesión MySQL
-    $conn->exec("SET @current_user_id = NULL");
-    $conn->exec("SET @current_user_name = NULL");
-    $conn->exec("SET @current_user_ip = NULL");
     
     // Traducir estado para el mensaje
     $statusLabels = [
@@ -216,15 +319,6 @@ try {
     // Revertir transacción en caso de error
     if ($conn->inTransaction()) {
         $conn->rollBack();
-    }
-    
-    // Limpiar variables de sesión MySQL
-    try {
-        $conn->exec("SET @current_user_id = NULL");
-        $conn->exec("SET @current_user_name = NULL");
-        $conn->exec("SET @current_user_ip = NULL");
-    } catch (Exception $cleanupError) {
-        error_log("Error al limpiar variables de sesión: " . $cleanupError->getMessage());
     }
     
     error_log("Error al actualizar estado de órdenes en masa: " . $e->getMessage());
