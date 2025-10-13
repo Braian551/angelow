@@ -1,7 +1,7 @@
-﻿/**
+/**
  * =========================================================
- * SISTEMA DE NAVEGACIN EN TIEMPO REAL - ANGELOW DELIVERY
- * Funcionalidad: Navegacin GPS estilo Uber/Waze con tracking en tiempo real
+ * SISTEMA DE NavegaciÃ³n EN TIEMPO REAL - ANGELOW DELIVERY
+ * Funcionalidad: NavegaciÃ³n GPS estilo Uber/Waze con tracking en tiempo real
  * =========================================================
  */
 
@@ -13,7 +13,7 @@
     // =========================================================
     const CONFIG = {
         BASE_URL: document.querySelector('meta[name="base-url"]')?.content || '',
-        UPDATE_INTERVAL: 5000, // Actualizar ubicacin cada 5 segundos
+        UPDATE_INTERVAL: 5000, // Actualizar ubicaciÃ³n cada 5 segundos
         ROUTE_CHECK_INTERVAL: 30000, // Verificar ruta cada 30 segundos
         NEAR_DESTINATION_THRESHOLD: 0.1, // 100 metros
         OFF_ROUTE_THRESHOLD: 0.05, // 50 metros fuera de ruta
@@ -71,7 +71,7 @@
             e.preventDefault();
         });
         
-        // Mantener pantalla activa durante navegacin
+        // Mantener pantalla activa durante NavegaciÃ³n
         if ('wakeLock' in navigator) {
             navigator.wakeLock.request('screen').catch(err => {
                 console.warn('Wake Lock no disponible:', err);
@@ -85,7 +85,7 @@
     // INICIALIZACIN
     // =========================================================
     document.addEventListener('DOMContentLoaded', function() {
-        console.log(' Iniciando sistema de navegacin...');
+        console.log(' Iniciando sistema de NavegaciÃ³n...');
         
         // Inicializar Voice Helper
         if (typeof VoiceHelper !== 'undefined') {
@@ -99,7 +99,7 @@
         // Cargar datos del delivery
         loadDeliveryData();
         
-        // Solicitar permisos de ubicacin
+        // Solicitar permisos de ubicaciÃ³n
         requestLocationPermission();
         
         // Inicializar mapa
@@ -108,7 +108,7 @@
         // Inicializar eventos
         initializeEvents();
         
-        // Obtener informacin de batera si est disponible
+        // Obtener informaciÃ³n de batera si est disponible
         if ('getBattery' in navigator) {
             navigator.getBattery().then(battery => {
                 state.batteryLevel = Math.round(battery.level * 100);
@@ -118,7 +118,7 @@
             });
         }
         
-        console.log(' Sistema de navegacin inicializado');
+        console.log(' Sistema de NavegaciÃ³n inicializado');
     });
 
     // =========================================================
@@ -142,9 +142,9 @@
             if (!state.destination.lat || !state.destination.lng || 
                 state.destination.lat === 0 || state.destination.lng === 0) {
                 console.error(' Coordenadas de destino no vlidas:', state.destination);
-                showNotification('Error: La direccin de entrega no tiene coordenadas GPS. Contacta al administrador.', 'error');
+                showNotification('Error: La direcciÃ³n de entrega no tiene coordenadas GPS. Contacta al administrador.', 'error');
                 
-                // Deshabilitar navegacin
+                // Deshabilitar NavegaciÃ³n
                 const btnAction = document.getElementById('btn-action-main');
                 if (btnAction) {
                     btnAction.disabled = true;
@@ -160,12 +160,12 @@
             console.log(' Destino:', state.destination);
         } catch (e) {
             console.error('Error al parsear datos del delivery:', e);
-            showNotification('Error al cargar informacin del pedido', 'error');
+            showNotification('Error al cargar informaciÃ³n del pedido', 'error');
         }
     }
 
     // =========================================================
-    // SOLICITAR PERMISOS DE UBICACIN
+    // SOLICITAR PERMISOS DE ubicaciÃ³n
     // =========================================================
     function requestLocationPermission() {
         if (!('geolocation' in navigator)) {
@@ -173,27 +173,27 @@
             return;
         }
 
-        updateStatus('Solicitando permisos de ubicacin...');
+        updateStatus('Solicitando permisos de ubicaciÃ³n...');
         
         navigator.permissions.query({ name: 'geolocation' }).then(result => {
             if (result.state === 'granted') {
-                console.log(' Permisos de ubicacin concedidos');
+                console.log(' Permisos de ubicaciÃ³n concedidos');
                 startLocationTracking();
             } else if (result.state === 'prompt') {
                 // Solicitar permisos
                 navigator.geolocation.getCurrentPosition(
                     position => {
-                        console.log(' Permisos de ubicacin concedidos');
+                        console.log(' Permisos de ubicaciÃ³n concedidos');
                         startLocationTracking();
                     },
                     error => {
-                        console.error(' Permisos de ubicacin denegados:', error);
-                        showNotification('Se requieren permisos de ubicacin para navegar', 'error');
+                        console.error(' Permisos de ubicaciÃ³n denegados:', error);
+                        showNotification('Se requieren permisos de ubicaciÃ³n para navegar', 'error');
                     },
                     { enableHighAccuracy: true }
                 );
             } else {
-                showNotification('Se requieren permisos de ubicacin para navegar', 'error');
+                showNotification('Se requieren permisos de ubicaciÃ³n para navegar', 'error');
             }
         });
     }
@@ -226,7 +226,7 @@
     }
 
     // =========================================================
-    // TRACKING DE UBICACIN EN TIEMPO REAL
+    // TRACKING DE ubicaciÃ³n EN TIEMPO REAL
     // =========================================================
     function startLocationTracking() {
         if (state.watchId) {
@@ -245,12 +245,12 @@
             options
         );
 
-        updateStatus('Obteniendo ubicacin...');
-        console.log(' Tracking de ubicacin iniciado');
+        updateStatus('Obteniendo ubicaciÃ³n...');
+        console.log(' Tracking de ubicaciÃ³n iniciado');
     }
 
     // =========================================================
-    // MANEJAR ACTUALIZACIN DE UBICACIN
+    // MANEJAR actualizaciÃ³n DE ubicaciÃ³n
     // =========================================================
     function handleLocationUpdate(position) {
         const { latitude, longitude, accuracy, speed, heading } = position.coords;
@@ -262,7 +262,7 @@
         // Actualizar marcador del conductor
         updateDriverMarker(state.currentLocation, state.currentHeading);
 
-        // Si es la primera ubicacin, centrar mapa y calcular ruta
+        // Si es la primera ubicaciÃ³n, centrar mapa y calcular ruta
         if (!state.route) {
             state.map.setView(state.currentLocation, CONFIG.MAP_ZOOM);
             calculateRoute(state.currentLocation, state.destination);
@@ -271,35 +271,35 @@
         // Actualizar UI
         updateSpeedDisplay(state.currentSpeed);
 
-        // Si estamos navegando, enviar actualizacin al servidor
+        // Si estamos navegando, enviar actualizaciÃ³n al servidor
         if (state.isNavigating) {
             sendLocationUpdate(position);
         }
 
-        console.log(` Ubicacin actualizada: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+        console.log(` ubicaciÃ³n actualizada: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
     }
 
     // =========================================================
-    // MANEJAR ERROR DE UBICACIN
+    // MANEJAR ERROR DE ubicaciÃ³n
     // =========================================================
     function handleLocationError(error) {
-        console.error(' Error de ubicacin:', error);
+        console.error(' Error de ubicaciÃ³n:', error);
         
-        let message = 'Error al obtener ubicacin';
+        let message = 'Error al obtener ubicaciÃ³n';
         switch (error.code) {
             case error.PERMISSION_DENIED:
-                message = 'Permisos de ubicacin denegados';
+                message = 'Permisos de ubicaciÃ³n denegados';
                 break;
             case error.POSITION_UNAVAILABLE:
-                message = 'Ubicacin no disponible';
+                message = 'ubicaciÃ³n no disponible';
                 break;
             case error.TIMEOUT:
-                message = 'Timeout al obtener ubicacin';
+                message = 'Timeout al obtener ubicaciÃ³n';
                 break;
         }
         
         showNotification(message, 'error');
-        updateStatus('Error de ubicacin');
+        updateStatus('Error de ubicaciÃ³n');
     }
 
     // =========================================================
@@ -405,7 +405,7 @@
 
             state.driverMarker = L.marker([location.lat, location.lng], { icon })
                 .addTo(state.map)
-                .bindPopup('Tu ubicacin');
+                .bindPopup('Tu ubicaciÃ³n');
         } else {
             // Actualizar posicin y rotacin
             state.driverMarker.setLatLng([location.lat, location.lng]);
@@ -435,7 +435,7 @@
 
         state.destinationMarker = L.marker([location.lat, location.lng], { icon })
             .addTo(state.map)
-            .bindPopup('Destino: ' + (state.deliveryData?.destination.address || 'Direccin de entrega'));
+            .bindPopup('Destino: ' + (state.deliveryData?.destination.address || 'direcciÃ³n de entrega'));
     }
 
     // =========================================================
@@ -449,16 +449,16 @@
     }
 
     // =========================================================
-    // INICIAR NAVEGACIN
+    // INICIAR NavegaciÃ³n
     // =========================================================
     async function startNavigation() {
         if (!state.currentLocation || !state.destination || !state.route) {
-            showNotification('Esperando ubicacin y ruta...', 'warning');
+            showNotification('Esperando ubicaciÃ³n y ruta...', 'warning');
             return;
         }
 
         try {
-            updateStatus('Iniciando navegacin...');
+            updateStatus('Iniciando NavegaciÃ³n...');
 
             const response = await fetch(`${CONFIG.BASE_URL}/delivery/api/navigation_api.php?action=start_navigation`, {
                 method: 'POST',
@@ -478,13 +478,13 @@
             const data = await response.json();
 
             if (!data.success) {
-                throw new Error(data.error || 'Error al iniciar navegacin');
+                throw new Error(data.error || 'Error al iniciar NavegaciÃ³n');
             }
 
             state.isNavigating = true;
             
             // Cambiar botn de accin
-            updateActionButton('pause', 'Pausar navegacin');
+            updateActionButton('pause', 'Pausar navegación');
             
             // Iniciar actualizaciones peridicas
             startPeriodicUpdates();
@@ -493,15 +493,15 @@
             centerOnDriver();
             
             updateStatus('Navegando');
-            showNotification('Navegacin iniciada', 'success');
+            showNotification('Navegación iniciada', 'success');
             
-            // Instruccin de voz
-            speak('Navegacin iniciada. Sigue la ruta marcada.');
+            // Instrucción de voz
+            speak('Navegación iniciada. Sigue la ruta marcada.');
 
-            console.log(' Navegacin iniciada');
+            console.log('✅ Navegación iniciada');
 
         } catch (error) {
-            console.error(' Error al iniciar navegacin:', error);
+            console.error(' Error al iniciar NavegaciÃ³n:', error);
             showNotification(error.message, 'error');
         }
     }
@@ -600,7 +600,7 @@
     // ACTUALIZACIONES PERIDICAS
     // =========================================================
     function startPeriodicUpdates() {
-        // Actualizar ubicacin al servidor cada 5 segundos
+        // Actualizar ubicaciÃ³n al servidor cada 5 segundos
         state.updateInterval = setInterval(() => {
             if (state.isNavigating && state.currentLocation) {
                 sendLocationUpdate({
@@ -624,7 +624,7 @@
     }
 
     // =========================================================
-    // ENVIAR ACTUALIZACIN DE UBICACIN AL SERVIDOR
+    // ENVIAR actualizaciÃ³n DE ubicaciÃ³n AL SERVIDOR
     // =========================================================
     async function sendLocationUpdate(position) {
         try {
@@ -645,7 +645,7 @@
             const data = await response.json();
 
             if (data.success) {
-                // Actualizar informacin local con datos del servidor
+                // Actualizar informaciÃ³n local con datos del servidor
                 if (data.distance_remaining !== null) {
                     state.distanceRemaining = data.distance_remaining;
                     updateDistanceDisplay(state.distanceRemaining);
@@ -663,7 +663,7 @@
             }
 
         } catch (error) {
-            console.error('Error al enviar actualizacin de ubicacin:', error);
+            console.error('Error al enviar actualizaciÃ³n de ubicaciÃ³n:', error);
         }
     }
 
@@ -671,7 +671,7 @@
     // VERIFICAR SI ESTAMOS EN LA RUTA
     // =========================================================
     function checkIfOnRoute() {
-        // TODO: Implementar verificacin de distancia a la ruta
+        // TODO: Implementar verificaciÃ³n de distancia a la ruta
         // Por ahora, siempre asumimos que estamos en ruta
     }
 
@@ -681,8 +681,8 @@
     function handleNearDestination() {
         if (!state.nearDestinationNotified) {
             state.nearDestinationNotified = true;
-            showNotification('Ests cerca del destino!', 'success');
-            speak('Ests cerca del destino');
+            showNotification('¡Estás cerca del destino!', 'success');
+            speak('Estás cerca del destino');
             
             // Registrar evento
             logNavigationEvent('destination_near', {
@@ -692,7 +692,7 @@
     }
 
     // =========================================================
-    // REGISTRAR EVENTO DE NAVEGACIN
+    // REGISTRAR EVENTO DE NavegaciÃ³n
     // =========================================================
     async function logNavigationEvent(eventType, eventData) {
         try {
@@ -856,11 +856,11 @@
         const button = document.getElementById('btn-traffic');
         
         if (state.isTrafficVisible) {
-            // Activar informacin de trfico
-            showNotification('Cargando informacin de trfico...', 'info');
+            // Activar informaciÃ³n de trfico
+            showNotification('Cargando informaciÃ³n de trfico...', 'info');
             
             try {
-                // Opcin 1: Usar capa de transporte de OpenStreetMap (muestra vas principales)
+                // opciÃ³n 1: Usar capa de transporte de OpenStreetMap (muestra vas principales)
                 if (!state.trafficLayer) {
                     state.trafficLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         attribution: ' OpenStreetMap contributors',
@@ -892,7 +892,7 @@
                 
             } catch (error) {
                 console.error('Error al activar trfico:', error);
-                showNotification('Error al cargar informacin de trfico', 'error');
+                showNotification('Error al cargar informaciÃ³n de trfico', 'error');
             }
             
         } else {
@@ -955,7 +955,7 @@
     }
     
     // =========================================================
-    // MOSTRAR INFORMACIN DE TRFICO EN UI
+    // MOSTRAR informaciÃ³n DE TRFICO EN UI
     // =========================================================
     function displayTrafficInfo(trafficLevel) {
         // Buscar o crear elemento de info de trfico
@@ -1017,7 +1017,7 @@
     };
 
     window.reportIssue = function() {
-        showNotification('Funcin en desarrollo', 'info');
+        showNotification('funciÃ³n en desarrollo', 'info');
         window.toggleMenu();
     };
 
@@ -1027,7 +1027,7 @@
     };
 
     window.cancelNavigation = function() {
-        if (confirm('Deseas cancelar la navegacin?')) {
+        if (confirm('Deseas cancelar la NavegaciÃ³n?')) {
             stopNavigation();
             window.location.href = `${CONFIG.BASE_URL}/delivery/orders.php`;
         }
@@ -1035,7 +1035,7 @@
 
     window.confirmExit = function() {
         if (state.isNavigating) {
-            if (confirm('Deseas salir de la navegacin? El progreso se guardar.')) {
+            if (confirm('Deseas salir de la NavegaciÃ³n? El progreso se guardar.')) {
                 stopNavigation();
                 window.location.href = `${CONFIG.BASE_URL}/delivery/orders.php`;
             }
@@ -1045,7 +1045,7 @@
     };
 
     // =========================================================
-    // DETENER NAVEGACIN
+    // DETENER NavegaciÃ³n
     // =========================================================
     function stopNavigation() {
         state.isNavigating = false;
@@ -1065,7 +1065,7 @@
             state.watchId = null;
         }
         
-        console.log(' Navegacin detenida');
+        console.log(' NavegaciÃ³n detenida');
     }
 
     // =========================================================
@@ -1173,7 +1173,7 @@
     window.speak = speak;
 
     // =========================================================
-    // DETENER NAVEGACIN
+    // DETENER NavegaciÃ³n
     // =========================================================
     function stopNavigation() {
         state.isNavigating = false;
@@ -1193,7 +1193,7 @@
             state.watchId = null;
         }
         
-        console.log(' Navegacin detenida');
+        console.log(' NavegaciÃ³n detenida');
     }
 
     // =========================================================

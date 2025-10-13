@@ -195,14 +195,20 @@ class VoiceHelper {
      * Límite: 350 solicitudes/día (suficiente para navegación)
      */
     async speakWithVoiceRSS(text, options = {}) {
-        // Crear un proxy PHP local para evitar CORS
+        // Asegurar encoding UTF-8 correcto
+        const textEncoded = encodeURIComponent(text);
+        
+        // Crear URL con parámetros correctamente codificados
         const params = new URLSearchParams({
-            text: text,
-            lang: options.lang || 'es-mx', // español mexicano (muy natural)
-            rate: options.rate || '0' // Velocidad normal (-10 a 10)
+            text: text, // URLSearchParams maneja el encoding automáticamente
+            lang: options.lang || 'es-mx',
+            rate: options.rate || '0'
         });
         
-        const url = `${window.location.origin}/angelow/delivery/api/text_to_speech.php?${params.toString()}`;
+        const baseUrl = window.location.origin || 'http://localhost';
+        const url = `${baseUrl}/angelow/delivery/api/text_to_speech.php?${params.toString()}`;
+        
+        console.log('🔗 URL VoiceRSS:', url);
         
         return new Promise((resolve, reject) => {
             const audio = new Audio(url);
@@ -224,8 +230,20 @@ class VoiceHelper {
                 resolve();
             };
             
-            audio.onerror = (e) => {
-                console.warn('⚠️ Error en VoiceRSS, usando fallback');
+            audio.onerror = async (e) => {
+                console.warn('⚠️ Error en VoiceRSS, verificando causa...');
+                
+                // Intentar obtener más información del error
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('❌ Respuesta del servidor:', errorText);
+                    }
+                } catch (fetchError) {
+                    console.error('❌ Error al verificar:', fetchError.message);
+                }
+                
                 reject(new Error('Error al reproducir con VoiceRSS'));
             };
             

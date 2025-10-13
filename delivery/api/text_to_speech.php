@@ -7,15 +7,20 @@
  * Límite gratuito: 350 solicitudes/día
  */
 
-header('Content-Type: audio/mpeg');
+// Asegurar UTF-8
+mb_internal_encoding('UTF-8');
+mb_http_output('UTF-8');
+
+header('Content-Type: audio/mpeg; charset=utf-8');
 header('Cache-Control: public, max-age=86400'); // Cache por 24 horas
 
 // API Key gratuita de VoiceRSS
 // Registra tu propia key en: https://www.voicerss.org/personel/
 $apiKey = '2ca1dadea5ee4f08a4212b6806d44c09'; // Key de ejemplo
 
-// Obtener parámetros
-$text = isset($_GET['text']) ? $_GET['text'] : 'Texto de prueba';
+// Obtener parámetros con encoding UTF-8
+$text = isset($_GET['text']) ? urldecode($_GET['text']) : 'Texto de prueba';
+$text = mb_convert_encoding($text, 'UTF-8', 'auto');
 $lang = isset($_GET['lang']) ? $_GET['lang'] : 'es-mx';
 $rate = isset($_GET['rate']) ? $_GET['rate'] : '0';
 
@@ -27,7 +32,7 @@ if (strlen($text) > 10000) {
     $text = substr($text, 0, 10000);
 }
 
-// Construir URL de VoiceRSS
+// Construir URL de VoiceRSS con encoding UTF-8 explícito
 $voiceRssUrl = 'https://api.voicerss.org/';
 $params = http_build_query([
     'key' => $apiKey,
@@ -36,7 +41,7 @@ $params = http_build_query([
     'r' => $rate,
     'c' => 'MP3',
     'f' => '44khz_16bit_stereo'
-]);
+], '', '&', PHP_QUERY_RFC3986);
 
 $url = $voiceRssUrl . '?' . $params;
 
