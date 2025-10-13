@@ -1403,3 +1403,51 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+/* ========== ANIMACIONES PARA ACTUALIZACIONES SIN PARPADEO ========== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(74, 144, 226, 0.08);
+    }
+    50% {
+        box-shadow: 0 8px 30px rgba(74, 144, 226, 0.18);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Indicador de actualización */
+.update-indicator {
+    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2s forwards !important;
+}

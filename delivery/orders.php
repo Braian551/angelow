@@ -176,6 +176,10 @@ $driverId = $_SESSION['user_id'];
         const perPage = 12;
         let currentFilters = {};
         let currentDeliveryId = null;
+        let currentOrdersHash = null;
+        let currentOrdersData = null;
+        let isLoading = false;
+        let pollingInterval = null;
         
         // Elementos del DOM
         const ordersContainer = document.getElementById('orders-container');
@@ -192,6 +196,7 @@ $driverId = $_SESSION['user_id'];
         window.switchTab = function(tab) {
             currentTab = tab;
             currentPage = 1;
+            currentOrdersHash = null; // Reset hash al cambiar de pestaña
             
             // Actualizar UI de pestañas
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -200,20 +205,60 @@ $driverId = $_SESSION['user_id'];
             document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
             
             // Cargar órdenes
-            loadOrders();
+            loadOrders(true);
         };
+        
+        // ====================================
+        // VERIFICAR SI HAY ACTUALIZACIONES
+        // ====================================
+        function checkForUpdates() {
+            if (isLoading || document.querySelector('.modal.show')) {
+                return; // No verificar si estamos cargando o hay un modal abierto
+            }
+            
+            const params = new URLSearchParams();
+            params.append('tab', currentTab);
+            
+            fetch(`${BASE_URL}/delivery/api/check_orders_update.php?${params.toString()}`, {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar contadores siempre
+                    updateTabCounts(data.counts);
+                    
+                    // Verificar si hay cambios en las órdenes
+                    if (currentOrdersHash === null || data.hash !== currentOrdersHash) {
+                        console.log('📦 Cambios detectados, actualizando órdenes...');
+                        loadOrders(false); // Cargar sin mostrar spinner
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error al verificar actualizaciones:', error);
+            });
+        }
         
         // ====================================
         // FUNCIÓN PARA CARGAR ÓRDENES
         // ====================================
-        function loadOrders() {
-            ordersContainer.innerHTML = `
-                <div class="loading-row">
-                    <div class="loading-spinner">
-                        <i class="fas fa-spinner fa-spin"></i> Cargando órdenes...
+        function loadOrders(showLoader = true) {
+            if (isLoading) return;
+            
+            isLoading = true;
+            
+            if (showLoader) {
+                ordersContainer.innerHTML = `
+                    <div class="loading-row">
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner fa-spin"></i> Cargando órdenes...
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
             
             // Construir URL con parámetros
             const params = new URLSearchParams();
@@ -228,7 +273,6 @@ $driverId = $_SESSION['user_id'];
             }
             
             const url = `${BASE_URL}/delivery/api/get_orders.php?${params.toString()}`;
-            console.log('Fetching orders from:', url);
             
             // Realizar petición
             fetch(url, {
@@ -239,9 +283,6 @@ $driverId = $_SESSION['user_id'];
                 }
             })
                 .then(response => {
-                    console.log('Response status:', response.status);
-                    console.log('Response headers:', response.headers);
-                    
                     // Verificar si la respuesta es JSON
                     const contentType = response.headers.get('content-type');
                     if (!contentType || !contentType.includes('application/json')) {
@@ -265,18 +306,31 @@ $driverId = $_SESSION['user_id'];
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Response data:', data);
-                    
                     if (data.success) {
-                        renderOrders(data.orders);
-                        renderPagination(data.meta);
-                        updateResultsCount(data.meta);
-                        updateTabCounts(data.counts);
+                        // Generar hash de las órdenes actuales
+                        const newHash = JSON.stringify(data.orders.map(o => ({
+                            id: o.id,
+                            delivery_id: o.delivery_id,
+                            delivery_status: o.delivery_status
+                        })));
+                        
+                        // Solo actualizar si hay cambios o es la primera carga
+                        if (!currentOrdersData || newHash !== currentOrdersHash || showLoader) {
+                            currentOrdersHash = newHash;
+                            currentOrdersData = data;
+                            
+                            renderOrders(data.orders);
+                            renderPagination(data.meta);
+                            updateResultsCount(data.meta);
+                            updateTabCounts(data.counts);
+                            
+                            if (!showLoader) {
+                                // Mostrar notificación sutil de actualización
+                                showUpdateIndicator();
+                            }
+                        }
                     } else {
                         console.error('API Error:', data.error);
-                        if (data.debug) {
-                            console.error('Debug info:', data.debug);
-                        }
                         throw new Error(data.error || 'Error desconocido');
                     }
                 })
@@ -285,21 +339,6 @@ $driverId = $_SESSION['user_id'];
                     
                     let errorMessage = error.message;
                     let actionButton = '';
-                    let debugInfo = '';
-                    
-                    // Intentar extraer información de debug si está disponible
-                    try {
-                        if (error.response && error.response.debug) {
-                            debugInfo = `
-                                <div style="margin-top: 1rem; padding: 1rem; background: var(--blue-05); border-radius: 8px; text-align: left; font-size: 1.2rem;">
-                                    <strong>Info de Debug:</strong><br>
-                                    <pre style="margin: 0.5rem 0; font-family: monospace;">${JSON.stringify(error.response.debug, null, 2)}</pre>
-                                </div>
-                            `;
-                        }
-                    } catch (e) {
-                        console.error('Error al procesar debug info:', e);
-                    }
                     
                     // Manejo específico de errores de sesión
                     if (error.message.includes('Sesión') || error.message.includes('sesión')) {
@@ -314,13 +353,13 @@ $driverId = $_SESSION['user_id'];
                             <button onclick="window.location.href='${BASE_URL}/auth/logout.php'" class="btn btn-danger">
                                 <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                             </button>
-                            <button onclick="loadOrders()" class="btn btn-primary">
+                            <button onclick="loadOrders(true)" class="btn btn-primary">
                                 <i class="fas fa-redo"></i> Reintentar
                             </button>
                         `;
                     } else {
                         actionButton = `
-                            <button onclick="loadOrders()" class="btn btn-primary">
+                            <button onclick="loadOrders(true)" class="btn btn-primary">
                                 <i class="fas fa-redo"></i> Reintentar
                             </button>
                         `;
@@ -334,20 +373,59 @@ $driverId = $_SESSION['user_id'];
                             <div class="error-content">
                                 <h3>Error al cargar órdenes</h3>
                                 <p>${errorMessage}</p>
-                                ${debugInfo}
                                 <div style="margin-top: 1.5rem;">
                                     ${actionButton}
                                 </div>
                             </div>
                         </div>
                     `;
+                })
+                .finally(() => {
+                    isLoading = false;
                 });
         }
         
         // ====================================
-        // FUNCIÓN PARA RENDERIZAR ÓRDENES
+        // INDICADOR DE ACTUALIZACIÓN
+        // ====================================
+        function showUpdateIndicator() {
+            const indicator = document.createElement('div');
+            indicator.className = 'update-indicator';
+            indicator.innerHTML = '<i class="fas fa-sync-alt"></i> Actualizado';
+            indicator.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: #10b981;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 13px;
+                font-weight: 500;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                z-index: 9999;
+                animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2s;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            `;
+            
+            document.body.appendChild(indicator);
+            
+            setTimeout(() => {
+                indicator.style.opacity = '0';
+                setTimeout(() => indicator.remove(), 300);
+            }, 2000);
+        }
+        
+        // ====================================
+        // FUNCIÓN PARA RENDERIZAR ÓRDENES (SIN PARPADEO)
         // ====================================
         function renderOrders(orders) {
+            const currentCards = ordersContainer.querySelectorAll('.order-card');
+            const existingOrderIds = new Set(
+                Array.from(currentCards).map(card => card.dataset.orderId)
+            );
             if (orders.length === 0) {
                 ordersContainer.innerHTML = `
                     <div class="empty-row">
@@ -363,13 +441,61 @@ $driverId = $_SESSION['user_id'];
                 return;
             }
             
-            let html = '';
-            
+            // Crear un mapa de órdenes actuales para comparación
+            const orderMap = new Map();
             orders.forEach(order => {
-                html += renderOrderCard(order);
+                const orderId = order.delivery_id || order.id;
+                orderMap.set(String(orderId), order);
             });
             
-            ordersContainer.innerHTML = html;
+            // Remover tarjetas que ya no existen
+            currentCards.forEach(card => {
+                const orderId = card.dataset.orderId;
+                if (!orderMap.has(orderId)) {
+                    card.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => card.remove(), 300);
+                }
+            });
+            
+            // Si no hay tarjetas actuales, renderizar todo de nuevo
+            if (currentCards.length === 0) {
+                let html = '';
+                orders.forEach(order => {
+                    html += renderOrderCard(order);
+                });
+                ordersContainer.innerHTML = html;
+                return;
+            }
+            
+            // Actualizar o agregar tarjetas
+            const tempContainer = document.createElement('div');
+            
+            orders.forEach((order, index) => {
+                const orderId = String(order.delivery_id || order.id);
+                const existingCard = ordersContainer.querySelector(`[data-order-id="${orderId}"]`);
+                
+                if (existingCard) {
+                    // Actualizar tarjeta existente solo si hay cambios
+                    const newCardHTML = renderOrderCard(order);
+                    tempContainer.innerHTML = newCardHTML;
+                    const newCard = tempContainer.firstElementChild;
+                    
+                    // Comparar solo el contenido relevante (sin animaciones)
+                    const existingContent = existingCard.querySelector('.order-card-body')?.innerHTML || '';
+                    const newContent = newCard.querySelector('.order-card-body')?.innerHTML || '';
+                    
+                    if (existingContent !== newContent) {
+                        existingCard.outerHTML = newCardHTML;
+                    }
+                } else {
+                    // Agregar nueva tarjeta con animación
+                    const newCardHTML = renderOrderCard(order);
+                    tempContainer.innerHTML = newCardHTML;
+                    const newCard = tempContainer.firstElementChild;
+                    newCard.style.animation = 'fadeIn 0.5s ease';
+                    ordersContainer.appendChild(newCard);
+                }
+            });
         }
         
         // ====================================
@@ -440,7 +566,7 @@ $driverId = $_SESSION['user_id'];
             }
             
             return `
-                <div class="order-card">
+                <div class="order-card" data-order-id="${order.delivery_id || order.id}">
                     <div class="order-card-header">
                         <div>
                             <h3><i class="fas fa-hashtag"></i>${order.order_number}</h3>
@@ -560,7 +686,9 @@ $driverId = $_SESSION['user_id'];
                     showNotification(result.message, 'success');
                     closeModal('accept-order-modal');
                     closeModal('reject-order-modal');
-                    setTimeout(() => loadOrders(), 1000);
+                    // Forzar recarga inmediata después de una acción
+                    currentOrdersHash = null;
+                    setTimeout(() => loadOrders(false), 500);
                 } else {
                     showNotification('Error: ' + (result.message || 'No se pudo procesar la acción'), 'error');
                 }
@@ -625,7 +753,8 @@ $driverId = $_SESSION['user_id'];
         
         window.goToPage = function(page) {
             currentPage = page;
-            loadOrders();
+            currentOrdersHash = null; // Reset hash para forzar recarga
+            loadOrders(true);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
         
@@ -684,7 +813,8 @@ $driverId = $_SESSION['user_id'];
             searchTimeout = setTimeout(() => {
                 currentPage = 1;
                 currentFilters.search = query;
-                loadOrders();
+                currentOrdersHash = null; // Reset hash para forzar recarga
+                loadOrders(true);
             }, 500);
         });
         
@@ -692,7 +822,8 @@ $driverId = $_SESSION['user_id'];
             searchInput.value = '';
             this.style.display = 'none';
             currentFilters.search = '';
-            loadOrders();
+            currentOrdersHash = null; // Reset hash
+            loadOrders(true);
         });
         
         // ====================================
@@ -700,23 +831,57 @@ $driverId = $_SESSION['user_id'];
         // ====================================
         refreshBtn.addEventListener('click', function() {
             this.querySelector('i').classList.add('fa-spin');
-            loadOrders();
+            currentOrdersHash = null; // Forzar recarga completa
+            loadOrders(true);
             setTimeout(() => {
                 this.querySelector('i').classList.remove('fa-spin');
             }, 1000);
         });
         
         // ====================================
-        // CARGAR ÓRDENES AL INICIO
+        // INICIAR SISTEMA DE POLLING
         // ====================================
-        loadOrders();
-        
-        // Auto-actualizar cada 30 segundos
-        setInterval(() => {
-            if (!document.querySelector('.modal.show')) {
-                loadOrders();
+        function startPolling() {
+            // Detener polling anterior si existe
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
             }
-        }, 30000);
+            
+            // Verificar actualizaciones cada 5 segundos
+            pollingInterval = setInterval(() => {
+                checkForUpdates();
+            }, 5000);
+        }
+        
+        function stopPolling() {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+        }
+        
+        // Pausar polling cuando la página no está visible
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                stopPolling();
+                console.log('⏸️ Polling pausado (página oculta)');
+            } else {
+                startPolling();
+                checkForUpdates(); // Verificar inmediatamente al volver
+                console.log('▶️ Polling reanudado');
+            }
+        });
+        
+        // ====================================
+        // CARGAR ÓRDENES AL INICIO E INICIAR POLLING
+        // ====================================
+        loadOrders(true);
+        startPolling();
+        
+        // Limpiar al cerrar
+        window.addEventListener('beforeunload', function() {
+            stopPolling();
+        });
     });
     </script>
 </body>
