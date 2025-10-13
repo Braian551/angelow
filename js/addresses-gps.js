@@ -641,9 +641,13 @@ class GPSAddressPicker {
         // Guardar coordenadas en campos ocultos (crearlos si no existen)
         this.setHiddenField('gps_latitude', lat);
         this.setHiddenField('gps_longitude', lng);
+        // Marcar explícitamente que se usó GPS
+        this.setHiddenField('gps_used', '1');
+        
+        console.log('GPS usado establecido: gps_used=1, lat=' + lat + ', lng=' + lng);
         
         // Notificar éxito
-        this.showNotification('Ubicación seleccionada correctamente', 'success');
+        this.showNotification('Ubicación GPS seleccionada correctamente', 'success');
         
         // Cerrar modal
         setTimeout(() => {

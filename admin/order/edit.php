@@ -40,7 +40,7 @@ $orderId = intval($_GET['id']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Validar datos
-        $requiredFields = ['status', 'payment_status', 'shipping_address', 'shipping_city'];
+        $requiredFields = ['status', 'payment_status'];
         
         foreach ($requiredFields as $field) {
             if (!isset($_POST[$field]) || trim($_POST[$field]) === '') {
@@ -71,27 +71,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->exec("SET @current_user_name = '{$currentUserName}'");
         $conn->exec("SET @current_user_ip = '{$_SERVER['REMOTE_ADDR']}'");
         
-        // Actualizar la orden (los triggers registrarán automáticamente los cambios)
-        $query = "UPDATE orders SET 
-            status = :status,
-            payment_status = :payment_status,
-            shipping_address = :shipping_address,
-            shipping_city = :shipping_city,
-            delivery_notes = :delivery_notes,
-            notes = :notes,
-            updated_at = NOW()
-            WHERE id = :id";
+        // Determinar si se cambió la dirección vinculada
+        $shippingAddressId = !empty($_POST['shipping_address_id']) ? intval($_POST['shipping_address_id']) : null;
+        
+        // Si se cambió la dirección FK, actualizar también el snapshot
+        $updateSnapshot = false;
+        if ($shippingAddressId) {
+            // Obtener la nueva dirección para crear snapshot
+            $stmtAddr = $conn->prepare("
+                SELECT CONCAT(address, ', ', neighborhood) as full_address, 
+                       neighborhood,
+                       gps_latitude,
+                       gps_longitude,
+                       gps_used
+                FROM user_addresses 
+                WHERE id = ? AND user_id = (SELECT user_id FROM orders WHERE id = ?)
+            ");
+            $stmtAddr->execute([$shippingAddressId, $orderId]);
+            $newAddress = $stmtAddr->fetch(PDO::FETCH_ASSOC);
             
+            if ($newAddress) {
+                $updateSnapshot = true;
+                $snapshotAddress = $newAddress['full_address'];
+                $snapshotCity = $_POST['shipping_city'] ?? $newAddress['neighborhood'];
+                
+                // También actualizar coordenadas en order_deliveries si existe
+                $stmtDelivery = $conn->prepare("
+                    UPDATE order_deliveries 
+                    SET destination_lat = ?,
+                        destination_lng = ?,
+                        updated_at = NOW()
+                    WHERE order_id = ?
+                    AND delivery_status IN ('driver_accepted', 'in_transit', 'arrived')
+                ");
+                $stmtDelivery->execute([
+                    $newAddress['gps_latitude'],
+                    $newAddress['gps_longitude'],
+                    $newAddress['gps_used'] ?? 0,
+                    $orderId
+                ]);
+            }
+        }
+        
+        // Construir query de actualización
+        if ($updateSnapshot) {
+            $query = "UPDATE orders SET 
+                status = :status,
+                payment_status = :payment_status,
+                shipping_address_id = :shipping_address_id,
+                shipping_address = :shipping_address,
+                shipping_city = :shipping_city,
+                delivery_notes = :delivery_notes,
+                notes = :notes,
+                updated_at = NOW()
+                WHERE id = :id";
+                
+            $params = [
+                ':status' => $_POST['status'],
+                ':payment_status' => $_POST['payment_status'],
+                ':shipping_address_id' => $shippingAddressId,
+                ':shipping_address' => $snapshotAddress,
+                ':shipping_city' => $snapshotCity,
+                ':delivery_notes' => trim($_POST['delivery_notes'] ?? ''),
+                ':notes' => trim($_POST['notes'] ?? ''),
+                ':id' => $orderId
+            ];
+        } else {
+            // Solo actualizar campos sin FK (para órdenes legacy)
+            $query = "UPDATE orders SET 
+                status = :status,
+                payment_status = :payment_status,
+                shipping_address = :shipping_address,
+                shipping_city = :shipping_city,
+                delivery_notes = :delivery_notes,
+                notes = :notes,
+                updated_at = NOW()
+                WHERE id = :id";
+                
+            $params = [
+                ':status' => $_POST['status'],
+                ':payment_status' => $_POST['payment_status'],
+                ':shipping_address' => trim($_POST['shipping_address'] ?? ''),
+                ':shipping_city' => trim($_POST['shipping_city'] ?? ''),
+                ':delivery_notes' => trim($_POST['delivery_notes'] ?? ''),
+                ':notes' => trim($_POST['notes'] ?? ''),
+                ':id' => $orderId
+            ];
+        }
+        
         $stmt = $conn->prepare($query);
-        $result = $stmt->execute([
-            ':status' => $_POST['status'],
-            ':payment_status' => $_POST['payment_status'],
-            ':shipping_address' => trim($_POST['shipping_address']),
-            ':shipping_city' => trim($_POST['shipping_city']),
-            ':delivery_notes' => trim($_POST['delivery_notes'] ?? ''),
-            ':notes' => trim($_POST['notes'] ?? ''),
-            ':id' => $orderId
-        ]);
+        $result = $stmt->execute($params);
         
         // Limpiar variables de sesión MySQL
         $conn->exec("SET @current_user_id = NULL");
@@ -113,15 +182,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Obtener información de la orden para editar
 try {
+    // Query principal con dirección vinculada
     $query = "SELECT 
         o.*, 
         u.name AS user_name,
         u.email AS user_email,
         u.phone AS user_phone,
         u.identification_number,
-        u.identification_type
+        u.identification_type,
+        ua.id AS current_address_id,
+        ua.address AS current_address,
+        ua.complement AS current_complement,
+        ua.neighborhood AS current_neighborhood,
+        ua.gps_latitude AS current_gps_lat,
+        ua.gps_longitude AS current_gps_lng,
+        ua.gps_used AS current_gps_used,
+        ua.alias AS current_address_alias
     FROM orders o
     LEFT JOIN users u ON o.user_id = u.id
+    LEFT JOIN user_addresses ua ON o.shipping_address_id = ua.id
     WHERE o.id = ?";
     
     $stmt = $conn->prepare($query);
@@ -133,6 +212,29 @@ try {
         header("Location: " . BASE_URL . "/admin/orders.php");
         exit();
     }
+    
+    // Obtener TODAS las direcciones del usuario (para selector)
+    $addressesQuery = "SELECT 
+        id,
+        alias,
+        address,
+        complement,
+        neighborhood,
+        building_type,
+        building_name,
+        apartment_number,
+        gps_latitude,
+        gps_longitude,
+        gps_used,
+        is_default,
+        is_active
+    FROM user_addresses 
+    WHERE user_id = ? AND is_active = 1
+    ORDER BY is_default DESC, created_at DESC";
+    
+    $stmt = $conn->prepare($addressesQuery);
+    $stmt->execute([$order['user_id']]);
+    $userAddresses = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Obtener items de la orden
     $itemsQuery = "SELECT 
@@ -582,6 +684,140 @@ try {
                 padding: 1rem 2rem;
             }
         }
+
+        /* Estilos para selector de dirección */
+        .address-selector-section {
+            background: var(--primary-lightest);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border: 2px dashed var(--primary-color);
+        }
+
+        .address-preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .address-preview h4 {
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .address-preview .address-details p {
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .address-preview .address-details p i {
+            margin-top: 0.2rem;
+            color: var(--primary-color);
+            min-width: 16px;
+        }
+
+        .address-preview .address-details code {
+            background: var(--bg-dark);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .address-preview .btn-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            transition: var(--transition-fast);
+        }
+
+        .address-preview .btn-link:hover {
+            background: var(--primary-lightest);
+        }
+
+        .divider {
+            margin: 1.5rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .divider span {
+            background: var(--bg-light);
+            padding: 0 1rem;
+            position: relative;
+            z-index: 1;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .form-text {
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: var(--success-light);
+            color: var(--success-color);
+        }
+
+        .badge-info {
+            background: var(--info-light);
+            color: var(--info-color);
+        }
+
+        .alert {
+            margin-top: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .alert i {
+            margin-top: 0.15rem;
+        }
+
+        .alert-success {
+            background: var(--success-light);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .alert-warning {
+            background: var(--warning-light);
+            color: var(--warning-color);
+            border: 1px solid var(--warning-color);
+        }
     </style>
 </head>
 
@@ -757,16 +993,81 @@ try {
                             <h3>
                                 <i class="fas fa-map-marker-alt"></i>
                                 Dirección de Envío
+                                <?php if ($order['current_gps_lat'] && $order['current_gps_lng']): ?>
+                                    <span class="badge badge-success">
+                                        <i class="fas fa-map-marked-alt"></i> Con GPS
+                                    </span>
+                                <?php endif; ?>
                             </h3>
                         </div>
                         <div class="card-body">
+                            <?php if (!empty($userAddresses)): ?>
+                                <!-- Selector de dirección del usuario -->
+                                <div class="address-selector-section">
+                                    <div class="form-group full-width">
+                                        <label for="shipping_address_id">
+                                            <i class="fas fa-map-pin"></i>
+                                            Seleccionar Dirección del Usuario
+                                            <span class="badge badge-info">Recomendado</span>
+                                        </label>
+                                        <select id="shipping_address_id" name="shipping_address_id" class="form-control">
+                                            <option value="">-- Seleccionar dirección guardada --</option>
+                                            <?php foreach ($userAddresses as $addr): ?>
+                                                <option value="<?= $addr['id'] ?>" 
+                                                        <?= $addr['id'] == $order['shipping_address_id'] ? 'selected' : '' ?>
+                                                        data-address="<?= htmlspecialchars($addr['address']) ?>"
+                                                        data-complement="<?= htmlspecialchars($addr['complement'] ?? '') ?>"
+                                                        data-neighborhood="<?= htmlspecialchars($addr['neighborhood'] ?? '') ?>"
+                                                        data-building="<?= htmlspecialchars($addr['building_name'] ?? '') ?>"
+                                                        data-apt="<?= htmlspecialchars($addr['apartment_number'] ?? '') ?>"
+                                                        data-lat="<?= $addr['gps_latitude'] ?? '' ?>"
+                                                        data-lng="<?= $addr['gps_longitude'] ?? '' ?>"
+                                                        data-gps-used="<?= $addr['gps_used'] ?? 0 ?>">
+                                                    <?= htmlspecialchars($addr['alias'] ?? 'Dirección ' . $addr['id']) ?>
+                                                    <?php if ($addr['is_default']): ?>
+                                                        ⭐ (Por defecto)
+                                                    <?php endif; ?>
+                                                    <?php if (!empty($addr['gps_used']) && $addr['gps_used'] == 1): ?>
+                                                        📍 GPS
+                                                    <?php elseif ($addr['gps_latitude'] && $addr['gps_longitude']): ?>
+                                                        � Con Coords
+                                                    <?php else: ?>
+                                                        ⚠️ Sin GPS
+                                                    <?php endif; ?>
+                                                    - <?= htmlspecialchars(substr($addr['address'], 0, 50)) ?>...
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <small class="form-text">
+                                            💡 Selecciona una dirección guardada del usuario. 
+                                            <?php if ($order['shipping_address_id']): ?>
+                                                <strong>Actualmente vinculada: <?= htmlspecialchars($order['current_address_alias'] ?? 'Dirección #' . $order['shipping_address_id']) ?></strong>
+                                            <?php else: ?>
+                                                <strong style="color: var(--warning-color);">⚠️ Esta orden no tiene dirección vinculada (legacy)</strong>
+                                            <?php endif; ?>
+                                        </small>
+                                    </div>
+
+                                    <!-- Preview de dirección seleccionada -->
+                                    <div id="address-preview" class="address-preview" style="display: <?= $order['shipping_address_id'] ? 'block' : 'none' ?>;">
+                                        <h4><i class="fas fa-eye"></i> Vista previa de dirección seleccionada:</h4>
+                                        <div id="address-preview-content"></div>
+                                    </div>
+                                </div>
+
+                                <div class="divider">
+                                    <span>O editar manualmente (legacy)</span>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Campos manuales (legacy o fallback) -->
                             <div class="form-grid">
                                 <div class="form-group">
                                     <label for="shipping_city">
                                         <i class="fas fa-city"></i>
                                         Ciudad
                                     </label>
-                                    <select id="shipping_city" name="shipping_city" class="form-control" required>
+                                    <select id="shipping_city" name="shipping_city" class="form-control">
                                         <option value="">Seleccione una ciudad</option>
                                         <?php foreach ($cities as $city): ?>
                                             <option value="<?= htmlspecialchars($city) ?>" <?= $city === $order['shipping_city'] ? 'selected' : '' ?>>
@@ -774,14 +1075,21 @@ try {
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
+                                    <small class="form-text">⚠️ Solo editar si no seleccionaste dirección arriba</small>
                                 </div>
 
                                 <div class="form-group full-width">
                                     <label for="shipping_address">
                                         <i class="fas fa-home"></i>
-                                        Dirección Completa
+                                        Dirección Completa (Snapshot Histórico)
                                     </label>
-                                    <textarea id="shipping_address" name="shipping_address" class="form-control" rows="3" required><?= htmlspecialchars($order['shipping_address'] ?? '') ?></textarea>
+                                    <textarea id="shipping_address" name="shipping_address" class="form-control" rows="3"><?= htmlspecialchars($order['shipping_address'] ?? '') ?></textarea>
+                                    <small class="form-text">
+                                        📜 Este campo guarda el snapshot histórico. 
+                                        <?php if ($order['shipping_address_id']): ?>
+                                            Se actualizará automáticamente si cambias la dirección arriba.
+                                        <?php endif; ?>
+                                    </small>
                                 </div>
 
                                 <div class="form-group full-width">
@@ -829,22 +1137,105 @@ try {
             <?php unset($_SESSION['alert']); ?>
         <?php endif; ?>
 
+        // Manejo del selector de dirección
+        const addressSelector = document.getElementById('shipping_address_id');
+        const addressPreview = document.getElementById('address-preview');
+        const addressPreviewContent = document.getElementById('address-preview-content');
+        
+        if (addressSelector) {
+            // Mostrar preview inicial si hay dirección seleccionada
+            if (addressSelector.value) {
+                updateAddressPreview(addressSelector.options[addressSelector.selectedIndex]);
+            }
+            
+            // Evento al cambiar dirección
+            addressSelector.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                
+                if (this.value) {
+                    updateAddressPreview(selectedOption);
+                    addressPreview.style.display = 'block';
+                } else {
+                    addressPreview.style.display = 'none';
+                }
+            });
+        }
+        
+        function updateAddressPreview(option) {
+            if (!option || !option.value) return;
+            
+            const address = option.dataset.address || '';
+            const complement = option.dataset.complement || '';
+            const neighborhood = option.dataset.neighborhood || '';
+            const building = option.dataset.building || '';
+            const apt = option.dataset.apt || '';
+            const lat = option.dataset.lat || '';
+            const lng = option.dataset.lng || '';
+            const hasGPS = lat && lng;
+            
+            let html = '<div class="address-details">';
+            
+            html += `<p><strong><i class="fas fa-home"></i> Dirección:</strong> ${address}</p>`;
+            
+            if (complement) {
+                html += `<p><strong><i class="fas fa-info-circle"></i> Complemento:</strong> ${complement}</p>`;
+            }
+            
+            if (neighborhood) {
+                html += `<p><strong><i class="fas fa-map"></i> Barrio:</strong> ${neighborhood}</p>`;
+            }
+            
+            if (building) {
+                html += `<p><strong><i class="fas fa-building"></i> Edificio:</strong> ${building}</p>`;
+            }
+            
+            if (apt) {
+                html += `<p><strong><i class="fas fa-door-closed"></i> Apto/Local:</strong> ${apt}</p>`;
+            }
+            
+            if (hasGPS) {
+                html += `<p><strong><i class="fas fa-map-pin"></i> GPS:</strong> 
+                    <code>${parseFloat(lat).toFixed(8)}, ${parseFloat(lng).toFixed(8)}</code> 
+                    <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="btn-link">
+                        <i class="fas fa-external-link-alt"></i> Ver en Maps
+                    </a>
+                </p>`;
+                html += '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Esta dirección tiene coordenadas GPS para navegación</div>';
+            } else {
+                html += '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> ⚠️ Esta dirección NO tiene GPS. Los deliveries pueden tener problemas de navegación.</div>';
+            }
+            
+            html += '</div>';
+            
+            addressPreviewContent.innerHTML = html;
+        }
+
         // Validación del formulario
         document.querySelector('form').addEventListener('submit', function(e) {
-            const requiredFields = ['status', 'payment_status', 'shipping_address', 'shipping_city'];
+            const requiredFields = ['status', 'payment_status'];
             let isValid = true;
             let errorMessage = '';
 
             requiredFields.forEach(fieldName => {
                 const field = document.querySelector(`[name="${fieldName}"]`);
-                if (!field.value.trim()) {
+                if (!field || !field.value.trim()) {
                     isValid = false;
-                    field.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+                    if (field) field.style.borderColor = 'rgba(239, 68, 68, 0.5)';
                     errorMessage = 'Por favor completa todos los campos obligatorios';
                 } else {
                     field.style.borderColor = 'rgba(0, 119, 182, 0.15)';
                 }
             });
+            
+            // Validar que haya dirección (ya sea FK o manual)
+            const addressId = document.getElementById('shipping_address_id');
+            const manualAddress = document.getElementById('shipping_address');
+            
+            if ((!addressId || !addressId.value) && (!manualAddress || !manualAddress.value.trim())) {
+                isValid = false;
+                errorMessage = 'Debes seleccionar una dirección o ingresar una manualmente';
+                if (manualAddress) manualAddress.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+            }
 
             if (!isValid) {
                 e.preventDefault();
@@ -867,13 +1258,16 @@ try {
             });
         });
 
-        document.querySelector('.btn-secondary').addEventListener('click', function(e) {
-            if (formChanged) {
-                if (!confirm('¿Estás seguro de que deseas cancelar? Los cambios no guardados se perderán.')) {
-                    e.preventDefault();
+        const cancelBtn = document.querySelector('.btn-secondary');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function(e) {
+                if (formChanged) {
+                    if (!confirm('¿Estás seguro de que deseas cancelar? Los cambios no guardados se perderán.')) {
+                        e.preventDefault();
+                    }
                 }
-            }
-        });
+            });
+        }
     </script>
 </body>
 </html>

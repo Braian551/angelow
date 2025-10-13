@@ -81,8 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
             $orderStmt = $conn->prepare("
                 INSERT INTO orders (
                     order_number, user_id, status, subtotal, total, 
-                    payment_method, payment_status, shipping_address, shipping_city, delivery_notes, created_at, updated_at
-                ) VALUES (?, ?, 'pending', ?, ?, ?, 'pending', ?, ?, ?, NOW(), NOW())
+                    payment_method, payment_status, shipping_address_id, shipping_address, shipping_city, delivery_notes, created_at, updated_at
+                ) VALUES (?, ?, 'pending', ?, ?, ?, 'pending', ?, ?, ?, ?, NOW(), NOW())
             ");
             $orderStmt->execute([
                 $orderNumber,
@@ -90,6 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
                 $subtotal,
                 $total,
                 $paymentMethod,
+                $_POST['shipping_address_id'] ?? null, // ID de la dirección seleccionada
                 $_POST['shipping_address'] ?? null,
                 $_POST['shipping_city'] ?? null,
                 $_POST['delivery_notes'] ?? null

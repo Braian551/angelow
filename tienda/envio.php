@@ -55,7 +55,7 @@ try {
         LEFT JOIN sizes s ON psv.size_id = s.id
         LEFT JOIN variant_images vi ON pcv.id = vi.color_variant_id AND vi.is_primary = 1
         WHERE ci.cart_id = :cart_id
-        GROUP BY ci.id
+        ORDER BY ci.created_at DESC
     ";
 
     $stmt = $conn->prepare($itemsQuery);

@@ -71,6 +71,10 @@ function saveAddress($conn, $data, $user_id) {
         }
 
         // Preparar datos
+        $gpsLat = !empty($data['gps_latitude']) ? floatval($data['gps_latitude']) : null;
+        $gpsLng = !empty($data['gps_longitude']) ? floatval($data['gps_longitude']) : null;
+        $hasGPS = ($gpsLat !== null && $gpsLng !== null);
+        
         $params = [
             'address_type' => $data['address_type'],
             'alias' => $data['alias'],
@@ -86,10 +90,11 @@ function saveAddress($conn, $data, $user_id) {
             'is_default' => !empty($data['is_default']) ? 1 : 0,
             'user_id' => $user_id,
             // Coordenadas GPS (opcionales)
-            'gps_latitude' => !empty($data['gps_latitude']) ? floatval($data['gps_latitude']) : null,
-            'gps_longitude' => !empty($data['gps_longitude']) ? floatval($data['gps_longitude']) : null,
+            'gps_latitude' => $gpsLat,
+            'gps_longitude' => $gpsLng,
             'gps_accuracy' => !empty($data['gps_accuracy']) ? floatval($data['gps_accuracy']) : null,
-            'gps_timestamp' => !empty($data['gps_latitude']) && !empty($data['gps_longitude']) ? date('Y-m-d H:i:s') : null
+            'gps_timestamp' => $hasGPS ? date('Y-m-d H:i:s') : null,
+            'gps_used' => $hasGPS ? 1 : 0  // Indicador de uso de GPS
         ];
 
         $conn->beginTransaction();
@@ -122,6 +127,7 @@ function saveAddress($conn, $data, $user_id) {
                 gps_longitude = :gps_longitude,
                 gps_accuracy = :gps_accuracy,
                 gps_timestamp = :gps_timestamp,
+                gps_used = :gps_used,
                 updated_at = NOW()
                 WHERE id = :id AND user_id = :user_id
             ");
@@ -142,13 +148,13 @@ function saveAddress($conn, $data, $user_id) {
                 (user_id, address_type, alias, recipient_name, recipient_phone, 
                  address, complement, neighborhood, building_type, building_name,
                  apartment_number, delivery_instructions, is_default, 
-                 gps_latitude, gps_longitude, gps_accuracy, gps_timestamp,
+                 gps_latitude, gps_longitude, gps_accuracy, gps_timestamp, gps_used,
                  created_at, updated_at) 
                 VALUES 
                 (:user_id, :address_type, :alias, :recipient_name, :recipient_phone, 
                  :address, :complement, :neighborhood, :building_type, :building_name,
                  :apartment_number, :delivery_instructions, :is_default,
-                 :gps_latitude, :gps_longitude, :gps_accuracy, :gps_timestamp,
+                 :gps_latitude, :gps_longitude, :gps_accuracy, :gps_timestamp, :gps_used,
                  NOW(), NOW())
             ");
             

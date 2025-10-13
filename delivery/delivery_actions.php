@@ -63,7 +63,7 @@ try {
             
             // Verificar que la orden existe y está disponible
             $stmt = $conn->prepare("
-                SELECT o.id, o.order_number, o.status, o.payment_status
+                SELECT o.id, o.order_number, o.status, o.payment_status, o.user_id
                 FROM orders o
                 WHERE o.id = ?
                 AND o.status = 'shipped'
@@ -87,13 +87,31 @@ try {
                 throw new Exception('Esta orden ya está asignada');
             }
             
-            // Crear nueva entrega directamente aceptada
+            // Obtener coordenadas de destino desde user_addresses
+            $stmt = $conn->prepare("
+                SELECT gps_latitude, gps_longitude 
+                FROM user_addresses 
+                WHERE user_id = ? AND is_default = 1 AND gps_latitude IS NOT NULL AND gps_longitude IS NOT NULL
+                LIMIT 1
+            ");
+            $stmt->execute([$order['user_id']]);
+            $address = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            $destLat = null;
+            $destLng = null;
+            
+            if ($address && $address['gps_latitude'] && $address['gps_longitude']) {
+                $destLat = floatval($address['gps_latitude']);
+                $destLng = floatval($address['gps_longitude']);
+            }
+            
+            // Crear nueva entrega directamente aceptada con coordenadas de destino
             $stmt = $conn->prepare("
                 INSERT INTO order_deliveries 
-                (order_id, driver_id, delivery_status, assigned_at, accepted_at, created_at, updated_at) 
-                VALUES (?, ?, 'driver_accepted', NOW(), NOW(), NOW(), NOW())
+                (order_id, driver_id, delivery_status, assigned_at, accepted_at, destination_lat, destination_lng, created_at, updated_at) 
+                VALUES (?, ?, 'driver_accepted', NOW(), NOW(), ?, ?, NOW(), NOW())
             ");
-            $stmt->execute([$orderId, $driverId]);
+            $stmt->execute([$orderId, $driverId, $destLat, $destLng]);
             $deliveryId = $conn->lastInsertId();
             
             $conn->commit();
@@ -114,9 +132,9 @@ try {
             
             $deliveryId = (int)$data['delivery_id'];
             
-            // Verificar que la entrega existe
+            // Verificar que la entrega existe y obtener user_id
             $stmt = $conn->prepare("
-                SELECT od.id, od.driver_id, od.delivery_status, o.order_number
+                SELECT od.id, od.driver_id, od.delivery_status, o.order_number, o.user_id
                 FROM order_deliveries od
                 INNER JOIN orders o ON od.order_id = o.id
                 WHERE od.id = ?
@@ -137,16 +155,36 @@ try {
                 throw new Exception('Esta orden no puede ser aceptada. Estado: ' . $delivery['delivery_status']);
             }
             
-            // Aceptar orden
+            // Obtener coordenadas de destino desde user_addresses
+            $stmt = $conn->prepare("
+                SELECT gps_latitude, gps_longitude 
+                FROM user_addresses 
+                WHERE user_id = ? AND is_default = 1 AND gps_latitude IS NOT NULL AND gps_longitude IS NOT NULL
+                LIMIT 1
+            ");
+            $stmt->execute([$delivery['user_id']]);
+            $address = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            $destLat = null;
+            $destLng = null;
+            
+            if ($address && $address['gps_latitude'] && $address['gps_longitude']) {
+                $destLat = floatval($address['gps_latitude']);
+                $destLng = floatval($address['gps_longitude']);
+            }
+            
+            // Aceptar orden con coordenadas de destino
             $stmt = $conn->prepare("
                 UPDATE order_deliveries 
                 SET delivery_status = 'driver_accepted',
                     driver_id = ?,
                     accepted_at = NOW(),
+                    destination_lat = ?,
+                    destination_lng = ?,
                     updated_at = NOW()
                 WHERE id = ?
             ");
-            $stmt->execute([$driverId, $deliveryId]);
+            $stmt->execute([$driverId, $destLat, $destLng, $deliveryId]);
             
             $conn->commit();
             
@@ -167,9 +205,15 @@ try {
             $lat = isset($data['latitude']) ? floatval($data['latitude']) : null;
             $lng = isset($data['longitude']) ? floatval($data['longitude']) : null;
             
-            // Verificar entrega
+            // Verificar entrega y obtener información del usuario
             $stmt = $conn->prepare("
-                SELECT od.id, od.driver_id, od.delivery_status, o.order_number
+                SELECT 
+                    od.id, 
+                    od.driver_id, 
+                    od.delivery_status, 
+                    o.order_number,
+                    o.user_id,
+                    o.shipping_address
                 FROM order_deliveries od
                 INNER JOIN orders o ON od.order_id = o.id
                 WHERE od.id = ? AND od.driver_id = ?
@@ -185,17 +229,37 @@ try {
                 throw new Exception('Debes aceptar la orden primero');
             }
             
-            // Iniciar recorrido
+            // Obtener coordenadas de destino desde user_addresses (dirección por defecto)
+            $stmt = $conn->prepare("
+                SELECT gps_latitude, gps_longitude 
+                FROM user_addresses 
+                WHERE user_id = ? AND is_default = 1 AND gps_latitude IS NOT NULL AND gps_longitude IS NOT NULL
+                LIMIT 1
+            ");
+            $stmt->execute([$delivery['user_id']]);
+            $address = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            $destLat = null;
+            $destLng = null;
+            
+            if ($address && $address['gps_latitude'] && $address['gps_longitude']) {
+                $destLat = floatval($address['gps_latitude']);
+                $destLng = floatval($address['gps_longitude']);
+            }
+            
+            // Iniciar recorrido con coordenadas de destino
             $stmt = $conn->prepare("
                 UPDATE order_deliveries 
                 SET delivery_status = 'in_transit',
                     started_at = NOW(),
                     current_lat = ?,
                     current_lng = ?,
+                    destination_lat = ?,
+                    destination_lng = ?,
                     updated_at = NOW()
                 WHERE id = ? AND driver_id = ?
             ");
-            $stmt->execute([$lat, $lng, $deliveryId, $driverId]);
+            $stmt->execute([$lat, $lng, $destLat, $destLng, $deliveryId, $driverId]);
             
             $conn->commit();
             
@@ -203,7 +267,11 @@ try {
                 'success' => true,
                 'message' => 'Recorrido iniciado para orden #' . $delivery['order_number'],
                 'delivery_status' => 'in_transit',
-                'delivery_id' => $deliveryId
+                'delivery_id' => $deliveryId,
+                'destination' => [
+                    'lat' => $destLat,
+                    'lng' => $destLng
+                ]
             ];
             break;
 

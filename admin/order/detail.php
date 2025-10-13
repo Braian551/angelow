@@ -38,16 +38,31 @@ $orderId = intval($_GET['id']);
 
 // Obtener información de la orden
 try {
-    // Consulta para obtener los detalles principales de la orden
+    // Consulta para obtener los detalles principales de la orden con dirección relacionada
     $orderQuery = "SELECT 
         o.*, 
         u.name AS user_name,
         u.email AS user_email,
         u.phone AS user_phone,
         u.identification_number,
-        u.identification_type
+        u.identification_type,
+        ua.id AS address_id,
+        ua.address AS address_current,
+        ua.complement AS address_complement,
+        ua.neighborhood AS address_neighborhood,
+        ua.building_type,
+        ua.building_name,
+        ua.apartment_number,
+        ua.recipient_name AS address_recipient_name,
+        ua.recipient_phone AS address_recipient_phone,
+        ua.delivery_instructions AS address_delivery_instructions,
+        ua.gps_latitude,
+        ua.gps_longitude,
+        ua.gps_used,
+        ua.alias AS address_alias
     FROM orders o
     LEFT JOIN users u ON o.user_id = u.id
+    LEFT JOIN user_addresses ua ON o.shipping_address_id = ua.id
     WHERE o.id = ?";
     
     $stmt = $conn->prepare($orderQuery);
@@ -291,6 +306,7 @@ function translateValue($value, $field = '') {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/orders/detail.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/orders/detail-address-gps.css">
   
 </head>
 
@@ -390,20 +406,140 @@ function translateValue($value, $field = '') {
                     <!-- Dirección de envío -->
                     <div class="order-address-card">
                         <div class="card-header">
-                            <h3>Dirección de Envío</h3>
+                            <h3>
+                                <i class="fas fa-map-marker-alt"></i> Dirección de Envío
+                                <?php if (!empty($order['gps_used']) && $order['gps_used'] == 1): ?>
+                                    <span class="badge badge-success" title="Dirección seleccionada con GPS (ubicación, búsqueda o pin)">
+                                        <i class="fas fa-map-marked-alt"></i> GPS Usado
+                                    </span>
+                                <?php elseif ($order['gps_latitude'] && $order['gps_longitude']): ?>
+                                    <span class="badge badge-warning" title="Tiene coordenadas pero no se marcó como GPS usado">
+                                        <i class="fas fa-map-pin"></i> Con Coordenadas
+                                    </span>
+                                <?php else: ?>
+                                    <span class="badge badge-secondary" title="Dirección ingresada manualmente sin GPS">
+                                        <i class="fas fa-keyboard"></i> Manual
+                                    </span>
+                                <?php endif; ?>
+                            </h3>
                         </div>
                         <div class="card-body">
-                            <?php if ($order['shipping_address']): ?>
-                                <p><strong>Dirección:</strong> <?= nl2br(htmlspecialchars($order['shipping_address'])) ?></p>
-                                <?php if ($order['shipping_city']): ?>
-                                    <p><strong>Ciudad:</strong> <?= htmlspecialchars($order['shipping_city']) ?></p>
-                                <?php endif; ?>
-                                <?php if ($order['delivery_notes']): ?>
-                                    <div class="delivery-notes">
-                                        <h4>Notas de Entrega:</h4>
-                                        <p><?= nl2br(htmlspecialchars($order['delivery_notes'])) ?></p>
+                            <?php if ($order['shipping_address_id'] && $order['address_current']): ?>
+                                <!-- Dirección actual vinculada -->
+                                <div class="address-section">
+                                    <div class="address-header">
+                                        <h4>
+                                            📍 <?= htmlspecialchars($order['address_alias'] ?? 'Dirección') ?>
+                                            <small class="text-muted">(Dirección Actual)</small>
+                                        </h4>
+                                    </div>
+                                    
+                                    <div class="address-details">
+                                        <p><strong><i class="fas fa-home"></i> Dirección:</strong> <?= htmlspecialchars($order['address_current']) ?></p>
+                                        
+                                        <?php if ($order['address_complement']): ?>
+                                            <p><strong><i class="fas fa-info-circle"></i> Complemento:</strong> <?= htmlspecialchars($order['address_complement']) ?></p>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($order['address_neighborhood']): ?>
+                                            <p><strong><i class="fas fa-map"></i> Barrio:</strong> <?= htmlspecialchars($order['address_neighborhood']) ?></p>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($order['shipping_city']): ?>
+                                            <p><strong><i class="fas fa-city"></i> Ciudad:</strong> <?= htmlspecialchars($order['shipping_city']) ?></p>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($order['building_type']): ?>
+                                            <p><strong><i class="fas fa-building"></i> Tipo:</strong> <?= ucfirst($order['building_type']) ?></p>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($order['building_name']): ?>
+                                            <p><strong><i class="fas fa-building"></i> Edificio:</strong> <?= htmlspecialchars($order['building_name']) ?></p>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($order['apartment_number']): ?>
+                                            <p><strong><i class="fas fa-door-closed"></i> Apto/Local:</strong> <?= htmlspecialchars($order['apartment_number']) ?></p>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($order['address_recipient_name']): ?>
+                                            <p><strong><i class="fas fa-user"></i> Recibe:</strong> <?= htmlspecialchars($order['address_recipient_name']) ?></p>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($order['address_recipient_phone']): ?>
+                                            <p><strong><i class="fas fa-phone"></i> Teléfono:</strong> 
+                                                <a href="tel:<?= htmlspecialchars($order['address_recipient_phone']) ?>">
+                                                    <?= htmlspecialchars($order['address_recipient_phone']) ?>
+                                                </a>
+                                            </p>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($order['gps_latitude'] && $order['gps_longitude']): ?>
+                                            <p><strong><i class="fas fa-map-pin"></i> Coordenadas GPS:</strong> 
+                                                <code><?= number_format($order['gps_latitude'], 8) ?>, <?= number_format($order['gps_longitude'], 8) ?></code>
+                                                <a href="https://www.google.com/maps?q=<?= $order['gps_latitude'] ?>,<?= $order['gps_longitude'] ?>" 
+                                                   target="_blank" 
+                                                   class="btn-link">
+                                                    <i class="fas fa-external-link-alt"></i> Ver en Google Maps
+                                                </a>
+                                            </p>
+                                        <?php endif; ?>
+                                    </div>
+                                    
+                                    <?php if ($order['address_delivery_instructions'] || $order['delivery_notes']): ?>
+                                        <div class="delivery-notes">
+                                            <h4><i class="fas fa-sticky-note"></i> Instrucciones de Entrega:</h4>
+                                            <?php if ($order['address_delivery_instructions']): ?>
+                                                <p><?= nl2br(htmlspecialchars($order['address_delivery_instructions'])) ?></p>
+                                            <?php endif; ?>
+                                            <?php if ($order['delivery_notes']): ?>
+                                                <p><?= nl2br(htmlspecialchars($order['delivery_notes'])) ?></p>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <?php if ($order['shipping_address'] && $order['shipping_address'] !== $order['address_current']): ?>
+                                    <!-- Dirección histórica (snapshot) -->
+                                    <div class="address-section address-historical">
+                                        <div class="address-header">
+                                            <h4>
+                                                📜 Dirección al momento del pedido 
+                                                <small class="text-muted">(Histórico)</small>
+                                            </h4>
+                                        </div>
+                                        <div class="address-details">
+                                            <p><?= nl2br(htmlspecialchars($order['shipping_address'])) ?></p>
+                                            <?php if ($order['shipping_city']): ?>
+                                                <p><strong>Ciudad:</strong> <?= htmlspecialchars($order['shipping_city']) ?></p>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i>
+                                            Esta dirección fue guardada al momento de realizar el pedido. 
+                                            La dirección actual puede haber cambiado desde entonces.
+                                        </div>
                                     </div>
                                 <?php endif; ?>
+                                
+                            <?php elseif ($order['shipping_address']): ?>
+                                <!-- Solo dirección legacy (sin FK) -->
+                                <div class="address-section">
+                                    <p><strong>Dirección:</strong> <?= nl2br(htmlspecialchars($order['shipping_address'])) ?></p>
+                                    <?php if ($order['shipping_city']): ?>
+                                        <p><strong>Ciudad:</strong> <?= htmlspecialchars($order['shipping_city']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($order['delivery_notes']): ?>
+                                        <div class="delivery-notes">
+                                            <h4>Notas de Entrega:</h4>
+                                            <p><?= nl2br(htmlspecialchars($order['delivery_notes'])) ?></p>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Esta orden no está vinculada a una dirección con GPS. 
+                                    Las entregas podrían tener problemas de navegación.
+                                </div>
                             <?php else: ?>
                                 <p class="text-muted">No se ha proporcionado dirección de envío</p>
                             <?php endif; ?>

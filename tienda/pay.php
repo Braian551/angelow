@@ -113,7 +113,7 @@ try {
         LEFT JOIN sizes s ON psv.size_id = s.id
         LEFT JOIN variant_images vi ON pcv.id = vi.color_variant_id AND vi.is_primary = 1
         WHERE ci.cart_id = :cart_id
-        GROUP BY ci.id
+        ORDER BY ci.created_at DESC
     ";
 
     $stmt = $conn->prepare($itemsQuery);
@@ -201,8 +201,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 INSERT INTO orders (
                     order_number, user_id, status, subtotal, shipping_cost, 
                     total, payment_method, payment_status,
-                    shipping_address, shipping_city
-                ) VALUES (?, ?, 'pending', ?, ?, ?, 'transfer', 'pending', ?, ?)
+                    shipping_address_id, shipping_address, shipping_city
+                ) VALUES (?, ?, 'pending', ?, ?, ?, 'transfer', 'pending', ?, ?, ?)
             ";
             
             $shipping_address = $selectedAddress['address'] . ', ' . $selectedAddress['neighborhood'];
@@ -217,6 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $checkout_data['subtotal'],
                 $checkout_data['shipping_cost'],
                 $checkout_data['total'],
+                $selectedAddress['id'], // Guardar el ID de la dirección seleccionada
                 $shipping_address,
                 'Medellín' // Asumiendo que todas las direcciones son en Medellín
             ]);

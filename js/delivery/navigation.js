@@ -81,6 +81,33 @@
     });
 
     // =========================================================
+    // INICIALIZAR EVENTOS
+    // =========================================================
+    function initializeEvents() {
+        console.log('📱 Inicializando eventos...');
+        
+        // Event listener para cerrar menú al hacer clic en overlay
+        const menuOverlay = document.getElementById('menu-overlay');
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', toggleMenu);
+        }
+        
+        // Prevenir zoom con gestos en móviles
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        
+        // Mantener pantalla activa durante navegación
+        if ('wakeLock' in navigator) {
+            navigator.wakeLock.request('screen').catch(err => {
+                console.warn('Wake Lock no disponible:', err);
+            });
+        }
+        
+        console.log('✅ Eventos inicializados');
+    }
+
+    // =========================================================
     // CARGA DE DATOS DEL DELIVERY
     // =========================================================
     function loadDeliveryData() {
@@ -97,7 +124,26 @@
                 lng: state.deliveryData.destination.lng
             };
             
+            // Validar coordenadas de destino
+            if (!state.destination.lat || !state.destination.lng || 
+                state.destination.lat === 0 || state.destination.lng === 0) {
+                console.error('❌ Coordenadas de destino no válidas:', state.destination);
+                showNotification('Error: La dirección de entrega no tiene coordenadas GPS. Contacta al administrador.', 'error');
+                
+                // Deshabilitar navegación
+                const btnAction = document.getElementById('btn-action-main');
+                if (btnAction) {
+                    btnAction.disabled = true;
+                    btnAction.style.opacity = '0.5';
+                    btnAction.style.cursor = 'not-allowed';
+                }
+                
+                updateStatus('Error: Sin coordenadas GPS');
+                return;
+            }
+            
             console.log('📦 Datos del delivery cargados:', state.deliveryData);
+            console.log('📍 Destino:', state.destination);
         } catch (e) {
             console.error('Error al parsear datos del delivery:', e);
             showNotification('Error al cargar información del pedido', 'error');
@@ -247,12 +293,23 @@
     // =========================================================
     async function calculateRoute(start, end) {
         try {
+            // Validar coordenadas antes de calcular
+            if (!start || !start.lat || !start.lng || start.lat === 0 || start.lng === 0) {
+                throw new Error('Coordenadas de inicio no válidas');
+            }
+            
+            if (!end || !end.lat || !end.lng || end.lat === 0 || end.lng === 0) {
+                throw new Error('Coordenadas de destino no válidas');
+            }
+            
             updateStatus('Calculando ruta...');
             showNotification('Calculando mejor ruta...', 'info');
 
             const url = `${CONFIG.BASE_URL}/delivery/api/navigation_api.php?action=get_route` +
                         `&start_lat=${start.lat}&start_lng=${start.lng}` +
                         `&end_lat=${end.lat}&end_lng=${end.lng}`;
+            
+            console.log('📍 Calculando ruta:', url);
 
             const response = await fetch(url);
             const data = await response.json();

@@ -1,0 +1,215 @@
+/* ===== ESTILOS ADICIONALES PARA DIRECCIONES CON GPS ===== */
+
+/* Secciones de dirección mejoradas */
+.address-section {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    transition: var(--transition);
+}
+
+.address-section:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
+}
+
+.address-section.address-historical {
+    background: var(--bg-hover);
+    border-left: 4px solid var(--warning-color);
+}
+
+.address-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.address-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.address-header small {
+    font-size: 0.85rem;
+    font-weight: normal;
+}
+
+.address-details {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.address-details p {
+    margin: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.6;
+}
+
+.address-details p i {
+    margin-top: 0.2rem;
+    color: var(--primary-color);
+    min-width: 16px;
+}
+
+.address-details p strong {
+    min-width: 120px;
+    color: var(--text-medium);
+}
+
+.address-details code {
+    background: var(--bg-dark);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    font-family: 'Courier New', monospace;
+}
+
+.address-details .btn-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    transition: var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.address-details .btn-link:hover {
+    background: var(--primary-lightest);
+    color: var(--primary-hover);
+}
+
+.address-details a[href^="tel:"] {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+.address-details a[href^="tel:"]:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* Badge GPS */
+.card-header .badge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: 0.5rem;
+}
+
+.badge-success {
+    background: var(--success-light);
+    color: var(--success-color);
+}
+
+.badge i {
+    font-size: 0.85em;
+}
+
+/* Notas de entrega mejoradas */
+.delivery-notes {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    background: var(--primary-lightest);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 8px;
+}
+
+.delivery-notes h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.delivery-notes p {
+    margin: 0;
+    color: var(--text-medium);
+    line-height: 1.6;
+}
+
+/* Alertas informativas */
+.alert {
+    margin-top: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.alert i {
+    margin-top: 0.15rem;
+    font-size: 1.1rem;
+}
+
+.alert-info {
+    background: var(--info-light);
+    color: var(--info-color);
+    border: 1px solid var(--info-color);
+}
+
+.alert-warning {
+    background: var(--warning-light);
+    color: var(--warning-color);
+    border: 1px solid var(--warning-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .address-section {
+        padding: 1rem;
+    }
+    
+    .address-details p {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .address-details p strong {
+        min-width: auto;
+    }
+    
+    .card-header .badge {
+        display: block;
+        margin-top: 0.5rem;
+        margin-left: 0;
+        width: fit-content;
+    }
+}
+
+@media (max-width: 576px) {
+    .address-header h4 {
+        font-size: 1rem;
+    }
+    
+    .delivery-notes {
+        padding: 0.75rem;
+    }
+    
+    .alert {
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+    }
+}
