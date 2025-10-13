@@ -39,6 +39,7 @@
         isNavigating: false,
         isPanelExpanded: false,
         isVoiceEnabled: true,
+        voiceHelper: null, // Instancia de VoiceHelper
         watchId: null,
         updateInterval: null,
         routeCheckInterval: null,
@@ -85,6 +86,15 @@
     // =========================================================
     document.addEventListener('DOMContentLoaded', function() {
         console.log(' Iniciando sistema de navegacin...');
+        
+        // Inicializar Voice Helper
+        if (typeof VoiceHelper !== 'undefined') {
+            state.voiceHelper = new VoiceHelper();
+            const engineInfo = state.voiceHelper.getEngineInfo();
+            console.log(`🎙️ Motor de voz: ${engineInfo.name}`);
+        } else {
+            console.warn('⚠️ VoiceHelper no disponible');
+        }
         
         // Cargar datos del delivery
         loadDeliveryData();
@@ -1129,124 +1139,68 @@
         } else {
             console.warn('⚠️ No se encontró ninguna voz en español. Total de voces:', voices.length);
         }
-        
-        return selectedVoice;
     }
     
+    // Inicializar voces cuando estén disponibles
+    if (window.speechSynthesis) {
+        if (window.speechSynthesis.getVoices().length > 0) {
+            selectBestSpanishVoice();
+        }
+        
+        // Las voces pueden cargarse de forma asíncrona
+        window.speechSynthesis.onvoiceschanged = selectBestSpanishVoice;
+    }
+        
+    // =========================================================
+    // SÍNTESIS DE VOZ - Usa VoiceHelper
+    // =========================================================
     function speak(text) {
         if (!state.isVoiceEnabled) {
+            console.log('� Voz desactivada por usuario');
             return;
         }
         
-        // Estrategia 1: Intentar con ResponsiveVoice (mejor calidad)
-        if (typeof responsiveVoice !== 'undefined') {
-            responsiveVoice.cancel();
-            responsiveVoice.speak(text, "Spanish Latin American Female", {
-                rate: 0.95,
-                pitch: 1.0,
-                volume: 1.0,
-                onstart: function() {
-                    console.log('🔊 ResponsiveVoice reproduciendo:', text);
-                },
-                onerror: function(e) {
-                    console.error('❌ Error en ResponsiveVoice:', e);
-                    // Fallback a Web Speech API
-                    speakWithWebSpeech(text);
-                }
+        if (state.voiceHelper) {
+            state.voiceHelper.speak(text).catch(err => {
+                console.error('Error al hablar:', err);
             });
-            return;
-        }
-        
-        // Estrategia 2: Fallback a Web Speech API
-        speakWithWebSpeech(text);
-    }
-    
-    function speakWithWebSpeech(text) {
-        if (!('speechSynthesis' in window)) {
-            console.warn('⚠️ Web Speech API no disponible');
-            return;
-        }
-        
-        // Cancelar cualquier voz anterior
-        window.speechSynthesis.cancel();
-        
-        // Si no hay voz seleccionada, intentar seleccionar una
-        if (!bestSpanishVoice) {
-            selectBestSpanishVoice();
-        }
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        
-        // Configuración optimizada para español
-        utterance.rate = 0.95;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-        
-        // Usar la mejor voz encontrada
-        if (bestSpanishVoice) {
-            utterance.voice = bestSpanishVoice;
-            utterance.lang = bestSpanishVoice.lang;
-            console.log('🔊 Web Speech hablando con:', bestSpanishVoice.name);
         } else {
-            // Fallback: probar diferentes configuraciones regionales
-            utterance.lang = 'es-MX'; // Español de México (mejor soporte)
-            console.warn('⚠️ Usando es-MX sin voz específica');
-            
-            // Ajustar parámetros para mejorar pronunciación
-            utterance.rate = 0.85; // Más lento para mejor claridad
+            console.warn('⚠️ VoiceHelper no inicializado');
         }
-        
-        utterance.onerror = (event) => {
-            console.error('❌ Error en Web Speech:', event.error);
-            
-            // Si falla, intentar con otra configuración regional
-            if (event.error === 'voice-unavailable' || event.error === 'language-unavailable') {
-                bestSpanishVoice = null;
-                
-                // Intentar con es-ES como último recurso
-                const fallbackUtterance = new SpeechSynthesisUtterance(text);
-                fallbackUtterance.lang = 'es-ES';
-                fallbackUtterance.rate = 0.85;
-                fallbackUtterance.pitch = 1.0;
-                fallbackUtterance.volume = 1.0;
-                
-                console.log('🔄 Reintentando con es-ES...');
-                window.speechSynthesis.speak(fallbackUtterance);
-            }
-        };
-        
-        utterance.onstart = () => {
-            console.log('🗣️ Reproduciendo:', text);
-        };
-        
-        window.speechSynthesis.speak(utterance);
     }
     
-    // Cargar y seleccionar voces cuando estén disponibles
-    if ('speechSynthesis' in window) {
-        // Las voces pueden no estar disponibles inmediatamente
-        window.speechSynthesis.onvoiceschanged = function() {
-            selectBestSpanishVoice();
-            
-            // Mostrar todas las voces en español disponibles
-            const voices = window.speechSynthesis.getVoices();
-            const spanishVoices = voices.filter(v => v.lang.startsWith('es'));
-            
-            if (spanishVoices.length > 0) {
-                console.log('📢 Voces en español disponibles:', 
-                    spanishVoices.map(v => `${v.name} (${v.lang})${v.localService ? ' [Local]' : ' [Online]'}`).join(', ')
-                );
-            }
-        };
+    // Función de compatibilidad para código antiguo
+    window.speak = speak;
+
+    // =========================================================
+    // DETENER NAVEGACIN
+    // =========================================================
+    function stopNavigation() {
+        state.isNavigating = false;
         
-        // Intentar cargar voces inmediatamente
-        setTimeout(selectBestSpanishVoice, 100);
+        if (state.updateInterval) {
+            clearInterval(state.updateInterval);
+            state.updateInterval = null;
+        }
+        
+        if (state.routeCheckInterval) {
+            clearInterval(state.routeCheckInterval);
+            state.routeCheckInterval = null;
+        }
+        
+        if (state.watchId) {
+            navigator.geolocation.clearWatch(state.watchId);
+            state.watchId = null;
+        }
+        
+        console.log(' Navegacin detenida');
     }
 
     // =========================================================
     // NOTIFICACIONES
     // =========================================================
-    function showNotification(message, type = 'info') {
+    function showNotification(message, type) {
+        type = type || 'info';
         const container = document.getElementById('notification-container');
         if (!container) return;
 

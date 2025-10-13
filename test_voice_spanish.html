@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Voz en Español - VoiceRSS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status.show {
+            display: block;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .logs {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .log-line {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+        
+        .log-success { color: #4ec9b0; }
+        .log-error { color: #f48771; }
+        .log-warning { color: #dcdcaa; }
+        .log-info { color: #569cd6; }
+        
+        .quick-tests {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .quick-tests button {
+            padding: 10px;
+            font-size: 14px;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .voice-samples {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .voice-sample {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .voice-sample .info {
+            flex: 1;
+        }
+        
+        .voice-sample .name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .voice-sample .details {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .voice-sample button {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 13px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Prueba de Voz en Español</h1>
+        <p class="subtitle">Sistema de Text-to-Speech con VoiceRSS API</p>
+        
+        <div class="test-section">
+            <label>Texto a reproducir:</label>
+            <textarea id="textInput" placeholder="Escribe aquí el texto que quieres escuchar...">Navegación iniciada. Sigue la ruta marcada hacia tu destino.</textarea>
+            
+            <label>Idioma / Acento:</label>
+            <select id="langSelect">
+                <option value="es-mx">Español (México) 🇲🇽</option>
+                <option value="es-es">Español (España) 🇪🇸</option>
+                <option value="es-us">Español (USA) 🇺🇸</option>
+            </select>
+            
+            <label>Voz:</label>
+            <select id="voiceSelect">
+                <option value="Rosa">Rosa (Femenino) 👩</option>
+                <option value="Diego">Diego (Masculino) 👨</option>
+            </select>
+            
+            <label>Velocidad:</label>
+            <select id="rateSelect">
+                <option value="-5">Muy Lento</option>
+                <option value="-2">Lento</option>
+                <option value="0" selected>Normal</option>
+                <option value="2">Rápido</option>
+                <option value="5">Muy Rápido</option>
+            </select>
+            
+            <button id="speakBtn" onclick="testVoice()">
+                🔊 Reproducir Audio
+            </button>
+            
+            <button class="btn-secondary" onclick="testProxy()">
+                🔧 Probar Proxy PHP
+            </button>
+        </div>
+        
+        <div class="test-section">
+            <label>🎯 Pruebas Rápidas de Navegación:</label>
+            <div class="quick-tests">
+                <button onclick="quickTest('Navegación iniciada')">Inicio</button>
+                <button onclick="quickTest('Gira a la derecha')">Derecha</button>
+                <button onclick="quickTest('Gira a la izquierda')">Izquierda</button>
+                <button onclick="quickTest('Continúa recto')">Recto</button>
+                <button onclick="quickTest('En 500 metros, gira a la derecha')">Instrucción</button>
+                <button onclick="quickTest('Has llegado a tu destino')">Destino</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <label>🗣️ Probar Diferentes Voces:</label>
+            <div class="voice-samples">
+                <div class="voice-sample">
+                    <div class="info">
+                        <div class="name">Rosa (México 🇲🇽)</div>
+                        <div class="details">Femenino, acento mexicano</div>
+                    </div>
+                    <button onclick="testVoiceSample('es-mx', 'Rosa')">▶️ Probar</button>
+                </div>
+                <div class="voice-sample">
+                    <div class="info">
+                        <div class="name">Diego (México 🇲🇽)</div>
+                        <div class="details">Masculino, acento mexicano</div>
+                    </div>
+                    <button onclick="testVoiceSample('es-mx', 'Diego')">▶️ Probar</button>
+                </div>
+                <div class="voice-sample">
+                    <div class="info">
+                        <div class="name">Conchita (España 🇪🇸)</div>
+                        <div class="details">Femenino, acento español</div>
+                    </div>
+                    <button onclick="testVoiceSample('es-es', 'Conchita')">▶️ Probar</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="status" class="status"></div>
+        
+        <div class="info-box">
+            <strong>ℹ️ Información:</strong><br>
+            • Esta prueba usa VoiceRSS API (gratuita)<br>
+            • Límite: 350 solicitudes/día<br>
+            • Si no funciona, verifica tu API key en <code>delivery/api/text_to_speech.php</code><br>
+            • Registro gratuito: <a href="https://www.voicerss.org/" target="_blank">www.voicerss.org</a>
+        </div>
+        
+        <div class="logs" id="logs"></div>
+    </div>
+
+    <script>
+        let currentAudio = null;
+        
+        function log(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const line = document.createElement('div');
+            line.className = `log-line log-${type}`;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logs.appendChild(line);
+            logs.scrollTop = logs.scrollHeight;
+            console.log(message);
+        }
+        
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type} show`;
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 5000);
+        }
+        
+        function testProxy() {
+            log('Probando conexión con proxy PHP...', 'info');
+            showStatus('Probando proxy PHP...', 'info');
+            
+            const url = '/angelow/delivery/api/text_to_speech.php?text=Hola mundo&lang=es-mx';
+            
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    log('✅ Proxy PHP funcionando correctamente', 'success');
+                    showStatus('✅ Proxy PHP funcionando correctamente', 'success');
+                    return response.blob();
+                })
+                .then(blob => {
+                    log(`Audio recibido: ${(blob.size / 1024).toFixed(2)} KB`, 'success');
+                    const audio = new Audio(URL.createObjectURL(blob));
+                    audio.play();
+                })
+                .catch(error => {
+                    log(`❌ Error en proxy: ${error.message}`, 'error');
+                    showStatus(`❌ Error: ${error.message}`, 'error');
+                });
+        }
+        
+        function testVoice() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            
+            const text = document.getElementById('textInput').value;
+            const lang = document.getElementById('langSelect').value;
+            const voice = document.getElementById('voiceSelect').value;
+            const rate = document.getElementById('rateSelect').value;
+            
+            if (!text.trim()) {
+                showStatus('⚠️ Por favor escribe un texto', 'error');
+                return;
+            }
+            
+            log(`🔊 Reproduciendo: "${text.substring(0, 50)}..."`, 'info');
+            log(`Configuración: ${lang}, ${voice}, velocidad: ${rate}`, 'info');
+            showStatus('🔊 Reproduciendo audio...', 'info');
+            
+            const params = new URLSearchParams({
+                text: text,
+                lang: lang,
+                voice: voice,
+                rate: rate
+            });
+            
+            const url = `/angelow/delivery/api/text_to_speech.php?${params.toString()}`;
+            
+            const btn = document.getElementById('speakBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Cargando...';
+            
+            currentAudio = new Audio(url);
+            
+            currentAudio.onloadstart = () => {
+                log('⏳ Cargando audio...', 'info');
+            };
+            
+            currentAudio.oncanplaythrough = () => {
+                log('✅ Audio listo para reproducir', 'success');
+            };
+            
+            currentAudio.onplay = () => {
+                log('▶️ Reproduciendo...', 'success');
+                showStatus('▶️ Reproduciendo audio', 'success');
+            };
+            
+            currentAudio.onended = () => {
+                log('✅ Reproducción completada', 'success');
+                showStatus('✅ Reproducción completada', 'success');
+                btn.disabled = false;
+                btn.textContent = '🔊 Reproducir Audio';
+            };
+            
+            currentAudio.onerror = (e) => {
+                log(`❌ Error al reproducir: ${e.type}`, 'error');
+                showStatus('❌ Error al reproducir audio', 'error');
+                btn.disabled = false;
+                btn.textContent = '🔊 Reproducir Audio';
+            };
+            
+            currentAudio.play().catch(e => {
+                log(`❌ Error al iniciar reproducción: ${e.message}`, 'error');
+                showStatus(`❌ Error: ${e.message}`, 'error');
+                btn.disabled = false;
+                btn.textContent = '🔊 Reproducir Audio';
+            });
+        }
+        
+        function quickTest(text) {
+            document.getElementById('textInput').value = text;
+            testVoice();
+        }
+        
+        function testVoiceSample(lang, voice) {
+            document.getElementById('langSelect').value = lang;
+            document.getElementById('voiceSelect').value = voice;
+            document.getElementById('textInput').value = `Hola, soy ${voice}. Esta es una muestra de mi voz en español.`;
+            testVoice();
+        }
+        
+        // Log inicial
+        log('Sistema de prueba de voz iniciado', 'success');
+        log('Presiona cualquier botón para probar', 'info');
+    </script>
+</body>
+</html>
