@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Navegación - API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        .log {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-left: 3px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prueba de API de Navegación</h1>
+    
+    <div class="test-section">
+        <h2>Configuración</h2>
+        <p>Delivery ID: <input type="number" id="delivery_id" value="9"></p>
+        <p>Latitud actual: <input type="text" id="start_lat" value="6.252786"></p>
+        <p>Longitud actual: <input type="text" id="start_lng" value="-75.538400"></p>
+        <p>Latitud destino: <input type="text" id="dest_lat" value="6.25617528"></p>
+        <p>Longitud destino: <input type="text" id="dest_lng" value="-75.55546772"></p>
+    </div>
+
+    <div class="test-section">
+        <h2>Pruebas</h2>
+        <button onclick="testStartNavigation()">1. Iniciar Navegación</button>
+        <button onclick="testUpdateLocation()">2. Actualizar Ubicación</button>
+        <button onclick="testGetRoute()">3. Obtener Ruta</button>
+        <button onclick="testGetNavigationInfo()">4. Info de Navegación</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        const BASE_URL = window.location.origin;
+
+        function log(title, data, isError = false) {
+            const resultsDiv = document.getElementById('results');
+            const logDiv = document.createElement('div');
+            logDiv.className = 'test-section ' + (isError ? 'error' : 'success');
+            logDiv.innerHTML = `
+                <h3>${title}</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+                <small>${new Date().toLocaleTimeString()}</small>
+            `;
+            resultsDiv.insertBefore(logDiv, resultsDiv.firstChild);
+        }
+
+        async function testStartNavigation() {
+            try {
+                const deliveryId = document.getElementById('delivery_id').value;
+                const startLat = parseFloat(document.getElementById('start_lat').value);
+                const startLng = parseFloat(document.getElementById('start_lng').value);
+                const destLat = parseFloat(document.getElementById('dest_lat').value);
+                const destLng = parseFloat(document.getElementById('dest_lng').value);
+
+                const response = await fetch(`${BASE_URL}/delivery/api/navigation_api.php?action=start_navigation`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        delivery_id: parseInt(deliveryId),
+                        start_lat: startLat,
+                        start_lng: startLng,
+                        dest_lat: destLat,
+                        dest_lng: destLng,
+                        route: {
+                            distance_km: 5.5,
+                            duration_seconds: 900,
+                            geometry: []
+                        },
+                        distance_km: 5.5,
+                        duration_seconds: 900
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+
+                log('✓ Iniciar Navegación', data, false);
+            } catch (error) {
+                log('✗ Error al Iniciar Navegación', { error: error.message }, true);
+            }
+        }
+
+        async function testUpdateLocation() {
+            try {
+                const deliveryId = document.getElementById('delivery_id').value;
+                const lat = parseFloat(document.getElementById('start_lat').value);
+                const lng = parseFloat(document.getElementById('start_lng').value);
+
+                const response = await fetch(`${BASE_URL}/delivery/api/navigation_api.php?action=update_location`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        delivery_id: parseInt(deliveryId),
+                        latitude: lat,
+                        longitude: lng,
+                        accuracy: 10,
+                        speed: 15.5,
+                        heading: 90,
+                        battery_level: 85
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+
+                log('✓ Actualizar Ubicación', data, false);
+            } catch (error) {
+                log('✗ Error al Actualizar Ubicación', { error: error.message }, true);
+            }
+        }
+
+        async function testGetRoute() {
+            try {
+                const startLat = parseFloat(document.getElementById('start_lat').value);
+                const startLng = parseFloat(document.getElementById('start_lng').value);
+                const destLat = parseFloat(document.getElementById('dest_lat').value);
+                const destLng = parseFloat(document.getElementById('dest_lng').value);
+
+                const response = await fetch(
+                    `${BASE_URL}/delivery/api/navigation_api.php?action=get_route&start_lat=${startLat}&start_lng=${startLng}&end_lat=${destLat}&end_lng=${destLng}`
+                );
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+
+                log('✓ Obtener Ruta', data, false);
+            } catch (error) {
+                log('✗ Error al Obtener Ruta', { error: error.message }, true);
+            }
+        }
+
+        async function testGetNavigationInfo() {
+            try {
+                const deliveryId = document.getElementById('delivery_id').value;
+
+                const response = await fetch(
+                    `${BASE_URL}/delivery/api/navigation_api.php?action=get_navigation_info&delivery_id=${deliveryId}`
+                );
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+
+                log('✓ Información de Navegación', data, false);
+            } catch (error) {
+                log('✗ Error al Obtener Info', { error: error.message }, true);
+            }
+        }
+    </script>
+</body>
+</html>

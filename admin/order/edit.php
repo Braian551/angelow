@@ -107,7 +107,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmtDelivery->execute([
                     $newAddress['gps_latitude'],
                     $newAddress['gps_longitude'],
-                    $newAddress['gps_used'] ?? 0,
                     $orderId
                 ]);
             }

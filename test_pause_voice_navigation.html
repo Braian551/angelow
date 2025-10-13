@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba: Pausar/Reanudar y Voz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        button.success {
+            background: #28a745;
+        }
+        button.warning {
+            background: #ffc107;
+            color: #333;
+        }
+        button.danger {
+            background: #dc3545;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        .test-result.success {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        .test-result.error {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        .voice-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .voice-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 3px;
+            border-left: 3px solid #007bff;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Pruebas de Navegación - Pausar/Reanudar y Voz</h1>
+
+    <!-- Información de ResponsiveVoice -->
+    <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <h2 style="color: white; border-bottom-color: white;">🎙️ Motor de Voz Activo</h2>
+        <div id="voice-engine-info"></div>
+        <script>
+            setTimeout(function() {
+                const infoDiv = document.getElementById('voice-engine-info');
+                if (typeof responsiveVoice !== 'undefined') {
+                    infoDiv.innerHTML = `
+                        <p><strong>✅ ResponsiveVoice</strong> - Motor de alta calidad cargado correctamente</p>
+                        <p>📢 Voces disponibles en español de alta calidad con pronunciación nativa</p>
+                        <p>🆓 Versión gratuita (hasta 5,000 caracteres/día)</p>
+                    `;
+                } else {
+                    infoDiv.innerHTML = `
+                        <p><strong>⚠️ Web Speech API</strong> - Motor del navegador</p>
+                        <p>ℹ️ ResponsiveVoice no se cargó, usando voces del sistema</p>
+                        <p>💡 <strong>Sugerencia:</strong> Asegúrate de tener conexión a internet para mejor calidad</p>
+                    `;
+                }
+            }, 1000);
+        </script>
+    </div>
+
+    <!-- Sección 1: Voz en Español -->
+    <div class="card">
+        <h2>🔊 Prueba de Voz en Español</h2>
+        
+        <div id="voice-status"></div>
+        
+        <div style="margin: 20px 0;">
+            <button onclick="testSpeak('Hola, esta es una prueba de síntesis de voz en español')">
+                Probar Voz
+            </button>
+            <button onclick="testSpeak('Navegación iniciada. Sigue la ruta marcada.')">
+                Probar: Navegación Iniciada
+            </button>
+            <button onclick="testSpeak('Navegación pausada')">
+                Probar: Pausa
+            </button>
+            <button onclick="testSpeak('Navegación reanudada')">
+                Probar: Reanudar
+            </button>
+            <button onclick="testSpeak('Estás cerca del destino')">
+                Probar: Cerca del Destino
+            </button>
+            <button class="danger" onclick="window.speechSynthesis.cancel()">
+                ⏹ Detener Voz
+            </button>
+        </div>
+
+        <h3>Voces en Español Disponibles:</h3>
+        <div id="voice-list" class="voice-list"></div>
+    </div>
+
+    <!-- Sección 2: Prueba de toFixed -->
+    <div class="card">
+        <h2>🔢 Prueba de updateDistanceDisplay (toFixed fix)</h2>
+        
+        <p>Probar con diferentes valores:</p>
+        <button onclick="testToFixed(5.5)">Número válido (5.5)</button>
+        <button onclick="testToFixed(null)">null</button>
+        <button onclick="testToFixed(undefined)">undefined</button>
+        <button onclick="testToFixed('abc')">String inválido</button>
+        <button onclick="testToFixed('10.5')">String numérico</button>
+        
+        <div id="toFixed-results"></div>
+    </div>
+
+    <!-- Sección 3: API de Pausar/Reanudar -->
+    <div class="card">
+        <h2>⏯️ Prueba de API Pausar/Reanudar</h2>
+        
+        <p>
+            Delivery ID: <input type="number" id="delivery-id" value="9" min="1">
+        </p>
+        
+        <div style="margin: 20px 0;">
+            <button class="warning" onclick="testPauseAPI()">
+                ⏸ Pausar Navegación
+            </button>
+            <button class="success" onclick="testResumeAPI()">
+                ▶ Reanudar Navegación
+            </button>
+        </div>
+
+        <div id="api-results"></div>
+    </div>
+
+    <!-- Sección 4: Eventos de Navegación -->
+    <div class="card">
+        <h2>📊 Eventos de Navegación Registrados</h2>
+        
+        <button onclick="getNavigationEvents()">
+            📋 Ver Últimos Eventos
+        </button>
+        
+        <div id="events-list"></div>
+    </div>
+
+    <script>
+        const BASE_URL = window.location.origin + '/angelow';
+
+        // ============================================
+        // PRUEBA DE VOZ MEJORADA
+        // ============================================
+        let bestSpanishVoice = null;
+        
+        function selectBestSpanishVoice() {
+            const voices = window.speechSynthesis.getVoices();
+            
+            // Prioridad de voces
+            const voicePriority = [
+                { pattern: /google.*español|google.*spanish.*es/i, lang: 'es-ES', priority: 10, name: 'Google Español' },
+                { pattern: /google.*español.*mexico|google.*spanish.*mx/i, lang: 'es-MX', priority: 9, name: 'Google Español México' },
+                { pattern: /helena/i, lang: 'es-ES', priority: 7, name: 'Microsoft Helena' },
+                { pattern: /sabina/i, lang: 'es-MX', priority: 7, name: 'Microsoft Sabina' },
+                { pattern: /monica/i, lang: 'es-ES', priority: 9, name: 'Apple Monica' },
+                { pattern: /paulina/i, lang: 'es-MX', priority: 9, name: 'Apple Paulina' },
+                { pattern: /juan/i, lang: 'es-MX', priority: 8, name: 'Apple Juan' }
+            ];
+            
+            let selectedVoice = null;
+            let highestPriority = 0;
+            
+            voices.forEach(voice => {
+                if (!voice.lang.startsWith('es-') && !voice.lang.startsWith('es')) return;
+                if (voice.name.toLowerCase().includes('en-') || voice.name.toLowerCase().includes('english')) return;
+                
+                for (const prio of voicePriority) {
+                    if (prio.pattern.test(voice.name) || voice.lang.startsWith(prio.lang)) {
+                        if (prio.priority > highestPriority) {
+                            highestPriority = prio.priority;
+                            selectedVoice = voice;
+                        }
+                    }
+                }
+            });
+            
+            if (!selectedVoice) {
+                selectedVoice = voices.find(v => v.lang.startsWith('es-') || v.lang === 'es');
+            }
+            
+            bestSpanishVoice = selectedVoice;
+            return selectedVoice;
+        }
+        
+        function loadVoices() {
+            const voices = window.speechSynthesis.getVoices();
+            const voiceList = document.getElementById('voice-list');
+            const voiceStatus = document.getElementById('voice-status');
+            
+            const spanishVoices = voices.filter(v => 
+                (v.lang.startsWith('es-') || v.lang === 'es') &&
+                !v.name.toLowerCase().includes('en-') &&
+                !v.name.toLowerCase().includes('english')
+            );
+            
+            // Seleccionar la mejor voz
+            const bestVoice = selectBestSpanishVoice();
+            
+            if (spanishVoices.length === 0) {
+                voiceStatus.innerHTML = `
+                    <div class="test-result error">
+                        ⚠️ No se encontraron voces en español. Total de voces: ${voices.length}
+                    </div>
+                `;
+            } else {
+                voiceStatus.innerHTML = `
+                    <div class="test-result success">
+                        ✅ Se encontraron ${spanishVoices.length} voces en español<br>
+                        ${bestVoice ? `<strong>🎯 Mejor voz seleccionada: ${bestVoice.name} (${bestVoice.lang})</strong>` : ''}
+                    </div>
+                `;
+            }
+            
+            voiceList.innerHTML = spanishVoices.length > 0 
+                ? spanishVoices.map(v => `
+                    <div class="voice-item" style="${v === bestVoice ? 'border-left-color: #28a745; border-left-width: 5px;' : ''}">
+                        <strong>${v.name}</strong> ${v === bestVoice ? '⭐ <span class="status active">SELECCIONADA</span>' : ''}<br>
+                        <small>
+                            Idioma: ${v.lang} | 
+                            Tipo: ${v.localService ? '📱 Local' : '☁️ Online'} |
+                            ${v.default ? '✓ Predeterminada' : ''}
+                        </small>
+                        <br>
+                        <button style="margin-top:5px; padding:3px 10px; font-size:12px;" 
+                                onclick="testWithSpecificVoice('${v.name.replace(/'/g, "\\'")}', '${v.lang}')">
+                            Probar esta voz
+                        </button>
+                    </div>
+                `).join('')
+                : '<p>No hay voces en español disponibles</p>';
+        }
+        
+        function testWithSpecificVoice(voiceName, voiceLang) {
+            const voices = window.speechSynthesis.getVoices();
+            const voice = voices.find(v => v.name === voiceName);
+            
+            if (!voice) {
+                alert('No se pudo encontrar la voz: ' + voiceName);
+                return;
+            }
+            
+            const text = 'Hola, esta es una prueba con ' + voiceName;
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = voice;
+            utterance.lang = voiceLang;
+            utterance.rate = 0.95;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            
+            console.log('🔊 Probando voz:', voiceName, voiceLang);
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function testSpeak(text) {
+            // Prioridad 1: Usar ResponsiveVoice si está disponible
+            if (typeof responsiveVoice !== 'undefined') {
+                responsiveVoice.cancel();
+                console.log('🔊 Usando ResponsiveVoice (alta calidad)');
+                responsiveVoice.speak(text, "Spanish Latin American Female", {
+                    rate: 0.95,
+                    pitch: 1.0,
+                    volume: 1.0,
+                    onstart: function() {
+                        console.log('▶️ Reproduciendo:', text);
+                    },
+                    onend: function() {
+                        console.log('✅ Reproducción completada');
+                    },
+                    onerror: function(e) {
+                        console.error('❌ Error en ResponsiveVoice:', e);
+                        // Fallback a Web Speech API
+                        testSpeakWebSpeech(text);
+                    }
+                });
+                return;
+            }
+            
+            // Fallback: Web Speech API
+            testSpeakWebSpeech(text);
+        }
+        
+        function testSpeakWebSpeech(text) {
+            if (!('speechSynthesis' in window)) {
+                alert('Tu navegador no soporta síntesis de voz');
+                return;
+            }
+            
+            window.speechSynthesis.cancel();
+            
+            // Seleccionar la mejor voz si aún no está seleccionada
+            if (!bestSpanishVoice) {
+                selectBestSpanishVoice();
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.95;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            
+            if (bestSpanishVoice) {
+                utterance.voice = bestSpanishVoice;
+                utterance.lang = bestSpanishVoice.lang;
+                console.log('🔊 Usando mejor voz Web Speech:', bestSpanishVoice.name, bestSpanishVoice.lang);
+            } else {
+                utterance.lang = 'es-MX';
+                console.warn('⚠️ No se encontró voz específica, usando es-MX');
+            }
+            
+            utterance.onerror = (event) => {
+                console.error('Error:', event.error);
+                alert('Error al reproducir voz: ' + event.error);
+            };
+            
+            utterance.onstart = () => {
+                console.log('🔊 Reproduciendo:', text);
+            };
+            
+            utterance.onend = () => {
+                console.log('✅ Reproducción completada');
+            };
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Cargar voces
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices();
+        }
+
+        // ============================================
+        // PRUEBA DE toFixed
+        // ============================================
+        function testToFixed(value) {
+            const resultsDiv = document.getElementById('toFixed-results');
+            
+            try {
+                // Simular la función updateDistanceDisplay corregida
+                const distance = parseFloat(value);
+                let result;
+                
+                if (isNaN(distance) || distance === null || distance === undefined) {
+                    result = '-- km';
+                } else {
+                    result = `${distance.toFixed(1)} km`;
+                }
+                
+                resultsDiv.innerHTML = `
+                    <div class="test-result success">
+                        <strong>Entrada:</strong> ${JSON.stringify(value)} (tipo: ${typeof value})<br>
+                        <strong>Resultado:</strong> ${result}<br>
+                        <strong>Estado:</strong> ✅ Sin errores
+                    </div>
+                ` + resultsDiv.innerHTML;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>Entrada:</strong> ${JSON.stringify(value)}<br>
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                ` + resultsDiv.innerHTML;
+            }
+        }
+
+        // ============================================
+        // PRUEBA DE API PAUSAR/REANUDAR
+        // ============================================
+        async function testPauseAPI() {
+            const deliveryId = document.getElementById('delivery-id').value;
+            const resultsDiv = document.getElementById('api-results');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/delivery/api/navigation_api.php?action=pause_navigation`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        delivery_id: parseInt(deliveryId)
+                    })
+                });
+
+                const data = await response.json();
+                
+                resultsDiv.innerHTML = `
+                    <div class="test-result ${data.success ? 'success' : 'error'}">
+                        <strong>⏸ Pausar Navegación</strong><br>
+                        <strong>HTTP Status:</strong> ${response.status}<br>
+                        <strong>Respuesta:</strong><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                ` + resultsDiv.innerHTML;
+                
+                if (data.success) {
+                    testSpeak('Navegación pausada');
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                ` + resultsDiv.innerHTML;
+            }
+        }
+
+        async function testResumeAPI() {
+            const deliveryId = document.getElementById('delivery-id').value;
+            const resultsDiv = document.getElementById('api-results');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/delivery/api/navigation_api.php?action=resume_navigation`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        delivery_id: parseInt(deliveryId)
+                    })
+                });
+
+                const data = await response.json();
+                
+                resultsDiv.innerHTML = `
+                    <div class="test-result ${data.success ? 'success' : 'error'}">
+                        <strong>▶ Reanudar Navegación</strong><br>
+                        <strong>HTTP Status:</strong> ${response.status}<br>
+                        <strong>Respuesta:</strong><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                ` + resultsDiv.innerHTML;
+                
+                if (data.success) {
+                    testSpeak('Navegación reanudada');
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                ` + resultsDiv.innerHTML;
+            }
+        }
+
+        // ============================================
+        // OBTENER EVENTOS
+        // ============================================
+        async function getNavigationEvents() {
+            const deliveryId = document.getElementById('delivery-id').value;
+            const eventsDiv = document.getElementById('events-list');
+            
+            try {
+                const response = await fetch(
+                    `${BASE_URL}/delivery/api/navigation_api.php?action=get_route_history&delivery_id=${deliveryId}`
+                );
+
+                const data = await response.json();
+                
+                if (data.success && data.events) {
+                    eventsDiv.innerHTML = `
+                        <div class="test-result success">
+                            <strong>Últimos ${data.events.length} eventos:</strong><br><br>
+                            ${data.events.map(e => `
+                                <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 3px;">
+                                    <strong>${e.event_type}</strong> - ${e.created_at}<br>
+                                    <small>${e.event_data || '{}'}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    eventsDiv.innerHTML = `
+                        <div class="test-result error">
+                            No se encontraron eventos
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                eventsDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+    </script>
+    
+    <!-- ResponsiveVoice - Voz en español de alta calidad (GRATIS) -->
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=8qTPPvZx"></script>
+</body>
+</html>

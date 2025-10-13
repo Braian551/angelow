@@ -322,7 +322,11 @@ try {
     <!-- Leaflet Routing Machine (OSRM) -->
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     
+    <!-- ResponsiveVoice - Voz en español de alta calidad (GRATIS) -->
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=8qTPPvZx"></script>
+    
     <!-- Custom Navigation JS -->
     <script src="<?= BASE_URL ?>/js/delivery/navigation.js"></script>
+    <script src="<?= BASE_URL ?>/js/delivery/navigation_fix.js"></script>
 </body>
 </html>

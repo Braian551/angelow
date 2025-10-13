@@ -1,7 +1,7 @@
-﻿/**
+/**
  * =========================================================
- * SISTEMA DE NAVEGACIN EN TIEMPO REAL - ANGELOW DELIVERY
- * Funcionalidad: Navegacin GPS estilo Uber/Waze con tracking en tiempo real
+ * SISTEMA DE NAVEGACIÓN EN TIEMPO REAL - ANGELOW DELIVERY
+ * Funcionalidad: Navegación GPS estilo Uber/Waze con tracking en tiempo real
  * =========================================================
  */
 
@@ -9,11 +9,11 @@
     'use strict';
 
     // =========================================================
-    // CONFIGURACIN GLOBAL
+    // CONFIGURACIÓN GLOBAL
     // =========================================================
     const CONFIG = {
         BASE_URL: document.querySelector('meta[name="base-url"]')?.content || '',
-        UPDATE_INTERVAL: 5000, // Actualizar ubicacin cada 5 segundos
+        UPDATE_INTERVAL: 5000, // Actualizar ubicación cada 5 segundos
         ROUTE_CHECK_INTERVAL: 30000, // Verificar ruta cada 30 segundos
         NEAR_DESTINATION_THRESHOLD: 0.1, // 100 metros
         OFF_ROUTE_THRESHOLD: 0.05, // 50 metros fuera de ruta
@@ -24,7 +24,7 @@
     };
 
     // =========================================================
-    // ESTADO DE LA APLICACIN
+    // ESTADO DE LA APLICACIÓN
     // =========================================================
     const state = {
         map: null,
@@ -55,9 +55,9 @@
     // INICIALIZAR EVENTOS
     // =========================================================
     function initializeEvents() {
-        console.log(' Inicializando eventos...');
+        console.log('� Inicializando eventos...');
         
-        // Event listener para cerrar men al hacer clic en overlay
+        // Event listener para cerrar menú al hacer clic en overlay
         const menuOverlay = document.getElementById('menu-overlay');
         if (menuOverlay) {
             menuOverlay.addEventListener('click', function() {
@@ -65,31 +65,31 @@
             });
         }
         
-        // Prevenir zoom con gestos en mviles
+        // Prevenir zoom con gestos en móviles
         document.addEventListener('gesturestart', function (e) {
             e.preventDefault();
         });
         
-        // Mantener pantalla activa durante navegacin
+        // Mantener pantalla activa durante navegación
         if ('wakeLock' in navigator) {
             navigator.wakeLock.request('screen').catch(err => {
                 console.warn('Wake Lock no disponible:', err);
             });
         }
         
-        console.log(' Eventos inicializados');
+        console.log('✅ Eventos inicializados');
     }
 
     // =========================================================
-    // INICIALIZACIN
+    // INICIALIZACIÓN
     // =========================================================
     document.addEventListener('DOMContentLoaded', function() {
-        console.log(' Iniciando sistema de navegacin...');
+        console.log('� Iniciando sistema de navegación...');
         
         // Cargar datos del delivery
         loadDeliveryData();
         
-        // Solicitar permisos de ubicacin
+        // Solicitar permisos de ubicación
         requestLocationPermission();
         
         // Inicializar mapa
@@ -98,7 +98,7 @@
         // Inicializar eventos
         initializeEvents();
         
-        // Obtener informacin de batera si est disponible
+        // Obtener información de batería si está disponible
         if ('getBattery' in navigator) {
             navigator.getBattery().then(battery => {
                 state.batteryLevel = Math.round(battery.level * 100);
@@ -108,7 +108,7 @@
             });
         }
         
-        console.log(' Sistema de navegacin inicializado');
+        console.log('✅ Sistema de navegación inicializado');
     });
 
     // =========================================================
@@ -131,10 +131,10 @@
             // Validar coordenadas de destino
             if (!state.destination.lat || !state.destination.lng || 
                 state.destination.lat === 0 || state.destination.lng === 0) {
-                console.error(' Coordenadas de destino no vlidas:', state.destination);
-                showNotification('Error: La direccin de entrega no tiene coordenadas GPS. Contacta al administrador.', 'error');
+                console.error('❌ Coordenadas de destino no válidas:', state.destination);
+                showNotification('Error: La dirección de entrega no tiene coordenadas GPS. Contacta al administrador.', 'error');
                 
-                // Deshabilitar navegacin
+                // Deshabilitar navegación
                 const btnAction = document.getElementById('btn-action-main');
                 if (btnAction) {
                     btnAction.disabled = true;
@@ -146,44 +146,44 @@
                 return;
             }
             
-            console.log(' Datos del delivery cargados:', state.deliveryData);
-            console.log(' Destino:', state.destination);
+            console.log('📦 Datos del delivery cargados:', state.deliveryData);
+            console.log('📍 Destino:', state.destination);
         } catch (e) {
             console.error('Error al parsear datos del delivery:', e);
-            showNotification('Error al cargar informacin del pedido', 'error');
+            showNotification('Error al cargar información del pedido', 'error');
         }
     }
 
     // =========================================================
-    // SOLICITAR PERMISOS DE UBICACIN
+    // SOLICITAR PERMISOS DE UBICACIÓN
     // =========================================================
     function requestLocationPermission() {
         if (!('geolocation' in navigator)) {
-            showNotification('Tu dispositivo no soporta geolocalizacin', 'error');
+            showNotification('Tu dispositivo no soporta geolocalización', 'error');
             return;
         }
 
-        updateStatus('Solicitando permisos de ubicacin...');
+        updateStatus('Solicitando permisos de ubicación...');
         
         navigator.permissions.query({ name: 'geolocation' }).then(result => {
             if (result.state === 'granted') {
-                console.log(' Permisos de ubicacin concedidos');
+                console.log('✅ Permisos de ubicación concedidos');
                 startLocationTracking();
             } else if (result.state === 'prompt') {
                 // Solicitar permisos
                 navigator.geolocation.getCurrentPosition(
                     position => {
-                        console.log(' Permisos de ubicacin concedidos');
+                        console.log('✅ Permisos de ubicación concedidos');
                         startLocationTracking();
                     },
                     error => {
-                        console.error(' Permisos de ubicacin denegados:', error);
-                        showNotification('Se requieren permisos de ubicacin para navegar', 'error');
+                        console.error('❌ Permisos de ubicación denegados:', error);
+                        showNotification('Se requieren permisos de ubicación para navegar', 'error');
                     },
                     { enableHighAccuracy: true }
                 );
             } else {
-                showNotification('Se requieren permisos de ubicacin para navegar', 'error');
+                showNotification('Se requieren permisos de ubicación para navegar', 'error');
             }
         });
     }
@@ -203,7 +203,7 @@
 
         // Capa de mapa (OpenStreetMap)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: ' OpenStreetMap contributors',
+            attribution: '© OpenStreetMap contributors',
             maxZoom: CONFIG.MAP_MAX_ZOOM
         }).addTo(state.map);
 
@@ -212,11 +212,11 @@
             addDestinationMarker(state.destination);
         }
 
-        console.log(' Mapa inicializado');
+        console.log('🗺️ Mapa inicializado');
     }
 
     // =========================================================
-    // TRACKING DE UBICACIN EN TIEMPO REAL
+    // TRACKING DE UBICACIÓN EN TIEMPO REAL
     // =========================================================
     function startLocationTracking() {
         if (state.watchId) {
@@ -235,12 +235,12 @@
             options
         );
 
-        updateStatus('Obteniendo ubicacin...');
-        console.log(' Tracking de ubicacin iniciado');
+        updateStatus('Obteniendo ubicación...');
+        console.log('📍 Tracking de ubicación iniciado');
     }
 
     // =========================================================
-    // MANEJAR ACTUALIZACIN DE UBICACIN
+    // MANEJAR ACTUALIZACIÓN DE UBICACIÓN
     // =========================================================
     function handleLocationUpdate(position) {
         const { latitude, longitude, accuracy, speed, heading } = position.coords;
@@ -252,7 +252,7 @@
         // Actualizar marcador del conductor
         updateDriverMarker(state.currentLocation, state.currentHeading);
 
-        // Si es la primera ubicacin, centrar mapa y calcular ruta
+        // Si es la primera ubicación, centrar mapa y calcular ruta
         if (!state.route) {
             state.map.setView(state.currentLocation, CONFIG.MAP_ZOOM);
             calculateRoute(state.currentLocation, state.destination);
@@ -261,35 +261,35 @@
         // Actualizar UI
         updateSpeedDisplay(state.currentSpeed);
 
-        // Si estamos navegando, enviar actualizacin al servidor
+        // Si estamos navegando, enviar actualización al servidor
         if (state.isNavigating) {
             sendLocationUpdate(position);
         }
 
-        console.log(` Ubicacin actualizada: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+        console.log(`📍 Ubicación actualizada: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
     }
 
     // =========================================================
-    // MANEJAR ERROR DE UBICACIN
+    // MANEJAR ERROR DE UBICACIÓN
     // =========================================================
     function handleLocationError(error) {
-        console.error(' Error de ubicacin:', error);
+        console.error('❌ Error de ubicación:', error);
         
-        let message = 'Error al obtener ubicacin';
+        let message = 'Error al obtener ubicación';
         switch (error.code) {
             case error.PERMISSION_DENIED:
-                message = 'Permisos de ubicacin denegados';
+                message = 'Permisos de ubicación denegados';
                 break;
             case error.POSITION_UNAVAILABLE:
-                message = 'Ubicacin no disponible';
+                message = 'Ubicación no disponible';
                 break;
             case error.TIMEOUT:
-                message = 'Timeout al obtener ubicacin';
+                message = 'Timeout al obtener ubicación';
                 break;
         }
         
         showNotification(message, 'error');
-        updateStatus('Error de ubicacin');
+        updateStatus('Error de ubicación');
     }
 
     // =========================================================
@@ -299,11 +299,11 @@
         try {
             // Validar coordenadas antes de calcular
             if (!start || !start.lat || !start.lng || start.lat === 0 || start.lng === 0) {
-                throw new Error('Coordenadas de inicio no vlidas');
+                throw new Error('Coordenadas de inicio no válidas');
             }
             
             if (!end || !end.lat || !end.lng || end.lat === 0 || end.lng === 0) {
-                throw new Error('Coordenadas de destino no vlidas');
+                throw new Error('Coordenadas de destino no válidas');
             }
             
             updateStatus('Calculando ruta...');
@@ -313,7 +313,7 @@
                         `&start_lat=${start.lat}&start_lng=${start.lng}` +
                         `&end_lat=${end.lat}&end_lng=${end.lng}`;
             
-            console.log(' Calculando ruta:', url);
+            console.log('📍 Calculando ruta:', url);
 
             const response = await fetch(url);
             const data = await response.json();
@@ -340,10 +340,10 @@
             updateStatus('Ruta calculada');
             showNotification(`Ruta de ${state.route.distance_km} km calculada`, 'success');
 
-            console.log(' Ruta calculada:', state.route);
+            console.log('🗺️ Ruta calculada:', state.route);
 
         } catch (error) {
-            console.error(' Error al calcular ruta:', error);
+            console.error('❌ Error al calcular ruta:', error);
             showNotification(error.message, 'error');
             updateStatus('Error al calcular ruta');
         }
@@ -395,9 +395,9 @@
 
             state.driverMarker = L.marker([location.lat, location.lng], { icon })
                 .addTo(state.map)
-                .bindPopup('Tu ubicacin');
+                .bindPopup('Tu ubicación');
         } else {
-            // Actualizar posicin y rotacin
+            // Actualizar posición y rotación
             state.driverMarker.setLatLng([location.lat, location.lng]);
             
             const iconElement = state.driverMarker.getElement();
@@ -425,7 +425,7 @@
 
         state.destinationMarker = L.marker([location.lat, location.lng], { icon })
             .addTo(state.map)
-            .bindPopup('Destino: ' + (state.deliveryData?.destination.address || 'Direccin de entrega'));
+            .bindPopup('Destino: ' + (state.deliveryData?.destination.address || 'Dirección de entrega'));
     }
 
     // =========================================================
@@ -439,16 +439,16 @@
     }
 
     // =========================================================
-    // INICIAR NAVEGACIN
+    // INICIAR NAVEGACIÓN
     // =========================================================
     async function startNavigation() {
         if (!state.currentLocation || !state.destination || !state.route) {
-            showNotification('Esperando ubicacin y ruta...', 'warning');
+            showNotification('Esperando ubicación y ruta...', 'warning');
             return;
         }
 
         try {
-            updateStatus('Iniciando navegacin...');
+            updateStatus('Iniciando navegación...');
 
             const response = await fetch(`${CONFIG.BASE_URL}/delivery/api/navigation_api.php?action=start_navigation`, {
                 method: 'POST',
@@ -468,102 +468,7 @@
             const data = await response.json();
 
             if (!data.success) {
-                throw new Error(data.error || 'Error al iniciar navegacin');
-            }
-
-            state.isNavigating = true;
-            
-            // Cambiar botn de accin
-            updateActionButton('pause', 'Pausar navegacin');
-            
-            // Iniciar actualizaciones peridicas
-            startPeriodicUpdates();
-            
-            // Centrar mapa en conductor
-            centerOnDriver();
-            
-            updateStatus('Navegando');
-            showNotification('Navegacin iniciada', 'success');
-            
-            // Instruccin de voz
-            speak('Navegacin iniciada. Sigue la ruta marcada.');
-
-            console.log(' Navegacin iniciada');
-
-        } catch (error) {
-            console.error(' Error al iniciar navegacin:', error);
-            showNotification(error.message, 'error');
-        }
-    }
-
-    // =========================================================
-    // PAUSAR NAVEGACIÓN
-    // =========================================================
-    async function pauseNavigation() {
-        try {
-            updateStatus('Pausando navegación...');
-
-            const response = await fetch(`${CONFIG.BASE_URL}/delivery/api/navigation_api.php?action=pause_navigation`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    delivery_id: state.deliveryData.delivery_id
-                })
-            });
-
-            const data = await response.json();
-
-            if (!data.success) {
-                throw new Error(data.error || 'Error al pausar navegación');
-            }
-
-            state.isNavigating = false;
-            
-            // Detener actualizaciones periódicas
-            if (state.updateInterval) {
-                clearInterval(state.updateInterval);
-                state.updateInterval = null;
-            }
-            
-            if (state.routeCheckInterval) {
-                clearInterval(state.routeCheckInterval);
-                state.routeCheckInterval = null;
-            }
-            
-            // Cambiar botón de acción
-            updateActionButton('resume', 'Reanudar navegación');
-            
-            updateStatus('Navegación pausada');
-            showNotification('Navegación pausada', 'warning');
-            speak('Navegación pausada');
-
-            console.log('⏸ Navegación pausada');
-
-        } catch (error) {
-            console.error('❌ Error al pausar navegación:', error);
-            showNotification(error.message, 'error');
-        }
-    }
-
-    // =========================================================
-    // REANUDAR NAVEGACIÓN
-    // =========================================================
-    async function resumeNavigation() {
-        try {
-            updateStatus('Reanudando navegación...');
-
-            const response = await fetch(`${CONFIG.BASE_URL}/delivery/api/navigation_api.php?action=resume_navigation`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    delivery_id: state.deliveryData.delivery_id
-                })
-            });
-
-            const data = await response.json();
-
-            if (!data.success) {
-                throw new Error(data.error || 'Error al reanudar navegación');
+                throw new Error(data.error || 'Error al iniciar navegación');
             }
 
             state.isNavigating = true;
@@ -571,26 +476,31 @@
             // Cambiar botón de acción
             updateActionButton('pause', 'Pausar navegación');
             
-            // Reiniciar actualizaciones periódicas
+            // Iniciar actualizaciones periódicas
             startPeriodicUpdates();
             
+            // Centrar mapa en conductor
+            centerOnDriver();
+            
             updateStatus('Navegando');
-            showNotification('Navegación reanudada', 'success');
-            speak('Navegación reanudada');
+            showNotification('Navegación iniciada', 'success');
+            
+            // Instrucción de voz
+            speak('Navegación iniciada. Sigue la ruta marcada.');
 
-            console.log('▶ Navegación reanudada');
+            console.log('🧭 Navegación iniciada');
 
         } catch (error) {
-            console.error('❌ Error al reanudar navegación:', error);
+            console.error('❌ Error al iniciar navegación:', error);
             showNotification(error.message, 'error');
         }
     }
 
     // =========================================================
-    // ACTUALIZACIONES PERIDICAS
+    // ACTUALIZACIONES PERIÓDICAS
     // =========================================================
     function startPeriodicUpdates() {
-        // Actualizar ubicacin al servidor cada 5 segundos
+        // Actualizar ubicación al servidor cada 5 segundos
         state.updateInterval = setInterval(() => {
             if (state.isNavigating && state.currentLocation) {
                 sendLocationUpdate({
@@ -614,7 +524,7 @@
     }
 
     // =========================================================
-    // ENVIAR ACTUALIZACIN DE UBICACIN AL SERVIDOR
+    // ENVIAR ACTUALIZACIÓN DE UBICACIÓN AL SERVIDOR
     // =========================================================
     async function sendLocationUpdate(position) {
         try {
@@ -635,7 +545,7 @@
             const data = await response.json();
 
             if (data.success) {
-                // Actualizar informacin local con datos del servidor
+                // Actualizar información local con datos del servidor
                 if (data.distance_remaining !== null) {
                     state.distanceRemaining = data.distance_remaining;
                     updateDistanceDisplay(state.distanceRemaining);
@@ -653,7 +563,7 @@
             }
 
         } catch (error) {
-            console.error('Error al enviar actualizacin de ubicacin:', error);
+            console.error('Error al enviar actualización de ubicación:', error);
         }
     }
 
@@ -661,7 +571,7 @@
     // VERIFICAR SI ESTAMOS EN LA RUTA
     // =========================================================
     function checkIfOnRoute() {
-        // TODO: Implementar verificacin de distancia a la ruta
+        // TODO: Implementar verificación de distancia a la ruta
         // Por ahora, siempre asumimos que estamos en ruta
     }
 
@@ -671,8 +581,8 @@
     function handleNearDestination() {
         if (!state.nearDestinationNotified) {
             state.nearDestinationNotified = true;
-            showNotification('Ests cerca del destino!', 'success');
-            speak('Ests cerca del destino');
+            showNotification('¡Estás cerca del destino!', 'success');
+            speak('Estás cerca del destino');
             
             // Registrar evento
             logNavigationEvent('destination_near', {
@@ -682,7 +592,7 @@
     }
 
     // =========================================================
-    // REGISTRAR EVENTO DE NAVEGACIN
+    // REGISTRAR EVENTO DE NAVEGACIÓN
     // =========================================================
     async function logNavigationEvent(eventType, eventData) {
         try {
@@ -715,7 +625,7 @@
     function updateRouteInfo(route) {
         const instructionMain = document.getElementById('instruction-main');
         if (instructionMain && route.steps && route.steps.length > 0) {
-            instructionMain.textContent = route.steps[0].name || 'Sigue por esta va';
+            instructionMain.textContent = route.steps[0].name || 'Sigue por esta vía';
         }
     }
 
@@ -743,20 +653,12 @@
         const distanceElement = document.getElementById('distance-remaining');
         const instructionDistance = document.getElementById('instruction-distance');
         
-        // Validar que km sea un número válido
-        const distance = parseFloat(km);
-        if (isNaN(distance) || distance === null || distance === undefined) {
-            if (distanceElement) distanceElement.textContent = '-- km';
-            if (instructionDistance) instructionDistance.textContent = '--';
-            return;
-        }
-        
         if (distanceElement) {
-            distanceElement.textContent = `${distance.toFixed(1)} km`;
+            distanceElement.textContent = `${km.toFixed(1)} km`;
         }
         
         if (instructionDistance) {
-            instructionDistance.textContent = `En ${distance.toFixed(1)} km`;
+            instructionDistance.textContent = `En ${km.toFixed(1)} km`;
         }
     }
 
@@ -793,10 +695,6 @@
         
         if (action === 'start') {
             startNavigation();
-        } else if (action === 'pause') {
-            pauseNavigation();
-        } else if (action === 'resume') {
-            resumeNavigation();
         }
     };
 
@@ -846,14 +744,14 @@
         const button = document.getElementById('btn-traffic');
         
         if (state.isTrafficVisible) {
-            // Activar informacin de trfico
-            showNotification('Cargando informacin de trfico...', 'info');
+            // Activar información de tráfico
+            showNotification('Cargando información de tráfico...', 'info');
             
             try {
-                // Opcin 1: Usar capa de transporte de OpenStreetMap (muestra vas principales)
+                // Opción 1: Usar capa de transporte de OpenStreetMap (muestra vías principales)
                 if (!state.trafficLayer) {
                     state.trafficLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: ' OpenStreetMap contributors',
+                        attribution: '© OpenStreetMap contributors',
                         maxZoom: CONFIG.MAP_MAX_ZOOM,
                         className: 'traffic-overlay',
                         opacity: 0.7
@@ -862,7 +760,7 @@
                 
                 state.trafficLayer.addTo(state.map);
                 
-                // Simular datos de trfico basados en hora del da
+                // Simular datos de tráfico basados en hora del día
                 const trafficLevel = getTrafficLevelByTime();
                 displayTrafficInfo(trafficLevel);
                 
@@ -870,28 +768,28 @@
                     button.classList.add('active');
                 }
                 
-                showNotification(`Trfico ${trafficLevel.label} en tu ruta`, 'success');
-                console.log(' Vista de trfico activada');
+                showNotification(`Tráfico ${trafficLevel.label} en tu ruta`, 'success');
+                console.log('🚦 Vista de tráfico activada');
                 
-                // Recalcular ETA considerando trfico
+                // Recalcular ETA considerando tráfico
                 if (state.route && trafficLevel.multiplier > 1) {
                     const adjustedETA = state.etaSeconds * trafficLevel.multiplier;
                     updateETADisplay(adjustedETA);
-                    showNotification(`ETA ajustado por trfico: +${Math.round((adjustedETA - state.etaSeconds) / 60)} min`, 'warning');
+                    showNotification(`ETA ajustado por tráfico: +${Math.round((adjustedETA - state.etaSeconds) / 60)} min`, 'warning');
                 }
                 
             } catch (error) {
-                console.error('Error al activar trfico:', error);
-                showNotification('Error al cargar informacin de trfico', 'error');
+                console.error('Error al activar tráfico:', error);
+                showNotification('Error al cargar información de tráfico', 'error');
             }
             
         } else {
-            // Desactivar capa de trfico
+            // Desactivar capa de tráfico
             if (state.trafficLayer) {
                 state.map.removeLayer(state.trafficLayer);
             }
             
-            // Ocultar info de trfico
+            // Ocultar info de tráfico
             hideTrafficInfo();
             
             if (button) {
@@ -903,20 +801,20 @@
                 updateETADisplay(state.route.duration_seconds);
             }
             
-            showNotification('Vista de trfico desactivada', 'info');
-            console.log(' Capa de trfico desactivada');
+            showNotification('Vista de tráfico desactivada', 'info');
+            console.log('🚦 Capa de tráfico desactivada');
         }
     };
     
     // =========================================================
-    // OBTENER NIVEL DE TRFICO SEGN LA HORA
+    // OBTENER NIVEL DE TRÁFICO SEGÚN LA HORA
     // =========================================================
     function getTrafficLevelByTime() {
         const now = new Date();
         const hour = now.getHours();
-        const dayOfWeek = now.getDay(); // 0 = Domingo, 6 = Sbado
+        const dayOfWeek = now.getDay(); // 0 = Domingo, 6 = Sábado
         
-        // Fin de semana - menos trfico
+        // Fin de semana - menos tráfico
         if (dayOfWeek === 0 || dayOfWeek === 6) {
             if (hour >= 10 && hour <= 14) {
                 return { level: 'medium', label: 'Moderado', color: '#fbbf24', multiplier: 1.2 };
@@ -925,12 +823,12 @@
         }
         
         // Entre semana - evaluar horas pico
-        // Hora pico maana: 6:00 - 9:00
+        // Hora pico mañana: 6:00 - 9:00
         if (hour >= 6 && hour < 9) {
             return { level: 'high', label: 'Pesado', color: '#ef4444', multiplier: 1.5 };
         }
         
-        // Medioda: 12:00 - 14:00
+        // Mediodía: 12:00 - 14:00
         if (hour >= 12 && hour < 14) {
             return { level: 'medium', label: 'Moderado', color: '#fbbf24', multiplier: 1.2 };
         }
@@ -940,15 +838,15 @@
             return { level: 'high', label: 'Pesado', color: '#ef4444', multiplier: 1.5 };
         }
         
-        // Resto del da - trfico normal
+        // Resto del día - tráfico normal
         return { level: 'low', label: 'Fluido', color: '#10b981', multiplier: 1.0 };
     }
     
     // =========================================================
-    // MOSTRAR INFORMACIN DE TRFICO EN UI
+    // MOSTRAR INFORMACIÓN DE TRÁFICO EN UI
     // =========================================================
     function displayTrafficInfo(trafficLevel) {
-        // Buscar o crear elemento de info de trfico
+        // Buscar o crear elemento de info de tráfico
         let trafficInfo = document.getElementById('traffic-info');
         
         if (!trafficInfo) {
@@ -975,14 +873,14 @@
         trafficInfo.innerHTML = `
             <div style="width: 8px; height: 8px; background: ${trafficLevel.color}; border-radius: 50%; box-shadow: 0 0 8px ${trafficLevel.color};"></div>
             <div style="color: white; font-size: 14px; font-weight: 500;">
-                Trfico ${trafficLevel.label}
+                Tráfico ${trafficLevel.label}
             </div>
         `;
         
         trafficInfo.style.display = 'flex';
     }
     
-    // Ocultar info de trfico cuando se desactive
+    // Ocultar info de tráfico cuando se desactive
     function hideTrafficInfo() {
         const trafficInfo = document.getElementById('traffic-info');
         if (trafficInfo) {
@@ -1007,7 +905,7 @@
     };
 
     window.reportIssue = function() {
-        showNotification('Funcin en desarrollo', 'info');
+        showNotification('Función en desarrollo', 'info');
         window.toggleMenu();
     };
 
@@ -1017,7 +915,7 @@
     };
 
     window.cancelNavigation = function() {
-        if (confirm('Deseas cancelar la navegacin?')) {
+        if (confirm('¿Deseas cancelar la navegación?')) {
             stopNavigation();
             window.location.href = `${CONFIG.BASE_URL}/delivery/orders.php`;
         }
@@ -1025,7 +923,7 @@
 
     window.confirmExit = function() {
         if (state.isNavigating) {
-            if (confirm('Deseas salir de la navegacin? El progreso se guardar.')) {
+            if (confirm('¿Deseas salir de la navegación? El progreso se guardará.')) {
                 stopNavigation();
                 window.location.href = `${CONFIG.BASE_URL}/delivery/orders.php`;
             }
@@ -1035,7 +933,7 @@
     };
 
     // =========================================================
-    // DETENER NAVEGACIN
+    // DETENER NAVEGACIÓN
     // =========================================================
     function stopNavigation() {
         state.isNavigating = false;
@@ -1055,192 +953,23 @@
             state.watchId = null;
         }
         
-        console.log(' Navegacin detenida');
+        console.log('🛑 Navegación detenida');
     }
 
     // =========================================================
-    // SÍNTESIS DE VOZ (ESPAÑOL MEJORADO)
+    // SÍNTESIS DE VOZ
     // =========================================================
-    
-    // Variable global para almacenar la mejor voz en español
-    let bestSpanishVoice = null;
-    
-    // Función para seleccionar la mejor voz en español
-    function selectBestSpanishVoice() {
-        const voices = window.speechSynthesis.getVoices();
-        
-        // Prioridad de voces (de mayor a menor calidad/naturalidad)
-        const voicePriority = [
-            // Voces de Google (muy naturales)
-            { pattern: /google.*español|google.*spanish.*es/i, lang: 'es-ES', priority: 10 },
-            { pattern: /google.*español.*mexico|google.*spanish.*mx/i, lang: 'es-MX', priority: 9 },
-            { pattern: /google.*español.*us/i, lang: 'es-US', priority: 8 },
-            
-            // Voces de Microsoft (buena calidad)
-            { pattern: /helena/i, lang: 'es-ES', priority: 7 },
-            { pattern: /sabina/i, lang: 'es-MX', priority: 7 },
-            
-            // Voces de Apple (excelente calidad)
-            { pattern: /monica/i, lang: 'es-ES', priority: 9 },
-            { pattern: /paulina/i, lang: 'es-MX', priority: 9 },
-            { pattern: /juan/i, lang: 'es-MX', priority: 8 },
-            
-            // Cualquier voz nativa en español
-            { pattern: /español|spanish/i, lang: 'es', priority: 5 }
-        ];
-        
-        let selectedVoice = null;
-        let highestPriority = 0;
-        
-        voices.forEach(voice => {
-            // Solo considerar voces que sean específicamente para español
-            if (!voice.lang.startsWith('es-') && !voice.lang.startsWith('es')) {
-                return;
-            }
-            
-            // Excluir voces con acento inglés
-            if (voice.name.toLowerCase().includes('en-') || 
-                voice.name.toLowerCase().includes('english')) {
-                return;
-            }
-            
-            // Buscar coincidencias en la prioridad
-            for (const prio of voicePriority) {
-                if (prio.pattern.test(voice.name) || voice.lang.startsWith(prio.lang)) {
-                    if (prio.priority > highestPriority) {
-                        highestPriority = prio.priority;
-                        selectedVoice = voice;
-                    }
-                }
-            }
-        });
-        
-        // Si no se encontró ninguna voz específica, buscar cualquiera en español
-        if (!selectedVoice) {
-            selectedVoice = voices.find(v => 
-                v.lang.startsWith('es-') || v.lang === 'es'
-            );
-        }
-        
-        bestSpanishVoice = selectedVoice;
-        
-        if (selectedVoice) {
-            console.log('✅ Mejor voz en español seleccionada:', selectedVoice.name, '(' + selectedVoice.lang + ')');
-        } else {
-            console.warn('⚠️ No se encontró ninguna voz en español. Total de voces:', voices.length);
-        }
-        
-        return selectedVoice;
-    }
-    
     function speak(text) {
-        if (!state.isVoiceEnabled) {
+        if (!state.isVoiceEnabled || !('speechSynthesis' in window)) {
             return;
-        }
-        
-        // Estrategia 1: Intentar con ResponsiveVoice (mejor calidad)
-        if (typeof responsiveVoice !== 'undefined') {
-            responsiveVoice.cancel();
-            responsiveVoice.speak(text, "Spanish Latin American Female", {
-                rate: 0.95,
-                pitch: 1.0,
-                volume: 1.0,
-                onstart: function() {
-                    console.log('🔊 ResponsiveVoice reproduciendo:', text);
-                },
-                onerror: function(e) {
-                    console.error('❌ Error en ResponsiveVoice:', e);
-                    // Fallback a Web Speech API
-                    speakWithWebSpeech(text);
-                }
-            });
-            return;
-        }
-        
-        // Estrategia 2: Fallback a Web Speech API
-        speakWithWebSpeech(text);
-    }
-    
-    function speakWithWebSpeech(text) {
-        if (!('speechSynthesis' in window)) {
-            console.warn('⚠️ Web Speech API no disponible');
-            return;
-        }
-        
-        // Cancelar cualquier voz anterior
-        window.speechSynthesis.cancel();
-        
-        // Si no hay voz seleccionada, intentar seleccionar una
-        if (!bestSpanishVoice) {
-            selectBestSpanishVoice();
         }
         
         const utterance = new SpeechSynthesisUtterance(text);
-        
-        // Configuración optimizada para español
-        utterance.rate = 0.95;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-        
-        // Usar la mejor voz encontrada
-        if (bestSpanishVoice) {
-            utterance.voice = bestSpanishVoice;
-            utterance.lang = bestSpanishVoice.lang;
-            console.log('🔊 Web Speech hablando con:', bestSpanishVoice.name);
-        } else {
-            // Fallback: probar diferentes configuraciones regionales
-            utterance.lang = 'es-MX'; // Español de México (mejor soporte)
-            console.warn('⚠️ Usando es-MX sin voz específica');
-            
-            // Ajustar parámetros para mejorar pronunciación
-            utterance.rate = 0.85; // Más lento para mejor claridad
-        }
-        
-        utterance.onerror = (event) => {
-            console.error('❌ Error en Web Speech:', event.error);
-            
-            // Si falla, intentar con otra configuración regional
-            if (event.error === 'voice-unavailable' || event.error === 'language-unavailable') {
-                bestSpanishVoice = null;
-                
-                // Intentar con es-ES como último recurso
-                const fallbackUtterance = new SpeechSynthesisUtterance(text);
-                fallbackUtterance.lang = 'es-ES';
-                fallbackUtterance.rate = 0.85;
-                fallbackUtterance.pitch = 1.0;
-                fallbackUtterance.volume = 1.0;
-                
-                console.log('🔄 Reintentando con es-ES...');
-                window.speechSynthesis.speak(fallbackUtterance);
-            }
-        };
-        
-        utterance.onstart = () => {
-            console.log('🗣️ Reproduciendo:', text);
-        };
+        utterance.lang = 'es-ES';
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
         
         window.speechSynthesis.speak(utterance);
-    }
-    
-    // Cargar y seleccionar voces cuando estén disponibles
-    if ('speechSynthesis' in window) {
-        // Las voces pueden no estar disponibles inmediatamente
-        window.speechSynthesis.onvoiceschanged = function() {
-            selectBestSpanishVoice();
-            
-            // Mostrar todas las voces en español disponibles
-            const voices = window.speechSynthesis.getVoices();
-            const spanishVoices = voices.filter(v => v.lang.startsWith('es'));
-            
-            if (spanishVoices.length > 0) {
-                console.log('📢 Voces en español disponibles:', 
-                    spanishVoices.map(v => `${v.name} (${v.lang})${v.localService ? ' [Local]' : ' [Online]'}`).join(', ')
-                );
-            }
-        };
-        
-        // Intentar cargar voces inmediatamente
-        setTimeout(selectBestSpanishVoice, 100);
     }
 
     // =========================================================

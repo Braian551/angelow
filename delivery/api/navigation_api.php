@@ -205,28 +205,57 @@ try {
                 throw new Exception('ID de entrega no válido');
             }
             
-            // Llamar al procedimiento almacenado
+            // Verificar que la entrega existe y está en estado correcto
             $stmt = $conn->prepare("
-                CALL StartNavigation(?, ?, ?, ?, ?, ?, ?, ?, ?, @result)
+                SELECT id, delivery_status 
+                FROM order_deliveries 
+                WHERE id = ? AND driver_id = ?
             ");
-            $stmt->execute([
-                $deliveryId, $driverId, 
-                $startLat, $startLng, 
-                $destLat, $destLng,
-                $routeJson, $distanceKm, $durationSeconds
-            ]);
+            $stmt->execute([$deliveryId, $driverId]);
+            $delivery = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            $result = $conn->query("SELECT @result as result")->fetch(PDO::FETCH_ASSOC);
-            
-            if ($result['result'] !== 'SUCCESS') {
-                throw new Exception('Error al iniciar navegación: ' . $result['result']);
+            if (!$delivery) {
+                throw new Exception('Entrega no encontrada o no pertenece al conductor');
             }
             
-            echo json_encode([
-                'success' => true,
-                'message' => 'Navegación iniciada',
-                'status' => 'in_transit'
-            ]);
+            if (!in_array($delivery['delivery_status'], ['driver_accepted', 'in_transit'])) {
+                throw new Exception('La entrega no está en un estado válido para navegación. Estado actual: ' . $delivery['delivery_status']);
+            }
+            
+            try {
+                // Asegurar que driver_id sea string (VARCHAR en DB)
+                $driverIdStr = strval($driverId);
+                
+                // Llamar al procedimiento almacenado
+                $stmt = $conn->prepare("CALL StartNavigation(?, ?, ?, ?, ?, ?, ?, ?, ?, @result)");
+                $stmt->execute([
+                    $deliveryId, $driverIdStr, 
+                    $startLat, $startLng, 
+                    $destLat, $destLng,
+                    $routeJson, $distanceKm, $durationSeconds
+                ]);
+                
+                // Cerrar el cursor del procedimiento
+                $stmt->closeCursor();
+                
+                // Obtener el resultado
+                $result = $conn->query("SELECT @result as result")->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$result || $result['result'] !== 'SUCCESS') {
+                    $errorMsg = $result['result'] ?? 'ERROR_DESCONOCIDO';
+                    throw new Exception('Error al iniciar navegación: ' . $errorMsg);
+                }
+                
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Navegación iniciada correctamente',
+                    'status' => 'in_transit'
+                ]);
+                
+            } catch (PDOException $e) {
+                error_log("Error en StartNavigation: " . $e->getMessage());
+                throw new Exception('Error de base de datos al iniciar navegación: ' . $e->getMessage());
+            }
             break;
         
         // ============================================
@@ -247,15 +276,21 @@ try {
                 throw new Exception('Datos de ubicación incompletos');
             }
             
+            // Asegurar que driver_id sea string (VARCHAR en DB)
+            $driverIdStr = strval($driverId);
+            
             // Llamar al procedimiento almacenado
             $stmt = $conn->prepare("
                 CALL UpdateDeliveryLocation(?, ?, ?, ?, ?, ?, ?, ?, @result)
             ");
             $stmt->execute([
-                $deliveryId, $driverId,
+                $deliveryId, $driverIdStr,
                 $latitude, $longitude,
                 $accuracy, $speed, $heading, $batteryLevel
             ]);
+            
+            // Cerrar el cursor del procedimiento
+            $stmt->closeCursor();
             
             $result = $conn->query("SELECT @result as result")->fetch(PDO::FETCH_ASSOC);
             
@@ -272,7 +307,7 @@ try {
                 FROM order_deliveries
                 WHERE id = ? AND driver_id = ?
             ");
-            $stmt->execute([$deliveryId, $driverId]);
+            $stmt->execute([$deliveryId, $driverIdStr]);
             $deliveryInfo = $stmt->fetch(PDO::FETCH_ASSOC);
             
             echo json_encode([
@@ -339,6 +374,92 @@ try {
                 'success' => true,
                 'info' => $info,
                 'recent_locations' => $recentLocations
+            ]);
+            break;
+        
+        // ============================================
+        // PAUSAR NAVEGACIÓN
+        // ============================================
+        case 'pause_navigation':
+            $data = json_decode(file_get_contents('php://input'), true);
+            $deliveryId = intval($data['delivery_id'] ?? 0);
+            
+            if (!$deliveryId) {
+                throw new Exception('ID de entrega no válido');
+            }
+            
+            // Verificar que la entrega pertenece al conductor
+            $stmt = $conn->prepare("
+                SELECT id, delivery_status
+                FROM order_deliveries 
+                WHERE id = ? AND driver_id = ?
+            ");
+            $stmt->execute([$deliveryId, $driverId]);
+            $delivery = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$delivery) {
+                throw new Exception('Entrega no encontrada');
+            }
+            
+            if ($delivery['delivery_status'] !== 'in_transit') {
+                throw new Exception('La entrega no está en tránsito');
+            }
+            
+            // Registrar evento de pausa
+            $stmt = $conn->prepare("
+                INSERT INTO navigation_events (
+                    delivery_id, driver_id, event_type, 
+                    latitude, longitude, event_data
+                ) VALUES (?, ?, 'paused', NULL, NULL, '{}')
+            ");
+            $stmt->execute([$deliveryId, $driverId]);
+            
+            echo json_encode([
+                'success' => true,
+                'message' => 'Navegación pausada'
+            ]);
+            break;
+        
+        // ============================================
+        // REANUDAR NAVEGACIÓN
+        // ============================================
+        case 'resume_navigation':
+            $data = json_decode(file_get_contents('php://input'), true);
+            $deliveryId = intval($data['delivery_id'] ?? 0);
+            
+            if (!$deliveryId) {
+                throw new Exception('ID de entrega no válido');
+            }
+            
+            // Verificar que la entrega pertenece al conductor
+            $stmt = $conn->prepare("
+                SELECT id, delivery_status
+                FROM order_deliveries 
+                WHERE id = ? AND driver_id = ?
+            ");
+            $stmt->execute([$deliveryId, $driverId]);
+            $delivery = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$delivery) {
+                throw new Exception('Entrega no encontrada');
+            }
+            
+            if ($delivery['delivery_status'] !== 'in_transit') {
+                throw new Exception('La entrega no está en tránsito');
+            }
+            
+            // Registrar evento de reanudación
+            $stmt = $conn->prepare("
+                INSERT INTO navigation_events (
+                    delivery_id, driver_id, event_type, 
+                    latitude, longitude, event_data
+                ) VALUES (?, ?, 'resumed', NULL, NULL, '{}')
+            ");
+            $stmt->execute([$deliveryId, $driverId]);
+            
+            echo json_encode([
+                'success' => true,
+                'message' => 'Navegación reanudada'
             ]);
             break;
         
