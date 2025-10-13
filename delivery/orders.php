@@ -631,9 +631,8 @@ $driverId = $_SESSION['user_id'];
         };
         
         window.startTrip = function(deliveryId) {
-            if (confirm('¿Iniciar el recorrido hacia el cliente?')) {
-                performAction('start_trip', deliveryId);
-            }
+            // Redirigir a la página de navegación en tiempo real
+            window.location.href = BASE_URL + '/delivery/navigation.php?delivery_id=' + deliveryId;
         };
         
         window.markArrived = function(deliveryId) {

@@ -196,6 +196,15 @@ try {
             <!-- Header -->
             <?php require_once __DIR__ . '/../layouts/delivery/headerdelivery.php'; ?>
 
+            <!-- Mensaje de error si existe -->
+            <?php if (isset($_SESSION['error_message'])): ?>
+                <div class="alert alert-danger" style="margin: 20px 0; padding: 15px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 8px; color: #721c24;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <?= htmlspecialchars($_SESSION['error_message']) ?>
+                </div>
+                <?php unset($_SESSION['error_message']); ?>
+            <?php endif; ?>
+
             <!-- Stats Summary -->
             <section class="stats-summary">
                 <div class="stat-card">
@@ -456,7 +465,22 @@ try {
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => response.json())
+            .then(response => {
+                // Verificar si la respuesta es JSON válido
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(text => {
+                        console.error('Response is not JSON:', text);
+                        throw new Error('La respuesta del servidor no es JSON válido. Revisa la consola.');
+                    });
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`Error del servidor: ${response.status}`);
+                }
+                
+                return response.json();
+            })
             .then(result => {
                 if (result.success) {
                     showNotification(result.message, 'success');
@@ -467,7 +491,7 @@ try {
             })
             .catch(error => {
                 console.error('Error:', error);
-                showNotification('Error al procesar la solicitud', 'error');
+                showNotification('Error: ' + error.message, 'error');
             });
         }
         
@@ -491,7 +515,22 @@ try {
                             order_id: orderId
                         })
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        // Verificar si la respuesta es JSON válido
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            return response.text().then(text => {
+                                console.error('Response is not JSON:', text);
+                                throw new Error('La respuesta del servidor no es JSON válido. Revisa la consola.');
+                            });
+                        }
+                        
+                        if (!response.ok) {
+                            throw new Error(`Error del servidor: ${response.status}`);
+                        }
+                        
+                        return response.json();
+                    })
                     .then(result => {
                         if (result.success) {
                             showNotification('¡Orden aceptada exitosamente!', 'success');
@@ -502,7 +541,7 @@ try {
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        showNotification('Error al procesar la solicitud', 'error');
+                        showNotification('Error: ' + error.message, 'error');
                     });
                 }
             });
@@ -543,10 +582,61 @@ try {
                 const deliveryId = this.getAttribute('data-delivery-id');
                 
                 if (confirm('¿Iniciar el recorrido hacia el cliente?')) {
-                    performDeliveryAction('start_trip', deliveryId);
+                    // Obtener ubicación y luego iniciar recorrido
+                    const data = {
+                        action: 'start_trip',
+                        delivery_id: deliveryId
+                    };
+                    
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function(position) {
+                            data.latitude = position.coords.latitude;
+                            data.longitude = position.coords.longitude;
+                            sendStartTripRequest(data, deliveryId);
+                        }, function(error) {
+                            console.warn('No se pudo obtener la ubicación:', error);
+                            sendStartTripRequest(data, deliveryId);
+                        });
+                    } else {
+                        sendStartTripRequest(data, deliveryId);
+                    }
                 }
             });
         });
+        
+        // Función especial para iniciar recorrido y redirigir a navegación
+        function sendStartTripRequest(data, deliveryId) {
+            fetch(BASE_URL + '/delivery/delivery_actions.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(result => {
+                console.log('Resultado del start_trip:', result);
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    // Redirigir a la página de navegación después de iniciar el recorrido
+                    setTimeout(() => {
+                        console.log('Redirigiendo a navegación con delivery_id:', deliveryId);
+                        window.location.href = BASE_URL + '/delivery/navigation.php?delivery_id=' + deliveryId;
+                    }, 800);
+                } else {
+                    showNotification('Error: ' + (result.message || 'No se pudo iniciar el recorrido'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error en start_trip:', error);
+                showNotification('Error al procesar la solicitud: ' + error.message, 'error');
+            });
+        }
         
         // ====================================
         // MARCAR COMO LLEGADO

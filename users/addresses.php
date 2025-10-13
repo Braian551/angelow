@@ -84,7 +84,12 @@ function saveAddress($conn, $data, $user_id) {
             'apartment_number' => !empty($data['apartment_number']) ? $data['apartment_number'] : null,
             'delivery_instructions' => !empty($data['delivery_instructions']) ? $data['delivery_instructions'] : null,
             'is_default' => !empty($data['is_default']) ? 1 : 0,
-            'user_id' => $user_id
+            'user_id' => $user_id,
+            // Coordenadas GPS (opcionales)
+            'gps_latitude' => !empty($data['gps_latitude']) ? floatval($data['gps_latitude']) : null,
+            'gps_longitude' => !empty($data['gps_longitude']) ? floatval($data['gps_longitude']) : null,
+            'gps_accuracy' => !empty($data['gps_accuracy']) ? floatval($data['gps_accuracy']) : null,
+            'gps_timestamp' => !empty($data['gps_latitude']) && !empty($data['gps_longitude']) ? date('Y-m-d H:i:s') : null
         ];
 
         $conn->beginTransaction();
@@ -113,6 +118,10 @@ function saveAddress($conn, $data, $user_id) {
                 apartment_number = :apartment_number,
                 delivery_instructions = :delivery_instructions,
                 is_default = :is_default,
+                gps_latitude = :gps_latitude,
+                gps_longitude = :gps_longitude,
+                gps_accuracy = :gps_accuracy,
+                gps_timestamp = :gps_timestamp,
                 updated_at = NOW()
                 WHERE id = :id AND user_id = :user_id
             ");
@@ -132,11 +141,15 @@ function saveAddress($conn, $data, $user_id) {
                 INSERT INTO user_addresses 
                 (user_id, address_type, alias, recipient_name, recipient_phone, 
                  address, complement, neighborhood, building_type, building_name,
-                 apartment_number, delivery_instructions, is_default, created_at, updated_at) 
+                 apartment_number, delivery_instructions, is_default, 
+                 gps_latitude, gps_longitude, gps_accuracy, gps_timestamp,
+                 created_at, updated_at) 
                 VALUES 
                 (:user_id, :address_type, :alias, :recipient_name, :recipient_phone, 
                  :address, :complement, :neighborhood, :building_type, :building_name,
-                 :apartment_number, :delivery_instructions, :is_default, NOW(), NOW())
+                 :apartment_number, :delivery_instructions, :is_default,
+                 :gps_latitude, :gps_longitude, :gps_accuracy, :gps_timestamp,
+                 NOW(), NOW())
             ");
             
             $stmt->execute($params);
@@ -245,7 +258,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'apartment_number' => trim($_POST['apartment_number'] ?? ''),
             'delivery_instructions' => trim($_POST['delivery_instructions'] ?? ''),
             'is_default' => isset($_POST['is_default']) ? 1 : 0,
-            'id' => $_POST['id'] ?? null
+            'id' => $_POST['id'] ?? null,
+            // Coordenadas GPS
+            'gps_latitude' => $_POST['gps_latitude'] ?? null,
+            'gps_longitude' => $_POST['gps_longitude'] ?? null,
+            'gps_accuracy' => $_POST['gps_accuracy'] ?? null
         ];
         
         $result = saveAddress($conn, $data, $_SESSION['user_id']);
@@ -285,13 +302,19 @@ if ($action === 'edit' && $id) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-url" content="<?= BASE_URL ?>">
     <title>Mis Direcciones - Angelow</title>
     <meta name="description" content="Administra tus direcciones de envío en Angelow Ropa Infantil.">
     <link rel="icon" href="<?= BASE_URL ?>/images/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <!-- Leaflet CSS para el mapa GPS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/addresses.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/addresses-gps.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboarduser2.css">
 </head>
 <body>
@@ -408,6 +431,17 @@ if ($action === 'edit' && $id) {
                                     <span class="step-number">3</span>
                                     <h3>Detalles de la dirección</h3>
                                     <p>¿Dónde debemos entregar tus pedidos?</p>
+                                </div>
+                                
+                                <!-- Botón GPS -->
+                                <div class="form-group">
+                                    <button type="button" class="btn-gps" id="btn-open-gps">
+                                        <i class="fas fa-map-marked-alt"></i>
+                                        <span>Usar mi ubicación GPS</span>
+                                    </button>
+                                    <p style="font-size: 1.2rem; color: #666; margin-top: 0.5rem; text-align: center;">
+                                        <i class="fas fa-info-circle"></i> Selecciona tu ubicación en el mapa de forma precisa
+                                    </p>
                                 </div>
                                 
                                 <div class="form-group">
@@ -621,7 +655,14 @@ if ($action === 'edit' && $id) {
 
     <?php includeFromRoot('layouts/footer.php'); ?>
     
+    <!-- Leaflet JS para el mapa GPS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <!-- GPS Address Picker Script -->
+    <script src="<?= BASE_URL ?>/js/addresses-gps.js"></script>
+    
     <script>
         $(document).ready(function() {
             // Cerrar notificación

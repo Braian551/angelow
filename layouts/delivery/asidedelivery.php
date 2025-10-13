@@ -36,6 +36,23 @@ if (!isset($userData)) {
         exit();
     }
 }
+
+// Verificar si hay una entrega activa en tránsito para habilitar navegación
+$activeDelivery = null;
+try {
+    $stmt = $conn->prepare("
+        SELECT id, delivery_status 
+        FROM order_deliveries 
+        WHERE driver_id = ? 
+        AND delivery_status IN ('driver_accepted', 'in_transit', 'arrived')
+        ORDER BY started_at DESC, accepted_at DESC
+        LIMIT 1
+    ");
+    $stmt->execute([$_SESSION['user_id']]);
+    $activeDelivery = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log("Error al verificar entrega activa: " . $e->getMessage());
+}
 ?>
 
 <!-- Sidebar de Delivery -->
@@ -62,6 +79,20 @@ if (!isset($userData)) {
                 <a href="<?= BASE_URL ?><?= $menu_items['orders'] ?>">
                     <i class="fas fa-shopping-bag"></i> Órdenes
                 </a>
+            </li>
+            <li class="<?= strpos($current_url, '/delivery/navigation.php') !== false ? 'active' : '' ?>">
+                <?php if ($activeDelivery && in_array($activeDelivery['delivery_status'], ['driver_accepted', 'in_transit', 'arrived'])): ?>
+                    <a href="<?= BASE_URL ?>/delivery/navigation.php?delivery_id=<?= $activeDelivery['id'] ?>">
+                        <i class="fas fa-map-marked-alt"></i> Navegación
+                        <?php if ($activeDelivery['delivery_status'] === 'in_transit'): ?>
+                            <span style="display:inline-block;width:8px;height:8px;background:#4caf50;border-radius:50%;margin-left:5px;"></span>
+                        <?php endif; ?>
+                    </a>
+                <?php else: ?>
+                    <a href="<?= BASE_URL ?>/delivery/dashboarddeli.php" style="opacity: 0.6;">
+                        <i class="fas fa-map-marked-alt"></i> Navegación
+                    </a>
+                <?php endif; ?>
             </li>
             <li class="<?= isDeliveryMenuItemActive($menu_items['history'], $current_url) ? 'active' : '' ?>">
                 <a href="<?= BASE_URL ?><?= $menu_items['history'] ?>">

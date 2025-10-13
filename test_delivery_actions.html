@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Delivery Actions - Angelow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        input, select {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .quick-action {
+            padding: 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quick-action:hover {
+            border-color: #667eea;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+        
+        .quick-action i {
+            font-size: 32px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .quick-action h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .quick-action p {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-truck"></i> Test Delivery Actions</h1>
+        <p class="subtitle">Prueba las acciones del sistema de delivery sin necesidad de la interfaz completa</p>
+        
+        <!-- Test 1: Aceptar Orden Disponible -->
+        <div class="test-section">
+            <h2><i class="fas fa-check-circle"></i> Test 1: Aceptar Orden Disponible</h2>
+            <p style="color: #666; margin-bottom: 15px;">Simula aceptar una orden disponible (self_assign_order)</p>
+            <div class="test-controls">
+                <input type="number" id="orderId" placeholder="ID de Orden (ej: 1)" value="1">
+                <button onclick="testSelfAssignOrder()">
+                    <i class="fas fa-play"></i> Ejecutar Test
+                </button>
+            </div>
+            <div id="result1"></div>
+        </div>
+        
+        <!-- Test 2: Iniciar Recorrido -->
+        <div class="test-section">
+            <h2><i class="fas fa-route"></i> Test 2: Iniciar Recorrido</h2>
+            <p style="color: #666; margin-bottom: 15px;">Inicia el recorrido de una orden aceptada (start_trip)</p>
+            <div class="test-controls">
+                <input type="number" id="deliveryId" placeholder="ID de Entrega (ej: 1)" value="1">
+                <button onclick="testStartTrip()">
+                    <i class="fas fa-play"></i> Iniciar Recorrido
+                </button>
+            </div>
+            <div id="result2"></div>
+        </div>
+        
+        <!-- Test 3: Marcar Llegada -->
+        <div class="test-section">
+            <h2><i class="fas fa-map-marker-alt"></i> Test 3: Marcar Llegada</h2>
+            <p style="color: #666; margin-bottom: 15px;">Marca que has llegado al destino (mark_arrived)</p>
+            <div class="test-controls">
+                <input type="number" id="deliveryId2" placeholder="ID de Entrega" value="1">
+                <button onclick="testMarkArrived()">
+                    <i class="fas fa-flag-checkered"></i> He Llegado
+                </button>
+            </div>
+            <div id="result3"></div>
+        </div>
+        
+        <!-- Test 4: Completar Entrega -->
+        <div class="test-section">
+            <h2><i class="fas fa-check-double"></i> Test 4: Completar Entrega</h2>
+            <p style="color: #666; margin-bottom: 15px;">Completa la entrega con información del receptor</p>
+            <div class="test-controls">
+                <input type="number" id="deliveryId3" placeholder="ID de Entrega" value="1">
+                <input type="text" id="recipientName" placeholder="Nombre del Receptor" value="Juan Pérez">
+                <button onclick="testCompleteDelivery()">
+                    <i class="fas fa-check"></i> Completar Entrega
+                </button>
+            </div>
+            <div id="result4"></div>
+        </div>
+        
+        <!-- Acciones Rápidas -->
+        <div class="test-section" style="border-left-color: #28a745;">
+            <h2><i class="fas fa-bolt"></i> Acciones Rápidas</h2>
+            <div class="quick-actions">
+                <div class="quick-action" onclick="goToDashboard()">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <h3>Ir al Dashboard</h3>
+                    <p>Panel principal</p>
+                </div>
+                <div class="quick-action" onclick="checkOrders()">
+                    <i class="fas fa-list"></i>
+                    <h3>Ver Órdenes</h3>
+                    <p>Órdenes disponibles</p>
+                </div>
+                <div class="quick-action" onclick="clearResults()">
+                    <i class="fas fa-eraser"></i>
+                    <h3>Limpiar Resultados</h3>
+                    <p>Borrar todos los tests</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const BASE_URL = window.location.origin + '/angelow';
+        
+        async function sendRequest(action, data) {
+            try {
+                const response = await fetch(`${BASE_URL}/delivery/delivery_actions.php`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        ...data
+                    })
+                });
+                
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    throw new Error('Respuesta no es JSON válido:\n' + text);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                throw error;
+            }
+        }
+        
+        function showResult(elementId, result, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = JSON.stringify(result, null, 2);
+        }
+        
+        async function testSelfAssignOrder() {
+            const orderId = document.getElementById('orderId').value;
+            const resultDiv = document.getElementById('result1');
+            resultDiv.innerHTML = '<div class="loading"></div> Procesando...';
+            
+            try {
+                const result = await sendRequest('self_assign_order', {
+                    order_id: parseInt(orderId)
+                });
+                
+                if (result.success) {
+                    showResult('result1', result, 'success');
+                    alert(`✅ Orden ${result.order_number} aceptada!\nID de Entrega: ${result.delivery_id}`);
+                } else {
+                    showResult('result1', result, 'error');
+                }
+            } catch (error) {
+                showResult('result1', { error: error.message }, 'error');
+            }
+        }
+        
+        async function testStartTrip() {
+            const deliveryId = document.getElementById('deliveryId').value;
+            const resultDiv = document.getElementById('result2');
+            resultDiv.innerHTML = '<div class="loading"></div> Procesando...';
+            
+            try {
+                // Obtener ubicación GPS
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(async (position) => {
+                        const result = await sendRequest('start_trip', {
+                            delivery_id: parseInt(deliveryId),
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        });
+                        
+                        if (result.success) {
+                            showResult('result2', result, 'success');
+                            alert(`✅ ${result.message}\nPuedes ir a la navegación ahora.`);
+                        } else {
+                            showResult('result2', result, 'error');
+                        }
+                    }, async (error) => {
+                        // Sin ubicación GPS
+                        const result = await sendRequest('start_trip', {
+                            delivery_id: parseInt(deliveryId),
+                            latitude: null,
+                            longitude: null
+                        });
+                        
+                        if (result.success) {
+                            showResult('result2', result, 'success');
+                        } else {
+                            showResult('result2', result, 'error');
+                        }
+                    });
+                } else {
+                    const result = await sendRequest('start_trip', {
+                        delivery_id: parseInt(deliveryId),
+                        latitude: null,
+                        longitude: null
+                    });
+                    
+                    if (result.success) {
+                        showResult('result2', result, 'success');
+                    } else {
+                        showResult('result2', result, 'error');
+                    }
+                }
+            } catch (error) {
+                showResult('result2', { error: error.message }, 'error');
+            }
+        }
+        
+        async function testMarkArrived() {
+            const deliveryId = document.getElementById('deliveryId2').value;
+            const resultDiv = document.getElementById('result3');
+            resultDiv.innerHTML = '<div class="loading"></div> Procesando...';
+            
+            try {
+                const result = await sendRequest('mark_arrived', {
+                    delivery_id: parseInt(deliveryId),
+                    latitude: 4.6097,
+                    longitude: -74.0817
+                });
+                
+                if (result.success) {
+                    showResult('result3', result, 'success');
+                } else {
+                    showResult('result3', result, 'error');
+                }
+            } catch (error) {
+                showResult('result3', { error: error.message }, 'error');
+            }
+        }
+        
+        async function testCompleteDelivery() {
+            const deliveryId = document.getElementById('deliveryId3').value;
+            const recipientName = document.getElementById('recipientName').value;
+            const resultDiv = document.getElementById('result4');
+            resultDiv.innerHTML = '<div class="loading"></div> Procesando...';
+            
+            try {
+                const result = await sendRequest('complete_delivery', {
+                    delivery_id: parseInt(deliveryId),
+                    recipient_name: recipientName,
+                    notes: 'Entrega realizada exitosamente - Test'
+                });
+                
+                if (result.success) {
+                    showResult('result4', result, 'success');
+                    alert(`✅ Entrega completada!\n${result.message}`);
+                } else {
+                    showResult('result4', result, 'error');
+                }
+            } catch (error) {
+                showResult('result4', { error: error.message }, 'error');
+            }
+        }
+        
+        function goToDashboard() {
+            window.location.href = `${BASE_URL}/delivery/dashboarddeli.php`;
+        }
+        
+        function checkOrders() {
+            window.location.href = `${BASE_URL}/delivery/orders.php`;
+        }
+        
+        function clearResults() {
+            ['result1', 'result2', 'result3', 'result4'].forEach(id => {
+                const el = document.getElementById(id);
+                el.textContent = '';
+                el.className = '';
+            });
+        }
+    </script>
+</body>
+</html>
