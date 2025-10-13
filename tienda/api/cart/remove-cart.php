@@ -30,7 +30,7 @@ try {
     $user_id = $_SESSION['user_id'] ?? null;
     $session_id = session_id();
     
-    $query = "SELECT ci.id FROM cart_items ci
+    $query = "SELECT ci.id, ci.cart_id FROM cart_items ci
               JOIN carts c ON ci.cart_id = c.id
               WHERE ci.id = :item_id AND ";
     
@@ -38,7 +38,7 @@ try {
         $query .= "c.user_id = :user_id";
         $params = [':item_id' => $item_id, ':user_id' => $user_id];
     } else {
-        $query .= "c.session_id = :session_id";
+        $query .= "c.session_id = :session_id AND c.user_id IS NULL";
         $params = [':item_id' => $item_id, ':session_id' => $session_id];
     }
     
@@ -50,18 +50,34 @@ try {
         throw new Exception("Item no encontrado en tu carrito");
     }
     
+    $cart_id = $item['cart_id'];
+    
     // Eliminar el item
     $stmt = $conn->prepare("DELETE FROM cart_items WHERE id = :id");
     $stmt->execute([':id' => $item_id]);
     
+    // Calcular el nuevo total del carrito
+    $stmt = $conn->prepare("
+        SELECT SUM(COALESCE(psv.price, p.price) * ci.quantity) as cart_total
+        FROM cart_items ci
+        JOIN products p ON ci.product_id = p.id
+        LEFT JOIN product_size_variants psv ON ci.size_variant_id = psv.id
+        WHERE ci.cart_id = :cart_id
+    ");
+    $stmt->execute([':cart_id' => $cart_id]);
+    $cartTotal = $stmt->fetch(PDO::FETCH_ASSOC)['cart_total'] ?? 0;
+    
     $response = [
         'success' => true,
-        'message' => 'Producto eliminado del carrito'
+        'message' => 'Producto eliminado del carrito',
+        'cart_total' => $cartTotal
     ];
 } catch (PDOException $e) {
     $response['error'] = 'Error al eliminar del carrito: ' . $e->getMessage();
+    error_log("Error en remove-cart.php: " . $e->getMessage());
 } catch (Exception $e) {
     $response['error'] = $e->getMessage();
+    error_log("Error en remove-cart.php: " . $e->getMessage());
 }
 
 echo json_encode($response);

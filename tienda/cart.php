@@ -43,7 +43,7 @@ try {
         p.name as product_name,
         p.slug as product_slug,
         p.price as product_price,
-        COALESCE(vi.image_path, pi.image_path) as primary_image,  -- Primero intenta con la imagen de la variante, luego con la del producto
+        COALESCE(vi.image_path, pi.image_path) as primary_image,
         c.name as color_name,
         s.name as size_name,
         pcv.id as color_variant_id,
@@ -58,9 +58,9 @@ try {
     LEFT JOIN colors c ON pcv.color_id = c.id
     LEFT JOIN product_size_variants psv ON ci.size_variant_id = psv.id
     LEFT JOIN sizes s ON psv.size_id = s.id
-    LEFT JOIN variant_images vi ON pcv.id = vi.color_variant_id AND vi.is_primary = 1  -- Nueva unión para obtener imagen de la variante
+    LEFT JOIN variant_images vi ON pcv.id = vi.color_variant_id AND vi.is_primary = 1
     WHERE ci.cart_id = :cart_id
-    GROUP BY ci.id
+    ORDER BY ci.created_at DESC
 ";
 
         $stmt = $conn->prepare($itemsQuery);
