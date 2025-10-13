@@ -182,7 +182,7 @@ if (class_exists('Dompdf\Dompdf')) {
         $dompdf->render();
         
         echo "<p class='success'>✓ Dompdf puede generar PDFs</p>";
-        echo "<p class='info'>Puedes descargar un PDF de prueba <a href='test_simple_pdf.php' target='_blank'>aquí</a></p>";
+        echo "<p class='info'>Puedes descargar un PDF de prueba <a href='../../tests/admin/api/test_simple_pdf.php' target='_blank'>aquí</a></p>";
     } catch (Exception $e) {
         echo "<p class='error'>✗ Error al crear PDF con Dompdf: " . $e->getMessage() . "</p>";
     }

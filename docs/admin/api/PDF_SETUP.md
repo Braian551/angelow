@@ -30,7 +30,7 @@ Esto instalará:
 
 Accede a la siguiente URL en tu navegador:
 ```
-http://localhost/angelow/admin/api/test_pdf.php
+http://localhost/angelow/tests/admin/api/test_pdf.php
 ```
 
 Deberías ver un mensaje confirmando que TCPDF está instalado correctamente.
@@ -146,5 +146,5 @@ composer update tecnickcom/tcpdf
 Si encuentras problemas:
 1. Revisa este archivo de documentación
 2. Verifica los logs de errores
-3. Ejecuta el archivo de prueba `test_pdf.php`
+3. Ejecuta el archivo de prueba `/tests/admin/api/test_pdf.php`
 4. Contacta al desarrollador del sistema

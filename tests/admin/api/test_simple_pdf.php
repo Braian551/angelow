@@ -1,7 +1,7 @@
 <?php
 // Test simple de generación de PDF
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 try {
     $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);

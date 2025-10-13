@@ -1,8 +1,8 @@
 <?php
 // Archivo de prueba para verificar que TCPDF esté disponible
 
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../../config.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 try {
     // Verificar si TCPDF está disponible

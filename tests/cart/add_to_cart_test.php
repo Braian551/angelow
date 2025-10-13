@@ -276,7 +276,7 @@
         async function getProductDetails(productId) {
             try {
                 // Crear una petición para obtener detalles del producto
-                const response = await fetch(`${baseUrl}/get_product_details.php?id=${productId}`);
+                const response = await fetch(`${baseUrl}/ajax/get_product_details.php?id=${productId}`);
                 const data = await response.json();
                 return data;
             } catch (error) {

@@ -53,15 +53,46 @@ angelow/
 ├── ajax/                    # Endpoints AJAX
 ├── auth/                    # Sistema de autenticación
 ├── css/                     # Estilos CSS
+├── database/                # 💾 Base de datos (ver estructura abajo)
+│   ├── migrations/          # Migraciones organizadas por versión
+│   ├── fixes/               # Correcciones y fixes
+│   └── scripts/             # Scripts de ejecución
+├── docs/                    # 📚 Documentación (ver estructura abajo)
+│   ├── correcciones/        # Documentación de correcciones
+│   ├── guias/               # Guías de uso
+│   ├── migraciones/         # Documentación de migraciones
+│   ├── soluciones/          # Soluciones a problemas
+│   ├── admin/               # Docs del módulo admin
+│   └── delivery/            # Docs del módulo delivery
 ├── images/                  # Recursos multimedia
 ├── js/                      # Scripts JavaScript
 ├── layouts/                 # Plantillas reutilizables
 ├── pagos/                   # Sistema de pagos
 ├── producto/                # Páginas de productos
+├── tests/                   # 🧪 Tests (ver estructura abajo)
+│   ├── admin/               # Tests del módulo admin
+│   ├── cart/                # Tests del carrito
+│   ├── database/            # Tests de base de datos
+│   ├── delivery/            # Tests de entregas
+│   ├── navigation/          # Tests de navegación
+│   └── voice/               # Tests de voz
 ├── tienda/                  # Catálogo y carrito
 ├── users/                   # Panel de usuario
 └── vendor/                  # Dependencias Composer
 ```
+
+#### 📂 Organización Modular
+
+El proyecto está organizado siguiendo una estructura modular que separa claramente:
+
+- **`database/`**: Toda la gestión de base de datos (migraciones, fixes, scripts)
+- **`docs/`**: Documentación completa organizada por tipo y módulo
+- **`tests/`**: Tests organizados por funcionalidad y módulo
+
+Para más detalles sobre cada carpeta, consultar:
+- [`database/README.md`](database/README.md) - Guía completa de base de datos
+- [`docs/README.md`](docs/README.md) - Índice de documentación
+- [`tests/README.md`](tests/README.md) - Guía de tests
 
 ## 🗄️ Base de Datos
 
