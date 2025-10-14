@@ -15,12 +15,15 @@
         BASE_URL: document.querySelector('meta[name="base-url"]')?.content || '',
         UPDATE_INTERVAL: 5000, // Actualizar ubicaciÃ³n cada 5 segundos
         ROUTE_CHECK_INTERVAL: 30000, // Verificar ruta cada 30 segundos
+        INSTRUCTION_CHECK_INTERVAL: 3000, // Verificar instrucciones cada 3 segundos
         NEAR_DESTINATION_THRESHOLD: 0.1, // 100 metros
         OFF_ROUTE_THRESHOLD: 0.05, // 50 metros fuera de ruta
         SPEECH_ENABLED: true,
         MAP_ZOOM: 17,
         MAP_MIN_ZOOM: 10,
-        MAP_MAX_ZOOM: 19
+        MAP_MAX_ZOOM: 19,
+        // Umbrales para instrucciones de voz (en metros)
+        INSTRUCTION_DISTANCES: [500, 200, 100, 50]
     };
 
     // =========================================================
@@ -43,11 +46,14 @@
         watchId: null,
         updateInterval: null,
         routeCheckInterval: null,
+        instructionCheckInterval: null,
         currentSpeed: 0,
         currentHeading: 0,
         distanceRemaining: 0,
         etaSeconds: 0,
         currentStepIndex: 0,
+        currentStep: null,
+        lastInstructionDistance: null,
         deliveryData: null,
         batteryLevel: 100
     };
@@ -486,6 +492,11 @@
             // Cambiar botn de accin
             updateActionButton('pause', 'Pausar navegación');
             
+            // CERRAR PANEL AUTOMÁTICAMENTE
+            if (state.isPanelExpanded) {
+                togglePanel();
+            }
+            
             // Iniciar actualizaciones peridicas
             startPeriodicUpdates();
             
@@ -495,8 +506,14 @@
             updateStatus('Navegando');
             showNotification('Navegación iniciada', 'success');
             
-            // Instrucción de voz
+            // Instrucción de voz inicial
             speak('Navegación iniciada. Sigue la ruta marcada.');
+            
+            // Dar primera instrucción si hay pasos
+            if (state.route.steps && state.route.steps.length > 0) {
+                state.currentStep = state.route.steps[0];
+                updateCurrentInstruction();
+            }
 
             console.log('✅ Navegación iniciada');
 
@@ -538,6 +555,11 @@
             if (state.routeCheckInterval) {
                 clearInterval(state.routeCheckInterval);
                 state.routeCheckInterval = null;
+            }
+            
+            if (state.instructionCheckInterval) {
+                clearInterval(state.instructionCheckInterval);
+                state.instructionCheckInterval = null;
             }
             
             // Cambiar botón de acción
@@ -621,6 +643,13 @@
                 checkIfOnRoute();
             }
         }, CONFIG.ROUTE_CHECK_INTERVAL);
+        
+        // Verificar instrucciones de navegación cada 3 segundos
+        state.instructionCheckInterval = setInterval(() => {
+            if (state.isNavigating && state.currentLocation) {
+                checkNavigationInstructions();
+            }
+        }, CONFIG.INSTRUCTION_CHECK_INTERVAL);
     }
 
     // =========================================================
@@ -673,6 +702,218 @@
     function checkIfOnRoute() {
         // TODO: Implementar verificaciÃ³n de distancia a la ruta
         // Por ahora, siempre asumimos que estamos en ruta
+    }
+    
+    // =========================================================
+    // VERIFICAR INSTRUCCIONES DE NAVEGACIÓN (ESTILO WAZE)
+    // =========================================================
+    function checkNavigationInstructions() {
+        if (!state.route || !state.route.steps || state.route.steps.length === 0) {
+            return;
+        }
+        
+        // Calcular distancia al siguiente paso
+        const nextStep = state.route.steps[state.currentStepIndex];
+        if (!nextStep || !nextStep.location) {
+            return;
+        }
+        
+        const distanceToStep = calculateDistance(
+            state.currentLocation.lat,
+            state.currentLocation.lng,
+            nextStep.location[1], // lat
+            nextStep.location[0]  // lng
+        );
+        
+        const distanceInMeters = distanceToStep * 1000;
+        
+        // Actualizar instrucción visual
+        updateNavigationInstruction(nextStep, distanceInMeters);
+        
+        // Dar instrucción de voz en puntos específicos
+        giveVoiceInstruction(nextStep, distanceInMeters);
+        
+        // Si ya pasamos este paso, avanzar al siguiente
+        if (distanceInMeters < 20 && state.currentStepIndex < state.route.steps.length - 1) {
+            state.currentStepIndex++;
+            state.lastInstructionDistance = null;
+            console.log(`➡️ Avanzando al paso ${state.currentStepIndex + 1}/${state.route.steps.length}`);
+        }
+    }
+    
+    // =========================================================
+    // ACTUALIZAR INSTRUCCIÓN VISUAL EN PANTALLA
+    // =========================================================
+    function updateNavigationInstruction(step, distanceInMeters) {
+        const instructionMain = document.getElementById('instruction-main');
+        const instructionDistance = document.getElementById('instruction-distance');
+        const instructionIcon = document.getElementById('instruction-icon');
+        
+        if (!instructionMain || !instructionDistance || !instructionIcon) return;
+        
+        // Obtener tipo de maniobra y texto
+        const maneuver = getManeuverInfo(step);
+        
+        // Actualizar icono
+        instructionIcon.innerHTML = `<i class="${maneuver.icon}"></i>`;
+        
+        // Actualizar texto principal
+        instructionMain.textContent = maneuver.text;
+        
+        // Actualizar distancia
+        if (distanceInMeters > 1000) {
+            instructionDistance.textContent = `En ${(distanceInMeters / 1000).toFixed(1)} km`;
+        } else {
+            instructionDistance.textContent = `En ${Math.round(distanceInMeters)} m`;
+        }
+    }
+    
+    // =========================================================
+    // DAR INSTRUCCIÓN DE VOZ EN PUNTOS ESPECÍFICOS
+    // =========================================================
+    function giveVoiceInstruction(step, distanceInMeters) {
+        // Solo dar instrucciones en distancias específicas
+        const distances = CONFIG.INSTRUCTION_DISTANCES;
+        
+        for (const threshold of distances) {
+            // Si estamos cerca de este umbral y no lo hemos anunciado aún
+            if (distanceInMeters <= threshold && 
+                distanceInMeters > threshold - 50 &&
+                state.lastInstructionDistance !== threshold) {
+                
+                state.lastInstructionDistance = threshold;
+                const maneuver = getManeuverInfo(step);
+                const distanceText = threshold >= 1000 
+                    ? `${threshold / 1000} kilómetros`
+                    : `${threshold} metros`;
+                
+                const instruction = `En ${distanceText}, ${maneuver.voiceText}`;
+                speak(instruction);
+                
+                console.log(`🔊 Instrucción: ${instruction}`);
+                break;
+            }
+        }
+        
+        // Instrucción inmediata cuando estamos muy cerca
+        if (distanceInMeters <= 30 && state.lastInstructionDistance !== 0) {
+            state.lastInstructionDistance = 0;
+            const maneuver = getManeuverInfo(step);
+            speak(maneuver.voiceText);
+        }
+    }
+    
+    // =========================================================
+    // OBTENER INFORMACIÓN DE MANIOBRA (TIPO WAZE)
+    // =========================================================
+    function getManeuverInfo(step) {
+        const instruction = step.instruction || step.name || '';
+        const instructionLower = instruction.toLowerCase();
+        
+        // Detectar tipo de maniobra
+        let icon = 'fas fa-arrow-up';
+        let text = 'Continúa recto';
+        let voiceText = 'continúa recto';
+        
+        // Giros a la derecha
+        if (instructionLower.includes('derecha') || instructionLower.includes('right')) {
+            if (instructionLower.includes('ligera') || instructionLower.includes('slight')) {
+                icon = 'fas fa-arrow-right';
+                text = 'Gira ligeramente a la derecha';
+                voiceText = 'gira ligeramente a la derecha';
+            } else {
+                icon = 'fas fa-arrow-right';
+                text = 'Gira a la derecha';
+                voiceText = 'gira a la derecha';
+            }
+        }
+        // Giros a la izquierda
+        else if (instructionLower.includes('izquierda') || instructionLower.includes('left')) {
+            if (instructionLower.includes('ligera') || instructionLower.includes('slight')) {
+                icon = 'fas fa-arrow-left';
+                text = 'Gira ligeramente a la izquierda';
+                voiceText = 'gira ligeramente a la izquierda';
+            } else {
+                icon = 'fas fa-arrow-left';
+                text = 'Gira a la izquierda';
+                voiceText = 'gira a la izquierda';
+            }
+        }
+        // Rotondas
+        else if (instructionLower.includes('rotonda') || instructionLower.includes('roundabout')) {
+            icon = 'fas fa-circle-notch';
+            text = 'Toma la rotonda';
+            voiceText = 'toma la rotonda';
+        }
+        // Salidas
+        else if (instructionLower.includes('salida') || instructionLower.includes('exit')) {
+            icon = 'fas fa-sign-out-alt';
+            text = 'Toma la salida';
+            voiceText = 'toma la salida';
+        }
+        // Continuar en calle
+        else if (instructionLower.includes('continua') || instructionLower.includes('continue')) {
+            icon = 'fas fa-arrow-up';
+            text = step.name || 'Continúa por esta vía';
+            voiceText = `continúa por ${step.name || 'esta vía'}`;
+        }
+        // Destino
+        else if (instructionLower.includes('destino') || instructionLower.includes('destination') ||
+                 instructionLower.includes('llegaste') || instructionLower.includes('arrived')) {
+            icon = 'fas fa-map-marker-alt';
+            text = 'Has llegado a tu destino';
+            voiceText = 'has llegado a tu destino';
+        }
+        // Incorporación
+        else if (instructionLower.includes('incorpora') || instructionLower.includes('merge')) {
+            icon = 'fas fa-compress-arrows-alt';
+            text = 'Incorpórate';
+            voiceText = 'incorpórate a la vía';
+        }
+        // Recto por defecto
+        else {
+            text = step.name || instruction || 'Continúa por esta vía';
+            voiceText = step.name ? `continúa por ${step.name}` : 'continúa recto';
+        }
+        
+        return { icon, text, voiceText };
+    }
+    
+    // =========================================================
+    // CALCULAR DISTANCIA ENTRE DOS PUNTOS (Haversine)
+    // =========================================================
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radio de la Tierra en km
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distancia en km
+    }
+    
+    function toRad(degrees) {
+        return degrees * (Math.PI / 180);
+    }
+    
+    // =========================================================
+    // ACTUALIZAR INSTRUCCIÓN ACTUAL
+    // =========================================================
+    function updateCurrentInstruction() {
+        if (!state.currentStep) return;
+        
+        const maneuver = getManeuverInfo(state.currentStep);
+        const instructionMain = document.getElementById('instruction-main');
+        const instructionIcon = document.getElementById('instruction-icon');
+        
+        if (instructionMain) {
+            instructionMain.textContent = maneuver.text;
+        }
+        
+        if (instructionIcon) {
+            instructionIcon.innerHTML = `<i class="${maneuver.icon}"></i>`;
+        }
     }
 
     // =========================================================
@@ -1186,6 +1427,11 @@
         if (state.routeCheckInterval) {
             clearInterval(state.routeCheckInterval);
             state.routeCheckInterval = null;
+        }
+        
+        if (state.instructionCheckInterval) {
+            clearInterval(state.instructionCheckInterval);
+            state.instructionCheckInterval = null;
         }
         
         if (state.watchId) {

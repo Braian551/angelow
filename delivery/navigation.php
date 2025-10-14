@@ -143,8 +143,8 @@ try {
 
     <!-- Panel de información inferior -->
     <div class="nav-panel" id="nav-panel">
-        <!-- Panel compacto (por defecto) -->
-        <div class="panel-compact" id="panel-compact">
+        <!-- Panel compacto (por defecto visible) -->
+        <div class="panel-compact" id="panel-compact" style="display: block;">
             <div class="panel-handle" onclick="togglePanel()">
                 <div class="handle-bar"></div>
             </div>
@@ -182,7 +182,7 @@ try {
             </div>
         </div>
 
-        <!-- Panel expandido -->
+        <!-- Panel expandido (oculto por defecto) -->
         <div class="panel-expanded" id="panel-expanded" style="display: none;">
             <div class="panel-handle" onclick="togglePanel()">
                 <div class="handle-bar"></div>

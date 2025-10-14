@@ -168,6 +168,15 @@ body {
     font-size: 28px;
     color: #fff;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+}
+
+.instruction-icon i {
+    transition: transform 0.3s ease;
+}
+
+.instruction-icon:active {
+    transform: scale(0.95);
 }
 
 .instruction-text {
