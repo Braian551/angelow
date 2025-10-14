@@ -1486,34 +1486,12 @@ select:focus-visible {
 
 .timeline-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, 
-        rgba(52, 152, 219, 0.9) 0%,
-        rgba(155, 89, 182, 0.9) 50%,
-        rgba(46, 204, 113, 0.9) 100%);
+    background: var(--primary-color);
     border-radius: 10px;
     transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 15px rgba(52, 152, 219, 0.4);
+    box-shadow: 0 0 15px rgba(0, 119, 182, 0.4);
     position: relative;
     overflow: hidden;
-}
-
-.timeline-progress-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.3), 
-        transparent);
-    animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
 }
 
 .timeline-steps-container {
@@ -1548,7 +1526,7 @@ select:focus-visible {
 
 /* Estado Pendiente */
 .timeline-step-modern.pending .timeline-dot-modern {
-    background: linear-gradient(135deg, rgba(189, 195, 199, 0.2), rgba(149, 165, 166, 0.15));
+    background: rgba(189, 195, 199, 0.4);
     backdrop-filter: blur(5px);
     color: rgba(127, 140, 141, 0.6);
     border: 2px solid rgba(189, 195, 199, 0.3);
@@ -1557,41 +1535,40 @@ select:focus-visible {
 
 /* Estado Activo */
 .timeline-step-modern.active .timeline-dot-modern {
-    background: linear-gradient(135deg, rgba(52, 152, 219, 0.9), rgba(41, 128, 185, 0.85));
+    background: var(--primary-color);
     backdrop-filter: blur(10px);
     color: #fff;
-    border: 2px solid rgba(52, 152, 219, 0.5);
+    border: 2px solid rgba(0, 119, 182, 0.5);
     box-shadow: 
-        0 8px 25px rgba(52, 152, 219, 0.4),
-        0 0 20px rgba(52, 152, 219, 0.3),
+        0 8px 25px rgba(0, 119, 182, 0.4),
+        0 0 20px rgba(0, 119, 182, 0.3),
         inset 0 1px 1px rgba(255, 255, 255, 0.3);
-    animation: pulse-active 2s infinite;
     transform: scale(1.1);
 }
 
 @keyframes pulse-active {
     0%, 100% {
         box-shadow: 
-            0 8px 25px rgba(52, 152, 219, 0.4),
-            0 0 20px rgba(52, 152, 219, 0.3),
+            0 8px 25px rgba(0, 119, 182, 0.4),
+            0 0 20px rgba(0, 119, 182, 0.3),
             inset 0 1px 1px rgba(255, 255, 255, 0.3);
     }
     50% {
         box-shadow: 
-            0 8px 30px rgba(52, 152, 219, 0.6),
-            0 0 30px rgba(52, 152, 219, 0.5),
+            0 8px 30px rgba(0, 119, 182, 0.6),
+            0 0 30px rgba(0, 119, 182, 0.5),
             inset 0 1px 1px rgba(255, 255, 255, 0.3);
     }
 }
 
 /* Estado Completado */
 .timeline-step-modern.completed .timeline-dot-modern {
-    background: linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.85));
+    background: var(--success-color);
     backdrop-filter: blur(10px);
     color: #fff;
-    border: 2px solid rgba(46, 204, 113, 0.4);
+    border: 2px solid rgba(75, 181, 67, 0.4);
     box-shadow: 
-        0 6px 20px rgba(46, 204, 113, 0.3),
+        0 6px 20px rgba(75, 181, 67, 0.3),
         inset 0 1px 1px rgba(255, 255, 255, 0.3);
     animation: check-bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
