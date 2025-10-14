@@ -1,7 +1,7 @@
 /**
  * =========================================================
- * SISTEMA DE Navegación³n EN TIEMPO REAL - ANGELOW DELIVERY
- * Funcionalidad: Navegación³n GPS estilo Uber/Waze con tracking en tiempo real
+ * SISTEMA DE Navegación EN TIEMPO REAL - ANGELOW DELIVERY
+ * Funcionalidad: Navegación GPS estilo Uber/Waze con tracking en tiempo real
  * =========================================================
  */
 
@@ -13,7 +13,7 @@
     // =========================================================
     const CONFIG = {
         BASE_URL: document.querySelector('meta[name="base-url"]')?.content || '',
-        UPDATE_INTERVAL: 5000, // Actualizar ubicación³n cada 5 segundos
+        UPDATE_INTERVAL: 5000, // Actualizar ubicación cada 5 segundos
         ROUTE_CHECK_INTERVAL: 30000, // Verificar ruta cada 30 segundos
         INSTRUCTION_CHECK_INTERVAL: 3000, // Verificar instrucciones cada 3 segundos
         NEAR_DESTINATION_THRESHOLD: 0.1, // 100 metros
@@ -77,7 +77,7 @@
             e.preventDefault();
         });
         
-        // Mantener pantalla activa durante Navegación³n
+        // Mantener pantalla activa durante Navegación
         if ('wakeLock' in navigator) {
             navigator.wakeLock.request('screen').catch(err => {
                 console.warn('Wake Lock no disponible:', err);
@@ -91,7 +91,7 @@
     // INICIALIZACIN
     // =========================================================
     document.addEventListener('DOMContentLoaded', function() {
-        console.log(' Iniciando sistema de Navegación³n...');
+        console.log(' Iniciando sistema de Navegación...');
         
         // Inicializar Voice Helper
         if (typeof VoiceHelper !== 'undefined') {
@@ -105,7 +105,7 @@
         // Cargar datos del delivery
         loadDeliveryData();
         
-        // Solicitar permisos de ubicación³n
+        // Solicitar permisos de ubicación
         requestLocationPermission();
         
         // Inicializar mapa
@@ -114,7 +114,7 @@
         // Inicializar eventos
         initializeEvents();
         
-        // Obtener información³n de batería si está disponible
+        // Obtener información de batería si está disponible
         if ('getBattery' in navigator) {
             navigator.getBattery().then(battery => {
                 state.batteryLevel = Math.round(battery.level * 100);
@@ -124,7 +124,7 @@
             });
         }
         
-        console.log(' Sistema de Navegación³n inicializado');
+        console.log(' Sistema de Navegación inicializado');
     });
 
     // =========================================================
@@ -148,9 +148,9 @@
             if (!state.destination.lat || !state.destination.lng || 
                 state.destination.lat === 0 || state.destination.lng === 0) {
                 console.error(' Coordenadas de destino no vstlidas:', state.destination);
-                showNotification('Error: La dirección³n de entrega no tiene coordenadas GPS. Contacta al administrador.', 'error');
+                showNotification('Error: La dirección de entrega no tiene coordenadas GPS. Contacta al administrador.', 'error');
                 
-                // Deshabilitar Navegación³n
+                // Deshabilitar Navegación
                 const btnAction = document.getElementById('btn-action-main');
                 if (btnAction) {
                     btnAction.disabled = true;
@@ -166,12 +166,12 @@
             console.log(' Destino:', state.destination);
         } catch (e) {
             console.error('Error al parsear datos del delivery:', e);
-            showNotification('Error al cargar información³n del pedido', 'error');
+            showNotification('Error al cargar información del pedido', 'error');
         }
     }
 
     // =========================================================
-    // SOLICITAR PERMISOS DE ubicación³n
+    // SOLICITAR PERMISOS DE ubicación
     // =========================================================
     function requestLocationPermission() {
         if (!('geolocation' in navigator)) {
@@ -179,27 +179,27 @@
             return;
         }
 
-        updateStatus('Solicitando permisos de ubicación³n...');
+        updateStatus('Solicitando permisos de ubicación...');
         
         navigator.permissions.query({ name: 'geolocation' }).then(result => {
             if (result.state === 'granted') {
-                console.log(' Permisos de ubicación³n concedidos');
+                console.log(' Permisos de ubicación concedidos');
                 startLocationTracking();
             } else if (result.state === 'prompt') {
                 // Solicitar permisos
                 navigator.geolocation.getCurrentPosition(
                     position => {
-                        console.log(' Permisos de ubicación³n concedidos');
+                        console.log(' Permisos de ubicación concedidos');
                         startLocationTracking();
                     },
                     error => {
-                        console.error(' Permisos de ubicación³n denegados:', error);
-                        showNotification('Se requieren permisos de ubicación³n para navegar', 'error');
+                        console.error(' Permisos de ubicación denegados:', error);
+                        showNotification('Se requieren permisos de ubicación para navegar', 'error');
                     },
                     { enableHighAccuracy: true }
                 );
             } else {
-                showNotification('Se requieren permisos de ubicación³n para navegar', 'error');
+                showNotification('Se requieren permisos de ubicación para navegar', 'error');
             }
         });
     }
@@ -232,7 +232,7 @@
     }
 
     // =========================================================
-    // TRACKING DE ubicación³n EN TIEMPO REAL
+    // TRACKING DE ubicación EN TIEMPO REAL
     // =========================================================
     function startLocationTracking() {
         if (state.watchId) {
@@ -251,12 +251,12 @@
             options
         );
 
-        updateStatus('Obteniendo ubicación³n...');
-        console.log(' Tracking de ubicación³n iniciado');
+        updateStatus('Obteniendo ubicación...');
+        console.log(' Tracking de ubicación iniciado');
     }
 
     // =========================================================
-    // MANEJAR actualización³n DE ubicación³n
+    // MANEJAR actualización³n DE ubicación
     // =========================================================
     function handleLocationUpdate(position) {
         const { latitude, longitude, accuracy, speed, heading } = position.coords;
@@ -268,7 +268,7 @@
         // Actualizar marcador del conductor
         updateDriverMarker(state.currentLocation, state.currentHeading);
 
-        // Si es la primera ubicación³n, centrar mapa y calcular ruta
+        // Si es la primera ubicación, centrar mapa y calcular ruta
         if (!state.route) {
             state.map.setView(state.currentLocation, CONFIG.MAP_ZOOM);
             calculateRoute(state.currentLocation, state.destination);
@@ -282,30 +282,30 @@
             sendLocationUpdate(position);
         }
 
-        console.log(` ubicación³n actualizada: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+        console.log(` ubicación actualizada: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
     }
 
     // =========================================================
-    // MANEJAR ERROR DE ubicación³n
+    // MANEJAR ERROR DE ubicación
     // =========================================================
     function handleLocationError(error) {
-        console.error(' Error de ubicación³n:', error);
+        console.error(' Error de ubicación:', error);
         
-        let message = 'Error al obtener ubicación³n';
+        let message = 'Error al obtener ubicación';
         switch (error.code) {
             case error.PERMISSION_DENIED:
-                message = 'Permisos de ubicación³n denegados';
+                message = 'Permisos de ubicación denegados';
                 break;
             case error.POSITION_UNAVAILABLE:
-                message = 'ubicación³n no disponible';
+                message = 'ubicación no disponible';
                 break;
             case error.TIMEOUT:
-                message = 'Timeout al obtener ubicación³n';
+                message = 'Timeout al obtener ubicación';
                 break;
         }
         
         showNotification(message, 'error');
-        updateStatus('Error de ubicación³n');
+        updateStatus('Error de ubicación');
     }
 
     // =========================================================
@@ -455,16 +455,16 @@
     }
 
     // =========================================================
-    // INICIAR Navegación³n
+    // INICIAR Navegación
     // =========================================================
     async function startNavigation() {
         if (!state.currentLocation || !state.destination || !state.route) {
-            showNotification('Esperando ubicación³n y ruta...', 'warning');
+            showNotification('Esperando ubicación y ruta...', 'warning');
             return;
         }
 
         try {
-            updateStatus('Iniciando Navegación³n...');
+            updateStatus('Iniciando Navegación...');
 
             const response = await fetch(`${CONFIG.BASE_URL}/delivery/api/navigation_api.php?action=start_navigation`, {
                 method: 'POST',
@@ -484,7 +484,7 @@
             const data = await response.json();
 
             if (!data.success) {
-                throw new Error(data.error || 'Error al iniciar Navegación³n');
+                throw new Error(data.error || 'Error al iniciar Navegación');
             }
 
             state.isNavigating = true;
@@ -518,7 +518,7 @@
             console.log('✅ Navegación iniciada');
 
         } catch (error) {
-            console.error(' Error al iniciar Navegación³n:', error);
+            console.error(' Error al iniciar Navegación:', error);
             showNotification(error.message, 'error');
         }
     }
@@ -622,7 +622,7 @@
     // ACTUALIZACIONES PERIDICAS
     // =========================================================
     function startPeriodicUpdates() {
-        // Actualizar ubicación³n al servidor cada 5 segundos
+        // Actualizar ubicación al servidor cada 5 segundos
         state.updateInterval = setInterval(() => {
             if (state.isNavigating && state.currentLocation) {
                 sendLocationUpdate({
@@ -653,7 +653,7 @@
     }
 
     // =========================================================
-    // ENVIAR actualización³n DE ubicación³n AL SERVIDOR
+    // ENVIAR actualización³n DE ubicación AL SERVIDOR
     // =========================================================
     async function sendLocationUpdate(position) {
         try {
@@ -674,7 +674,7 @@
             const data = await response.json();
 
             if (data.success) {
-                // Actualizar información³n local con datos del servidor
+                // Actualizar información local con datos del servidor
                 if (data.distance_remaining !== null) {
                     state.distanceRemaining = data.distance_remaining;
                     updateDistanceDisplay(state.distanceRemaining);
@@ -692,7 +692,7 @@
             }
 
         } catch (error) {
-            console.error('Error al enviar actualización³n de ubicación³n:', error);
+            console.error('Error al enviar actualización³n de ubicación:', error);
         }
     }
 
@@ -933,7 +933,7 @@
     }
 
     // =========================================================
-    // REGISTRAR EVENTO DE Navegación³n
+    // REGISTRAR EVENTO DE Navegación
     // =========================================================
     async function logNavigationEvent(eventType, eventData) {
         try {
@@ -1104,8 +1104,8 @@
         const button = document.getElementById('btn-traffic');
         
         if (state.isTrafficVisible) {
-            // Activar información³n de trstfico
-            showNotification('Cargando información³n de trstfico...', 'info');
+            // Activar información de trstfico
+            showNotification('Cargando información de trstfico...', 'info');
             
             try {
                 // opción³n 1: Usar capa de transporte de OpenStreetMap (muestára vínas principales)
@@ -1140,7 +1140,7 @@
                 
             } catch (error) {
                 console.error('Error al activar trstfico:', error);
-                showNotification('Error al cargar información³n de trstfico', 'error');
+                showNotification('Error al cargar información de trstfico', 'error');
             }
             
         } else {
@@ -1203,7 +1203,7 @@
     }
     
     // =========================================================
-    // MOSTRAR información³n DE trstfico EN UI
+    // MOSTRAR información DE trstfico EN UI
     // =========================================================
     function displayTrafficInfo(trafficLevel) {
         // Buscar o crear elemento de info de trstfico
@@ -1275,7 +1275,7 @@
     };
 
     window.cancelNavigation = function() {
-        if (confirm('Deseas cancelar la Navegación³n?')) {
+        if (confirm('Deseas cancelar la Navegación?')) {
             stopNavigation();
             window.location.href = `${CONFIG.BASE_URL}/delivery/orders.php`;
         }
@@ -1283,7 +1283,7 @@
 
     window.confirmExit = function() {
         if (state.isNavigating) {
-            if (confirm('Deseas salir de la Navegación³n? El progreso se guardarst.')) {
+            if (confirm('Deseas salir de la Navegación? El progreso se guardarst.')) {
                 stopNavigation();
                 window.location.href = `${CONFIG.BASE_URL}/delivery/orders.php`;
             }
@@ -1293,7 +1293,7 @@
     };
 
     // =========================================================
-    // DETENER Navegación³n
+    // DETENER Navegación
     // =========================================================
     function stopNavigation() {
         state.isNavigating = false;
@@ -1313,7 +1313,7 @@
             state.watchId = null;
         }
         
-        console.log(' Navegación³n detenida');
+        console.log(' Navegación detenida');
     }
 
     // =========================================================
@@ -1389,13 +1389,13 @@
         }
     }
     
-    // Inicializar voces cuando estáénn disponibles
+    // Inicializar voces cuando estáén disponibles
     if (window.speechSynthesis) {
         if (window.speechSynthesis.getVoices().length > 0) {
             selectBestSpanishVoice();
         }
         
-        // Las voces pueden cargarse de forma asínncrona
+        // Las voces pueden cargarse de forma asíncrona
         window.speechSynthesis.onvoiceschanged = selectBestSpanishVoice;
     }
         
@@ -1421,7 +1421,7 @@
     window.speak = speak;
 
     // =========================================================
-    // DETENER Navegación³n
+    // DETENER Navegación
     // =========================================================
     function stopNavigation() {
         state.isNavigating = false;
@@ -1446,7 +1446,7 @@
             state.watchId = null;
         }
         
-        console.log(' Navegación³n detenida');
+        console.log(' Navegación detenida');
     }
 
     // =========================================================
