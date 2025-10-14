@@ -26,6 +26,12 @@ class VoiceHelper {
         
         this.bestSpanishVoice = null;
         this.audioCache = new Map(); // Cache para audio
+        
+        // Sistema de cola con prioridades
+        this.messageQueue = [];
+        this.isSpeaking = false;
+        this.currentAudio = null; // Referencia al audio actual
+        
         this.initialize();
     }
     
@@ -145,6 +151,11 @@ class VoiceHelper {
     
     /**
      * Hablar texto usando el mejor motor disponible
+     * CON SISTEMA DE COLA Y PRIORIDADES
+     * 
+     * @param {string} text - Texto a hablar
+     * @param {object} options - Opciones de voz
+     * @param {number} options.priority - Prioridad (1=máxima para inicio/pausa/reanudar, 5=baja para guías)
      */
     async speak(text, options = {}) {
         if (!this.enabled) {
@@ -152,28 +163,65 @@ class VoiceHelper {
             return;
         }
         
-        console.log('🔊 Intentando hablar:', text);
+        // Determinar prioridad (por defecto es 5 = baja)
+        const priority = options.priority !== undefined ? options.priority : 5;
+        
+        console.log(`🔊 [Cola] Agregando mensaje (prioridad ${priority}):`, text);
+        
+        // Agregar a la cola
+        this.messageQueue.push({
+            text,
+            options,
+            priority,
+            timestamp: Date.now()
+        });
+        
+        // Ordenar cola por prioridad (menor número = mayor prioridad)
+        this.messageQueue.sort((a, b) => a.priority - b.priority);
+        
+        // Procesar cola
+        this.processQueue();
+    }
+    
+    /**
+     * Procesar cola de mensajes
+     */
+    async processQueue() {
+        // Si ya está hablando, esperar
+        if (this.isSpeaking) {
+            console.log('⏳ [Cola] Ya hay una voz reproduciéndose, esperando...');
+            return;
+        }
+        
+        // Si la cola está vacía, terminar
+        if (this.messageQueue.length === 0) {
+            console.log('✅ [Cola] Cola vacía');
+            return;
+        }
+        
+        // Tomar el primer mensaje de la cola (mayor prioridad)
+        const message = this.messageQueue.shift();
+        this.isSpeaking = true;
+        
+        console.log(`▶️ [Cola] Reproduciendo (prioridad ${message.priority}): ${message.text}`);
+        console.log(`   [Cola] Mensajes restantes: ${this.messageQueue.length}`);
         
         try {
             // Intentar primero con VoiceRSS (mejor calidad para español)
             if (this.currentEngine === 'voicerss') {
-                await this.speakWithVoiceRSS(text, options);
-                return;
+                await this.speakWithVoiceRSS(message.text, message.options);
             }
-            
             // Fallback a Web Speech API
-            if (this.engines.webspeech.available) {
-                await this.speakWithWebSpeech(text, options);
-                return;
+            else if (this.engines.webspeech.available) {
+                await this.speakWithWebSpeech(message.text, message.options);
             }
-            
             // Último fallback a ResponsiveVoice
-            if (this.engines.responsivevoice.available) {
-                await this.speakWithResponsiveVoice(text, options);
-                return;
+            else if (this.engines.responsivevoice.available) {
+                await this.speakWithResponsiveVoice(message.text, message.options);
             }
-            
-            console.warn('⚠️ No hay motor de voz disponible');
+            else {
+                console.warn('⚠️ No hay motor de voz disponible');
+            }
         } catch (error) {
             console.error('❌ Error al hablar:', error.message);
             
@@ -181,10 +229,21 @@ class VoiceHelper {
             if (this.currentEngine === 'voicerss' && this.engines.webspeech.available) {
                 console.log('🔄 Fallback a Web Speech API...');
                 try {
-                    await this.speakWithWebSpeech(text, options);
+                    await this.speakWithWebSpeech(message.text, message.options);
                 } catch (fallbackError) {
                     console.error('❌ Fallback también falló');
                 }
+            }
+        } finally {
+            this.isSpeaking = false;
+            this.currentAudio = null;
+            
+            console.log('✅ [Cola] Reproducción completada');
+            
+            // Continuar con el siguiente mensaje en la cola
+            if (this.messageQueue.length > 0) {
+                console.log(`🔄 [Cola] Procesando siguiente mensaje...`);
+                setTimeout(() => this.processQueue(), 100); // Pequeña pausa entre mensajes
             }
         }
     }
@@ -212,6 +271,7 @@ class VoiceHelper {
         
         return new Promise((resolve, reject) => {
             const audio = new Audio(url);
+            this.currentAudio = audio; // Guardar referencia
             
             audio.onloadstart = () => {
                 console.log('⏳ Cargando audio VoiceRSS...');
@@ -227,6 +287,7 @@ class VoiceHelper {
             
             audio.onended = () => {
                 console.log('✅ Reproducción VoiceRSS completada');
+                this.currentAudio = null;
                 resolve();
             };
             
@@ -244,12 +305,14 @@ class VoiceHelper {
                     console.error('❌ Error al verificar:', fetchError.message);
                 }
                 
+                this.currentAudio = null;
                 reject(new Error('Error al reproducir con VoiceRSS'));
             };
             
             // Intentar reproducir
             audio.play().catch(e => {
                 console.warn('⚠️ Error al iniciar reproducción VoiceRSS');
+                this.currentAudio = null;
                 reject(e);
             });
         });
@@ -362,15 +425,31 @@ class VoiceHelper {
     }
     
     /**
-     * Cancelar cualquier reproducción actual
+     * Cancelar cualquier reproducción actual Y limpiar cola
      */
     cancel() {
+        console.log('🛑 [Cola] Cancelando todas las reproducciones');
+        
+        // Detener audio actual
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio.currentTime = 0;
+            this.currentAudio = null;
+        }
+        
+        // Cancelar motores de voz
         if (this.currentEngine === 'responsivevoice' && typeof responsiveVoice !== 'undefined') {
             responsiveVoice.cancel();
         }
         if (this.engines.webspeech.available) {
             window.speechSynthesis.cancel();
         }
+        
+        // Limpiar cola
+        this.messageQueue = [];
+        this.isSpeaking = false;
+        
+        console.log('✅ [Cola] Cola limpiada');
     }
     
     /**

@@ -1,7 +1,7 @@
 /**
  * =========================================================
- * SISTEMA DE NavegaciÃ³n EN TIEMPO REAL - ANGELOW DELIVERY
- * Funcionalidad: NavegaciÃ³n GPS estilo Uber/Waze con tracking en tiempo real
+ * SISTEMA DE Navegación³n EN TIEMPO REAL - ANGELOW DELIVERY
+ * Funcionalidad: Navegación³n GPS estilo Uber/Waze con tracking en tiempo real
  * =========================================================
  */
 
@@ -13,7 +13,7 @@
     // =========================================================
     const CONFIG = {
         BASE_URL: document.querySelector('meta[name="base-url"]')?.content || '',
-        UPDATE_INTERVAL: 5000, // Actualizar ubicaciÃ³n cada 5 segundos
+        UPDATE_INTERVAL: 5000, // Actualizar ubicación³n cada 5 segundos
         ROUTE_CHECK_INTERVAL: 30000, // Verificar ruta cada 30 segundos
         INSTRUCTION_CHECK_INTERVAL: 3000, // Verificar instrucciones cada 3 segundos
         NEAR_DESTINATION_THRESHOLD: 0.1, // 100 metros
@@ -27,7 +27,7 @@
     };
 
     // =========================================================
-    // ESTADO DE LA APLICACIN
+    // ESTADO DE LA APLICACIÓN
     // =========================================================
     const state = {
         map: null,
@@ -72,12 +72,12 @@
             });
         }
         
-        // Prevenir zoom con gestos en mviles
+        // Prevenir zoom con gestos en móviles
         document.addEventListener('gesturestart', function (e) {
             e.preventDefault();
         });
         
-        // Mantener pantalla activa durante NavegaciÃ³n
+        // Mantener pantalla activa durante Navegación³n
         if ('wakeLock' in navigator) {
             navigator.wakeLock.request('screen').catch(err => {
                 console.warn('Wake Lock no disponible:', err);
@@ -91,7 +91,7 @@
     // INICIALIZACIN
     // =========================================================
     document.addEventListener('DOMContentLoaded', function() {
-        console.log(' Iniciando sistema de NavegaciÃ³n...');
+        console.log(' Iniciando sistema de Navegación³n...');
         
         // Inicializar Voice Helper
         if (typeof VoiceHelper !== 'undefined') {
@@ -105,7 +105,7 @@
         // Cargar datos del delivery
         loadDeliveryData();
         
-        // Solicitar permisos de ubicaciÃ³n
+        // Solicitar permisos de ubicación³n
         requestLocationPermission();
         
         // Inicializar mapa
@@ -114,7 +114,7 @@
         // Inicializar eventos
         initializeEvents();
         
-        // Obtener informaciÃ³n de batera si est disponible
+        // Obtener información³n de batería si está disponible
         if ('getBattery' in navigator) {
             navigator.getBattery().then(battery => {
                 state.batteryLevel = Math.round(battery.level * 100);
@@ -124,7 +124,7 @@
             });
         }
         
-        console.log(' Sistema de NavegaciÃ³n inicializado');
+        console.log(' Sistema de Navegación³n inicializado');
     });
 
     // =========================================================
@@ -147,10 +147,10 @@
             // Validar coordenadas de destino
             if (!state.destination.lat || !state.destination.lng || 
                 state.destination.lat === 0 || state.destination.lng === 0) {
-                console.error(' Coordenadas de destino no vlidas:', state.destination);
-                showNotification('Error: La direcciÃ³n de entrega no tiene coordenadas GPS. Contacta al administrador.', 'error');
+                console.error(' Coordenadas de destino no vstlidas:', state.destination);
+                showNotification('Error: La dirección³n de entrega no tiene coordenadas GPS. Contacta al administrador.', 'error');
                 
-                // Deshabilitar NavegaciÃ³n
+                // Deshabilitar Navegación³n
                 const btnAction = document.getElementById('btn-action-main');
                 if (btnAction) {
                     btnAction.disabled = true;
@@ -166,12 +166,12 @@
             console.log(' Destino:', state.destination);
         } catch (e) {
             console.error('Error al parsear datos del delivery:', e);
-            showNotification('Error al cargar informaciÃ³n del pedido', 'error');
+            showNotification('Error al cargar información³n del pedido', 'error');
         }
     }
 
     // =========================================================
-    // SOLICITAR PERMISOS DE ubicaciÃ³n
+    // SOLICITAR PERMISOS DE ubicación³n
     // =========================================================
     function requestLocationPermission() {
         if (!('geolocation' in navigator)) {
@@ -179,27 +179,27 @@
             return;
         }
 
-        updateStatus('Solicitando permisos de ubicaciÃ³n...');
+        updateStatus('Solicitando permisos de ubicación³n...');
         
         navigator.permissions.query({ name: 'geolocation' }).then(result => {
             if (result.state === 'granted') {
-                console.log(' Permisos de ubicaciÃ³n concedidos');
+                console.log(' Permisos de ubicación³n concedidos');
                 startLocationTracking();
             } else if (result.state === 'prompt') {
                 // Solicitar permisos
                 navigator.geolocation.getCurrentPosition(
                     position => {
-                        console.log(' Permisos de ubicaciÃ³n concedidos');
+                        console.log(' Permisos de ubicación³n concedidos');
                         startLocationTracking();
                     },
                     error => {
-                        console.error(' Permisos de ubicaciÃ³n denegados:', error);
-                        showNotification('Se requieren permisos de ubicaciÃ³n para navegar', 'error');
+                        console.error(' Permisos de ubicación³n denegados:', error);
+                        showNotification('Se requieren permisos de ubicación³n para navegar', 'error');
                     },
                     { enableHighAccuracy: true }
                 );
             } else {
-                showNotification('Se requieren permisos de ubicaciÃ³n para navegar', 'error');
+                showNotification('Se requieren permisos de ubicación³n para navegar', 'error');
             }
         });
     }
@@ -225,14 +225,14 @@
 
         // Agregar marcador de destino
         if (state.destination && state.destination.lat && state.destination.lng) {
-            addDestinationMarker(state.destination);
+            addDestáinationMarker(state.destination);
         }
 
         console.log(' Mapa inicializado');
     }
 
     // =========================================================
-    // TRACKING DE ubicaciÃ³n EN TIEMPO REAL
+    // TRACKING DE ubicación³n EN TIEMPO REAL
     // =========================================================
     function startLocationTracking() {
         if (state.watchId) {
@@ -251,12 +251,12 @@
             options
         );
 
-        updateStatus('Obteniendo ubicaciÃ³n...');
-        console.log(' Tracking de ubicaciÃ³n iniciado');
+        updateStatus('Obteniendo ubicación³n...');
+        console.log(' Tracking de ubicación³n iniciado');
     }
 
     // =========================================================
-    // MANEJAR actualizaciÃ³n DE ubicaciÃ³n
+    // MANEJAR actualización³n DE ubicación³n
     // =========================================================
     function handleLocationUpdate(position) {
         const { latitude, longitude, accuracy, speed, heading } = position.coords;
@@ -268,7 +268,7 @@
         // Actualizar marcador del conductor
         updateDriverMarker(state.currentLocation, state.currentHeading);
 
-        // Si es la primera ubicaciÃ³n, centrar mapa y calcular ruta
+        // Si es la primera ubicación³n, centrar mapa y calcular ruta
         if (!state.route) {
             state.map.setView(state.currentLocation, CONFIG.MAP_ZOOM);
             calculateRoute(state.currentLocation, state.destination);
@@ -277,35 +277,35 @@
         // Actualizar UI
         updateSpeedDisplay(state.currentSpeed);
 
-        // Si estamos navegando, enviar actualizaciÃ³n al servidor
+        // Si estáamos navegando, enviar actualización³n al servidor
         if (state.isNavigating) {
             sendLocationUpdate(position);
         }
 
-        console.log(` ubicaciÃ³n actualizada: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+        console.log(` ubicación³n actualizada: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
     }
 
     // =========================================================
-    // MANEJAR ERROR DE ubicaciÃ³n
+    // MANEJAR ERROR DE ubicación³n
     // =========================================================
     function handleLocationError(error) {
-        console.error(' Error de ubicaciÃ³n:', error);
+        console.error(' Error de ubicación³n:', error);
         
-        let message = 'Error al obtener ubicaciÃ³n';
+        let message = 'Error al obtener ubicación³n';
         switch (error.code) {
             case error.PERMISSION_DENIED:
-                message = 'Permisos de ubicaciÃ³n denegados';
+                message = 'Permisos de ubicación³n denegados';
                 break;
             case error.POSITION_UNAVAILABLE:
-                message = 'ubicaciÃ³n no disponible';
+                message = 'ubicación³n no disponible';
                 break;
             case error.TIMEOUT:
-                message = 'Timeout al obtener ubicaciÃ³n';
+                message = 'Timeout al obtener ubicación³n';
                 break;
         }
         
         showNotification(message, 'error');
-        updateStatus('Error de ubicaciÃ³n');
+        updateStatus('Error de ubicación³n');
     }
 
     // =========================================================
@@ -315,11 +315,11 @@
         try {
             // Validar coordenadas antes de calcular
             if (!start || !start.lat || !start.lng || start.lat === 0 || start.lng === 0) {
-                throw new Error('Coordenadas de inicio no vlidas');
+                throw new Error('Coordenadas de inicio no vstlidas');
             }
             
             if (!end || !end.lat || !end.lng || end.lat === 0 || end.lng === 0) {
-                throw new Error('Coordenadas de destino no vlidas');
+                throw new Error('Coordenadas de destino no vstlidas');
             }
             
             updateStatus('Calculando ruta...');
@@ -411,9 +411,9 @@
 
             state.driverMarker = L.marker([location.lat, location.lng], { icon })
                 .addTo(state.map)
-                .bindPopup('Tu ubicaciÃ³n');
+                .bindPopup('Tu ubicación');
         } else {
-            // Actualizar posicin y rotacin
+            // Actualizar posición y rotación
             state.driverMarker.setLatLng([location.lat, location.lng]);
             
             const iconElement = state.driverMarker.getElement();
@@ -427,9 +427,9 @@
     }
 
     // =========================================================
-    // AGREGAR MARCADOR DE DESTINO
+    // AGREGAR MARCADOR DE Destino
     // =========================================================
-    function addDestinationMarker(location) {
+    function addDestáinationMarker(location) {
         const icon = L.divIcon({
             html: `<div class="destination-marker">
                     <i class="fas fa-map-marker-alt"></i>
@@ -441,7 +441,7 @@
 
         state.destinationMarker = L.marker([location.lat, location.lng], { icon })
             .addTo(state.map)
-            .bindPopup('Destino: ' + (state.deliveryData?.destination.address || 'direcciÃ³n de entrega'));
+            .bindPopup('Destino: ' + (state.deliveryData?.destination.address || 'dirección de entrega'));
     }
 
     // =========================================================
@@ -455,16 +455,16 @@
     }
 
     // =========================================================
-    // INICIAR NavegaciÃ³n
+    // INICIAR Navegación³n
     // =========================================================
     async function startNavigation() {
         if (!state.currentLocation || !state.destination || !state.route) {
-            showNotification('Esperando ubicaciÃ³n y ruta...', 'warning');
+            showNotification('Esperando ubicación³n y ruta...', 'warning');
             return;
         }
 
         try {
-            updateStatus('Iniciando NavegaciÃ³n...');
+            updateStatus('Iniciando Navegación³n...');
 
             const response = await fetch(`${CONFIG.BASE_URL}/delivery/api/navigation_api.php?action=start_navigation`, {
                 method: 'POST',
@@ -473,8 +473,8 @@
                     delivery_id: state.deliveryData.delivery_id,
                     start_lat: state.currentLocation.lat,
                     start_lng: state.currentLocation.lng,
-                    dest_lat: state.destination.lat,
-                    dest_lng: state.destination.lng,
+                    destá_lat: state.destination.lat,
+                    destá_lng: state.destination.lng,
                     route: state.route,
                     distance_km: state.route.distance_km,
                     duration_seconds: state.route.duration_seconds
@@ -484,15 +484,15 @@
             const data = await response.json();
 
             if (!data.success) {
-                throw new Error(data.error || 'Error al iniciar NavegaciÃ³n');
+                throw new Error(data.error || 'Error al iniciar Navegación³n');
             }
 
             state.isNavigating = true;
             
             // Cambiar botn de accin
-            updateActionButton('pause', 'Pausar navegación');
+            updateActionButton('pause', 'Pausar Navegación');
             
-            // CERRAR PANEL AUTOMÁTICAMENTE
+            // CERRAR PANEL AUTOMstTICAMENTE
             if (state.isPanelExpanded) {
                 togglePanel();
             }
@@ -506,8 +506,8 @@
             updateStatus('Navegando');
             showNotification('Navegación iniciada', 'success');
             
-            // Instrucción de voz inicial
-            speak('Navegación iniciada. Sigue la ruta marcada.');
+            // Instrucción de voz inicial (PRIORIDAD ALTA)
+            speak('Navegación iniciada. Sigue la ruta marcada.', 1);
             
             // Dar primera instrucción si hay pasos
             if (state.route.steps && state.route.steps.length > 0) {
@@ -518,17 +518,17 @@
             console.log('✅ Navegación iniciada');
 
         } catch (error) {
-            console.error(' Error al iniciar NavegaciÃ³n:', error);
+            console.error(' Error al iniciar Navegación³n:', error);
             showNotification(error.message, 'error');
         }
     }
 
     // =========================================================
-    // PAUSAR NAVEGACIÓN
+    // PAUSAR Navegación
     // =========================================================
     async function pauseNavigation() {
         try {
-            updateStatus('Pausando navegación...');
+            updateStatus('Pausando Navegación...');
 
             const response = await fetch(`${CONFIG.BASE_URL}/delivery/api/navigation_api.php?action=pause_navigation`, {
                 method: 'POST',
@@ -541,12 +541,12 @@
             const data = await response.json();
 
             if (!data.success) {
-                throw new Error(data.error || 'Error al pausar navegación');
+                throw new Error(data.error || 'Error al pausar Navegación');
             }
 
             state.isNavigating = false;
             
-            // Detener actualizaciones periódicas
+            // Detener actualizaciones perióndicas
             if (state.updateInterval) {
                 clearInterval(state.updateInterval);
                 state.updateInterval = null;
@@ -563,26 +563,26 @@
             }
             
             // Cambiar botón de acción
-            updateActionButton('resume', 'Reanudar navegación');
+            updateActionButton('resume', 'Reanudar Navegación');
             
             updateStatus('Navegación pausada');
             showNotification('Navegación pausada', 'warning');
-            speak('Navegación pausada');
+            speak('Navegación pausada', 1); // PRIORIDAD ALTA
 
             console.log('⏸ Navegación pausada');
 
         } catch (error) {
-            console.error('❌ Error al pausar navegación:', error);
+            console.error('❌ Error al pausar Navegación:', error);
             showNotification(error.message, 'error');
         }
     }
 
     // =========================================================
-    // REANUDAR NAVEGACIÓN
+    // REANUDAR Navegación
     // =========================================================
     async function resumeNavigation() {
         try {
-            updateStatus('Reanudando navegación...');
+            updateStatus('Reanudando Navegación...');
 
             const response = await fetch(`${CONFIG.BASE_URL}/delivery/api/navigation_api.php?action=resume_navigation`, {
                 method: 'POST',
@@ -595,25 +595,25 @@
             const data = await response.json();
 
             if (!data.success) {
-                throw new Error(data.error || 'Error al reanudar navegación');
+                throw new Error(data.error || 'Error al reanudar Navegación');
             }
 
             state.isNavigating = true;
             
             // Cambiar botón de acción
-            updateActionButton('pause', 'Pausar navegación');
+            updateActionButton('pause', 'Pausar Navegación');
             
-            // Reiniciar actualizaciones periódicas
+            // Reiniciar actualizaciones perióndicas
             startPeriodicUpdates();
             
             updateStatus('Navegando');
             showNotification('Navegación reanudada', 'success');
-            speak('Navegación reanudada');
+            speak('Navegación reanudada', 1); // PRIORIDAD ALTA
 
             console.log('▶ Navegación reanudada');
 
         } catch (error) {
-            console.error('❌ Error al reanudar navegación:', error);
+            console.error('❌ Error al reanudar Navegación:', error);
             showNotification(error.message, 'error');
         }
     }
@@ -622,7 +622,7 @@
     // ACTUALIZACIONES PERIDICAS
     // =========================================================
     function startPeriodicUpdates() {
-        // Actualizar ubicaciÃ³n al servidor cada 5 segundos
+        // Actualizar ubicación³n al servidor cada 5 segundos
         state.updateInterval = setInterval(() => {
             if (state.isNavigating && state.currentLocation) {
                 sendLocationUpdate({
@@ -637,14 +637,14 @@
             }
         }, CONFIG.UPDATE_INTERVAL);
 
-        // Verificar si estamos fuera de ruta cada 30 segundos
+        // Verificar si estáamos fuera de ruta cada 30 segundos
         state.routeCheckInterval = setInterval(() => {
             if (state.isNavigating) {
                 checkIfOnRoute();
             }
         }, CONFIG.ROUTE_CHECK_INTERVAL);
         
-        // Verificar instrucciones de navegación cada 3 segundos
+        // Verificar instrucciones de Navegación cada 3 segundos
         state.instructionCheckInterval = setInterval(() => {
             if (state.isNavigating && state.currentLocation) {
                 checkNavigationInstructions();
@@ -653,7 +653,7 @@
     }
 
     // =========================================================
-    // ENVIAR actualizaciÃ³n DE ubicaciÃ³n AL SERVIDOR
+    // ENVIAR actualización³n DE ubicación³n AL SERVIDOR
     // =========================================================
     async function sendLocationUpdate(position) {
         try {
@@ -674,7 +674,7 @@
             const data = await response.json();
 
             if (data.success) {
-                // Actualizar informaciÃ³n local con datos del servidor
+                // Actualizar información³n local con datos del servidor
                 if (data.distance_remaining !== null) {
                     state.distanceRemaining = data.distance_remaining;
                     updateDistanceDisplay(state.distanceRemaining);
@@ -685,27 +685,27 @@
                     updateETADisplay(state.etaSeconds);
                 }
 
-                // Verificar si estamos cerca del destino
+                // Verificar si estáamos cerca del destino
                 if (state.distanceRemaining < CONFIG.NEAR_DESTINATION_THRESHOLD) {
-                    handleNearDestination();
+                    handleNearDestáination();
                 }
             }
 
         } catch (error) {
-            console.error('Error al enviar actualizaciÃ³n de ubicaciÃ³n:', error);
+            console.error('Error al enviar actualización³n de ubicación³n:', error);
         }
     }
 
     // =========================================================
-    // VERIFICAR SI ESTAMOS EN LA RUTA
+    // VERIFICAR SI estáAMOS EN LA RUTA
     // =========================================================
     function checkIfOnRoute() {
-        // TODO: Implementar verificaciÃ³n de distancia a la ruta
-        // Por ahora, siempre asumimos que estamos en ruta
+        // TODO: Implementar verificación³n de distancia a la ruta
+        // Por ahora, siempre asumimos que estáamos en ruta
     }
     
     // =========================================================
-    // VERIFICAR INSTRUCCIONES DE NAVEGACIÓN (ESTILO WAZE)
+    // VERIFICAR INSTRUCCIONES DE Navegación (estilo WAZE)
     // =========================================================
     function checkNavigationInstructions() {
         if (!state.route || !state.route.steps || state.route.steps.length === 0) {
@@ -730,10 +730,10 @@
         // Actualizar instrucción visual
         updateNavigationInstruction(nextStep, distanceInMeters);
         
-        // Dar instrucción de voz en puntos específicos
+        // Dar instrucción de voz en puntos especínficos
         giveVoiceInstruction(nextStep, distanceInMeters);
         
-        // Si ya pasamos este paso, avanzar al siguiente
+        // Si ya pasamos estáe paso, avanzar al siguiente
         if (distanceInMeters < 20 && state.currentStepIndex < state.route.steps.length - 1) {
             state.currentStepIndex++;
             state.lastInstructionDistance = null;
@@ -742,7 +742,7 @@
     }
     
     // =========================================================
-    // ACTUALIZAR INSTRUCCIÓN VISUAL EN PANTALLA
+    // ACTUALIZAR INSTRUCCIón VISUAL EN PANTALLA
     // =========================================================
     function updateNavigationInstruction(step, distanceInMeters) {
         const instructionMain = document.getElementById('instruction-main');
@@ -769,14 +769,14 @@
     }
     
     // =========================================================
-    // DAR INSTRUCCIÓN DE VOZ EN PUNTOS ESPECÍFICOS
+    // DAR INSTRUCCIón DE VOZ EN PUNTOS ESPECínFICOS
     // =========================================================
     function giveVoiceInstruction(step, distanceInMeters) {
-        // Solo dar instrucciones en distancias específicas
+        // Solo dar instrucciones en distancias especínficas
         const distances = CONFIG.INSTRUCTION_DISTANCES;
         
         for (const threshold of distances) {
-            // Si estamos cerca de este umbral y no lo hemos anunciado aún
+            // Si estáamos cerca de estáe umbral y no lo hemos anunciado aúnn
             if (distanceInMeters <= threshold && 
                 distanceInMeters > threshold - 50 &&
                 state.lastInstructionDistance !== threshold) {
@@ -784,27 +784,27 @@
                 state.lastInstructionDistance = threshold;
                 const maneuver = getManeuverInfo(step);
                 const distanceText = threshold >= 1000 
-                    ? `${threshold / 1000} kilómetros`
+                    ? `${threshold / 1000} kilónmetros`
                     : `${threshold} metros`;
                 
                 const instruction = `En ${distanceText}, ${maneuver.voiceText}`;
-                speak(instruction);
+                speak(instruction, 5); // PRIORIDAD BAJA (guína de Navegación)
                 
                 console.log(`🔊 Instrucción: ${instruction}`);
                 break;
             }
         }
         
-        // Instrucción inmediata cuando estamos muy cerca
+        // Instrucción inmediata cuando estáamos muy cerca
         if (distanceInMeters <= 30 && state.lastInstructionDistance !== 0) {
             state.lastInstructionDistance = 0;
             const maneuver = getManeuverInfo(step);
-            speak(maneuver.voiceText);
+            speak(maneuver.voiceText, 5); // PRIORIDAD BAJA (guína de Navegación)
         }
     }
     
     // =========================================================
-    // OBTENER INFORMACIÓN DE MANIOBRA (TIPO WAZE)
+    // OBTENER información DE MANIOBRA (TIPO WAZE)
     // =========================================================
     function getManeuverInfo(step) {
         const instruction = step.instruction || step.name || '';
@@ -812,8 +812,8 @@
         
         // Detectar tipo de maniobra
         let icon = 'fas fa-arrow-up';
-        let text = 'Continúa recto';
-        let voiceText = 'continúa recto';
+        let text = 'Continúna recto';
+        let voiceText = 'continúna recto';
         
         // Giros a la derecha
         if (instructionLower.includes('derecha') || instructionLower.includes('right')) {
@@ -854,8 +854,8 @@
         // Continuar en calle
         else if (instructionLower.includes('continua') || instructionLower.includes('continue')) {
             icon = 'fas fa-arrow-up';
-            text = step.name || 'Continúa por esta vía';
-            voiceText = `continúa por ${step.name || 'esta vía'}`;
+            text = step.name || 'Continúna por estáa vína';
+            voiceText = `continúna por ${step.name || 'estáa vína'}`;
         }
         // Destino
         else if (instructionLower.includes('destino') || instructionLower.includes('destination') ||
@@ -867,13 +867,13 @@
         // Incorporación
         else if (instructionLower.includes('incorpora') || instructionLower.includes('merge')) {
             icon = 'fas fa-compress-arrows-alt';
-            text = 'Incorpórate';
-            voiceText = 'incorpórate a la vía';
+            text = 'Incorpónrate';
+            voiceText = 'incorpónrate a la vína';
         }
         // Recto por defecto
         else {
-            text = step.name || instruction || 'Continúa por esta vía';
-            voiceText = step.name ? `continúa por ${step.name}` : 'continúa recto';
+            text = step.name || instruction || 'Continúna por estáa vína';
+            voiceText = step.name ? `continúna por ${step.name}` : 'continúna recto';
         }
         
         return { icon, text, voiceText };
@@ -898,7 +898,7 @@
     }
     
     // =========================================================
-    // ACTUALIZAR INSTRUCCIÓN ACTUAL
+    // ACTUALIZAR INSTRUCCIón ACTUAL
     // =========================================================
     function updateCurrentInstruction() {
         if (!state.currentStep) return;
@@ -917,13 +917,13 @@
     }
 
     // =========================================================
-    // MANEJAR PROXIMIDAD AL DESTINO
+    // MANEJAR PROXIMIDAD AL Destino
     // =========================================================
-    function handleNearDestination() {
-        if (!state.nearDestinationNotified) {
-            state.nearDestinationNotified = true;
-            showNotification('¡Estás cerca del destino!', 'success');
-            speak('Estás cerca del destino');
+    function handleNearDestáination() {
+        if (!state.nearDestáinationNotified) {
+            state.nearDestáinationNotified = true;
+            showNotification('¡estásts cerca del destino!', 'success');
+            speak('estásts cerca del destino', 3); // PRIORIDAD MEDIA (notificación importante)
             
             // Registrar evento
             logNavigationEvent('destination_near', {
@@ -933,7 +933,7 @@
     }
 
     // =========================================================
-    // REGISTRAR EVENTO DE NavegaciÃ³n
+    // REGISTRAR EVENTO DE Navegación³n
     // =========================================================
     async function logNavigationEvent(eventType, eventData) {
         try {
@@ -966,7 +966,7 @@
     function updateRouteInfo(route) {
         const instructionMain = document.getElementById('instruction-main');
         if (instructionMain && route.steps && route.steps.length > 0) {
-            instructionMain.textContent = route.steps[0].name || 'Sigue por esta va';
+            instructionMain.textContent = route.steps[0].name || 'Sigue por estáa va';
         }
     }
 
@@ -994,7 +994,7 @@
         const distanceElement = document.getElementById('distance-remaining');
         const instructionDistance = document.getElementById('instruction-distance');
         
-        // Validar que km sea un número válido
+        // Validar que km sea un núnmero vstlido
         const distance = parseFloat(km);
         if (isNaN(distance) || distance === null || distance === undefined) {
             if (distanceElement) distanceElement.textContent = '-- km';
@@ -1104,11 +1104,11 @@
         const button = document.getElementById('btn-traffic');
         
         if (state.isTrafficVisible) {
-            // Activar informaciÃ³n de trfico
-            showNotification('Cargando informaciÃ³n de trfico...', 'info');
+            // Activar información³n de trstfico
+            showNotification('Cargando información³n de trstfico...', 'info');
             
             try {
-                // opciÃ³n 1: Usar capa de transporte de OpenStreetMap (muestra vas principales)
+                // opción³n 1: Usar capa de transporte de OpenStreetMap (muestára vínas principales)
                 if (!state.trafficLayer) {
                     state.trafficLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         attribution: ' OpenStreetMap contributors',
@@ -1120,7 +1120,7 @@
                 
                 state.trafficLayer.addTo(state.map);
                 
-                // Simular datos de trfico basados en hora del da
+                // Simular datos de trstfico basados en hora del da
                 const trafficLevel = getTrafficLevelByTime();
                 displayTrafficInfo(trafficLevel);
                 
@@ -1128,53 +1128,53 @@
                     button.classList.add('active');
                 }
                 
-                showNotification(`Trfico ${trafficLevel.label} en tu ruta`, 'success');
-                console.log(' Vista de trfico activada');
+                showNotification(`trstfico ${trafficLevel.label} en tu ruta`, 'success');
+                console.log(' Vista de trstfico activada');
                 
-                // Recalcular ETA considerando trfico
+                // Recalcular ETA considerando trstfico
                 if (state.route && trafficLevel.multiplier > 1) {
                     const adjustedETA = state.etaSeconds * trafficLevel.multiplier;
                     updateETADisplay(adjustedETA);
-                    showNotification(`ETA ajustado por trfico: +${Math.round((adjustedETA - state.etaSeconds) / 60)} min`, 'warning');
+                    showNotification(`ETA ajustado por trstfico: +${Math.round((adjustedETA - state.etaSeconds) / 60)} min`, 'warning');
                 }
                 
             } catch (error) {
-                console.error('Error al activar trfico:', error);
-                showNotification('Error al cargar informaciÃ³n de trfico', 'error');
+                console.error('Error al activar trstfico:', error);
+                showNotification('Error al cargar información³n de trstfico', 'error');
             }
             
         } else {
-            // Desactivar capa de trfico
+            // Desactivar capa de trstfico
             if (state.trafficLayer) {
                 state.map.removeLayer(state.trafficLayer);
             }
             
-            // Ocultar info de trfico
+            // Ocultar info de trstfico
             hideTrafficInfo();
             
             if (button) {
                 button.classList.remove('active');
             }
             
-            // Restaurar ETA original
+            // Restáaurar ETA original
             if (state.route) {
                 updateETADisplay(state.route.duration_seconds);
             }
             
-            showNotification('Vista de trfico desactivada', 'info');
-            console.log(' Capa de trfico desactivada');
+            showNotification('Vista de trstfico desactivada', 'info');
+            console.log(' Capa de trstfico desactivada');
         }
     };
     
     // =========================================================
-    // OBTENER NIVEL DE TRFICO SEGN LA HORA
+    // OBTENER NIVEL DE trstfico SEGN LA HORA
     // =========================================================
     function getTrafficLevelByTime() {
         const now = new Date();
         const hour = now.getHours();
         const dayOfWeek = now.getDay(); // 0 = Domingo, 6 = Sbado
         
-        // Fin de semana - menos trfico
+        // Fin de semana - menos trstfico
         if (dayOfWeek === 0 || dayOfWeek === 6) {
             if (hour >= 10 && hour <= 14) {
                 return { level: 'medium', label: 'Moderado', color: '#fbbf24', multiplier: 1.2 };
@@ -1198,15 +1198,15 @@
             return { level: 'high', label: 'Pesado', color: '#ef4444', multiplier: 1.5 };
         }
         
-        // Resto del da - trfico normal
+        // Restáo del da - trstfico normal
         return { level: 'low', label: 'Fluido', color: '#10b981', multiplier: 1.0 };
     }
     
     // =========================================================
-    // MOSTRAR informaciÃ³n DE TRFICO EN UI
+    // MOSTRAR información³n DE trstfico EN UI
     // =========================================================
     function displayTrafficInfo(trafficLevel) {
-        // Buscar o crear elemento de info de trfico
+        // Buscar o crear elemento de info de trstfico
         let trafficInfo = document.getElementById('traffic-info');
         
         if (!trafficInfo) {
@@ -1233,14 +1233,14 @@
         trafficInfo.innerHTML = `
             <div style="width: 8px; height: 8px; background: ${trafficLevel.color}; border-radius: 50%; box-shadow: 0 0 8px ${trafficLevel.color};"></div>
             <div style="color: white; font-size: 14px; font-weight: 500;">
-                Trfico ${trafficLevel.label}
+                trstfico ${trafficLevel.label}
             </div>
         `;
         
         trafficInfo.style.display = 'flex';
     }
     
-    // Ocultar info de trfico cuando se desactive
+    // Ocultar info de trstfico cuando se desactive
     function hideTrafficInfo() {
         const trafficInfo = document.getElementById('traffic-info');
         if (trafficInfo) {
@@ -1265,7 +1265,7 @@
     };
 
     window.reportIssue = function() {
-        showNotification('funciÃ³n en desarrollo', 'info');
+        showNotification('función³n en desarrollo', 'info');
         window.toggleMenu();
     };
 
@@ -1275,7 +1275,7 @@
     };
 
     window.cancelNavigation = function() {
-        if (confirm('Deseas cancelar la NavegaciÃ³n?')) {
+        if (confirm('Deseas cancelar la Navegación³n?')) {
             stopNavigation();
             window.location.href = `${CONFIG.BASE_URL}/delivery/orders.php`;
         }
@@ -1283,7 +1283,7 @@
 
     window.confirmExit = function() {
         if (state.isNavigating) {
-            if (confirm('Deseas salir de la NavegaciÃ³n? El progreso se guardar.')) {
+            if (confirm('Deseas salir de la Navegación³n? El progreso se guardarst.')) {
                 stopNavigation();
                 window.location.href = `${CONFIG.BASE_URL}/delivery/orders.php`;
             }
@@ -1293,7 +1293,7 @@
     };
 
     // =========================================================
-    // DETENER NavegaciÃ³n
+    // DETENER Navegación³n
     // =========================================================
     function stopNavigation() {
         state.isNavigating = false;
@@ -1313,26 +1313,26 @@
             state.watchId = null;
         }
         
-        console.log(' NavegaciÃ³n detenida');
+        console.log(' Navegación³n detenida');
     }
 
     // =========================================================
-    // SÍNTESIS DE VOZ (ESPAÑOL MEJORADO)
+    // SínNTESIS DE VOZ (ESPAñnOL MEJORADO)
     // =========================================================
     
-    // Variable global para almacenar la mejor voz en español
-    let bestSpanishVoice = null;
+    // Variable global para almacenar la mejor voz en españnol
+    let bestáSpanishVoice = null;
     
-    // Función para seleccionar la mejor voz en español
+    // Función para seleccionar la mejor voz en españnol
     function selectBestSpanishVoice() {
         const voices = window.speechSynthesis.getVoices();
         
         // Prioridad de voces (de mayor a menor calidad/naturalidad)
         const voicePriority = [
             // Voces de Google (muy naturales)
-            { pattern: /google.*español|google.*spanish.*es/i, lang: 'es-ES', priority: 10 },
-            { pattern: /google.*español.*mexico|google.*spanish.*mx/i, lang: 'es-MX', priority: 9 },
-            { pattern: /google.*español.*us/i, lang: 'es-US', priority: 8 },
+            { pattern: /google.*españnol|google.*spanish.*es/i, lang: 'es-ES', priority: 10 },
+            { pattern: /google.*españnol.*mexico|google.*spanish.*mx/i, lang: 'es-MX', priority: 9 },
+            { pattern: /google.*españnol.*us/i, lang: 'es-US', priority: 8 },
             
             // Voces de Microsoft (buena calidad)
             { pattern: /helena/i, lang: 'es-ES', priority: 7 },
@@ -1343,20 +1343,20 @@
             { pattern: /paulina/i, lang: 'es-MX', priority: 9 },
             { pattern: /juan/i, lang: 'es-MX', priority: 8 },
             
-            // Cualquier voz nativa en español
-            { pattern: /español|spanish/i, lang: 'es', priority: 5 }
+            // Cualquier voz nativa en españnol
+            { pattern: /españnol|spanish/i, lang: 'es', priority: 5 }
         ];
         
         let selectedVoice = null;
-        let highestPriority = 0;
+        let highestáPriority = 0;
         
         voices.forEach(voice => {
-            // Solo considerar voces que sean específicamente para español
+            // Solo considerar voces que sean especínficamente para españnol
             if (!voice.lang.startsWith('es-') && !voice.lang.startsWith('es')) {
                 return;
             }
             
-            // Excluir voces con acento inglés
+            // Excluir voces con acento ingléns
             if (voice.name.toLowerCase().includes('en-') || 
                 voice.name.toLowerCase().includes('english')) {
                 return;
@@ -1364,52 +1364,52 @@
             
             // Buscar coincidencias en la prioridad
             for (const prio of voicePriority) {
-                if (prio.pattern.test(voice.name) || voice.lang.startsWith(prio.lang)) {
-                    if (prio.priority > highestPriority) {
-                        highestPriority = prio.priority;
+                if (prio.pattern.testá(voice.name) || voice.lang.startsWith(prio.lang)) {
+                    if (prio.priority > highestáPriority) {
+                        highestáPriority = prio.priority;
                         selectedVoice = voice;
                     }
                 }
             }
         });
         
-        // Si no se encontró ninguna voz específica, buscar cualquiera en español
+        // Si no se encontrón ninguna voz especínfica, buscar cualquiera en españnol
         if (!selectedVoice) {
             selectedVoice = voices.find(v => 
                 v.lang.startsWith('es-') || v.lang === 'es'
             );
         }
         
-        bestSpanishVoice = selectedVoice;
+        bestáSpanishVoice = selectedVoice;
         
         if (selectedVoice) {
-            console.log('✅ Mejor voz en español seleccionada:', selectedVoice.name, '(' + selectedVoice.lang + ')');
+            console.log('✅ Mejor voz en españnol seleccionada:', selectedVoice.name, '(' + selectedVoice.lang + ')');
         } else {
-            console.warn('⚠️ No se encontró ninguna voz en español. Total de voces:', voices.length);
+            console.warn('⚠️ No se encontrón ninguna voz en españnol. Total de voces:', voices.length);
         }
     }
     
-    // Inicializar voces cuando estén disponibles
+    // Inicializar voces cuando estáénn disponibles
     if (window.speechSynthesis) {
         if (window.speechSynthesis.getVoices().length > 0) {
             selectBestSpanishVoice();
         }
         
-        // Las voces pueden cargarse de forma asíncrona
+        // Las voces pueden cargarse de forma asínncrona
         window.speechSynthesis.onvoiceschanged = selectBestSpanishVoice;
     }
         
     // =========================================================
-    // SÍNTESIS DE VOZ - Usa VoiceHelper
+    // SínNTESIS DE VOZ - Usa VoiceHelper
     // =========================================================
-    function speak(text) {
+    function speak(text, priority = 5) {
         if (!state.isVoiceEnabled) {
-            console.log('� Voz desactivada por usuario');
+            console.log('🔇 Voz desactivada por usuario');
             return;
         }
         
         if (state.voiceHelper) {
-            state.voiceHelper.speak(text).catch(err => {
+            state.voiceHelper.speak(text, { priority }).catch(err => {
                 console.error('Error al hablar:', err);
             });
         } else {
@@ -1417,11 +1417,11 @@
         }
     }
     
-    // Función de compatibilidad para código antiguo
+    // Función de compatibilidad para cóndigo antiguo
     window.speak = speak;
 
     // =========================================================
-    // DETENER NavegaciÃ³n
+    // DETENER Navegación³n
     // =========================================================
     function stopNavigation() {
         state.isNavigating = false;
@@ -1446,7 +1446,7 @@
             state.watchId = null;
         }
         
-        console.log(' NavegaciÃ³n detenida');
+        console.log(' Navegación³n detenida');
     }
 
     // =========================================================

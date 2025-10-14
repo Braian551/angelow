@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Sistema de Prioridad de Voz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #2196F3;
+        }
+        button {
+            padding: 12px 24px;
+            margin: 5px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-priority-1 {
+            background: #f44336;
+            color: white;
+        }
+        .btn-priority-3 {
+            background: #FF9800;
+            color: white;
+        }
+        .btn-priority-5 {
+            background: #2196F3;
+            color: white;
+        }
+        .btn-cancel {
+            background: #9E9E9E;
+            color: white;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .log {
+            margin-top: 20px;
+            padding: 15px;
+            background: #263238;
+            color: #4CAF50;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #4CAF50;
+            padding-left: 10px;
+        }
+        .priority-1 { border-left-color: #f44336; color: #f44336; }
+        .priority-3 { border-left-color: #FF9800; color: #FF9800; }
+        .priority-5 { border-left-color: #2196F3; color: #2196F3; }
+        .queue-info {
+            background: #E3F2FD;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .queue-item {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 3px;
+            background: white;
+            border-radius: 3px;
+            border-left: 3px solid;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔊 Prueba de Sistema de Prioridad de Voz</h1>
+        
+        <div class="test-section">
+            <h3>Prueba 1: Orden por Prioridad</h3>
+            <p>Haz clic en este orden: Baja → Alta → Media</p>
+            <button class="btn-priority-5" onclick="testPriority5()">
+                🔵 Prioridad Baja (5)
+            </button>
+            <button class="btn-priority-1" onclick="testPriority1()">
+                🔴 Prioridad Alta (1)
+            </button>
+            <button class="btn-priority-3" onclick="testPriority3()">
+                🟡 Prioridad Media (3)
+            </button>
+            <p><small>Esperado: Escucharás en orden 1 → 3 → 5 (no en el orden que clickeaste)</small></p>
+        </div>
+
+        <div class="test-section">
+            <h3>Prueba 2: Simular Escenario Real</h3>
+            <p>Click para simular "Pausar durante una instrucción de guía"</p>
+            <button class="btn-priority-5" onclick="simulateGuide()">
+                📍 Instrucción de Guía + Pausa
+            </button>
+            <p><small>Esperado: "Navegación pausada" primero, luego la instrucción</small></p>
+        </div>
+
+        <div class="test-section">
+            <h3>Prueba 3: Múltiples Mensajes</h3>
+            <button class="btn-priority-5" onclick="multipleMessages()">
+                📢 Agregar 5 mensajes rápidos
+            </button>
+            <p><small>Esperado: Se reproducen uno por uno, sin solaparse</small></p>
+        </div>
+
+        <div class="test-section">
+            <h3>Control</h3>
+            <button class="btn-cancel" onclick="cancelAll()">
+                🛑 Cancelar Todas las Voces
+            </button>
+        </div>
+
+        <div class="queue-info">
+            <h4>Estado de la Cola:</h4>
+            <div id="queue-status">Cola vacía</div>
+        </div>
+
+        <div class="log" id="log">
+            <div class="log-entry">Sistema de logs iniciado...</div>
+        </div>
+    </div>
+
+    <script src="../js/delivery/voice-helper.js"></script>
+    <script>
+        // Instanciar VoiceHelper
+        const voiceHelper = new VoiceHelper();
+        
+        // Sobrescribir console.log para capturar en nuestra UI
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLogEntry(args.join(' '));
+        };
+
+        function addLogEntry(message) {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            // Detectar prioridad en el mensaje
+            if (message.includes('prioridad 1')) {
+                entry.classList.add('priority-1');
+            } else if (message.includes('prioridad 3')) {
+                entry.classList.add('priority-3');
+            } else if (message.includes('prioridad 5')) {
+                entry.classList.add('priority-5');
+            }
+            
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            
+            updateQueueStatus();
+        }
+
+        function updateQueueStatus() {
+            const queueDiv = document.getElementById('queue-status');
+            const queue = voiceHelper.messageQueue;
+            
+            if (queue.length === 0) {
+                queueDiv.innerHTML = '<span style="color: #4CAF50;">✅ Cola vacía</span>';
+            } else {
+                let html = `<strong>${queue.length} mensajes en cola:</strong><br>`;
+                queue.forEach((msg, i) => {
+                    const color = msg.priority === 1 ? '#f44336' : 
+                                  msg.priority === 3 ? '#FF9800' : '#2196F3';
+                    html += `<span class="queue-item" style="border-left-color: ${color}">
+                        ${i+1}. [P${msg.priority}] ${msg.text.substring(0, 30)}...
+                    </span>`;
+                });
+                queueDiv.innerHTML = html;
+            }
+            
+            // Actualizar cada 500ms mientras hay mensajes
+            if (queue.length > 0) {
+                setTimeout(updateQueueStatus, 500);
+            }
+        }
+
+        // PRUEBAS
+        function testPriority5() {
+            voiceHelper.speak('En 100 metros, continúa por Calle 63', { priority: 5 });
+        }
+
+        function testPriority1() {
+            voiceHelper.speak('Navegación pausada', { priority: 1 });
+        }
+
+        function testPriority3() {
+            voiceHelper.speak('Estás cerca del destino', { priority: 3 });
+        }
+
+        function simulateGuide() {
+            // Simular: Instrucción de guía inicia, luego usuario pausa
+            voiceHelper.speak('En 200 metros, gira a la derecha en Avenida Principal', { priority: 5 });
+            
+            // Usuario hace click en "Pausar" 500ms después
+            setTimeout(() => {
+                voiceHelper.speak('Navegación pausada', { priority: 1 });
+            }, 500);
+        }
+
+        function multipleMessages() {
+            voiceHelper.speak('Mensaje uno con prioridad baja', { priority: 5 });
+            voiceHelper.speak('Mensaje dos con prioridad baja', { priority: 5 });
+            voiceHelper.speak('Mensaje tres con prioridad baja', { priority: 5 });
+            voiceHelper.speak('Mensaje cuatro con prioridad baja', { priority: 5 });
+            voiceHelper.speak('Mensaje cinco con prioridad baja', { priority: 5 });
+        }
+
+        function cancelAll() {
+            voiceHelper.cancel();
+            addLogEntry('🛑 TODAS LAS VOCES CANCELADAS');
+        }
+
+        // Inicializar estado de cola
+        updateQueueStatus();
+    </script>
+</body>
+</html>
