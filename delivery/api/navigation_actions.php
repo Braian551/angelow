@@ -280,7 +280,7 @@ function getProblemTypes() {
         ],
         [
             'value' => 'app_error',
-            'label' => 'Error de la App',
+            'label' => 'Error de software',
             'icon' => 'fa-mobile-screen-button'
         ],
         [
