@@ -122,6 +122,42 @@ function cancelNavigation($driver_id) {
         return;
     }
     
+    // Verificar que el delivery existe y pertenece al driver
+    try {
+        $stmt = $conn->prepare("
+            SELECT od.id, od.delivery_status 
+            FROM order_deliveries od 
+            WHERE od.id = ? AND od.driver_id = ? COLLATE utf8mb4_general_ci
+        ");
+        $stmt->execute([$delivery_id, $driver_id]);
+        $deliveryCheck = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$deliveryCheck) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'error' => 'Esta entrega no te pertenece o no existe'
+            ]);
+            return;
+        }
+        
+        if (!in_array($deliveryCheck['delivery_status'], ['driver_accepted', 'in_transit', 'arrived'])) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'error' => 'No se puede cancelar navegación para entregas en estado: ' . $deliveryCheck['delivery_status']
+            ]);
+            return;
+        }
+    } catch (PDOException $e) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Error al validar la entrega'
+        ]);
+        return;
+    }
+    
     // Llamar al procedimiento almacenado usando PDO
     try {
         $stmt = $conn->prepare("CALL CancelNavigation(?, ?, ?, ?, ?, ?, ?)");
@@ -157,24 +193,28 @@ function cancelNavigation($driver_id) {
 function reportProblem($driver_id) {
     global $conn;
     
-    // Obtener datos del POST
-    $data = json_decode(file_get_contents('php://input'), true);
-    
-    $delivery_id = $data['delivery_id'] ?? null;
-    $problem_type = $data['problem_type'] ?? 'other';
-    $title = $data['title'] ?? '';
-    $description = $data['description'] ?? '';
-    $severity = $data['severity'] ?? 'medium';
-    $latitude = $data['latitude'] ?? null;
-    $longitude = $data['longitude'] ?? null;
-    $photo_path = $data['photo_path'] ?? null;
+    // Obtener datos del request soportando JSON y multipart/form-data
+    $contentType = $_SERVER['CONTENT_TYPE'] ?? $_SERVER['HTTP_CONTENT_TYPE'] ?? '';
+    $isJson = stripos($contentType, 'application/json') !== false;
+    $rawBody = file_get_contents('php://input');
+    $data = $isJson ? (json_decode($rawBody, true) ?: []) : [];
+
+    // Preferir $_POST cuando llega multipart/form-data o x-www-form-urlencoded
+    $delivery_id = $_POST['delivery_id'] ?? ($data['delivery_id'] ?? null);
+    $problem_type = $_POST['problem_type'] ?? ($data['problem_type'] ?? 'other');
+    $title = $_POST['title'] ?? ($data['title'] ?? '');
+    $description = $_POST['description'] ?? ($data['description'] ?? '');
+    $severity = $_POST['severity'] ?? ($data['severity'] ?? 'medium');
+    $latitude = isset($_POST['latitude']) ? $_POST['latitude'] : ($data['latitude'] ?? null);
+    $longitude = isset($_POST['longitude']) ? $_POST['longitude'] : ($data['longitude'] ?? null);
+    $photo_path = $_POST['photo_path'] ?? ($data['photo_path'] ?? null);
     
     // Información del dispositivo
     $device_info = json_encode([
         'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
         'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
         'timestamp' => date('Y-m-d H:i:s'),
-        'screen_resolution' => $data['screen_resolution'] ?? null
+        'screen_resolution' => $_POST['screen_resolution'] ?? ($data['screen_resolution'] ?? null)
     ]);
     
     // Validar datos requeridos
@@ -187,8 +227,44 @@ function reportProblem($driver_id) {
         return;
     }
     
+    // Verificar que el delivery existe y pertenece al driver
+    try {
+        $stmt = $conn->prepare("
+            SELECT od.id, od.delivery_status 
+            FROM order_deliveries od 
+            WHERE od.id = ? AND od.driver_id = ? COLLATE utf8mb4_general_ci
+        ");
+        $stmt->execute([$delivery_id, $driver_id]);
+        $deliveryCheck = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$deliveryCheck) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'error' => 'Esta entrega no te pertenece o no existe'
+            ]);
+            return;
+        }
+        
+        if (!in_array($deliveryCheck['delivery_status'], ['driver_accepted', 'in_transit', 'arrived'])) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'error' => 'No se pueden reportar problemas para entregas en estado: ' . $deliveryCheck['delivery_status']
+            ]);
+            return;
+        }
+    } catch (PDOException $e) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Error al validar la entrega'
+        ]);
+        return;
+    }
+    
     // Manejar subida de foto si existe
-    if (isset($_FILES['photo'])) {
+    if (isset($_FILES['photo']) && is_array($_FILES['photo']) && ($_FILES['photo']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
         try {
             $photo_path = handlePhotoUpload($_FILES['photo'], $delivery_id);
         } catch (Exception $e) {

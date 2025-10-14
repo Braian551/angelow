@@ -58,6 +58,16 @@
         batteryLevel: 100
     };
 
+    // Helper para obtener el delivery_id actual de forma consistente
+    function getDeliveryId() {
+        // Preferir el id desde los datos del delivery cargados
+        if (state.deliveryData && state.deliveryData.delivery_id) {
+            return state.deliveryData.delivery_id;
+        }
+        // Fallback si alguna lógica previa lo guardó en state.deliveryId
+        return state.deliveryId;
+    }
+
     // =========================================================
     // INICIALIZAR EVENTOS
     // =========================================================
@@ -1294,10 +1304,10 @@
     // Procesar cancelación desde el modal
     window.processCancellation = async function(reason, notes) {
         try {
-            const position = await getCurrentPosition();
+            const position = await getSafePosition();
             
             const cancelData = {
-                delivery_id: state.deliveryId,
+                delivery_id: getDeliveryId(),
                 reason: reason,
                 notes: notes,
                 latitude: position.coords.latitude,
@@ -1322,7 +1332,7 @@
                 stopNavigation();
                 
                 // Notificación de éxito
-                voiceHelper.speak('Navegación cancelada', 1);
+                speak('Navegación cancelada', 1);
                 
                 // Redirigir después de un breve delay
                 setTimeout(() => {
@@ -1333,7 +1343,11 @@
             }
         } catch (error) {
             console.error('Error al cancelar navegación:', error);
-            alert('Error al cancelar la navegación: ' + error.message);
+            if (typeof window.showAlert === 'function') {
+                window.showAlert('Error al cancelar la navegación: ' + (error.message || 'Error desconocido'), 'error');
+            } else {
+                console.warn('showAlert no disponible, usando console.error');
+            }
             
             // Rehabilitar botón
             const confirmBtn = document.getElementById('confirmCancellationBtn');
@@ -1353,11 +1367,11 @@
     // Enviar reporte de problema desde el modal
     window.submitProblemReport = async function(problemData) {
         try {
-            const position = await getCurrentPosition();
+            const position = await getSafePosition();
             
             // Crear FormData para soportar foto
             const formData = new FormData();
-            formData.append('delivery_id', state.deliveryId);
+            formData.append('delivery_id', getDeliveryId());
             formData.append('problem_type', problemData.problem_type);
             formData.append('title', problemData.title);
             formData.append('description', problemData.description);
@@ -1382,8 +1396,10 @@
                 $('#reportProblemModal').modal('hide');
                 
                 // Notificación de éxito
-                voiceHelper.speak('Problema reportado exitosamente', 1);
-                alert('Problema reportado exitosamente. ID: ' + result.report_id);
+                speak('Problema reportado exitosamente', 1);
+                if (typeof window.showAlert === 'function') {
+                    window.showAlert('Problema reportado exitosamente.<br>ID de reporte: ' + (result.report_id ?? '-'), 'success');
+                }
                 
                 // Registrar en el estado
                 if (!state.problemReports) {
@@ -1400,7 +1416,9 @@
             }
         } catch (error) {
             console.error('Error al reportar problema:', error);
-            alert('Error al reportar el problema: ' + error.message);
+            if (typeof window.showAlert === 'function') {
+                window.showAlert('Error al reportar el problema: ' + (error.message || 'Error desconocido'), 'error');
+            }
         } finally {
             // Rehabilitar botón
             const submitBtn = document.getElementById('submitProblemBtn');
@@ -1425,6 +1443,27 @@
                 { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
         });
+    }
+
+    // Preferir la última ubicación conocida del estado para evitar timeouts
+    function buildPositionFromState() {
+        return {
+            coords: {
+                latitude: state.currentLocation.lat,
+                longitude: state.currentLocation.lng,
+                accuracy: 10,
+                speed: (state.currentSpeed || 0) / 3.6,
+                heading: state.currentHeading || 0
+            }
+        };
+    }
+
+    async function getSafePosition() {
+        if (state.currentLocation && typeof state.currentLocation.lat === 'number' && typeof state.currentLocation.lng === 'number') {
+            return buildPositionFromState();
+        }
+        // Fallback a geolocalización inmediata si no hay estado aún
+        return await getCurrentPosition();
     }
 
     // Función auxiliar para formatear tiempo

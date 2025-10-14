@@ -72,10 +72,10 @@
                 </div>
             </div>
             <div class="modal-footer glass-footer">
-                <button type="button" class="btn btn-light glass-btn" data-dismiss="modal">
+                <button type="button" class="glass-btn glass-btn-ghost" data-dismiss="modal">
                     <i class="fas fa-times"></i> No, Continuar
                 </button>
-                <button type="button" class="btn btn-warning glass-btn-primary" id="confirmCancellationBtn">
+                <button type="button" class="glass-btn-primary" id="confirmCancellationBtn">
                     <i class="fas fa-check"></i> Sí, Cancelar Navegación
                 </button>
             </div>
@@ -103,6 +103,16 @@
 .glass-btn { border-radius: 10px; border: 1px solid rgba(255,255,255,0.25); }
 .glass-btn-primary { background: linear-gradient(135deg, #ffcc66, #e0a800); border: none; color: #2a2a2a; border-radius: 10px; font-weight: 600; }
 .glass-btn-primary:hover { filter: brightness(1.05); }
+/* Ghost button and shared states */
+.glass-btn-ghost { background: transparent; color: #e9eef6; border: 1px solid rgba(255,255,255,0.25); }
+.glass-btn-ghost:hover { background: rgba(255,255,255,0.06); }
+.glass-btn, .glass-btn-primary { padding: 10px 16px; letter-spacing: .2px; }
+.glass-btn i, .glass-btn-primary i { margin-right: 6px; }
+.glass-btn:focus-visible, .glass-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255,204,102,0.35); }
+.glass-btn[disabled], .glass-btn-primary[disabled] { opacity: .7; cursor: not-allowed; }
+/* Enhanced buttons sizing and spacing */
+.glass-btn, .glass-btn-primary { padding: 10px 16px; letter-spacing: .2px; }
+.glass-btn i, .glass-btn-primary i { margin-right: 6px; }
 
 .reason-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); grid-gap: 12px; margin-top: 10px; }
 .reason-card { border: 1px solid rgba(255,255,255,0.25); background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.06)); padding: 14px; border-radius: 14px; cursor: pointer; transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease; }
@@ -110,7 +120,9 @@
 .reason-card .title { font-weight: 600; color: #e9eef6; }
 .reason-card .hint { font-size: 12px; color: #b4c0d1; }
 .reason-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,.18); }
-.reason-card.active { border-color: rgba(255,204,102,0.8); box-shadow: 0 0 0 2px rgba(255,204,102,0.2) inset; }
+.reason-card:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255,204,102,0.45); }
+.reason-card.active { border-color: rgba(255,204,102,0.95); background: linear-gradient(145deg, rgba(255,204,102,.18), rgba(255,255,255,.06)); box-shadow: 0 6px 24px rgba(255,204,102,.18), 0 0 0 2px rgba(255,204,102,0.25) inset; position: relative; }
+.reason-card.active::after { content: '✓'; position: absolute; top: 10px; right: 12px; font-weight: 700; color: #ffe6b3; font-size: 16px; }
 </style>
 
 <!-- JavaScript del Modal (Interactividad) -->
@@ -160,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const reason = reasonSelect.value;
             const notes = notesTextarea.value.trim();
 
-            if (!reason) { alert('Por favor selecciona una razón de cancelación'); return; }
+            if (!reason) { if (typeof window.showAlert === 'function') window.showAlert('Por favor selecciona una razón de cancelación', 'warning'); return; }
 
             confirmBtn.disabled = true;
             confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cancelando...';

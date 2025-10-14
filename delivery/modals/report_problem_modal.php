@@ -122,10 +122,10 @@
                 </div>
             </div>
             <div class="modal-footer glass-footer">
-                <button type="button" class="btn btn-light glass-btn" data-dismiss="modal">
+                <button type="button" class="glass-btn glass-btn-ghost" data-dismiss="modal">
                     <i class="fas fa-times"></i> Cancelar
                 </button>
-                <button type="button" class="btn btn-primary glass-btn-primary" id="submitProblemBtn">
+                <button type="button" class="glass-btn-primary" id="submitProblemBtn">
                     <i class="fas fa-paper-plane"></i> Enviar Reporte
                 </button>
             </div>
@@ -218,7 +218,18 @@
 .problem-card .title { font-weight: 600; color: var(--soft-text); }
 .problem-card .hint { font-size: 12px; color: var(--muted-text); }
 .problem-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,.18); }
-.problem-card.active { border-color: rgba(76,132,255,0.7); box-shadow: 0 0 0 2px rgba(76,132,255,0.15) inset; }
+.problem-card:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(76,132,255,0.35); }
+.problem-card.active {
+    border-color: rgba(76,132,255,0.85);
+    background: linear-gradient(145deg, rgba(76,132,255,.18), rgba(255,255,255,.06));
+    box-shadow: 0 6px 24px rgba(76,132,255,.15), 0 0 0 2px rgba(76,132,255,0.25) inset;
+    position: relative;
+}
+.problem-card.active::after {
+    content: '✓';
+    position: absolute; top: 10px; right: 12px; font-weight: 700;
+    color: #cfe0ff; font-size: 16px;
+}
 
 .severity-group { display: flex; flex-wrap: wrap; gap: 10px; }
 .severity-pill {
@@ -227,7 +238,11 @@
     color: var(--soft-text); user-select: none; background: var(--glass-bg);
 }
 .severity-pill input { display:none; }
-.severity-pill.active { box-shadow: 0 0 0 2px rgba(76,132,255,0.15) inset; border-color: rgba(76,132,255,0.65); }
+.severity-pill.active {
+    box-shadow: 0 0 0 2px rgba(76,132,255,0.2) inset;
+    border-color: rgba(76,132,255,0.85);
+    filter: saturate(1.1);
+}
 .severity-low { background: linear-gradient(135deg, rgba(76,217,100,.12), rgba(76,217,100,.08)); }
 .severity-medium { background: linear-gradient(135deg, rgba(255,204,102,.14), rgba(255,204,102,.08)); }
 .severity-high { background: linear-gradient(135deg, rgba(255,93,93,.14), rgba(255,93,93,.08)); }
@@ -259,6 +274,14 @@
     border: none; color: #fff; border-radius: 10px;
 }
 .glass-btn-primary:hover { filter: brightness(1.05); }
+.glass-btn-ghost { background: transparent; color: var(--soft-text); border: 1px solid var(--glass-border); }
+.glass-btn-ghost:hover { background: rgba(255,255,255,0.06); }
+.glass-btn, .glass-btn-primary { padding: 10px 16px; font-weight: 600; letter-spacing: .2px; }
+.glass-btn i, .glass-btn-primary i { margin-right: 6px; }
+.glass-btn:focus-visible, .glass-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(76,132,255,0.35); }
+.glass-btn[disabled], .glass-btn-primary[disabled] { opacity: .7; cursor: not-allowed; }
+.glass-btn, .glass-btn-primary { padding: 10px 16px; font-weight: 600; letter-spacing: .2px; }
+.glass-btn i, .glass-btn-primary i { margin-right: 6px; }
 </style>
 
 <!-- JavaScript del Modal (Interactividad) -->
@@ -359,9 +382,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const photo = photoInput.files[0] || null;
 
             // Validaciones
-            if (!problemType) { alert('Por favor selecciona el tipo de problema'); return; }
-            if (!title) { alert('Por favor ingresa un título'); titleInput.focus(); return; }
-            if (!description) { alert('Por favor describe el problema'); descriptionTextarea.focus(); return; }
+            if (!problemType) { if (typeof window.showAlert === 'function') window.showAlert('Por favor selecciona el tipo de problema', 'warning'); return; }
+            if (!title) { if (typeof window.showAlert === 'function') window.showAlert('Por favor ingresa un título', 'warning'); titleInput.focus(); return; }
+            if (!description) { if (typeof window.showAlert === 'function') window.showAlert('Por favor describe el problema', 'warning'); descriptionTextarea.focus(); return; }
 
             // Deshabilitar botón
             submitBtn.disabled = true;
