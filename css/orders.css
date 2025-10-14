@@ -1533,6 +1533,13 @@ select:focus-visible {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
+.timeline-step-modern.pending .timeline-dot-modern:hover {
+    background: rgba(189, 195, 199, 0.6);
+    transform: scale(1.05) translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* Estado Activo */
 .timeline-step-modern.active .timeline-dot-modern {
     background: var(--primary-color);
@@ -1544,6 +1551,16 @@ select:focus-visible {
         0 0 20px rgba(0, 119, 182, 0.3),
         inset 0 1px 1px rgba(255, 255, 255, 0.3);
     transform: scale(1.1);
+    animation: active-glow 3s ease-in-out infinite;
+}
+
+.timeline-step-modern.active .timeline-dot-modern:hover {
+    transform: scale(1.15) translateY(-2px);
+    box-shadow: 
+        0 12px 35px rgba(0, 119, 182, 0.5),
+        0 0 30px rgba(0, 119, 182, 0.4),
+        inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Estado Completado */
@@ -1558,10 +1575,27 @@ select:focus-visible {
     animation: check-bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-@keyframes check-bounce {
-    0% { transform: scale(0); }
-    50% { transform: scale(1.15); }
-    100% { transform: scale(1); }
+.timeline-step-modern.completed .timeline-dot-modern:hover {
+    transform: scale(1.05) translateY(-1px);
+    box-shadow: 
+        0 8px 25px rgba(75, 181, 67, 0.4),
+        inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes active-glow {
+    0%, 100% {
+        box-shadow: 
+            0 8px 25px rgba(0, 119, 182, 0.4),
+            0 0 20px rgba(0, 119, 182, 0.3),
+            inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        box-shadow: 
+            0 10px 30px rgba(0, 119, 182, 0.5),
+            0 0 25px rgba(0, 119, 182, 0.4),
+            inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    }
 }
 
 .timeline-label-modern {
