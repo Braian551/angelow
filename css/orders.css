@@ -611,13 +611,15 @@
     transition: var(--transition);
     backdrop-filter: var(--blur-intensity-light);
     -webkit-backdrop-filter: var(--blur-intensity-light);
-    border: 1px solid var(--glass-border-light);
+    border: 2px solid rgba(0, 119, 182, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .info-item:hover {
     background: rgba(255, 255, 255, 0.8);
     transform: translateY(-3px);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 6px 20px rgba(0, 119, 182, 0.15);
+    border-color: rgba(0, 119, 182, 0.25);
 }
 
 .info-item i {
@@ -666,11 +668,17 @@
     transition: var(--transition);
     backdrop-filter: var(--blur-intensity-light);
     -webkit-backdrop-filter: var(--blur-intensity-light);
+    border: 2px solid rgba(0, 119, 182, 0.15);
+    border-left: 4px solid var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .delivery-address:hover {
     background: rgba(255, 255, 255, 0.8);
     transform: translateX(5px);
+    box-shadow: 0 6px 20px rgba(0, 119, 182, 0.15);
+    border-color: rgba(0, 119, 182, 0.25);
+    border-left-color: var(--primary-color);
 }
 
 .delivery-address i {
@@ -785,10 +793,10 @@
 
 /* Timeline de estados mejorado */
 .order-timeline {
-    margin-top: 2.5rem;
+    /* margin-top: 2.5rem; */ 
     position: relative;
     z-index: 1;
-    padding: 2rem 0;
+    /* /* padding: 0rem 0; */
 }
 
 .timeline {
@@ -1466,14 +1474,14 @@ select:focus-visible {
     backdrop-filter: var(--blur-intensity);
     -webkit-backdrop-filter: var(--blur-intensity);
     border-radius: var(--border-radius-lg);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-sm);
+    border: 2px solid rgba(0, 119, 182, 0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     transition: var(--transition);
 }
 
 .order-timeline-modern:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--glass-border-dark);
+    box-shadow: 0 8px 25px rgba(0, 119, 182, 0.2);
+    border-color: rgba(0, 119, 182, 0.25);
 }
 
 .timeline-progress-bar {
