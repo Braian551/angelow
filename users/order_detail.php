@@ -34,10 +34,13 @@ try {
         exit;
     }
 
-    // Obtener items de la orden con información básica
+    // Obtener items de la orden
     $stmtItems = $conn->prepare("
-        SELECT oi.*
+        SELECT oi.*, 
+               COALESCE(vi.image_path, pi.image_path, 'uploads/productos/default-product.jpg') as product_image
         FROM order_items oi
+        LEFT JOIN product_images pi ON pi.product_id = oi.product_id AND pi.is_primary = 1
+        LEFT JOIN variant_images vi ON vi.color_variant_id = oi.color_variant_id AND vi.is_primary = 1
         WHERE oi.order_id = :order_id
         ORDER BY oi.id ASC
     ");
@@ -524,11 +527,11 @@ function calculateDiscountAmount($order, $subtotal) {
                             <?php else: ?>
                                 <?php foreach ($items as $item): ?>
                                     <div class="order-item">
-                                        <img src="<?= BASE_URL ?>/uploads/products/default-product.jpg"
+                                        <img src="<?= BASE_URL ?>/<?= htmlspecialchars($item['product_image']) ?>"
                                              alt="Producto"
-                                             onerror="this.src='<?= BASE_URL ?>/uploads/products/default-product.jpg'">
+                                             onerror="this.src='<?= BASE_URL ?>/uploads/productos/default-product.jpg'">
                                         <div class="order-item-details">
-                                            <h3>Producto #<?= $item['id'] ?></h3>
+                                            <h3><?= htmlspecialchars($item['product_name']) ?></h3>
                                             <div class="item-meta">
                                                 <span><i class="fas fa-hashtag"></i> Cantidad: <?= $item['quantity'] ?></span>
                                                 <?php if (isset($item['color_variant_id']) && $item['color_variant_id']): ?>

@@ -141,7 +141,7 @@
 
 .dashboard-header h1 {
   font-size: 2.8rem;
-  color: var(--dashboard-primary-dark);
+  color: var(--primary-color);
   margin-bottom: 1rem;
 }
 

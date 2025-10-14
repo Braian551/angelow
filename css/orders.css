@@ -87,6 +87,14 @@
     transition: var(--transition);
 }
 
+.dashboard-header {
+    background: white;
+    padding: 15px;
+    box-shadow: var(--shadow-sm);
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
 .floating-notification:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-xl);
