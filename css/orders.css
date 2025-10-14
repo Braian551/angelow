@@ -1462,12 +1462,18 @@ select:focus-visible {
     position: relative;
     margin: 35px 0 25px;
     padding: 25px 20px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2));
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur-intensity);
+    -webkit-backdrop-filter: var(--blur-intensity);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.order-timeline-modern:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--glass-border-dark);
 }
 
 .timeline-progress-bar {
@@ -1476,20 +1482,18 @@ select:focus-visible {
     left: 60px;
     right: 60px;
     height: 4px;
-    background: linear-gradient(90deg, 
-        rgba(200, 200, 200, 0.2) 0%, 
-        rgba(200, 200, 200, 0.15) 100%);
-    border-radius: 10px;
+    background: var(--border-light);
+    border-radius: var(--border-radius);
     overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .timeline-progress-fill {
     height: 100%;
     background: var(--primary-color);
-    border-radius: 10px;
-    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 15px rgba(0, 119, 182, 0.4);
+    border-radius: var(--border-radius);
+    transition: var(--transition-slow);
+    box-shadow: 0 0 10px rgba(0, 119, 182, 0.3);
     position: relative;
     overflow: hidden;
 }
@@ -1520,36 +1524,36 @@ select:focus-visible {
     margin-bottom: 12px;
     position: relative;
     z-index: 3;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: var(--transition);
     font-size: 18px;
+    backdrop-filter: var(--blur-intensity-light);
+    -webkit-backdrop-filter: var(--blur-intensity-light);
 }
 
 /* Estado Pendiente */
 .timeline-step-modern.pending .timeline-dot-modern {
-    background: rgba(189, 195, 199, 0.4);
-    backdrop-filter: blur(5px);
-    color: rgba(127, 140, 141, 0.6);
-    border: 2px solid rgba(189, 195, 199, 0.3);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    background: var(--bg-lighter);
+    color: var(--text-lighter);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
 }
 
 .timeline-step-modern.pending .timeline-dot-modern:hover {
-    background: rgba(189, 195, 199, 0.6);
+    background: var(--bg-white);
     transform: scale(1.05) translateY(-1px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-medium);
 }
 
 /* Estado Activo */
 .timeline-step-modern.active .timeline-dot-modern {
     background: var(--primary-color);
-    backdrop-filter: blur(10px);
-    color: #fff;
-    border: 2px solid rgba(0, 119, 182, 0.5);
+    color: white;
+    border: 2px solid rgba(0, 119, 182, 0.3);
     box-shadow: 
-        0 8px 25px rgba(0, 119, 182, 0.4),
-        0 0 20px rgba(0, 119, 182, 0.3),
-        inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        0 6px 20px rgba(0, 119, 182, 0.25),
+        0 0 15px rgba(0, 119, 182, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
     transform: scale(1.1);
     animation: active-glow 3s ease-in-out infinite;
 }
@@ -1557,69 +1561,78 @@ select:focus-visible {
 .timeline-step-modern.active .timeline-dot-modern:hover {
     transform: scale(1.15) translateY(-2px);
     box-shadow: 
-        0 12px 35px rgba(0, 119, 182, 0.5),
-        0 0 30px rgba(0, 119, 182, 0.4),
-        inset 0 1px 1px rgba(255, 255, 255, 0.4);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        0 10px 30px rgba(0, 119, 182, 0.35),
+        0 0 25px rgba(0, 119, 182, 0.3),
+        inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 /* Estado Completado */
 .timeline-step-modern.completed .timeline-dot-modern {
     background: var(--success-color);
-    backdrop-filter: blur(10px);
-    color: #fff;
-    border: 2px solid rgba(75, 181, 67, 0.4);
+    color: white;
+    border: 2px solid rgba(75, 181, 67, 0.3);
     box-shadow: 
-        0 6px 20px rgba(75, 181, 67, 0.3),
-        inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        0 4px 15px rgba(75, 181, 67, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
     animation: check-bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .timeline-step-modern.completed .timeline-dot-modern:hover {
     transform: scale(1.05) translateY(-1px);
     box-shadow: 
-        0 8px 25px rgba(75, 181, 67, 0.4),
-        inset 0 1px 1px rgba(255, 255, 255, 0.4);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        0 6px 20px rgba(75, 181, 67, 0.3),
+        inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 @keyframes active-glow {
     0%, 100% {
         box-shadow: 
-            0 8px 25px rgba(0, 119, 182, 0.4),
-            0 0 20px rgba(0, 119, 182, 0.3),
-            inset 0 1px 1px rgba(255, 255, 255, 0.3);
+            0 6px 20px rgba(0, 119, 182, 0.25),
+            0 0 15px rgba(0, 119, 182, 0.2),
+            inset 0 1px 1px rgba(255, 255, 255, 0.2);
     }
     50% {
         box-shadow: 
-            0 10px 30px rgba(0, 119, 182, 0.5),
-            0 0 25px rgba(0, 119, 182, 0.4),
-            inset 0 1px 1px rgba(255, 255, 255, 0.4);
+            0 8px 25px rgba(0, 119, 182, 0.3),
+            0 0 20px rgba(0, 119, 182, 0.25),
+            inset 0 1px 1px rgba(255, 255, 255, 0.3);
     }
 }
 
 .timeline-label-modern {
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
     text-align: center;
     letter-spacing: 0.3px;
-    transition: all 0.3s ease;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    transition: var(--transition);
+    color: var(--text-light);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: var(--blur-intensity-light);
+    -webkit-backdrop-filter: var(--blur-intensity-light);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border-light);
+    box-shadow: var(--shadow-sm);
 }
 
 .timeline-step-modern.pending .timeline-label-modern {
-    color: rgba(127, 140, 141, 0.7);
+    color: var(--text-lighter);
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .timeline-step-modern.active .timeline-label-modern {
-    color: #3498db;
-    font-weight: 700;
-    transform: scale(1.05);
+    color: var(--primary-color);
+    font-weight: 600;
+    background: var(--primary-light);
+    border-color: var(--primary-medium);
+    transform: scale(1.02);
 }
 
 .timeline-step-modern.completed .timeline-label-modern {
-    color: #27ae60;
+    color: var(--success-color);
     font-weight: 600;
+    background: var(--success-light);
+    border-color: rgba(75, 181, 67, 0.3);
 }
 
 /* Responsive para la nueva timeline */
