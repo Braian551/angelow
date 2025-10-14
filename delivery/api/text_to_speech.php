@@ -16,7 +16,7 @@ header('Cache-Control: public, max-age=86400'); // Cache por 24 horas
 
 // API Key gratuita de VoiceRSS
 // Registra tu propia key en: https://www.voicerss.org/personel/
-$apiKey = '2ca1dadea5ee4f08a4212b6806d44c09'; // Key de ejemplo
+$apiKey = '2ca1dadea5ee4f08a4212b6806d44c09';
 
 // Obtener parámetros con encoding UTF-8
 $text = isset($_GET['text']) ? urldecode($_GET['text']) : 'Texto de prueba';

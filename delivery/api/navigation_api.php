@@ -226,23 +226,33 @@ try {
                 // Asegurar que driver_id sea string (VARCHAR en DB)
                 $driverIdStr = strval($driverId);
                 
-                // Llamar al procedimiento almacenado
-                $stmt = $conn->prepare("CALL StartNavigation(?, ?, ?, ?, ?, ?, ?, ?, ?, @result)");
-                $stmt->execute([
-                    $deliveryId, $driverIdStr, 
-                    $startLat, $startLng, 
-                    $destLat, $destLng,
-                    $routeJson, $distanceKm, $durationSeconds
+                // Preparar device_info JSON
+                $deviceInfo = json_encode([
+                    'route' => $data['route'] ?? [],
+                    'distance_km' => $distanceKm,
+                    'duration_seconds' => $durationSeconds,
+                    'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
+                    'timestamp' => date('Y-m-d H:i:s')
                 ]);
+                
+                // Llamar al procedimiento almacenado con 5 parámetros correctos
+                $stmt = $conn->prepare("CALL StartNavigation(?, ?, ?, ?, ?)");
+                $stmt->execute([
+                    $deliveryId,      // p_delivery_id
+                    $driverIdStr,     // p_driver_id
+                    $startLat,        // p_lat
+                    $startLng,        // p_lng
+                    $deviceInfo       // p_device_info
+                ]);
+                
+                // Obtener el resultado del procedimiento
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
                 
                 // Cerrar el cursor del procedimiento
                 $stmt->closeCursor();
                 
-                // Obtener el resultado
-                $result = $conn->query("SELECT @result as result")->fetch(PDO::FETCH_ASSOC);
-                
-                if (!$result || $result['result'] !== 'SUCCESS') {
-                    $errorMsg = $result['result'] ?? 'ERROR_DESCONOCIDO';
+                if (!$result || $result['status'] !== 'success') {
+                    $errorMsg = $result['message'] ?? 'ERROR_DESCONOCIDO';
                     throw new Exception('Error al iniciar navegación: ' . $errorMsg);
                 }
                 

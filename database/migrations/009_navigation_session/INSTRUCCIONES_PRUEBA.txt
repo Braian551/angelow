@@ -1,0 +1,203 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║              ✅ SISTEMA CORREGIDO - LISTO PARA PROBAR             ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+FECHA: 2025-10-13 20:24:51
+ESTADO: ✅ TODOS LOS HOTFIXES APLICADOS
+
+═══════════════════════════════════════════════════════════════════
+
+🔧 PROBLEMAS RESUELTOS
+═══════════════════════════════════════════════════════════════════
+
+✅ HOTFIX #001: Parámetros incorrectos (10 en lugar de 5)
+✅ HOTFIX #002: Conflicto de colaciones MySQL 8.0
+
+═══════════════════════════════════════════════════════════════════
+
+🎯 INSTRUCCIONES DE PRUEBA
+═══════════════════════════════════════════════════════════════════
+
+PASO 1: ABRIR NAVEGACIÓN
+────────────────────────────────────────────────────────────────────
+
+Abre en tu navegador:
+
+    http://localhost/angelow/delivery/navigation.php?delivery_id=9
+
+
+PASO 2: INICIAR NAVEGACIÓN
+────────────────────────────────────────────────────────────────────
+
+1. Busca el botón "INICIAR NAVEGACIÓN" o "START NAVIGATION"
+2. Haz clic en él
+3. Abre la consola del navegador (F12) para ver los logs
+
+
+PASO 3: VERIFICAR EN CONSOLA
+────────────────────────────────────────────────────────────────────
+
+Deberías ver en la consola:
+
+    ✅ "Navegación iniciada correctamente"
+    ✅ "ubicación actualizada: [lat], [lng]"
+    ❌ NO deberías ver error 400
+    ❌ NO deberías ver error 1267
+
+
+PASO 4: VERIFICAR EN BASE DE DATOS
+────────────────────────────────────────────────────────────────────
+
+Ejecuta en PowerShell:
+
+mysql -u root angelow -e "SELECT id, session_status, driver_id, navigation_started_at, current_lat, current_lng FROM delivery_navigation_sessions WHERE delivery_id = 9;"
+
+Deberías ver UN registro con:
+    - session_status: navigating
+    - driver_id: 6862b7448112f
+    - navigation_started_at: (fecha y hora actual)
+    - current_lat y current_lng: (coordenadas)
+
+
+PASO 5: PROBAR PERSISTENCIA (RECARGA)
+────────────────────────────────────────────────────────────────────
+
+1. Con la navegación iniciada, RECARGA LA PÁGINA (F5)
+2. El sistema debería:
+   
+   ✅ Detectar que hay sesión activa
+   ✅ Restaurar el estado "navegando"
+   ✅ NO mostrar botón "Iniciar Navegación" nuevamente
+   ✅ Continuar donde lo dejaste
+
+
+PASO 6: VERIFICAR AUTO-GUARDADO
+────────────────────────────────────────────────────────────────────
+
+Espera 10-15 segundos con la navegación activa y ejecuta:
+
+mysql -u root angelow -e "SELECT update_count, last_update_at FROM delivery_navigation_sessions WHERE delivery_id = 9;"
+
+Deberías ver:
+    - update_count: incrementándose cada 5 segundos
+    - last_update_at: actualizándose continuamente
+
+
+PASO 7: VERIFICAR EVENTOS
+────────────────────────────────────────────────────────────────────
+
+mysql -u root angelow -e "SELECT event_type, created_at FROM delivery_navigation_events WHERE delivery_id = 9 ORDER BY created_at DESC LIMIT 5;"
+
+Deberías ver eventos como:
+    - session_started
+    - location_updated
+    - (otros eventos según las acciones)
+
+═══════════════════════════════════════════════════════════════════
+
+❌ QUÉ HACER SI ALGO FALLA
+═══════════════════════════════════════════════════════════════════
+
+SI VES ERROR 400:
+────────────────────────────────────────────────────────────────────
+Verifica que el archivo fue modificado:
+
+Get-Content "delivery\api\navigation_api.php" | Select-String -Pattern "CALL StartNavigation" -Context 2,2
+
+
+SI VES ERROR 1267:
+────────────────────────────────────────────────────────────────────
+Verifica que los procedimientos tienen la colación correcta:
+
+mysql -u root angelow -e "SHOW CREATE PROCEDURE StartNavigation\G" | Select-String -Pattern "utf8mb4_general_ci"
+
+
+SI NO SE CREA LA SESIÓN:
+────────────────────────────────────────────────────────────────────
+Verifica logs de PHP en Laragon:
+    C:\laragon\www\logs\apache_error.log
+
+Verifica que el delivery_id=9 existe:
+    mysql -u root angelow -e "SELECT id, delivery_status FROM order_deliveries WHERE id = 9;"
+
+
+SI LA PÁGINA NO CARGA:
+────────────────────────────────────────────────────────────────────
+Verifica que Laragon está corriendo
+Verifica que Apache está activo
+Verifica la URL: debe ser /angelow/ no /angelow
+
+═══════════════════════════════════════════════════════════════════
+
+📊 COMANDOS ÚTILES DE MONITOREO
+═══════════════════════════════════════════════════════════════════
+
+# Ver todas las sesiones activas
+mysql -u root angelow -e "SELECT * FROM v_active_navigation_sessions\G"
+
+# Ver estado detallado de la sesión
+mysql -u root angelow -e "SELECT * FROM delivery_navigation_sessions WHERE delivery_id = 9\G"
+
+# Ver últimos 10 eventos
+mysql -u root angelow -e "SELECT * FROM delivery_navigation_events WHERE delivery_id = 9 ORDER BY created_at DESC LIMIT 10\G"
+
+# Ver si los procedimientos existen
+mysql -u root angelow -e "SHOW PROCEDURE STATUS WHERE Db = 'angelow' AND Name LIKE '%Navigation%';"
+
+# Limpiar sesión para volver a probar (OPCIONAL)
+mysql -u root angelow -e "DELETE FROM delivery_navigation_sessions WHERE delivery_id = 9;"
+
+═══════════════════════════════════════════════════════════════════
+
+✅ CHECKLIST DE PRUEBAS
+═══════════════════════════════════════════════════════════════════
+
+[ ] Página carga sin errores
+[ ] Botón "Iniciar Navegación" es visible
+[ ] Al hacer clic, sin error 400 en consola
+[ ] Sin error 1267 en consola
+[ ] Mensaje de éxito en consola
+[ ] Sesión creada en base de datos
+[ ] Al recargar página, mantiene estado
+[ ] update_count incrementa cada 5 segundos
+[ ] Eventos se registran en delivery_navigation_events
+[ ] Vista v_active_navigation_sessions muestra la sesión
+
+═══════════════════════════════════════════════════════════════════
+
+🎉 RESULTADO ESPERADO
+═══════════════════════════════════════════════════════════════════
+
+Si todo funciona correctamente:
+
+    1. ✅ Navegación se inicia sin errores
+    2. ✅ Estado se guarda en base de datos
+    3. ✅ Al recargar, continúa desde donde estaba
+    4. ✅ No vuelve a pedir "Iniciar Navegación"
+    5. ✅ Auto-guardado funciona cada 5 segundos
+    6. ✅ Eventos se registran correctamente
+
+    🎊 ¡SISTEMA DE PERSISTENCIA FUNCIONANDO! 🎊
+
+═══════════════════════════════════════════════════════════════════
+
+📞 SOPORTE ADICIONAL
+═══════════════════════════════════════════════════════════════════
+
+Si después de seguir todos los pasos sigue habiendo problemas:
+
+1. Copia el error EXACTO de la consola del navegador
+2. Ejecuta: 
+   mysql -u root angelow -e "SELECT * FROM delivery_navigation_sessions WHERE delivery_id = 9\G"
+3. Revisa logs de Apache en C:\laragon\www\logs\
+4. Comparte el error completo para análisis
+
+═══════════════════════════════════════════════════════════════════
+
+Documento creado: 2025-10-13 20:24:51
+Hotfixes aplicados: 2
+Procedimientos corregidos: 5
+
+¡ADELANTE, PRUEBA EL SISTEMA! 🚀

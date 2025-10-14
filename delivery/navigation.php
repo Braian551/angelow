@@ -325,6 +325,9 @@ try {
     <!-- Voice Helper - Sistema de voz con múltiples motores -->
     <script src="<?= BASE_URL ?>/js/delivery/voice-helper.js"></script>
     
+    <!-- Navigation Session Manager - Sistema de persistencia -->
+    <script src="<?= BASE_URL ?>/js/delivery/navigation-session.js"></script>
+    
     <!-- Custom Navigation JS -->
     <script src="<?= BASE_URL ?>/js/delivery/navigation.js"></script>
     <script src="<?= BASE_URL ?>/js/delivery/navigation_fix.js"></script>
