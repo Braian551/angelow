@@ -1,5 +1,8 @@
 // Funcionalidad avanzada para la página de pedidos
 document.addEventListener('DOMContentLoaded', function() {
+    // 0. Animación de la línea de tiempo moderna
+    initializeModernTimeline();
+    
     // 1. Filtrado y búsqueda de pedidos
     const searchInput = document.getElementById('order-search');
     if (searchInput) {
@@ -183,3 +186,53 @@ notificationStyles.innerHTML = `
     }
 `;
 document.head.appendChild(notificationStyles);
+
+// Función para inicializar la línea de tiempo moderna
+function initializeModernTimeline() {
+    const timelines = document.querySelectorAll('.order-timeline-modern');
+    
+    timelines.forEach(timeline => {
+        const progressFill = timeline.querySelector('.timeline-progress-fill');
+        const steps = timeline.querySelectorAll('.timeline-step-modern');
+        
+        if (!progressFill) return;
+        
+        // Obtener el ancho/alto actual
+        const currentWidth = progressFill.style.width;
+        
+        // Para móvil (vertical)
+        if (window.innerWidth <= 480) {
+            const progressBar = timeline.querySelector('.timeline-progress-bar');
+            if (progressBar) {
+                const totalHeight = progressBar.offsetHeight;
+                const completedSteps = Array.from(steps).filter(step => 
+                    step.classList.contains('completed') || step.classList.contains('active')
+                ).length;
+                
+                const progressHeight = (completedSteps / steps.length) * 100;
+                progressFill.style.setProperty('--progress-height', progressHeight + '%');
+                
+                // Animar la altura
+                setTimeout(() => {
+                    progressFill.style.height = progressHeight + '%';
+                }, 100);
+            }
+        } else {
+            // Para desktop (horizontal) - ya está animado con CSS
+            // Forzar reflow para activar animación
+            progressFill.style.width = '0%';
+            setTimeout(() => {
+                progressFill.style.width = currentWidth;
+            }, 50);
+        }
+    });
+    
+    // Re-inicializar en cambio de tamaño
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            initializeModernTimeline();
+        }, 250);
+    });
+}

@@ -376,32 +376,42 @@ function getPaymentStatusText($status) {
 
 function renderOrderTimeline($status) {
     $steps = [
-        'pending' => ['active' => true, 'completed' => false],
-        'processing' => ['active' => false, 'completed' => false],
-        'shipped' => ['active' => false, 'completed' => false],
-        'delivered' => ['active' => false, 'completed' => false]
+        'pending' => ['icon' => 'fas fa-clock', 'label' => 'Pendiente'],
+        'processing' => ['icon' => 'fas fa-cog', 'label' => 'En Proceso'],
+        'shipped' => ['icon' => 'fas fa-truck', 'label' => 'Enviado'],
+        'delivered' => ['icon' => 'fas fa-check-circle', 'label' => 'Entregado']
     ];
     
-    // Marcar pasos completados según el estado actual
+    // Calcular el progreso
     $statusOrder = array_keys($steps);
     $currentIndex = array_search($status, $statusOrder);
     
-    if ($currentIndex !== false) {
-        for ($i = 0; $i <= $currentIndex; $i++) {
-            $steps[$statusOrder[$i]]['completed'] = true;
-        }
-        $steps[$status]['active'] = true;
+    if ($currentIndex === false) {
+        $currentIndex = 0;
     }
     
-    $html = '<div class="timeline">';
-    foreach ($steps as $step => $data) {
-        $html .= '<div class="timeline-step ' . 
-                 ($data['completed'] ? 'completed' : '') . ' ' . 
-                 ($data['active'] ? 'active' : '') . '">';
-        $html .= '<div class="timeline-dot"></div>';
-        $html .= '<span class="timeline-label">' . getStatusText($step) . '</span>';
+    $progress = (($currentIndex + 1) / count($steps)) * 100;
+    
+    $html = '<div class="order-timeline-modern">';
+    $html .= '<div class="timeline-progress-bar">';
+    $html .= '<div class="timeline-progress-fill" style="width: ' . $progress . '%"></div>';
+    $html .= '</div>';
+    $html .= '<div class="timeline-steps-container">';
+    
+    foreach ($statusOrder as $index => $step) {
+        $isCompleted = $index < $currentIndex;
+        $isActive = $index === $currentIndex;
+        $statusClass = $isCompleted ? 'completed' : ($isActive ? 'active' : 'pending');
+        
+        $html .= '<div class="timeline-step-modern ' . $statusClass . '">';
+        $html .= '<div class="timeline-dot-modern">';
+        $html .= '<i class="' . $steps[$step]['icon'] . '"></i>';
+        $html .= '</div>';
+        $html .= '<span class="timeline-label-modern">' . $steps[$step]['label'] . '</span>';
         $html .= '</div>';
     }
+    
+    $html .= '</div>';
     $html .= '</div>';
     
     return $html;
