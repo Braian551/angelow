@@ -111,7 +111,7 @@ try {
             <!-- Estadísticas rápidas -->
             <div class="orders-stats">
                 <div class="stat-card">
-                    <div class="stat-icon">
+                    <div class="stat-icon total">
                         <i class="fas fa-shopping-bag"></i>
                     </div>
                     <div class="stat-info">
