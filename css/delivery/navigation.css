@@ -616,6 +616,11 @@ body {
     background: rgba(18, 18, 18, 0.95);
 }
 
+/* Posicionar los controles de zoom más abajo */
+.leaflet-top.leaflet-left {
+    top: 120px !important;
+}
+
 .leaflet-control-zoom {
     border: none !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
