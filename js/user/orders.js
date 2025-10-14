@@ -1,34 +1,15 @@
 // orders.js - Interacciones modernas y robustas
 document.addEventListener('DOMContentLoaded', function() {
     // Elementos globales
-    const orderDetailsModal = document.getElementById('order-details-modal');
-    const trackingModal = document.getElementById('tracking-modal');
     const orderSearch = document.getElementById('order-search');
     const statusFilter = document.getElementById('status-filter');
     
     // Inicializar funcionalidades
-    initFilters();
     initSearch();
     initOrderActions();
-    initModals();
 
-    // Filtros
-    function initFilters() {
-        document.getElementById('apply-filter').addEventListener('click', function() {
-            const status = statusFilter.value;
-            const search = orderSearch.value;
-            let url = `?status=${status}`;
-            if (search) url += `&search=${encodeURIComponent(search)}`;
-            window.location.href = url;
-        });
-
-        // Filtro automático al cambiar selección
-        statusFilter.addEventListener('change', function() {
-            if (this.value) {
-                document.getElementById('apply-filter').click();
-            }
-        });
-    }
+    // Filtros - REMOVIDO: Funcionalidad básica de filtrado
+    // initFilters() { ... }
 
     // Búsqueda en tiempo real
     function initSearch() {
@@ -45,11 +26,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Acciones de orden
     function initOrderActions() {
-        // Ver detalles
+        // Ver detalles - redirigir a página de detalles
         document.querySelectorAll('.btn-view-details').forEach(button => {
             button.addEventListener('click', function() {
                 const orderId = this.dataset.orderId;
-                loadOrderDetails(orderId);
+                window.location.href = `order_detail.php?id=${orderId}`;
             });
         });
 
@@ -86,117 +67,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Modales
-    function initModals() {
-        // Cerrar modales
-        document.querySelectorAll('.close-modal').forEach(closeBtn => {
-            closeBtn.addEventListener('click', function() {
-                this.closest('.modal').style.display = 'none';
-            });
-        });
+    // Modales - REMOVIDO: Ya no se usan modales para detalles
+    // initModals() { ... }
 
-        // Cerrar al hacer clic fuera
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.style.display = 'none';
-                }
-            });
-        });
+    // Funciones de modal - REMOVIDAS: Ahora se usan páginas separadas
+    // loadOrderDetails(orderId) { ... }
 
-        // Cerrar con ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal').forEach(modal => {
-                    modal.style.display = 'none';
-                });
-            }
-        });
+    // Rastrear envío - redirigir a página de rastreo
+    function trackOrder(orderId) {
+        window.location.href = `track_order.php?id=${orderId}`;
     }
 
-    // Cargar detalles de orden
-    async function loadOrderDetails(orderId) {
-        try {
-            showLoader(orderDetailsModal);
-            orderDetailsModal.style.display = 'flex';
-
-            const response = await fetch(`${BASE_URL}/users/orders/order_details.php?id=${orderId}`);
-            const data = await response.json();
-
-            if (data.success) {
-                document.getElementById('order-details-content').innerHTML = data.html;
-                initDetailActions();
-            } else {
-                showNotification(data.message, 'error');
-                orderDetailsModal.style.display = 'none';
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showNotification('Error al cargar detalles del pedido', 'error');
-            orderDetailsModal.style.display = 'none';
-        }
-    }
-
-    // Rastrear orden
-    async function trackOrder(orderId) {
-        try {
-            showLoader(trackingModal);
-            trackingModal.style.display = 'flex';
-
-            const response = await fetch(`${BASE_URL}/users/orders/track_order.php?id=${orderId}`);
-            const data = await response.json();
-
-            if (data.success) {
-                document.getElementById('tracking-content').innerHTML = data.html;
-                
-                // Actualizar en tiempo real si está en camino
-                if (data.tracking_active) {
-                    startLiveTracking(orderId);
-                }
-            } else {
-                document.getElementById('tracking-content').innerHTML = `
-                    <div class="tracking-error">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Información de rastreo no disponible</h3>
-                        <p>${data.message}</p>
-                    </div>
-                `;
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('tracking-content').innerHTML = `
-                <div class="tracking-error">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h3>Error de conexión</h3>
-                    <p>No se pudo cargar la información de rastreo</p>
-                </div>
-            `;
-        }
-    }
-
-    // Rastreo en tiempo real
-    function startLiveTracking(orderId) {
-        const trackingInterval = setInterval(async () => {
-            try {
-                const response = await fetch(`${BASE_URL}/users/orders/live_tracking.php?id=${orderId}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    updateTrackingDisplay(data.tracking_data);
-                } else {
-                    clearInterval(trackingInterval);
-                }
-            } catch (error) {
-                console.error('Tracking error:', error);
-                clearInterval(trackingInterval);
-            }
-        }, 10000); // Actualizar cada 10 segundos
-
-        // Limpiar intervalo cuando se cierre el modal
-        trackingModal.addEventListener('close', () => {
-            clearInterval(trackingInterval);
-        });
-    }
+    // startLiveTracking(orderId) { ... }
 
     // Cancelar orden
     async function cancelOrder(orderId, orderCard) {
@@ -257,15 +139,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Utilidades
-    function showLoader(container) {
-        container.querySelector('.modal-content > div').innerHTML = `
-            <div class="loader-container">
-                <div class="loader"></div>
-                <p>Cargando...</p>
-            </div>
-        `;
-    }
+    // Funciones de modal de detalles - REMOVIDAS: Ya no se usan
+    // initDetailActions() { ... }
+    // updateTrackingDisplay(trackingData) { ... }
+
+    // Utilidades - showLoader REMOVIDO: Ya no se usan modales
 
     function showConfirmationModal(title, message, confirmText, onConfirm) {
         const modal = document.createElement('div');

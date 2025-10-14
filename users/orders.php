@@ -305,22 +305,6 @@ try {
         </main>
     </div>
 
-    <!-- Modal para detalles de orden -->
-    <div id="order-details-modal" class="modal glass-effect">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div id="order-details-content"></div>
-        </div>
-    </div>
-
-    <!-- Modal de rastreo -->
-    <div id="tracking-modal" class="modal glass-effect">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div id="tracking-content"></div>
-        </div>
-    </div>
-
     <?php includeFromRoot('layouts/footer.php'); ?>
     <script>
         const BASE_URL = '<?= BASE_URL ?>';

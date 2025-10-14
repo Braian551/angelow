@@ -1,7 +1,16 @@
 <?php
 // Este archivo se usa via AJAX para actualizaciones en tiempo real
-if (!isset($conn) || !isset($_SESSION['user_id'])) {
-    die(json_encode(['success' => false, 'message' => 'Acceso denegado']));
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../conexion.php';
+
+// Iniciar sesión si no está iniciada
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Verificar autenticación
+if (!isset($_SESSION['user_id'])) {
+    die(json_encode(['success' => false, 'message' => 'Acceso denegado - Sesión no válida']));
 }
 
 $orderId = isset($_GET['id']) ? intval($_GET['id']) : 0;
