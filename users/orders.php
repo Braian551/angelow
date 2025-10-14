@@ -322,6 +322,9 @@ try {
     </div>
 
     <?php includeFromRoot('layouts/footer.php'); ?>
+    <script>
+        const BASE_URL = '<?= BASE_URL ?>';
+    </script>
     <script src="<?= BASE_URL ?>/js/user/orders.js"></script>
 </body>
 </html>
