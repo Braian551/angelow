@@ -1051,6 +1051,13 @@
         }
     };
 
+    // Exponer funciones para interceptación de persistencia
+    window.startNavigation = startNavigation;
+    window.pauseNavigation = pauseNavigation;
+    window.resumeNavigation = resumeNavigation;
+    window.showNotification = showNotification;
+    window.updateActionButton = updateActionButton;
+
     window.togglePanel = function() {
         state.isPanelExpanded = !state.isPanelExpanded;
         

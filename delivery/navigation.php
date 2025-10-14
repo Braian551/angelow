@@ -331,5 +331,8 @@ try {
     <!-- Custom Navigation JS -->
     <script src="<?= BASE_URL ?>/js/delivery/navigation.js"></script>
     <script src="<?= BASE_URL ?>/js/delivery/navigation_fix.js"></script>
+    
+    <!-- Navigation State Restore - Restaurar estado al cargar página -->
+    <script src="<?= BASE_URL ?>/js/delivery/navigation-restore.js"></script>
 </body>
 </html>

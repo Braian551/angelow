@@ -415,19 +415,35 @@ try {
                 throw new Exception('La entrega no está en tránsito');
             }
             
-            // Registrar evento de pausa
-            $stmt = $conn->prepare("
-                INSERT INTO navigation_events (
-                    delivery_id, driver_id, event_type, 
-                    latitude, longitude, event_data
-                ) VALUES (?, ?, 'paused', NULL, NULL, '{}')
-            ");
-            $stmt->execute([$deliveryId, $driverId]);
-            
-            echo json_encode([
-                'success' => true,
-                'message' => 'Navegación pausada'
-            ]);
+            try {
+                // Llamar al procedimiento almacenado PauseNavigation
+                $driverIdStr = strval($driverId);
+                $stmt = $conn->prepare("CALL PauseNavigation(?, ?)");
+                $stmt->execute([$deliveryId, $driverIdStr]);
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                $stmt->closeCursor();
+                
+                if (!$result || $result['status'] !== 'success') {
+                    throw new Exception('Error al pausar navegación en BD');
+                }
+                
+                // También registrar evento en navigation_events (compatibilidad)
+                $stmt = $conn->prepare("
+                    INSERT INTO navigation_events (
+                        delivery_id, driver_id, event_type, 
+                        latitude, longitude, event_data
+                    ) VALUES (?, ?, 'paused', NULL, NULL, '{}')
+                ");
+                $stmt->execute([$deliveryId, $driverId]);
+                
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Navegación pausada'
+                ]);
+            } catch (PDOException $e) {
+                error_log("Error en PauseNavigation: " . $e->getMessage());
+                throw new Exception('Error de base de datos al pausar navegación: ' . $e->getMessage());
+            }
             break;
         
         // ============================================
@@ -458,19 +474,43 @@ try {
                 throw new Exception('La entrega no está en tránsito');
             }
             
-            // Registrar evento de reanudación
-            $stmt = $conn->prepare("
-                INSERT INTO navigation_events (
-                    delivery_id, driver_id, event_type, 
-                    latitude, longitude, event_data
-                ) VALUES (?, ?, 'resumed', NULL, NULL, '{}')
-            ");
-            $stmt->execute([$deliveryId, $driverId]);
-            
-            echo json_encode([
-                'success' => true,
-                'message' => 'Navegación reanudada'
-            ]);
+            try {
+                // Reanudar simplemente cambiando el estado de vuelta a 'navigating'
+                // Esto lo hace actualizando la sesión directamente
+                $driverIdStr = strval($driverId);
+                $stmt = $conn->prepare("
+                    UPDATE delivery_navigation_sessions
+                    SET 
+                        session_status = 'navigating',
+                        navigation_resumed_at = NOW(),
+                        updated_at = NOW()
+                    WHERE delivery_id = ? 
+                    AND driver_id = CONVERT(? USING utf8mb4) COLLATE utf8mb4_general_ci
+                    AND session_status = 'paused'
+                ");
+                $stmt->execute([$deliveryId, $driverIdStr]);
+                
+                if ($stmt->rowCount() === 0) {
+                    throw new Exception('No hay sesión pausada para reanudar');
+                }
+                
+                // Registrar evento en navigation_events (compatibilidad)
+                $stmt = $conn->prepare("
+                    INSERT INTO navigation_events (
+                        delivery_id, driver_id, event_type, 
+                        latitude, longitude, event_data
+                    ) VALUES (?, ?, 'resumed', NULL, NULL, '{}')
+                ");
+                $stmt->execute([$deliveryId, $driverId]);
+                
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Navegación reanudada'
+                ]);
+            } catch (PDOException $e) {
+                error_log("Error en ResumeNavigation: " . $e->getMessage());
+                throw new Exception('Error de base de datos al reanudar navegación: ' . $e->getMessage());
+            }
             break;
         
         // ============================================
