@@ -120,6 +120,9 @@ try {
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Bootstrap 4 CSS (para modales y componentes) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/delivery/navigation.css">
 </head>
@@ -277,7 +280,7 @@ try {
                 <i class="fas fa-route"></i>
                 Recalcular ruta
             </button>
-            <button class="menu-item" onclick="reportIssue()">
+            <button class="menu-item" onclick="reportProblem()">
                 <i class="fas fa-exclamation-triangle"></i>
                 Reportar problema
             </button>
@@ -322,6 +325,12 @@ try {
     <!-- Leaflet Routing Machine (OSRM) -->
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     
+    <!-- jQuery requerido por scripts heredados -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    
+    <!-- Bootstrap 4 JS (bundle con Popper) para habilitar $('#...').modal() -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    
     <!-- Voice Helper - Sistema de voz con múltiples motores -->
     <script src="<?= BASE_URL ?>/js/delivery/voice-helper.js"></script>
     
@@ -334,5 +343,9 @@ try {
     
     <!-- Navigation State Restore - Restaurar estado al cargar página -->
     <script src="<?= BASE_URL ?>/js/delivery/navigation-restore.js"></script>
+    
+    <!-- Modales de Acciones de Navegación -->
+    <?php include 'modals/cancel_navigation_modal.php'; ?>
+    <?php include 'modals/report_problem_modal.php'; ?>
 </body>
 </html>

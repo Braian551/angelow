@@ -1265,7 +1265,7 @@
     };
 
     window.reportIssue = function() {
-        showNotification('función³n en desarrollo', 'info');
+        showNotification('Función no implementada. Use "Reportar problema" del menú.', 'warning');
         window.toggleMenu();
     };
 
@@ -1275,11 +1275,172 @@
     };
 
     window.cancelNavigation = function() {
-        if (confirm('Deseas cancelar la Navegación?')) {
-            stopNavigation();
-            window.location.href = `${CONFIG.BASE_URL}/delivery/orders.php`;
+        // Obtener información de progreso actual
+        if (state.navigationSession) {
+            const distance = state.totalDistance ? (state.totalDistance / 1000).toFixed(2) + ' km' : '-';
+            const time = state.elapsedTime ? formatTime(state.elapsedTime) : '-';
+            const percent = state.progressPercentage ? state.progressPercentage.toFixed(1) + '%' : '-';
+            
+            // Actualizar modal con datos de progreso
+            if (typeof updateCancellationProgress === 'function') {
+                updateCancellationProgress(distance, time, percent);
+            }
+        }
+        
+        // Mostrar modal
+        $('#cancelNavigationModal').modal('show');
+    };
+
+    // Procesar cancelación desde el modal
+    window.processCancellation = async function(reason, notes) {
+        try {
+            const position = await getCurrentPosition();
+            
+            const cancelData = {
+                delivery_id: state.deliveryId,
+                reason: reason,
+                notes: notes,
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            };
+            
+            const response = await fetch(`${CONFIG.BASE_URL}/delivery/api/navigation_actions.php?action=cancel_navigation`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(cancelData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Cerrar modal
+                $('#cancelNavigationModal').modal('hide');
+                
+                // Detener navegación
+                stopNavigation();
+                
+                // Notificación de éxito
+                voiceHelper.speak('Navegación cancelada', 1);
+                
+                // Redirigir después de un breve delay
+                setTimeout(() => {
+                    window.location.href = `${CONFIG.BASE_URL}/delivery/orders.php`;
+                }, 1500);
+            } else {
+                throw new Error(result.error || 'Error al cancelar navegación');
+            }
+        } catch (error) {
+            console.error('Error al cancelar navegación:', error);
+            alert('Error al cancelar la navegación: ' + error.message);
+            
+            // Rehabilitar botón
+            const confirmBtn = document.getElementById('confirmCancellationBtn');
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="fas fa-check"></i> Sí, Cancelar Navegación';
+            }
         }
     };
+
+    // Reportar problema
+    window.reportProblem = function() {
+        // Mostrar modal
+        $('#reportProblemModal').modal('show');
+    };
+
+    // Enviar reporte de problema desde el modal
+    window.submitProblemReport = async function(problemData) {
+        try {
+            const position = await getCurrentPosition();
+            
+            // Crear FormData para soportar foto
+            const formData = new FormData();
+            formData.append('delivery_id', state.deliveryId);
+            formData.append('problem_type', problemData.problem_type);
+            formData.append('title', problemData.title);
+            formData.append('description', problemData.description);
+            formData.append('severity', problemData.severity);
+            formData.append('latitude', position.coords.latitude);
+            formData.append('longitude', position.coords.longitude);
+            
+            // Agregar foto si existe
+            if (problemData.photo) {
+                formData.append('photo', problemData.photo);
+            }
+            
+            const response = await fetch(`${CONFIG.BASE_URL}/delivery/api/navigation_actions.php?action=report_problem`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Cerrar modal
+                $('#reportProblemModal').modal('hide');
+                
+                // Notificación de éxito
+                voiceHelper.speak('Problema reportado exitosamente', 1);
+                alert('Problema reportado exitosamente. ID: ' + result.report_id);
+                
+                // Registrar en el estado
+                if (!state.problemReports) {
+                    state.problemReports = [];
+                }
+                state.problemReports.push({
+                    id: result.report_id,
+                    type: problemData.problem_type,
+                    severity: problemData.severity,
+                    timestamp: new Date().toISOString()
+                });
+            } else {
+                throw new Error(result.error || 'Error al reportar problema');
+            }
+        } catch (error) {
+            console.error('Error al reportar problema:', error);
+            alert('Error al reportar el problema: ' + error.message);
+        } finally {
+            // Rehabilitar botón
+            const submitBtn = document.getElementById('submitProblemBtn');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Reporte';
+            }
+        }
+    };
+
+    // Función auxiliar para obtener posición actual
+    function getCurrentPosition() {
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject(new Error('Geolocalización no disponible'));
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                position => resolve(position),
+                error => reject(error),
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        });
+    }
+
+    // Función auxiliar para formatear tiempo
+    function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        
+        if (hours > 0) {
+            return `${hours}h ${minutes}m`;
+        } else if (minutes > 0) {
+            return `${minutes}m ${secs}s`;
+        } else {
+            return `${secs}s`;
+        }
+    }
 
     window.confirmExit = function() {
         if (state.isNavigating) {
