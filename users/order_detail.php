@@ -88,413 +88,42 @@ function calculateDiscountAmount($order, $subtotal) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalles de Pedido #<?= htmlspecialchars($order['order_number']) ?> - Angelow</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboarduser2.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/orders.css">
-    <style>
-        .order-detail-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .order-detail-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .order-detail-header h1 {
-            margin: 0 0 10px 0;
-            font-size: 2.5rem;
-        }
-
-        .order-meta-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 15px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-
-        .meta-item i {
-            font-size: 1.2rem;
-            width: 20px;
-        }
-
-        .order-detail-content {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 30px;
-        }
-
-        .order-section {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
-        }
-
-        .order-section h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .order-item {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-            border: 1px solid #eee;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .order-item:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-
-        .order-item img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 8px;
-            flex-shrink: 0;
-        }
-
-        .order-item-details {
-            flex: 1;
-        }
-
-        .order-item-details h3 {
-            margin: 0 0 8px 0;
-            color: #333;
-            font-size: 1.1rem;
-        }
-
-        .item-meta {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
-        }
-
-        .item-meta span {
-            background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        .item-price {
-            font-weight: bold;
-            color: #667eea;
-            font-size: 1.1rem;
-        }
-
-        .item-subtotal {
-            font-weight: bold;
-            color: #333;
-            font-size: 1.2rem;
-        }
-
-        .summary-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .summary-row.total {
-            border-bottom: none;
-            border-top: 2px solid #667eea;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #667eea;
-            padding-top: 15px;
-        }
-
-        .status-badge {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-processing { background: #cce5ff; color: #004085; }
-        .status-shipped { background: #d1ecf1; color: #0c5460; }
-        .status-delivered { background: #d4edda; color: #155724; }
-        .status-cancelled { background: #f8d7da; color: #721c24; }
-
-        .driver-card {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin-top: 15px;
-        }
-
-        .driver-photo {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .driver-info {
-            flex: 1;
-        }
-
-        .driver-rating {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: #ffc107;
-            font-size: 0.9rem;
-        }
-
-        .history-timeline {
-            position: relative;
-            padding-left: 30px;
-        }
-
-        .history-timeline::before {
-            content: '';
-            position: absolute;
-            left: 10px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #e9ecef;
-        }
-
-        .history-item {
-            position: relative;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        .history-item::before {
-            content: '';
-            position: absolute;
-            left: -25px;
-            top: 20px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #667eea;
-            border: 3px solid white;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a67d8;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background: #e53e3e;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c53030;
-            transform: translateY(-2px);
-        }
-
-        .btn-success {
-            background: #38a169;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #2f855a;
-            transform: translateY(-2px);
-        }
-
-        .progress-container {
-            margin: 20px 0;
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: #e9ecef;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        .progress-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        @media (max-width: 1024px) {
-            .order-detail-content {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .order-detail-header h1 {
-                font-size: 2rem;
-            }
-
-            .order-meta-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .order-item {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .action-buttons {
-                justify-content: center;
-            }
-
-            .driver-card {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/user/orders/order_detail.css">
 </head>
 <body>
     <div class="user-dashboard-container">
         <?php require_once __DIR__ . '/../layouts/asideuser.php'; ?>
 
         <main class="user-main-content">
-            <div class="order-detail-container">
+            <div class="order-details-container">
                 <!-- Header con información principal -->
-                <div class="order-detail-header animate__animated animate__fadeIn">
-                    <h1>Pedido #<?= htmlspecialchars($order['order_number']) ?></h1>
-                    <p class="order-date">Realizado el <?= date('d/m/Y \a \l\a\s H:i', strtotime($order['created_at'])) ?></p>
+                <div class="order-details-header animate__animated animate__fadeIn">
+                    <div class="order-details-title">
+                        <h1>Pedido #<?= htmlspecialchars($order['order_number']) ?></h1>
+                        <div class="order-details-meta">
+                            <p class="order-date"><i class="fas fa-calendar-alt"></i> Realizado el <?= date('d/m/Y \a \l\a\s H:i', strtotime($order['created_at'])) ?></p>
+                        </div>
+                    </div>
                     
-                    <div class="order-meta-grid">
-                        <div class="meta-item">
-                            <i class="fas fa-info-circle"></i>
-                            <div>
-                                <div>Estado del Pedido</div>
-                                <span class="status-badge status-<?= htmlspecialchars($order['status']) ?>">
-                                    <i class="fas fa-<?= getStatusIcon($order['status']) ?>"></i>
-                                    <?= getStatusText($order['status']) ?>
-                                </span>
-                            </div>
+                    <div class="order-status-overview">
+                        <div class="status-badge status-<?= htmlspecialchars($order['status']) ?>">
+                            <i class="fas fa-<?= getStatusIcon($order['status']) ?>"></i>
+                            <?= getStatusText($order['status']) ?>
                         </div>
-
-                        <div class="meta-item">
-                            <i class="fas fa-credit-card"></i>
-                            <div>
-                                <div>Estado del Pago</div>
-                                <span class="status-badge status-<?= $order['payment_status'] === 'paid' ? 'delivered' : 'pending' ?>">
-                                    <i class="fas fa-<?= $order['payment_status'] === 'paid' ? 'check-circle' : 'clock' ?>"></i>
-                                    <?= getPaymentStatusText($order['payment_status'] ?: 'pending') ?>
-                                </span>
-                            </div>
+                        <div class="status-badge status-<?= $order['payment_status'] === 'paid' ? 'delivered' : 'pending' ?>">
+                            <i class="fas fa-check-circle"></i>
+                            <?= getPaymentStatusText($order['payment_status'] ?: 'pending') ?>
                         </div>
-
                         <?php if ($delivery): ?>
-                        <div class="meta-item">
-                            <i class="fas fa-truck"></i>
-                            <div>
-                                <div>Estado de Entrega</div>
-                                <span class="status-badge status-<?= htmlspecialchars($delivery['delivery_status']) ?>">
-                                    <i class="fas fa-<?= getDeliveryStatusIcon($delivery['delivery_status']) ?>"></i>
-                                    <?= getDeliveryStatusText($delivery['delivery_status']) ?>
-                                </span>
-                            </div>
+                        <div class="delivery-badge">
+                            <i class="fas fa-<?= getDeliveryStatusIcon($delivery['delivery_status']) ?>"></i>
+                            <?= getDeliveryStatusText($delivery['delivery_status']) ?>
                         </div>
                         <?php endif; ?>
-
-                        <div class="meta-item">
-                            <i class="fas fa-money-bill-wave"></i>
-                            <div>
-                                <div>Total del Pedido</div>
-                                <strong style="font-size: 1.2rem;">$<?= number_format($total, 0) ?></strong>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -513,43 +142,49 @@ function calculateDiscountAmount($order, $subtotal) {
                 <?php endif; ?>
 
                 <!-- Contenido principal -->
-                <div class="order-detail-content">
+                <div class="order-details-grid">
                     <!-- Columna izquierda -->
                     <div>
                         <!-- Sección de productos -->
-                        <div class="order-section animate__animated animate__fadeInLeft">
-                            <h2><i class="fas fa-box-open"></i> Productos del Pedido</h2>
+                        <div class="order-items-section">
+                            <div class="panel-header">
+                                <i class="fas fa-box-open"></i>
+                                <h2>Productos del Pedido</h2>
+                            </div>
                             <?php if (empty($items)): ?>
                                 <div class="empty-state">
                                     <i class="fas fa-box-open fa-3x"></i>
                                     <p>No hay productos en esta orden.</p>
                                 </div>
                             <?php else: ?>
-                                <?php foreach ($items as $item): ?>
-                                    <div class="order-item">
-                                        <img src="<?= BASE_URL ?>/<?= htmlspecialchars($item['product_image']) ?>"
-                                             alt="Producto"
-                                             onerror="this.src='<?= BASE_URL ?>/uploads/productos/default-product.jpg'">
-                                        <div class="order-item-details">
-                                            <h3><?= htmlspecialchars($item['product_name']) ?></h3>
-                                            <div class="item-meta">
-                                                <span><i class="fas fa-hashtag"></i> Cantidad: <?= $item['quantity'] ?></span>
-                                                <?php if (isset($item['color_variant_id']) && $item['color_variant_id']): ?>
-                                                    <span><i class="fas fa-palette"></i> Variante Color: <?= $item['color_variant_id'] ?></span>
-                                                <?php endif; ?>
-                                                <?php if (isset($item['size_variant_id']) && $item['size_variant_id']): ?>
-                                                    <span><i class="fas fa-ruler"></i> Variante Talla: <?= $item['size_variant_id'] ?></span>
-                                                <?php endif; ?>
+                                <div class="order-items-grid">
+                                    <?php foreach ($items as $item): ?>
+                                        <div class="order-item-card">
+                                            <img src="<?= BASE_URL ?>/<?= htmlspecialchars($item['product_image']) ?>"
+                                                 alt="Producto"
+                                                 onerror="this.src='<?= BASE_URL ?>/uploads/productos/default-product.jpg'">
+                                            <div class="item-info">
+                                                <h4><?= htmlspecialchars($item['product_name']) ?></h4>
+                                                <div class="item-meta">
+                                                    <span><i class="fas fa-hashtag"></i> Cantidad: <?= $item['quantity'] ?></span>
+                                                    <?php if (isset($item['color_variant_id']) && $item['color_variant_id']): ?>
+                                                        <span><i class="fas fa-palette"></i> Variante Color: <?= $item['color_variant_id'] ?></span>
+                                                    <?php endif; ?>
+                                                    <?php if (isset($item['size_variant_id']) && $item['size_variant_id']): ?>
+                                                        <span><i class="fas fa-ruler"></i> Variante Talla: <?= $item['size_variant_id'] ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <p class="item-price">$<?= number_format($item['price'], 0) ?> c/u</p>
                                             </div>
-                                            <p class="item-price">$<?= number_format($item['price'], 0) ?> c/u</p>
+                                            <div class="item-price">
+                                                $<?= number_format($item['quantity'] * $item['price'], 0) ?>
+                                            </div>
                                         </div>
-                                        <div class="item-subtotal">
-                                            $<?= number_format($item['quantity'] * $item['price'], 0) ?>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
+                                    <?php endforeach; ?>
+                                </div>
                             <?php endif; ?>
                         </div>
+                    </div>
 
                         <!-- Historial de estados - temporalmente deshabilitado -->
                         <!-- <div class="order-section animate__animated animate__fadeInLeft">
@@ -561,30 +196,31 @@ function calculateDiscountAmount($order, $subtotal) {
                     <!-- Columna derecha -->
                     <div>
                         <!-- Resumen de la orden -->
-                        <div class="order-section animate__animated animate__fadeInRight">
-                            <h2><i class="fas fa-receipt"></i> Resumen del Pedido</h2>
-                            <div class="summary-grid">
-                                <div class="summary-row">
-                                    <span>Subtotal:</span>
-                                    <span>$<?= number_format($subtotal, 0) ?></span>
-                                </div>
-                                
-                                <?php if ($discount_amount > 0): ?>
-                                <div class="summary-row" style="color: #38a169;">
-                                    <span>Descuento:</span>
-                                    <span>-$<?= number_format($discount_amount, 0) ?></span>
-                                </div>
-                                <?php endif; ?>
-                                
-                                <div class="summary-row">
-                                    <span>Envío:</span>
-                                    <span>$<?= number_format($shipping_cost, 0) ?></span>
-                                </div>
-                                
-                                <div class="summary-row total">
-                                    <span>Total:</span>
-                                    <span>$<?= number_format($total, 0) ?></span>
-                                </div>
+                        <div class="order-summary">
+                            <div class="panel-header">
+                                <i class="fas fa-receipt"></i>
+                                <h2>Resumen del Pedido</h2>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Subtotal:</span>
+                                <span class="summary-value">$<?= number_format($subtotal, 0) ?></span>
+                            </div>
+                            
+                            <?php if ($discount_amount > 0): ?>
+                            <div class="summary-row" style="color: #38a169;">
+                                <span class="summary-label">Descuento:</span>
+                                <span class="summary-value">-$<?= number_format($discount_amount, 0) ?></span>
+                            </div>
+                            <?php endif; ?>
+                            
+                            <div class="summary-row">
+                                <span class="summary-label">Envío:</span>
+                                <span class="summary-value">$<?= number_format($shipping_cost, 0) ?></span>
+                            </div>
+                            
+                            <div class="summary-row summary-total">
+                                <span class="summary-label">Total:</span>
+                                <span class="summary-value">$<?= number_format($total, 0) ?></span>
                             </div>
 
                             <!-- Información de pago -->
@@ -593,6 +229,7 @@ function calculateDiscountAmount($order, $subtotal) {
                                 <p><strong>Método:</strong> <?= htmlspecialchars($order['payment_method'] ?? 'No especificado') ?></p>
                                 <p><strong>Estado:</strong> 
                                     <span class="status-badge status-<?= $order['payment_status'] === 'paid' ? 'delivered' : 'pending' ?>">
+                                        <i class="fas fa-<?= $order['payment_status'] === 'paid' ? 'check-circle' : 'clock' ?>"></i>
                                         <?= getPaymentStatusText($order['payment_status'] ?: 'pending') ?>
                                     </span>
                                 </p>
@@ -600,23 +237,32 @@ function calculateDiscountAmount($order, $subtotal) {
                         </div>
 
                         <!-- Información de envío -->
-                        <div class="order-section animate__animated animate__fadeInRight">
-                            <h2><i class="fas fa-map-marker-alt"></i> Dirección de Envío</h2>
-                            <div class="shipping-info">
-                                <p><strong>Dirección:</strong> <?= htmlspecialchars($order['shipping_address']) ?></p>
-                                <?php if ($order['neighborhood']): ?>
-                                    <p><strong>Barrio:</strong> <?= htmlspecialchars($order['neighborhood']) ?></p>
-                                <?php endif; ?>
-                                <?php if ($order['delivery_notes']): ?>
-                                    <p><strong>Notas:</strong> <?= htmlspecialchars($order['delivery_notes']) ?></p>
-                                <?php endif; ?>
+                        <div class="shipping-info">
+                            <div class="panel-header">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <h2>Dirección de Envío</h2>
+                            </div>
+                            <div class="delivery-address">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>
+                                    <strong>Dirección:</strong> <?= htmlspecialchars($order['shipping_address']) ?><br>
+                                    <?php if ($order['neighborhood']): ?>
+                                        <strong>Barrio:</strong> <?= htmlspecialchars($order['neighborhood']) ?><br>
+                                    <?php endif; ?>
+                                    <?php if ($order['delivery_notes']): ?>
+                                        <strong>Notas:</strong> <?= htmlspecialchars($order['delivery_notes']) ?>
+                                    <?php endif; ?>
+                                </span>
                             </div>
                         </div>
 
                         <!-- Información de delivery -->
                         <?php if ($delivery): ?>
-                        <div class="order-section animate__animated animate__fadeInRight">
-                            <h2><i class="fas fa-truck"></i> Información de Entrega</h2>
+                        <div class="order-info-panel">
+                            <div class="panel-header">
+                                <i class="fas fa-truck"></i>
+                                <h2>Información de Entrega</h2>
+                            </div>
                             
                             <?php if ($delivery['driver_name']): ?>
                                 <div class="driver-card">
@@ -648,40 +294,37 @@ function calculateDiscountAmount($order, $subtotal) {
                         <?php endif; ?>
 
                         <!-- Botones de acción -->
-                        <div class="order-section animate__animated animate__fadeInRight">
-                            <h2><i class="fas fa-cog"></i> Acciones</h2>
-                            <div class="action-buttons">
-                                <a href="orders.php" class="btn btn-secondary">
-                                    <i class="fas fa-arrow-left"></i> Volver a Pedidos
+                        <div class="order-actions">
+                            <a href="orders.php" class="back-button">
+                                <i class="fas fa-arrow-left"></i> Volver a Pedidos
+                            </a>
+
+                            <?php if ($order['status'] === 'delivered'): ?>
+                                <button class="btn btn-success" onclick="reorderItems(<?= $order['id'] ?>)">
+                                    <i class="fas fa-redo"></i> Volver a Pedir
+                                </button>
+                                <button class="btn btn-primary" onclick="downloadInvoice(<?= $order['id'] ?>)">
+                                    <i class="fas fa-download"></i> Descargar Factura
+                                </button>
+                            <?php endif; ?>
+
+                            <?php if (in_array($order['status'], ['pending', 'processing'])): ?>
+                                <button class="btn btn-danger" onclick="cancelOrder(<?= $order['id'] ?>)">
+                                    <i class="fas fa-times"></i> Cancelar Pedido
+                                </button>
+                            <?php endif; ?>
+
+                            <?php if ($order['status'] === 'shipped' || ($delivery && in_array($delivery['delivery_status'], ['in_transit', 'out_for_delivery']))): ?>
+                                <a href="track_order.php?id=<?= $order['id'] ?>" class="btn btn-primary">
+                                    <i class="fas fa-map-marked-alt"></i> Rastrear Envío
                                 </a>
+                            <?php endif; ?>
 
-                                <?php if ($order['status'] === 'delivered'): ?>
-                                    <button class="btn btn-success" onclick="reorderItems(<?= $order['id'] ?>)">
-                                        <i class="fas fa-redo"></i> Volver a Pedir
-                                    </button>
-                                    <button class="btn btn-primary" onclick="downloadInvoice(<?= $order['id'] ?>)">
-                                        <i class="fas fa-download"></i> Descargar Factura
-                                    </button>
-                                <?php endif; ?>
-
-                                <?php if (in_array($order['status'], ['pending', 'processing'])): ?>
-                                    <button class="btn btn-danger" onclick="cancelOrder(<?= $order['id'] ?>)">
-                                        <i class="fas fa-times"></i> Cancelar Pedido
-                                    </button>
-                                <?php endif; ?>
-
-                                <?php if ($order['status'] === 'shipped' || ($delivery && in_array($delivery['delivery_status'], ['in_transit', 'out_for_delivery']))): ?>
-                                    <a href="track_order.php?id=<?= $order['id'] ?>" class="btn btn-primary">
-                                        <i class="fas fa-map-marked-alt"></i> Rastrear Envío
-                                    </a>
-                                <?php endif; ?>
-
-                                <?php if ($order['status'] === 'delivered'): ?>
-                                    <button class="btn btn-primary" onclick="rateOrder(<?= $order['id'] ?>)">
-                                        <i class="fas fa-star"></i> Calificar Pedido
-                                    </button>
-                                <?php endif; ?>
-                            </div>
+                            <?php if ($order['status'] === 'delivered'): ?>
+                                <button class="btn btn-primary" onclick="rateOrder(<?= $order['id'] ?>)">
+                                    <i class="fas fa-star"></i> Calificar Pedido
+                                </button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -835,6 +478,11 @@ function calculateDiscountAmount($order, $subtotal) {
                 </div>
             `;
             document.body.appendChild(notification);
+            
+            // Trigger animation
+            setTimeout(() => {
+                notification.classList.add('notification-show');
+            }, 10);
             
             setTimeout(() => {
                 notification.classList.add('notification-hide');
