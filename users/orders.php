@@ -201,7 +201,7 @@ try {
                                         <?php if ($order['delivery_status']): ?>
                                             <span class="delivery-badge">
                                                 <i class="fas fa-truck"></i>
-                                                <?= ucfirst($order['delivery_status']) ?>
+                                                <?= getDeliveryStatusText($order['delivery_status']) ?>
                                             </span>
                                         <?php endif; ?>
                                     </div>
@@ -220,7 +220,7 @@ try {
                                         <div class="info-item">
                                             <i class="fas fa-credit-card"></i>
                                             <span class="payment-status payment-<?= $order['payment_status'] ?>">
-                                                <?= ucfirst($order['payment_status'] ?: 'pending') ?>
+                                                <?= getPaymentStatusText($order['payment_status'] ?: 'pending') ?>
                                             </span>
                                         </div>
                                         <?php if ($order['driver_name']): ?>
@@ -346,6 +346,29 @@ function getStatusText($status) {
         'processing' => 'En Proceso',
         'shipped' => 'Enviado',
         'delivered' => 'Entregado',
+        'cancelled' => 'Cancelado'
+    ];
+    return $statuses[$status] ?? ucfirst($status);
+}
+
+function getDeliveryStatusText($status) {
+    $statuses = [
+        'in_transit' => 'En Tránsito',
+        'delivered' => 'Entregado',
+        'pending' => 'Pendiente',
+        'picked_up' => 'Recogido',
+        'out_for_delivery' => 'En Reparto',
+        'failed_delivery' => 'Entrega Fallida'
+    ];
+    return $statuses[$status] ?? ucfirst(str_replace('_', ' ', $status));
+}
+
+function getPaymentStatusText($status) {
+    $statuses = [
+        'pending' => 'Pendiente',
+        'paid' => 'Pagado',
+        'failed' => 'Fallido',
+        'refunded' => 'Reembolsado',
         'cancelled' => 'Cancelado'
     ];
     return $statuses[$status] ?? ucfirst($status);
