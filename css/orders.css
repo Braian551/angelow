@@ -1546,21 +1546,6 @@ select:focus-visible {
     transform: scale(1.1);
 }
 
-@keyframes pulse-active {
-    0%, 100% {
-        box-shadow: 
-            0 8px 25px rgba(0, 119, 182, 0.4),
-            0 0 20px rgba(0, 119, 182, 0.3),
-            inset 0 1px 1px rgba(255, 255, 255, 0.3);
-    }
-    50% {
-        box-shadow: 
-            0 8px 30px rgba(0, 119, 182, 0.6),
-            0 0 30px rgba(0, 119, 182, 0.5),
-            inset 0 1px 1px rgba(255, 255, 255, 0.3);
-    }
-}
-
 /* Estado Completado */
 .timeline-step-modern.completed .timeline-dot-modern {
     background: var(--success-color);
