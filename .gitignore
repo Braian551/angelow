@@ -19,6 +19,7 @@ auth/google_auth.php
 !procedimiento*.sql
 !trigger_*.sql
 
+
 # Uploads and media
 uploads/
 images/productos/
