@@ -155,11 +155,16 @@ try {
                 </ul>
             </li>
 
-            <li class="nav-item">
+            <li class="nav-item with-submenu">
                 <a href="#configuracion">
                     <i class="fas fa-cog"></i>
                     <span>Configuración</span>
+                    <i class="fas fa-chevron-down submenu-toggle"></i>
                 </a>
+                <ul class="submenu">
+                    <li><a href="<?= BASE_URL ?>/admin/sliders/sliders_list.php">Sliders</a></li>
+                    <li><a href="#general">General</a></li>
+                </ul>
             </li>
 
             <li class="nav-item">

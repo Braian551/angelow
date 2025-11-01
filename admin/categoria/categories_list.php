@@ -67,7 +67,7 @@ switch ($action) {
                 // Procesar imagen si se subió
                 $imagePath = null;
                 if (!empty($_FILES['image']['name'])) {
-                    $uploadDir = __DIR__ . '/../../../uploads/categories/';
+                    $uploadDir = __DIR__ . '/../../uploads/categories/';
                     if (!is_dir($uploadDir)) {
                         mkdir($uploadDir, 0755, true);
                     }
@@ -131,14 +131,14 @@ switch ($action) {
 
                 // Procesar nueva imagen si se subió
                 if (!empty($_FILES['image']['name'])) {
-                    $uploadDir = __DIR__ . '/../../../uploads/categories/';
+                    $uploadDir = __DIR__ . '/../../uploads/categories/';
                     if (!is_dir($uploadDir)) {
                         mkdir($uploadDir, 0755, true);
                     }
                     
                     // Eliminar imagen anterior si existe
-                    if ($imagePath && file_exists(__DIR__ . '/../../../' . $imagePath)) {
-                        unlink(__DIR__ . '/../../../' . $imagePath);
+                    if ($imagePath && file_exists(__DIR__ . '/../../' . $imagePath)) {
+                        unlink(__DIR__ . '/../../' . $imagePath);
                     }
                     
                     $fileExt = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
@@ -185,8 +185,8 @@ switch ($action) {
             $stmt->execute([$id]);
             $category = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            if ($category['image'] && file_exists(__DIR__ . '/../../../' . $category['image'])) {
-                unlink(__DIR__ . '/../../../' . $category['image']);
+            if ($category['image'] && file_exists(__DIR__ . '/../../' . $category['image'])) {
+                unlink(__DIR__ . '/../../' . $category['image']);
             }
 
             $stmt = $conn->prepare("DELETE FROM categories WHERE id = ?");
@@ -229,7 +229,7 @@ switch ($action) {
                 
                 if ($category && $category['image']) {
                     // Eliminar archivo físico
-                    $imagePath = __DIR__ . '/../../../' . $category['image'];
+                    $imagePath = __DIR__ . '/../../' . $category['image'];
                     if (file_exists($imagePath)) {
                         unlink($imagePath);
                     }
