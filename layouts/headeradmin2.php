@@ -71,6 +71,7 @@ try {
                     <li><a href="<?= BASE_URL ?>/admin/products.php">Todos los productos</a></li>
                     <li><a href="<?= BASE_URL ?>/admin/subproducto.php">Agregar nuevo</a></li>
                     <li><a href="<?= BASE_URL ?>/admin/categoria/categories_list.php">Categorías</a></li>
+                    <li><a href="<?= BASE_URL ?>/admin/colecciones/collections_list.php">Colecciones</a></li>
                     <li><a href="<?= BASE_URL ?>/admin/tallas/sizes.php">Tallas</a></li>
                     <li><a href="<?= BASE_URL ?>/admin/inventario/inventory.php">Inventario</a></li>
                 </ul>

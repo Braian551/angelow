@@ -375,11 +375,11 @@ if (isset($_SESSION['alert'])) {
                                                 <i class="fas fa-cloud-upload-alt"></i>
                                                 <span id="file-label-text">Seleccionar imagen</span>
                                             </label>
-                                            <input type="file" id="image" name="image" accept="image/*">
+                                            <input type="file" id="image" name="image" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
                                         </div>
                                         
                                         <div class="image-info">
-                                            <small>Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 2MB</small>
+                                            <small>Formatos permitidos: JPG, PNG, GIF, WebP. Tamaño máximo: 2MB</small>
                                         </div>
                                         
                                         <div id="image-preview">
@@ -594,7 +594,7 @@ if (isset($_SESSION['alert'])) {
                 
                 if (file) {
                     // Validar tipo de archivo
-                    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
                     if (!validTypes.includes(file.type)) {
                         showAlert('Por favor selecciona un archivo de imagen válido (JPG, PNG, GIF)', 'error');
                         this.value = '';

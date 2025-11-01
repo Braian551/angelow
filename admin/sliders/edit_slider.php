@@ -82,13 +82,13 @@ try {
                                 <img src="<?= BASE_URL . '/' . htmlspecialchars($slider['image']) ?>" class="img-preview" alt="Imagen actual" onerror="this.style.display='none'">
                             </div>
                         <?php endif; ?>
-                        <small>Formatos: jpg, jpeg, png, webp. Máx 5MB. Recomendado: 1920x800px</small>
+                        <small>Formatos: jpg, jpeg, png, webp, avif. Máx 15MB. Recomendado: 1920x800px</small>
                     </div>
 
                     <div class="form-group">
                         <label for="link">Enlace (URL opcional)</label>
-                        <input type="url" id="link" name="link" class="form-control" placeholder="https://..." value="<?= htmlspecialchars($slider['link'] ?? '') ?>">
-                        <small>URL de destino al hacer clic en el slider</small>
+                        <input type="text" id="link" name="link" class="form-control" placeholder="https://ejemplo.com o /pagina-interna" value="<?= htmlspecialchars($slider['link'] ?? '') ?>">
+                        <small>URL completa (https://...) o ruta relativa (/pagina). Dejar vacío si no hay enlace</small>
                     </div>
 
                     <div class="form-group">

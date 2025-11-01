@@ -54,14 +54,14 @@ requireRole('admin');
                     <div class="form-group">
                         <label for="image">Imagen *</label>
                         <input type="file" id="image" name="image" accept="image/*" class="form-control" required>
-                        <small>Formatos: jpg, jpeg, png, webp. Máx 5MB. Recomendado: 1920x800px</small>
+                        <small>Formatos: jpg, jpeg, png, webp, avif. Máx 15MB. Recomendado: 1920x800px</small>
                         <div><img id="preview" class="img-preview" style="display:none" /></div>
                     </div>
 
                     <div class="form-group">
                         <label for="link">Enlace (URL opcional)</label>
-                        <input type="url" id="link" name="link" class="form-control" placeholder="https://...">
-                        <small>URL de destino al hacer clic en el slider</small>
+                        <input type="text" id="link" name="link" class="form-control" placeholder="https://ejemplo.com o /pagina-interna">
+                        <small>URL completa (https://...) o ruta relativa (/pagina). Dejar vacío si no hay enlace</small>
                     </div>
 
                     <div class="form-group">

@@ -29,7 +29,7 @@ $imagePath = null;
 $hasUpload = isset($_FILES['image']) && isset($_FILES['image']['tmp_name']) && is_uploaded_file($_FILES['image']['tmp_name']);
 
 if ($hasUpload) {
-    $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+    $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/avif' => 'avif'];
     $mime = mime_content_type($_FILES['image']['tmp_name']);
     $size = (int)$_FILES['image']['size'];
     
@@ -38,8 +38,8 @@ if ($hasUpload) {
         header('Location: ' . BASE_URL . '/admin/sliders/sliders_list.php');
         exit();
     }
-    if ($size > 5 * 1024 * 1024) { // 5MB
-        $_SESSION['alert'] = ['type' => 'error', 'message' => 'La imagen excede 5MB'];
+    if ($size > 15 * 1024 * 1024) { // 15MB
+        $_SESSION['alert'] = ['type' => 'error', 'message' => 'La imagen excede 15MB'];
         header('Location: ' . BASE_URL . '/admin/sliders/sliders_list.php');
         exit();
     }
