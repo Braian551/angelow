@@ -150,9 +150,9 @@ try {
                     <i class="fas fa-chevron-down submenu-toggle"></i>
                 </a>
                 <ul class="submenu">
-                    <li><a href="#ventas">Ventas</a></li>
-                    <li><a href="#productos-populares">Productos populares</a></li>
-                    <li><a href="#clientes-recurrentes">Clientes recurrentes</a></li>
+                    <li><a href="<?= BASE_URL ?>/admin/informes/ventas.php">Ventas</a></li>
+                    <li><a href="<?= BASE_URL ?>/admin/informes/productos.php">Productos populares</a></li>
+                    <li><a href="<?= BASE_URL ?>/admin/informes/clientes.php">Clientes recurrentes</a></li>
                 </ul>
             </li>
 

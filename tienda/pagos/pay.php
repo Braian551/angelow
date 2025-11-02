@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../conexion.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../conexion.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -19,7 +19,7 @@ $user_id = $_SESSION['user_id'];
 
 // Verificar que existan datos de checkout en la sesión
 if (!isset($_SESSION['checkout_data'])) {
-    header("Location: " . BASE_URL . "/tienda/envio.php");
+    header("Location: " . BASE_URL . "/tienda/pagos/envio.php");
     exit();
 }
 
@@ -42,7 +42,7 @@ try {
     }
 } catch (Exception $e) {
     error_log("Error al obtener cuenta bancaria: " . $e->getMessage());
-    header("Location: " . BASE_URL . "/tienda/envio.php?error=bank_config");
+    header("Location: " . BASE_URL . "/tienda/pagos/envio.php?error=bank_config");
     exit();
 }
 
@@ -58,7 +58,7 @@ try {
     }
 } catch (Exception $e) {
     error_log("Error al obtener dirección: " . $e->getMessage());
-    header("Location: " . BASE_URL . "/tienda/envio.php?error=address");
+    header("Location: " . BASE_URL . "/tienda/pagos/envio.php?error=address");
     exit();
 }
 
@@ -74,7 +74,7 @@ try {
     }
 } catch (Exception $e) {
     error_log("Error al obtener método de envío: " . $e->getMessage());
-    header("Location: " . BASE_URL . "/tienda/envio.php?error=shipping");
+    header("Location: " . BASE_URL . "/tienda/pagos/envio.php?error=shipping");
     exit();
 }
 
@@ -133,7 +133,7 @@ try {
     }
 } catch (Exception $e) {
     error_log("Error al obtener items del carrito: " . $e->getMessage());
-    header("Location: " . BASE_URL . "/tienda/pagos/cart.php");
+    header("Location: " . BASE_URL . "/tienda/cart.php");
     exit();
 }
 
@@ -294,7 +294,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             unset($_SESSION['checkout_data']);
             $_SESSION['last_order'] = $order_number;
             
-            header("Location: " . BASE_URL . "/tienda/confirmacion.php");
+            header("Location: " . BASE_URL . "/tienda/pagos/confirmacion.php");
             exit();
             
         } catch (Exception $e) {
@@ -329,7 +329,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-    <?php include __DIR__ . '/../layouts/headerproducts.php'; ?>
+    <?php include __DIR__ . '/../../layouts/headerproducts.php'; ?>
 
     <main class="container checkout-container">
         <div class="checkout-header">
@@ -598,7 +598,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <!-- Botones de Acción -->
                         <div class="checkout-actions">
-                            <a href="<?= BASE_URL ?>/tienda/envio.php" class="btn btn-outline">
+                            <a href="<?= BASE_URL ?>/tienda/pagos/envio.php" class="btn btn-outline">
                                 <i class="fas fa-arrow-left"></i> Volver al Envío
                             </a>
                             <button type="submit" class="btn btn-primary btn-confirm" id="confirm-payment">
@@ -616,7 +616,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </main>
 
-    <?php include __DIR__ . '/../layouts/footer.php'; ?>
+    <?php include __DIR__ . '/../../layouts/footer.php'; ?>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

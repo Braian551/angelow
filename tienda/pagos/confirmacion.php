@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../conexion.php';
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../conexion.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 // Verificar disponibilidad de una librería para generar PDF (Dompdf o TCPDF)
 $pdf_available = class_exists('\Dompdf\\Dompdf') || class_exists('Dompdf') || class_exists('TCPDF') || class_exists('\\TCPDF');
@@ -23,7 +23,7 @@ $user_id = $_SESSION['user_id'];
 
 // Verificar que exista la última orden en la sesión
 if (!isset($_SESSION['last_order'])) {
-    header("Location: " . BASE_URL . "/tienda/cart.php");
+    header("Location: " . BASE_URL . "/tienda/pagos/cart.php");
     exit();
 }
 
@@ -69,14 +69,14 @@ try {
     
 } catch (Exception $e) {
     error_log("Error al obtener información de la orden: " . $e->getMessage());
-    header("Location: " . BASE_URL . "/tienda/cart.php");
+    header("Location: " . BASE_URL . "/tienda/pagos/cart.php");
     exit();
 }
 
 // Incluir el helper de correo (envío de confirmación)
-require_once __DIR__ . '/api/pay/send_confirmation.php';
+require_once __DIR__ . '/../api/pay/send_confirmation.php';
 // Incluir helper puro para generar PDF (no ejecutar endpoint que haga stream/exit al incluir)
-require_once __DIR__ . '/api/pay/pdf_helpers.php';
+require_once __DIR__ . '/../api/pay/pdf_helpers.php';
 
 // Enviar correo de confirmación una sola vez por número de orden (adjuntar PDF si es posible)
 try {
@@ -176,7 +176,7 @@ try {
 </head>
 
 <body>
-    <?php include __DIR__ . '/../layouts/headerproducts.php'; ?>
+    <?php include __DIR__ . '/../../layouts/headerproducts.php'; ?>
 
     <main class="container checkout-container">
         <div class="checkout-header">
@@ -408,7 +408,7 @@ try {
         </div>
     </main>
 
-    <?php include __DIR__ . '/../layouts/footer.php'; ?>
+    <?php include __DIR__ . '/../../layouts/footer.php'; ?>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

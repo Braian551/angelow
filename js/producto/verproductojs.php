@@ -106,7 +106,7 @@
                 notification.click(function(e) {
                     // No redirigir si se hace clic en el botón de cerrar
                     if (!$(e.target).hasClass('close-notification') && !$(e.target).closest('.close-notification').length) {
-                        window.location.href = '<?= BASE_URL ?>/tienda/cart.php';
+                        window.location.href = '<?= BASE_URL ?>/tienda/pagos/cart.php';
                     }
                 });
             }

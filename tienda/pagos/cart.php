@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../conexion.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../conexion.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -97,7 +97,7 @@ try {
 </head>
 
 <body>
-    <?php include __DIR__ . '/../layouts/headerproducts.php'; ?>
+    <?php include __DIR__ . '/../../layouts/headerproducts.php'; ?>
 
     <main class="container cart-container">
         <div class="cart-header">
@@ -227,7 +227,7 @@ try {
                         </div>
 
                         <div class="summary-actions">
-                            <a href="<?= BASE_URL ?>/tienda/envio.php" class="btn btn-primary btn-block">
+                            <a href="<?= BASE_URL ?>/tienda/pagos/envio.php" class="btn btn-primary btn-block">
                                 Proceder al pago <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -241,11 +241,11 @@ try {
         <?php endif; ?>
     </main>
 
-    <?php include __DIR__ . '/../layouts/footer.php'; ?>
+    <?php include __DIR__ . '/../../layouts/footer.php'; ?>
 
     <div class="floating-notification-container"></div>
 
-    <?php include __DIR__ . '/../js/cart/cartjs.php'; ?>
+    <?php include __DIR__ . '/../../js/cart/cartjs.php'; ?>
 </body>
 
 </html>

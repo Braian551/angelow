@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../conexion.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../conexion.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -25,7 +25,7 @@ try {
     $cart = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$cart) {
-        header("Location: " . BASE_URL . "/tienda/cart.php");
+        header("Location: " . BASE_URL . "/tienda/pagos/cart.php");
         exit();
     }
 
@@ -63,7 +63,7 @@ try {
     $cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($cartItems)) {
-        header("Location: " . BASE_URL . "/tienda/cart.php");
+        header("Location: " . BASE_URL . "/tienda/pagos/cart.php");
         exit();
     }
 
@@ -76,7 +76,7 @@ try {
     }
 } catch (PDOException $e) {
     error_log("Error al obtener el carrito: " . $e->getMessage());
-    header("Location: " . BASE_URL . "/tienda/cart.php");
+    header("Location: " . BASE_URL . "/tienda/pagos/cart.php");
     exit();
 }
 
@@ -256,7 +256,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $markUsed->execute([$appliedDiscount['id']]);
         }
 
-        header("Location: " . BASE_URL . "/tienda/pay.php");
+        header("Location: " . BASE_URL . "/tienda/pagos/pay.php");
         exit();
     }
 }
@@ -286,7 +286,7 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
 </head>
 
 <body>
-    <?php include __DIR__ . '/../layouts/headerproducts.php'; ?>
+    <?php include __DIR__ . '/../../layouts/headerproducts.php'; ?>
 
     <main class="container checkout-container">
         <div class="checkout-header">
@@ -590,7 +590,7 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
         </form>
     </main>
 
-    <?php include __DIR__ . '/../layouts/footer.php'; ?>
+    <?php include __DIR__ . '/../../layouts/footer.php'; ?>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -696,7 +696,7 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                 applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 applyBtn.disabled = true;
 
-                fetch('<?= BASE_URL ?>/tienda/apply_discount.php', {
+                fetch('<?= BASE_URL ?>/tienda/pagos/apply_discount.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -739,7 +739,7 @@ $currentDiscountCode = $appliedDiscount ? $appliedDiscount['discount_code'] : ''
                 removeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 removeBtn.disabled = true;
 
-                fetch('<?= BASE_URL ?>/tienda/apply_discount.php', {
+                fetch('<?= BASE_URL ?>/tienda/pagos/apply_discount.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
