@@ -71,14 +71,11 @@ Por lo tanto, la especialización en E-commerce de ropa infantil en Colombia no 
 ## APIS A UTILIZAR
 
 **Inicio de sesión:**  
-Google Sign-In API: Permite a los usuarios iniciar sesión con su cuenta de Google.  
-Apple Sign-In API: Ofrece a los usuarios la opción de iniciar sesión con su ID de Apple.  
-Facebook Login API: Permite a los usuarios iniciar sesión con su cuenta de Facebook.
+Registro y autenticación tradicional con email y contraseña.
 
 **Pagos:**  
-Stripe API: Para procesar pagos con tarjeta de crédito y otras formas de pago.  
-PayPal API: Permite a los usuarios pagar con su cuenta de PayPal.  
-API de Facturación Electrónica: La DIAN proporciona un conjunto de servicios web para la emisión, validación y envío de facturas electrónicas. Estas APIs son esenciales para las empresas que deben cumplir con las regulaciones de facturación electrónica en Colombia.
+Transferencia bancaria con validación de comprobante de pago.  
+Pago contra entrega (solo Medellín).
 
 **Geolocalización:**  
 OpenStreetMap API: Ofrece mapas personalizados y funcionalidades de geolocalización.
@@ -153,7 +150,7 @@ Estos resultados esperados reflejan la implementación exitosa del software y el
 **Módulo de Gestión de Usuarios:**  
 Funcionalidad: Gestiona la creación, autenticación y administración de usuarios (clientes y administradores).  
 Características:  
-- Registro y autenticación de usuarios (inicio de sesión con email, redes sociales, etc.).  
+- Registro y autenticación de usuarios (inicio de sesión con email).  
 - Perfiles de usuario con información personal, historial de compras y preferencias.  
 - Roles y permisos (clientes, administradores).  
 Resultado esperado: Un sistema seguro y escalable que permita a los usuarios registrarse, autenticarse y gestionar sus cuentas sin problemas.
@@ -185,16 +182,16 @@ Resultado esperado: Una experiencia de compra fluida y sin fricciones que aument
 **Módulo de Pagos:**  
 Funcionalidad: Gestiona transacciones financieras de manera segura.  
 Características:  
-- Integración con pasarelas de pago (PSE, tarjetas de crédito/débito, PayPal, etc.).  
+- Transferencia bancaria con validación de comprobante.  
+- Pago contra entrega (solo Medellín).  
 - Procesamiento seguro de pagos (SSL, encriptación).  
-- Confirmación de pagos y generación de facturas electrónicas.  
+- Confirmación de pagos y generación de facturas.  
 Resultado esperado: Un sistema de pagos confiable y seguro que inspire confianza en los clientes.
 
 **Módulo de Envío y Seguimiento de Pedidos:**  
 Funcionalidad: Gestiona el envío y seguimiento de pedidos.  
 Características:  
 - Cálculo de costos de envío.  
-- Integración con servicios de mensajería (FedEx, DHL, etc.).  
 - Seguimiento en tiempo real del estado del pedido con GPS.  
 Resultado esperado: Un sistema que brinde transparencia y confianza a los clientes sobre el estado de sus pedidos.
 
@@ -203,7 +200,7 @@ Funcionalidad: Permite a los administradores gestionar toda la plataforma.
 Características:  
 - Panel de control con métricas clave (ventas, usuarios, inventario).  
 - Gestión de usuarios, productos, pedidos y entregas.  
-- Configuración de la tienda (diseño, políticas, pasarelas de pago).  
+- Configuración de la tienda (diseño, políticas, métodos de pago).  
 Resultado esperado: Una herramienta integral que facilite la gestión diaria de la tienda.
 
 **Módulo de Reportes y Análisis:**  
@@ -247,66 +244,53 @@ Resultado esperado: Información clara y accesible que permita optimizar la oper
 ### Avance General: 85% Completado
 
 #### Módulos Implementados (100%)
-- ✅ Sistema de autenticación y usuarios
-- ✅ Gestión de productos y variantes
-- ✅ Control de inventario
-- ✅ Carrito de compras
-- ✅ Sistema de pagos
-- ✅ Gestión de órdenes
-- ✅ Sistema de entregas con GPS
-- ✅ Panel administrativo
-- ✅ Sistema de descuentos
-- ✅ Búsqueda y filtros
-- ✅ Reportes y análisis
-- ✅ Sistema de auditoría
+- Sistema de autenticación y usuarios
+- Gestión de productos y variantes
+- Control de inventario
+- Carrito de compras
+- Sistema de pagos
+- Gestión de órdenes
+- Sistema de entregas con GPS
+- Panel administrativo
+- Sistema de descuentos
+- Búsqueda y filtros
+- Reportes y análisis
+- Sistema de auditoría
 
 #### En Proceso
-- 🔄 Pruebas de usabilidad con usuarios reales
-- 🔄 Optimización de rendimiento
-- 🔄 Refinamiento de interfaces
-- 🔄 Documentación de usuario
+- Pruebas de usabilidad con usuarios reales
+- Optimización de rendimiento
+- Refinamiento de interfaces
+- Documentación de usuario
 
 #### Pendiente
-- ⏳ Despliegue en producción
-- ⏳ Capacitación formal de usuarios
-- ⏳ Manuales de usuario finales
-- ⏳ Plan de mantenimiento
-
----
-
-## CRONOGRAMA DE ACTIVIDADES
-
-| Fase | Actividad | Estado | Período |
-|------|-----------|--------|---------|
-| **I** | Análisis y Planificación | ✅ Completado | Sep - Oct 2024 |
-| **II** | Diseño de Base de Datos e Interfaces | ✅ Completado | Oct - Nov 2024 |
-| **III** | Desarrollo de Módulos Backend | ✅ Completado | Nov 2024 - Ene 2025 |
-| **IV** | Desarrollo de Interfaces Frontend | ✅ Completado | Dic 2024 - Feb 2025 |
-| **V** | Integración y Pruebas | 🔄 En proceso | Feb - Mar 2025 |
-| **VI** | Despliegue y Capacitación | ⏳ Pendiente | Mar - Abr 2025 |
+- Despliegue en producción
+- Capacitación formal de usuarios
+- Manuales de usuario finales
+- Plan de mantenimiento
 
 ---
 
 ## INDICADORES DE ÉXITO
 
 ### Métricas Técnicas
-- ✅ **Cobertura de requerimientos:** 100% (83/83 RF implementados)
-- 🔄 **Tiempo de carga:** < 4 segundos (en optimización)
-- ✅ **Disponibilidad:** 99.9% objetivo
-- ✅ **Usuarios simultáneos:** Soporte para 100+ usuarios
-- ✅ **Seguridad:** 0 vulnerabilidades críticas
+- **Cobertura de requerimientos:** 100% (83/83 RF implementados)
+- **Tiempo de carga:** < 4 segundos (en optimización)
+- **Disponibilidad:** 99.9% objetivo
+- **Usuarios simultáneos:** Soporte para 100+ usuarios
+- **Seguridad:** 0 vulnerabilidades críticas
 
 ### Métricas de Negocio
-- ⏳ **Tasa de conversión objetivo:** > 3%
-- ⏳ **Satisfacción de usuarios:** > 90%
-- ⏳ **Tiempo promedio de compra:** < 5 minutos
-- ⏳ **Abandonos de carrito:** < 30%
+- **Tasa de conversión objetivo:** > 3%
+- **Satisfacción de usuarios:** > 90%
+- **Tiempo promedio de compra:** < 5 minutos
+- **Abandonos de carrito:** < 30%
 
 ### Métricas de Calidad
-- ✅ **Cumplimiento ISO/IEC 25010:** 100%
-- ✅ **Errores críticos en producción:** 0 objetivo
-- 🔄 **Cobertura de pruebas:** > 80%
-- ✅ **Documentación:** Completa y actualizada
+- **Cumplimiento ISO/IEC 25010:** 100%
+- **Errores críticos en producción:** 0 objetivo
+- **Cobertura de pruebas:** > 80%
+- **Documentación:** Completa y actualizada
 
 ---
 
