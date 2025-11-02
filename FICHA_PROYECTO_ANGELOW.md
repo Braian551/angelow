@@ -2,34 +2,37 @@
 
 ## INFORMACIÓN GENERAL
 
-**Título del proyecto:** Desarrollo de un Sistema de Gestión de Ventas de Ropa Infantil (ANGELOW)
+**Título del proyecto:** Desarrollo de un Sistema de Gestión de Ventas para Ropa infantil (ANGELOW)
 
-**Sector productivo:** Comercio Electrónico - Tienda Virtual de Ropa Infantil con Venta al Detal y Mayorista
+**Sector productivo objetivo del proyecto:** Tienda Virtual de Ropa Infantil con Causa: Venta al Detal y Mayorista (ANGELOW)
 
-**Centro de formación:** Centro Textil y de Gestión Industrial - SENA
+**Nombres de las entidades o Centros del SENA con los que se asocia (cliente):**  
+Centro Textil y de Gestión Industrial (proyecto formativo)
 
-**Número de Ficha:** 3147208
+**Programa de formación con el que se asocia (si el proyecto se hace con otro programa de formación):**  
 
-**Programa de formación:** Análisis y Desarrollo de Software (ADSO)
+**Nro. Ficha:** 3147208
 
 **Instructor titular:** Edilfredo Pineda
 
----
-
-## INSTRUCTORES PARTICIPANTES
-
-| Nombres y Apellidos | Competencia | Observaciones | Trimestre |
-|---------------------|-------------|---------------|-----------|
-| Edilfredo Pineda | Diseñar la solución de software de acuerdo con procedimientos y requisitos técnicos | Instructor titular | Segundo |
-| Héctor Maya | Evaluar requisitos de la solución de software de acuerdo con metodologías de análisis y estándares | | Segundo |
-| Juan David Carvajal | Evaluar requisitos de la solución de software de acuerdo con metodologías de análisis y estándares | | Segundo |
+**Programa de formación:** ADSO
 
 ---
 
-## INFORMACIÓN DE APRENDICES
+## INSTRUCTORES PARTICIPANTES EN LA FORMACIÓN
 
-| Documento | Nombres y Apellidos | E-mail | Teléfono |
-|-----------|---------------------|--------|----------|
+| Nombres y Apellidos | Competencia que Imparte | Observaciones | Fecha |
+|---------------------|-------------------------|---------------|-------|
+| Edilfredo Pineda | Diseñar la solución de software de acuerdo con procedimientos y requisitos técnicos |  | segundo trimestre |
+| Héctor Maya | Evaluar requisitos de la solución de software de acuerdo con metodologías de análisis y estándares |  | segundo trimestre |
+| Juan David Carvajal | Evaluar requisitos de la solución de software de acuerdo con metodologías de análisis y estándares |  | segundo trimestre |
+
+---
+
+## INFORMACIÓN DE APRENDICES QUE DESARROLLARÁN EL PROYECTO
+
+| Documento de identidad | Nombres y Apellidos | E-mail | Teléfono |
+|------------------------|---------------------|--------|----------|
 | 1023526011 | Braian Andrés Oquendo Durango | braianoquen@gmail.com | 302 2613326 |
 | 1020111377 | Sara Hernández Higuita | sarahiguita21@gmail.com | 3188981654 |
 | 1015070475 | Julian David Cardenas Obando | cabeceguayabojuly@gmail.com | 3154839619 |
@@ -39,514 +42,203 @@
 
 ## DESCRIPCIÓN DEL PROYECTO
 
-El desarrollo de **Angelow** es una plataforma de E-commerce especializada en la comercialización de ropa infantil de alta calidad, diseñada para satisfacer las necesidades de padres y cuidadores que buscan prendas de vestir para niños de manera rápida, segura y cómoda desde cualquier dispositivo.
+El desarrollo de una tienda virtual para la venta de ropa infantil requiere de una planificación adecuada para satisfacer las necesidades de los usuarios finales y garantizar una experiencia de compra segura y eficiente. A pesar de contar con la necesidad de implementar un sistema digital que permita ampliar el alcance de las ventas y facilitar la gestión del negocio, existen varios retos en el proceso de desarrollo.
 
-### Problemática
+Primero, es fundamental identificar los requerimientos del software y adquirir los elementos necesarios para el análisis, como las tecnologías adecuadas y los recursos para la construcción de la base de datos y las interfaces gráficas. Sin una planificación precisa y la correcta adquisición de herramientas, el desarrollo del software podría no cumplir con las expectativas de funcionalidad e integración.
 
-A pesar de la creciente demanda de comercio electrónico en Colombia, especialmente en Medellín, existen varios desafíos en el desarrollo de plataformas de venta online:
+Segundo, el diseño de la base de datos y la interfaz gráfica (mockups) debe ser realizado de manera eficiente para asegurar una estructura óptima que permita una gestión ágil de productos y un proceso de compra intuitivo para los usuarios finales, que en su mayoría son padres que buscan ropa infantil en línea.
 
-1. **Identificación de Requerimientos:** Es fundamental identificar con precisión las funcionalidades necesarias y adquirir las herramientas tecnológicas adecuadas para el desarrollo, construcción de base de datos e interfaces gráficas intuitivas.
+En tercer lugar, es esencial verificar que los requerimientos definidos sean completos y se alineen con el diseño de la plataforma. Esto incluye la realización de pruebas de funcionalidad para asegurar que el software cumpla con los estándares establecidos y que el sistema sea capaz de manejar tareas como la gestión de pedidos, pagos seguros y la atención al cliente.
 
-2. **Diseño Eficiente:** El diseño de la base de datos y las interfaces debe ser óptimo para asegurar una gestión ágil de productos, un proceso de compra intuitivo y una experiencia de usuario satisfactoria.
+Por último, una vez verificado el sistema, es crucial realizar pruebas de funcionalidad del software, implementar la plataforma en un entorno en vivo y proporcionar capacitación a los usuarios finales para asegurar que el sistema sea utilizado correctamente. Además, se deben realizar ajustes en base a las pruebas y la retroalimentación recibida durante el proceso de implementación.
 
-3. **Verificación de Calidad:** Es esencial verificar que los requerimientos definidos sean completos, se alineen con el diseño de la plataforma y cumplan con estándares de calidad mediante pruebas funcionales rigurosas.
+En resumen, el desafío principal es asegurar que el proceso de desarrollo del software, desde la identificación de requerimientos hasta la implementación final y la capacitación de los usuarios, se lleve a cabo de manera efectiva, garantizando que el sistema final sea funcional, seguro y escalable para satisfacer las necesidades del negocio y los usuarios.
 
-4. **Implementación y Capacitación:** Una vez verificado el sistema, es crucial implementarlo correctamente, realizar pruebas de funcionalidad y proporcionar capacitación a los usuarios finales para garantizar su correcto uso.
+**Justificación:** En Colombia, existen diversas plataformas de comercio electrónico y servicios en línea que buscan ofrecer soluciones de compra y venta de productos, como ropa, tecnología, alimentos, entre otros. Sin embargo, el sector de ropa infantil presenta oportunidades de mejora en términos de experiencia de usuario especializada, gestión eficiente de variantes de productos y seguimiento GPS de entregas.
 
-### Solución Propuesta
+A pesar de que existen tiendas en línea como Éxito, Falabella, MercadoLibre, y otras plataformas de comercio electrónico populares en Colombia, estas generalmente ofrecen soluciones genéricas que no se especializan en las necesidades específicas del mercado de ropa infantil, como la gestión de variantes de productos (tallas, colores), control de inventario avanzado y seguimiento GPS de entregas.
 
-**Angelow** es una plataforma integral de E-commerce que aborda estos desafíos mediante:
+Este vacío en el mercado abre una oportunidad de negocio significativa. Una plataforma especializada en E-commerce de ropa infantil, como lo planteamos en el proyecto, podría ser una ventaja competitiva al ofrecer funcionalidades específicas del sector, mejorando la experiencia de compra para padres y cuidadores.
 
-- **Sistema robusto de gestión de usuarios** con autenticación segura
-- **Catálogo de productos avanzado** con filtros, búsqueda inteligente y sistema de variantes
-- **Proceso de compra simplificado** con múltiples métodos de pago
-- **Panel administrativo completo** para gestión de inventario, pedidos y reportes
-- **Sistema de seguimiento GPS** para entregas en tiempo real
-- **Arquitectura escalable** que permite crecimiento futuro del negocio
+El concepto de especialización en nichos ha sido exitoso en otros países, y su implementación en Colombia podría fomentar una mayor eficiencia en el comercio electrónico infantil, al mismo tiempo que se maximiza la satisfacción del cliente y la optimización operativa.
+
+En este contexto, la implementación de una tienda virtual especializada en ropa infantil no solo satisface una necesidad del mercado, sino que también contribuye a la transformación digital del sector retail en Colombia. Además, podría incentivar la lealtad de los consumidores que buscan soluciones especializadas y eficientes para sus compras infantiles, lo que, en última instancia, podría aumentar las ventas y fortalecer la reputación de la marca.
+
+Por lo tanto, la especialización en E-commerce de ropa infantil en Colombia no solo tiene un impacto comercial, sino que también promueve una mayor eficiencia y especialización en el comercio electrónico local.
 
 ---
 
-## JUSTIFICACIÓN
+## APIS A UTILIZAR
 
-### Contexto del Mercado
+**Inicio de sesión:**  
+Google Sign-In API: Permite a los usuarios iniciar sesión con su cuenta de Google.  
+Apple Sign-In API: Ofrece a los usuarios la opción de iniciar sesión con su ID de Apple.  
+Facebook Login API: Permite a los usuarios iniciar sesión con su cuenta de Facebook.
 
-En Colombia, el comercio electrónico ha experimentado un crecimiento significativo, especialmente después de la pandemia COVID-19. Sin embargo, el sector de ropa infantil online aún presenta oportunidades de mejora en términos de:
+**Pagos:**  
+Stripe API: Para procesar pagos con tarjeta de crédito y otras formas de pago.  
+PayPal API: Permite a los usuarios pagar con su cuenta de PayPal.  
+API de Facturación Electrónica: La DIAN proporciona un conjunto de servicios web para la emisión, validación y envío de facturas electrónicas. Estas APIs son esenciales para las empresas que deben cumplir con las regulaciones de facturación electrónica en Colombia.
 
-- **Experiencia de usuario** optimizada y personalizada
-- **Confiabilidad** en procesos de pago y entrega
-- **Gestión eficiente** de inventario y variantes de productos
-- **Transparencia** en el seguimiento de pedidos
+**Geolocalización:**  
+OpenStreetMap API: Ofrece mapas personalizados y funcionalidades de geolocalización.
 
-### Oportunidad de Innovación
-
-**Angelow** se diferencia en el mercado colombiano mediante:
-
-1. **Tecnología Moderna:** Implementación de tecnologías web actuales (PHP 8.0+, MySQL 8.0) que garantizan rendimiento y seguridad.
-
-2. **Sistema de Variantes Avanzado:** Gestión completa de variantes de productos (colores, tallas) con control de stock individual.
-
-3. **Seguimiento GPS en Tiempo Real:** Sistema de navegación para repartidores que permite a los clientes seguir sus pedidos en vivo.
-
-4. **Gestión Integral:** Panel administrativo completo con reportes, análisis de ventas y control de inventario automatizado.
-
-5. **Experiencia de Usuario Superior:** Interfaces intuitivas, proceso de compra simplificado y múltiples opciones de pago.
-
-### Impacto Social y Económico
-
-- **Acceso:** Facilita el acceso a ropa infantil de calidad para familias en Medellín y alrededores
-- **Empleo:** Genera oportunidades laborales para repartidores y personal administrativo
-- **Comercio Local:** Fortalece el comercio electrónico local y la economía digital
-- **Innovación:** Contribuye a la transformación digital del sector retail en Colombia
+**Seguridad:**  
+reCAPTCHA API: Para prevenir spam y abuso en formularios de contacto y registro.
 
 ---
 
 ## OBJETIVOS DEL PROYECTO
 
-### Objetivo General
+**General:** Desarrollar una plataforma de E-commerce integral para la comercialización mayorista y minorista de ropa infantil, incorporando funcionalidades avanzadas como seguimiento GPS de entregas y gestión especializada de productos infantiles.
 
-Desarrollar una plataforma de E-commerce integral y escalable para la comercialización mayorista y minorista de ropa infantil, que ofrezca una experiencia de compra superior, gestión administrativa eficiente y seguimiento en tiempo real de entregas.
+**Específicos:**  
 
-### Objetivos Específicos
+1. **Planificar requerimientos del software,** incluyendo las funcionalidades esenciales y deseables, adquirir los elementos necesarios para el análisis, como herramientas de desarrollo, tecnologías y recursos.
 
-1. **Planificación y Análisis**
-   - Identificar y documentar los requerimientos funcionales y no funcionales del software
-   - Definir la arquitectura tecnológica adecuada (PHP, MySQL, JavaScript)
-   - Seleccionar herramientas de desarrollo y tecnologías necesarias
-   - Establecer estándares de calidad según ISO/IEC 25010
+2. **Hacer la base de datos y las interfaces gráficas (mockups) del software,** asegurando que la estructura de la base de datos sea eficiente y que las interfaces sean intuitivas y fáciles de usar para los usuarios finales.
 
-2. **Diseño y Modelado**
-   - Diseñar la base de datos relacional con estructura normalizada y eficiente
-   - Crear mockups y prototipos de interfaces gráficas intuitivas
-   - Definir el modelo de negocio y flujos de proceso
-   - Diseñar la arquitectura de seguridad del sistema
+3. **Verificar que los requerimientos del software estén completos y sean correctos,** asegurándose de que la construcción del software se alinee con los objetivos definidos previamente, y realizar pruebas de funcionalidad para comprobar que el sistema cumpla con las expectativas.
 
-3. **Desarrollo e Implementación**
-   - Desarrollar todos los módulos del sistema según especificaciones
-   - Implementar sistema de autenticación y autorización por roles
-   - Integrar sistemas de pago y seguimiento de entregas
-   - Crear panel administrativo con reportes y análisis
-
-4. **Verificación y Pruebas**
-   - Realizar pruebas unitarias y de integración de todos los módulos
-   - Verificar el cumplimiento de requerimientos funcionales y no funcionales
-   - Ejecutar pruebas de usabilidad con usuarios finales
-   - Validar la seguridad y rendimiento del sistema
-
-5. **Despliegue y Capacitación**
-   - Implementar el sistema en ambiente de producción
-   - Capacitar a usuarios finales (clientes, administradores, repartidores)
-   - Crear documentación técnica y manuales de usuario
-   - Establecer procesos de soporte y mantenimiento
+4. **Actuar con las pruebas de funcionalidad del software, implementarlo y capacitar a los usuarios finales en su uso.** Además de los ajustes, según los resultados obtenidos de las pruebas y de la retroalimentación recibida durante la capacitación para un funcionamiento óptimo.
 
 ---
 
-## TECNOLOGÍAS Y HERRAMIENTAS
+## ANTECEDENTES
 
-### Stack Tecnológico
+El comercio electrónico en Medellín, al igual que a nivel global, ha experimentado una transformación significativa gracias a la adopción de tecnologías como las APIs (Interfaces de Programación de Aplicaciones) y los sistemas de geolocalización. Estas herramientas han demostrado su capacidad para optimizar la experiencia del usuario, automatizar procesos y mejorar la eficiencia operativa.
 
-#### Backend
-- **Lenguaje:** PHP 8.0+
-- **Base de datos:** MySQL 8.0
-- **Servidor:** Apache/Nginx compatible
-- **Extensiones PHP:** PDO, GD, cURL, OpenSSL
+En Medellín, diversas empresas de E-commerce han integrado APIs para mejorar la eficiencia de la atención al cliente y personalizar la experiencia de compra. Plataformas como TiendaMIA han implementado soluciones automatizadas de atención al cliente, facilitando las transacciones y ofreciendo soporte en tiempo real. Esta tendencia se alinea con las conclusiones de Revista Semana (2021), que destaca el impacto positivo de las APIs en la fidelización de clientes, gracias a la mejora en la eficiencia operativa y la personalización del servicio.
 
-#### Frontend
-- **HTML5** - Estructura semántica
-- **CSS3** - Estilos y diseño responsivo
-- **JavaScript (Vanilla)** - Interactividad y validaciones
-- **Font Awesome** - Iconografía
+La Cámara de Comercio de Medellín para Antioquia ha desempeñado un papel crucial en la promoción de la digitalización empresarial a través de su programa "Transformación Digital". Este programa ha apoyado a las empresas locales en la adopción de tecnologías como APIs y geolocalización, facilitando la interacción con los consumidores y optimizando las operaciones comerciales. Eventos como el Digital Transformation Day han contribuido a difundir las ventajas de las herramientas digitales, integrando soluciones de venta en línea y gestión automatizada de interacciones (Cámara de Comercio de Medellín, 2020).
 
-#### Librerías y Componentes
-- **Font Awesome:** Librería de iconos para mejorar la interfaz de usuario
-- **JavaScript Nativo:** Para interactividad sin dependencias externas pesadas
+En respuesta a una creciente demanda de eficiencia en el comercio electrónico, algunas tiendas virtuales en Medellín han integrado sistemas de geolocalización a sus plataformas. Empresas locales han implementado mapas interactivos para seguimiento de entregas, permitiendo a los compradores rastrear sus pedidos en tiempo real. Esta tendencia, respaldada por informes del sector, demuestra que la integración de sistemas de geolocalización no solo beneficia la experiencia del cliente, sino que también fortalece la confianza al ofrecer transparencia en el proceso de entrega.
 
-### APIs y Servicios Integrados
+Grandes plataformas de E-commerce, como Mercado Libre, también han incorporado opciones de geolocalización en sus plataformas en Medellín. Mediante la integración de APIs de mapas, los usuarios pueden visualizar rutas de entrega y tiempos estimados mientras compran en línea (Mercado Libre, 2021). Esta funcionalidad ha contribuido a mejorar la satisfacción del cliente y a fomentar la participación activa en el proceso de compra.
 
-#### Geolocalización y Mapas
-- **Mapbox API / Google Maps API**
-  - Mapas interactivos para seguimiento de entregas
-  - Geocodificación de direcciones
-  - Cálculo de rutas optimizadas
-  - Estimación de tiempos de entrega
+**Conclusión**
 
-#### Seguridad
-- **reCAPTCHA API**
-  - Protección contra spam en formularios
-  - Prevención de bots en registro y login
-  - Validación de acciones críticas
-
-### Sistemas de Pago Implementados
-
-#### Métodos de Pago Disponibles
-1. **Transferencia Bancaria**
-   - Validación de comprobantes
-   - Subida segura de archivos (JPG, PNG, PDF)
-   - Verificación manual por administradores
-   - Generación automática de facturas
-
-2. **Pago Contra Entrega**
-   - Disponible solo para Medellín
-   - Validación de dirección
-   - Gestión integrada con sistema de entregas
-   - Confirmación de pago al completar entrega
-
-### Características de Seguridad
-
-- **Encriptación de contraseñas** con `password_hash()` de PHP
-- **Tokens de sesión seguros** para autenticación persistente
-- **Validación y sanitización** de todos los inputs
-- **Protección contra SQL Injection** mediante prepared statements
-- **Headers de seguridad** (CORS, CSP, X-Frame-Options)
-- **Protección CSRF** en formularios críticos
-- **Validación de tipos de archivo** en uploads
-- **Sistema de auditoría** para acciones críticas
-
----
-
-## MÓDULOS DEL SOFTWARE
-
-### 1. Módulo de Gestión de Usuarios
-**Funcionalidad:** Gestión completa del ciclo de vida de usuarios
-
-**Características:**
-- Registro con validación de datos
-- Autenticación segura (email/teléfono + contraseña)
-- Sistema de "Recordar mi cuenta" con tokens seguros
-- Perfiles de usuario con información personal
-- Historial de compras y pedidos
-- Gestión de direcciones de envío
-- Preferencias y configuraciones
-- Roles y permisos (cliente, administrador, repartidor)
-
-**Resultado esperado:** Sistema seguro que permita a los usuarios gestionar sus cuentas de manera intuitiva y segura.
-
----
-
-### 2. Módulo de Gestión de Productos
-**Funcionalidad:** Administración completa del catálogo de productos
-
-**Características:**
-- CRUD completo de productos
-- Sistema de variantes (colores y tallas)
-- Categorización jerárquica
-- Gestión de imágenes múltiples
-- Precios y descuentos
-- Descripciones detalladas
-- Control de visibilidad
-- Sistema de búsqueda y filtros
-
-**Resultado esperado:** Catálogo flexible que permita gestionar productos con variantes complejas de manera eficiente.
-
----
-
-### 3. Módulo de Inventario
-**Funcionalidad:** Control de stock en tiempo real
-
-**Características:**
-- Stock por variante (color + talla)
-- Alertas automáticas de bajo stock
-- Historial de movimientos
-- Transferencias entre variantes
-- Reportes de inventario
-- Auditoría de cambios
-- Actualización automática tras ventas
-
-**Resultado esperado:** Sistema que evite sobreventa y optimice la gestión del inventario.
-
----
-
-### 4. Módulo de Carrito de Compras
-**Funcionalidad:** Gestión del proceso de selección de productos
-
-**Características:**
-- Agregar/modificar/eliminar productos
-- Selección de variantes (color/talla)
-- Cálculo automático de totales
-- Validación de stock en tiempo real
-- Persistencia entre sesiones
-- Aplicación de descuentos
-- Sistema de favoritos
-
-**Resultado esperado:** Experiencia de compra fluida que maximice la conversión.
-
----
-
-### 5. Módulo de Pagos
-**Funcionalidad:** Procesamiento seguro de transacciones
-
-**Características:**
-- Transferencia bancaria con validación de comprobantes
-- Pago contra entrega (solo Medellín)
-- Generación automática de facturas PDF
-- Confirmación por email
-- Registro de transacciones
-- Estados de pago (pendiente, pagado, rechazado)
-
-**Resultado esperado:** Sistema de pagos confiable que inspire confianza en los clientes.
-
----
-
-### 6. Módulo de Órdenes
-**Funcionalidad:** Gestión completa del ciclo de vida de pedidos
-
-**Características:**
-- Creación de órdenes con número único
-- Estados de pedido (pendiente, pagado, enviado, entregado)
-- Seguimiento en tiempo real
-- Historial de cambios
-- Asignación a repartidores
-- Notificaciones automáticas
-- Cancelaciones y devoluciones
-
-**Resultado esperado:** Transparencia total en el proceso de pedido desde la compra hasta la entrega.
-
----
-
-### 7. Módulo de Entregas (Delivery)
-**Funcionalidad:** Gestión de entregas con seguimiento GPS
-
-**Características:**
-- Sistema de navegación en tiempo real
-- Asignación de pedidos a repartidores
-- Seguimiento GPS en vivo para clientes
-- Registro de eventos de navegación
-- Reporte de problemas durante entrega
-- Confirmación de entrega con ubicación
-- Historial completo de rutas
-
-**Resultado esperado:** Sistema de entregas eficiente con transparencia total para el cliente.
-
----
-
-### 8. Módulo de Descuentos
-**Funcionalidad:** Gestión de promociones y códigos de descuento
-
-**Características:**
-- Códigos promocionales personalizables
-- Descuentos por volumen automáticos
-- Fecha de inicio y expiración
-- Límite de usos
-- Aplicación automática o manual
-- Seguimiento de uso
-- Reportes de efectividad
-
-**Resultado esperado:** Sistema flexible que permita implementar diversas estrategias de marketing.
-
----
-
-### 9. Módulo de Búsqueda y Filtros
-**Funcionalidad:** Sistema de búsqueda inteligente
-
-**Características:**
-- Búsqueda por nombre de producto
-- Filtros por categoría, género, precio, talla
-- Ordenamiento (precio, popularidad, novedad)
-- Historial de búsquedas
-- Sugerencias automáticas
-- Resultados paginados
-
-**Resultado esperado:** Experiencia de búsqueda rápida e intuitiva que ayude a los usuarios a encontrar productos fácilmente.
-
----
-
-### 10. Módulo de Administración
-**Funcionalidad:** Panel de control centralizado
-
-**Características:**
-- Dashboard con métricas clave
-- Gestión de usuarios y roles
-- Gestión de productos e inventario
-- Gestión de pedidos y entregas
-- Configuración de descuentos
-- Gestión de categorías y tallas
-- Configuración de envíos
-- Reportes y análisis
-
-**Resultado esperado:** Herramienta integral que facilite la gestión diaria de la tienda.
-
----
-
-### 11. Módulo de Reportes y Análisis
-**Funcionalidad:** Generación de reportes y análisis de datos
-
-**Características:**
-- Reportes de ventas (diario, mensual, anual)
-- Análisis de productos más vendidos
-- Reportes de inventario
-- Análisis de comportamiento de usuarios
-- Exportación en PDF y Excel
-- Gráficos y visualizaciones
-- Métricas de conversión
-
-**Resultado esperado:** Información clara y accionable para la toma de decisiones estratégicas.
-
----
-
-### 12. Módulo de Notificaciones
-**Funcionalidad:** Sistema de comunicación con usuarios
-
-**Características:**
-- Notificaciones por email
-- Confirmaciones de pedido
-- Cambios de estado
-- Alertas de bajo stock (admin)
-- Notificaciones en tiempo real en la aplicación
-- Plantillas personalizables
-
-**Resultado esperado:** Comunicación efectiva que mantenga informados a todos los usuarios.
-
----
-
-### 13. Módulo de Auditoría y Seguridad
-**Funcionalidad:** Registro y control de acciones críticas
-
-**Características:**
-- Log de todas las acciones importantes
-- Auditoría de cambios en usuarios
-- Auditoría de cambios en productos
-- Auditoría de órdenes
-- Registro de accesos
-- Detección de actividad sospechosa
-- Respaldos automáticos
-
-**Resultado esperado:** Sistema auditable que garantice la trazabilidad de todas las operaciones.
+La integración de APIs y sistemas de geolocalización en el E-commerce de Medellín representa una tendencia en alza, impulsada tanto por empresas grandes como pequeñas. Estas tecnologías no solo mejoran la experiencia del cliente y optimizan los procesos comerciales, sino que también fomentan la competitividad de la ciudad en el ámbito del comercio electrónico. El apoyo de instituciones como la Cámara de Comercio de Medellín ha sido fundamental para democratizar el acceso a estas herramientas y promover la digitalización de las empresas locales.
 
 ---
 
 ## RESULTADOS ESPERADOS
 
-### 1. Planificación de Requerimientos
+**Planificación de Requerimientos del Software:**  
+Resultado esperado: Un documento detallado de los requerimientos del software que describa las funcionalidades esenciales y deseables, como la gestión de usuarios, inventario, carrito de compras, pagos y seguimiento de entregas.  
+La selección adecuada de herramientas y tecnologías de desarrollo que garanticen un sistema robusto, escalable y seguro.  
+Una arquitectura bien definida que permita integrar todos los módulos del sistema de forma eficiente, asegurando que el software pueda crecer a medida que la tienda virtual expanda su base de usuarios y productos.
 
-**Entregables:**
-- Documento detallado de requerimientos funcionales (83 RF)
-- Documento de requerimientos no funcionales (40 RNF según ISO/IEC 25010)
-- Matriz de trazabilidad completa (RF, RN, RI)
-- Arquitectura tecnológica definida
-- Plan de desarrollo con cronograma
+**Diseño de la Base de Datos y Mockups (Interfaces Gráficas):**  
+Resultado esperado: Una base de datos eficiente que soporte todos los módulos del sistema, con relaciones bien definidas para gestionar usuarios, productos, pagos, inventario y entregas sin problemas de rendimiento.  
+Mockups funcionales y detallados de las interfaces gráficas que sean intuitivos, fáciles de usar y proporcionen una excelente experiencia de usuario. Esto incluirá formularios de pago, páginas de productos, vistas de carrito de compras, y el proceso de seguimiento de pedidos.  
+Interfaces que respondan a las necesidades del usuario final, con un diseño que sea coherente con la marca y atractivo visualmente, para facilitar la navegación y aumentar la tasa de conversión.
 
-**Criterios de éxito:**
-- Cobertura del 100% de funcionalidades esenciales
-- Requerimientos validados por stakeholders
-- Arquitectura escalable y segura
-- Tecnologías seleccionadas justificadas
+**Verificación de Requerimientos y Pruebas de Funcionalidad:**  
+Resultado esperado: Confirmación de que todos los requerimientos definidos se han implementado correctamente en cada módulo. Cada funcionalidad esencial (como el sistema de pago, seguimiento de pedidos y gestión de inventario) se verifica que funciona correctamente.  
+Un informe detallado de las pruebas de funcionalidad que certifique que el sistema cumple con los estándares de calidad requeridos. Las pruebas garantizarán que los módulos interactúan de manera fluida y eficiente, sin errores en el proceso de compra o gestión de entregas.  
+Un sistema que sea estable y fiable, con todos los procesos funcionando según lo previsto (pago seguro, gestión eficiente de inventario, y seguimiento de pedidos).
 
----
-
-### 2. Diseño de Base de Datos e Interfaces
-
-**Entregables:**
-- Modelo Entidad-Relación completo
-- Base de datos MySQL implementada con 40+ tablas
-- Mockups de todas las interfaces principales
-- Guías de estilo y diseño
-- Prototipos funcionales
-
-**Criterios de éxito:**
-- Base de datos normalizada y eficiente
-- Interfaces intuitivas y responsivas
-- Diseño coherente en toda la plataforma
-- Accesibilidad mejorada
-- Tiempo de carga optimizado
+**Implementación, Pruebas de Funcionalidad y Capacitación de Usuarios Finales:**  
+Resultado esperado: El sistema completamente implementado y funcionando de manera fluida, con todas las funcionalidades operativas, como la gestión de usuarios, el carrito de compras, la pasarela de pagos, el proceso de entregas, y la atención al cliente.  
+Realización de pruebas finales para asegurar que no haya fallos en el sistema, tanto en términos de usabilidad como de rendimiento (por ejemplo, tiempo de carga rápido, procesos de pago sin errores).  
+Capacitación exitosa de los usuarios finales, quienes deben sentirse cómodos utilizando el sistema, desde realizar compras hasta gestionar productos o resolver problemas. Se espera que los usuarios puedan navegar fácilmente, realizar pagos seguros y recibir soporte en caso de problemas.  
+Retroalimentación positiva por parte de los usuarios finales, con una mejora en la satisfacción del cliente debido a la facilidad de uso del sistema y la eficiencia del proceso de compra.  
+Estos resultados esperados reflejan la implementación exitosa del software y el cumplimiento de los objetivos definidos previamente, asegurando que tanto los usuarios como los administradores del sistema puedan utilizarlo de manera eficiente y efectiva.
 
 ---
 
-### 3. Verificación y Pruebas
+## MÓDULOS DEL SOFTWARE
 
-**Entregables:**
-- Plan de pruebas completo
-- Casos de prueba documentados
-- Reportes de pruebas funcionales
-- Correcciones implementadas
-- Certificación de calidad
+**Módulo de Gestión de Usuarios:**  
+Funcionalidad: Gestiona la creación, autenticación y administración de usuarios (clientes y administradores).  
+Características:  
+- Registro y autenticación de usuarios (inicio de sesión con email, redes sociales, etc.).  
+- Perfiles de usuario con información personal, historial de compras y preferencias.  
+- Roles y permisos (clientes, administradores).  
+Resultado esperado: Un sistema seguro y escalable que permita a los usuarios registrarse, autenticarse y gestionar sus cuentas sin problemas.
 
-**Criterios de éxito:**
-- 100% de requerimientos verificados
-- Pruebas de integración exitosas
-- Pruebas de usabilidad con usuarios reales
-- Rendimiento óptimo (carga < 4 segundos)
-- Seguridad validada
+**Módulo de Gestión de Productos:**  
+Funcionalidad: Administra la información de los productos ofrecidos en la tienda.  
+Características:  
+- Creación, edición y eliminación de productos.  
+- Categorización y filtrado de productos (por talla, color, precio, etc.).  
+- Detalles de productos (imágenes, descripciones, precios, reseñas).  
+Resultado esperado: Una base de datos bien estructurada que permita a los administradores gestionar productos de manera eficiente y a los clientes encontrar lo que buscan fácilmente.
+
+**Módulo de Inventario:**  
+Funcionalidad: Controla el stock de productos y alerta sobre niveles bajos.  
+Características:  
+- Actualización automática del inventario tras cada compra.  
+- Alertas de reposición cuando el stock es bajo.  
+- Gestión de variantes de productos (tallas, colores, etc.).  
+Resultado esperado: Un sistema que evite ventas de productos agotados y optimice la gestión del inventario.
+
+**Módulo de Carrito de Compras:**  
+Funcionalidad: Permite a los usuarios agregar, modificar y eliminar productos antes de finalizar la compra.  
+Características:  
+- Agregar/eliminar productos del carrito.  
+- Calcular totales (subtotal, impuestos, descuentos, envío).  
+- Guardar carritos para compras futuras.  
+Resultado esperado: Una experiencia de compra fluida y sin fricciones que aumente la tasa de conversión.
+
+**Módulo de Pagos:**  
+Funcionalidad: Gestiona transacciones financieras de manera segura.  
+Características:  
+- Integración con pasarelas de pago (PSE, tarjetas de crédito/débito, PayPal, etc.).  
+- Procesamiento seguro de pagos (SSL, encriptación).  
+- Confirmación de pagos y generación de facturas electrónicas.  
+Resultado esperado: Un sistema de pagos confiable y seguro que inspire confianza en los clientes.
+
+**Módulo de Envío y Seguimiento de Pedidos:**  
+Funcionalidad: Gestiona el envío y seguimiento de pedidos.  
+Características:  
+- Cálculo de costos de envío.  
+- Integración con servicios de mensajería (FedEx, DHL, etc.).  
+- Seguimiento en tiempo real del estado del pedido con GPS.  
+Resultado esperado: Un sistema que brinde transparencia y confianza a los clientes sobre el estado de sus pedidos.
+
+**Módulo de Administración:**  
+Funcionalidad: Permite a los administradores gestionar toda la plataforma.  
+Características:  
+- Panel de control con métricas clave (ventas, usuarios, inventario).  
+- Gestión de usuarios, productos, pedidos y entregas.  
+- Configuración de la tienda (diseño, políticas, pasarelas de pago).  
+Resultado esperado: Una herramienta integral que facilite la gestión diaria de la tienda.
+
+**Módulo de Reportes y Análisis:**  
+Funcionalidad: Genera informes y análisis para la toma de decisiones.  
+Características:  
+- Reportes de ventas, inventario y entregas.  
+- Análisis de comportamiento del usuario.  
+- Exportación de datos en diferentes formatos (PDF, Excel).  
+Resultado esperado: Información clara y accesible que permita optimizar la operación y estrategia de la tienda.
 
 ---
 
-### 4. Implementación y Capacitación
+## ALCANCE
 
-**Entregables:**
-- Sistema implementado en producción
-- Manuales de usuario
-- Documentación técnica
-- Videos de capacitación
-- Soporte post-implementación
+- **Planificación de Requerimientos del Software:**  
+  Definir las funcionalidades esenciales y deseables de cada módulo del sistema (como la gestión de usuarios, productos, carrito de compras, pagos, entregas, entre otros).  
+  Adquirir herramientas de desarrollo, como plataformas para el diseño de bases de datos, tecnologías de backend (servidores, API), y tecnologías de frontend (HTML, CSS, JavaScript).  
+  Determinar los recursos necesarios, como el equipo de desarrollo, las plataformas de hospedaje y las soluciones de seguridad.  
+  Establecer la arquitectura de la plataforma, con énfasis en la escalabilidad, accesibilidad y seguridad.
 
-**Criterios de éxito:**
-- Sistema 100% funcional
-- Usuarios capacitados exitosamente
-- Satisfacción de usuarios > 90%
-- Tiempo de respuesta del sistema óptimo
-- Cero errores críticos en producción
+- **Diseño de la Base de Datos y Mockups (Interfaces Gráficas):**  
+  Desarrollar la base de datos que respalde las funcionalidades del sistema, asegurando que esté bien estructurada para manejar la información de los usuarios, productos, inventario, pedidos, pagos y entregas.  
+  Crear los mockups de las interfaces gráficas, centrados en la simplicidad, usabilidad y experiencia de usuario, para cada módulo del sistema, como el panel de administración, la vista de productos, el carrito de compras y el proceso de pago.  
+  Garantizar que los mockups sean fáciles de usar, con una disposición lógica y elementos interactivos (botones, menús, formularios de pago) fáciles de identificar para los usuarios finales.
 
----
+- **Verificación de Requerimientos y Pruebas de Funcionalidad:**  
+  Comprobar que los requerimientos del software sean completos y correctos, asegurando que cada módulo (como el módulo de entregas o el carrito de compras) esté alineado con las expectativas y objetivos del sistema.  
+  Validar que las funcionalidades esenciales y deseables (como las pasarelas de pago y el seguimiento de pedidos) se implementen correctamente.  
+  Realizar pruebas de funcionalidad, como pruebas de integración entre el sistema de inventario y el sistema de pagos, así como la correcta interacción entre los módulos de productos y los módulos de entregas.
 
-## ALCANCE DEL PROYECTO
-
-### Incluido en el Alcance
-
-#### Fase 1: Planificación (Completada ✅)
-- ✅ Identificación de requerimientos funcionales y no funcionales
-- ✅ Definición de arquitectura tecnológica
-- ✅ Selección de herramientas y tecnologías
-- ✅ Creación de matriz de trazabilidad
-- ✅ Establecimiento de estándares de calidad
-
-#### Fase 2: Diseño (Completada ✅)
-- ✅ Diseño de base de datos normalizada
-- ✅ Creación de mockups de interfaces
-- ✅ Definición de flujos de proceso
-- ✅ Diseño de arquitectura de seguridad
-- ✅ Prototipado de funcionalidades clave
-
-#### Fase 3: Desarrollo (Completada ✅)
-- ✅ Implementación de todos los módulos
-- ✅ Sistema de autenticación y autorización
-- ✅ Catálogo de productos con variantes
-- ✅ Proceso de compra completo
-- ✅ Panel administrativo
-- ✅ Sistema de entregas con GPS
-- ✅ Integración de pagos
-- ✅ Sistema de reportes
-
-#### Fase 4: Pruebas (En Progreso 🔄)
-- ✅ Pruebas unitarias de módulos
-- ✅ Pruebas de integración
-- 🔄 Pruebas de usabilidad con usuarios finales
-- 🔄 Pruebas de rendimiento y carga
-- 🔄 Pruebas de seguridad
-
-#### Fase 5: Despliegue y Capacitación (Pendiente ⏳)
-- ⏳ Implementación en servidor de producción
-- ⏳ Capacitación de usuarios finales
-- ⏳ Creación de manuales y documentación
-- ⏳ Soporte post-implementación
-- ⏳ Mantenimiento y actualizaciones
-
-### Exclusiones del Alcance
-
-**No incluido en el proyecto:**
-- ❌ Sistema de chatbot automatizado
-- ❌ Sistema de donaciones benéficas
-- ❌ Aplicación móvil nativa (iOS/Android)
-- ❌ Integración con redes sociales para ventas
-- ❌ Sistema de afiliados o referidos
-- ❌ Integración con marketplaces externos
-- ❌ Realidad aumentada para probar ropa
-- ❌ Inteligencia artificial para recomendaciones
-- ❌ Sistema de suscripciones o membresías
-
-**Futuras implementaciones consideradas:**
-- Aplicación móvil nativa
-- Sistema de recomendaciones con IA
-- Integración con más métodos de pago
-- Expansión a otras ciudades de Colombia
-- Sistema de reviews con imágenes
+- **Implementación, Pruebas de Funcionalidad y Capacitación de Usuarios Finales:**  
+  Implementar el sistema de forma integral, garantizando que los módulos interactúen de manera fluida y eficiente, como la integración de los sistemas de pago con el carrito de compras y las pasarelas de entregas.  
+  Realizar pruebas de usabilidad y rendimiento para verificar que los módulos funcionen de manera óptima, y que el sistema pueda soportar el tráfico de usuarios y realizar transacciones de manera segura.  
+  Capacitar a los usuarios finales en el uso del software, enfocándose en cómo navegar por las interfaces gráficas, realizar compras, gestionar productos, y resolver cualquier problema a través del sistema de atención al cliente.  
+  Ajustar el sistema según los resultados de las pruebas y la retroalimentación recibada, asegurando que los procesos sean fáciles de entender y ejecutar para los usuarios finales.
 
 ---
 
@@ -656,7 +348,7 @@ Programa: Análisis y Desarrollo de Software (ADSO)
 ---
 
 **Fecha de elaboración:** 2 de Noviembre de 2025  
-**Versión del documento:** 2.0  
+**Versión del documento:** 3.0  
 **Estado del proyecto:** En fase de pruebas finales
 
 ---
