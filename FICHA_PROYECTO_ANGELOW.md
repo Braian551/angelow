@@ -74,8 +74,7 @@ Por lo tanto, la especialización en E-commerce de ropa infantil en Colombia no 
 Registro y autenticación tradicional con email y contraseña.
 
 **Pagos:**  
-Transferencia bancaria con validación de comprobante de pago.  
-Pago contra entrega (solo Medellín).
+Transferencia bancaria con validación de comprobante de pago.
 
 **Geolocalización:**  
 OpenStreetMap API: Ofrece mapas personalizados y funcionalidades de geolocalización.
@@ -183,7 +182,7 @@ Resultado esperado: Una experiencia de compra fluida y sin fricciones que aument
 Funcionalidad: Gestiona transacciones financieras de manera segura.  
 Características:  
 - Transferencia bancaria con validación de comprobante.  
-- Pago contra entrega (solo Medellín).  
+- Transferencia bancaria con validación de comprobante.  
 - Procesamiento seguro de pagos (SSL, encriptación).  
 - Confirmación de pagos y generación de facturas.  
 Resultado esperado: Un sistema de pagos confiable y seguro que inspire confianza en los clientes.

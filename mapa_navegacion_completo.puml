@@ -1,0 +1,226 @@
+@startuml Mapa de Navegación Completo - Angelow
+skinparam componentStyle rectangle
+skinparam backgroundColor #FEFEFE
+skinparam component {
+    BackgroundColor #FFFFFF
+    BorderColor #333333
+    BorderThickness 2
+}
+
+title Mapa de Navegación Completo - Sistema Angelow
+
+' ===== USUARIO PÚBLICO / TIENDA =====
+package "Tienda Online (Frontend Público)" as Tienda {
+    component "Inicio\n(index.php)" as Inicio
+    component "Catálogo\n(tienda/productos.php)" as Catalogo
+    component "Detalle Producto\n(producto/verproducto.php)" as DetalleProducto
+    component "Carrito\n(tienda/carrito.php)" as Carrito
+    component "Checkout/Pago\n(tienda/pay.php)" as Checkout
+    component "Confirmación\n(tienda/pay.php)" as Confirmacion
+}
+
+' ===== AUTENTICACIÓN =====
+package "Sistema de Autenticación" as Auth {
+    component "Login\n(auth/login.php)" as Login
+    component "Registro\n(auth/register.php)" as Registro
+    component "Middleware Roles\n(auth/auth_middleware.php)" as Middleware
+    component "Redirección Roles\n(auth/role_redirect.php)" as RoleRedirect
+}
+
+' ===== PANEL DE USUARIO =====
+package "Panel de Usuario" as UserPanel {
+    component "Dashboard Usuario\n(users/dashboarduser.php)" as UserDashboard
+    component "Perfil\n(users/settings.php)" as UserPerfil
+    component "Mis Órdenes\n(users/orders.php)" as UserOrders
+    component "Direcciones\n(users/addresses.php)" as UserAddresses
+    component "Seguimiento\n(users/track_order.php)" as UserTracking
+    component "Detalle Orden\n(users/order_detail.php)" as UserOrderDetail
+}
+
+' ===== PANEL DE ADMINISTRACIÓN =====
+package "Panel de Administración" as AdminPanel {
+    component "Dashboard Admin\n(admin/dashboardadmin.php)" as AdminDashboard
+
+    package "Gestión de Productos" as AdminProducts {
+        component "Productos\n(admin/products.php)" as AdminProductsList
+        component "Agregar Producto\n(admin/subproducto.php)" as AdminAddProduct
+        component "Categorías\n(admin/categoria/)" as AdminCategories
+        component "Colecciones\n(admin/colecciones/)" as AdminCollections
+        component "Tallas\n(admin/tallas/)" as AdminSizes
+        component "Inventario\n(admin/inventario/)" as AdminInventory
+    }
+
+    package "Gestión de Ventas" as AdminSales {
+        component "Órdenes\n(admin/orders.php)" as AdminOrders
+        component "Pagos\n(admin/pagos/)" as AdminPayments
+        component "Envíos\n(admin/envio/)" as AdminShipping
+        component "Descuentos\n(admin/descuento/)" as AdminDiscounts
+    }
+
+    package "Contenido y Marketing" as AdminContent {
+        component "Sliders\n(admin/sliders/)" as AdminSliders
+        component "Noticias\n(admin/news/)" as AdminNews
+        component "Reseñas\n(admin/reseñas)" as AdminReviews
+    }
+
+    package "Informes y Análisis" as AdminReports {
+        component "Ventas\n(admin/informes/ventas.php)" as AdminSalesReport
+        component "Productos\n(admin/informes/productos.php)" as AdminProductReport
+        component "Clientes\n(admin/informes/clientes.php)" as AdminClientReport
+    }
+
+    component "Clientes\n(admin/clientes)" as AdminClients
+    component "Administradores\n(admin/administradores)" as AdminAdmins
+}
+
+' ===== PANEL DE DELIVERY =====
+package "Panel de Delivery" as DeliveryPanel {
+    component "Dashboard Delivery\n(delivery/dashboarddeli.php)" as DeliveryDashboard
+    component "Órdenes Asignadas\n(delivery/orders.php)" as DeliveryOrders
+    component "Navegación GPS\n(delivery/navigation.php)" as DeliveryNavigation
+    component "Acciones de Entrega\n(delivery/delivery_actions.php)" as DeliveryActions
+
+    package "APIs de Delivery" as DeliveryAPI {
+        component "Actualizar Estado\n(delivery/api/update_status.php)" as DeliveryAPIStatus
+        component "GPS Tracking\n(delivery/api/gps_tracking.php)" as DeliveryAPIGPS
+    }
+}
+
+' ===== APIs Y SERVICIOS =====
+package "APIs y Servicios Externos" as APIs {
+    component "OpenStreetMap\n(Geolocalización)" as OpenStreetMap
+    component "reCAPTCHA\n(Seguridad)" as Recaptcha
+    component "Sistema de Correo\n(PHPMailer)" as EmailService
+}
+
+' ===== BASE DE DATOS =====
+database "Base de Datos MySQL" as DB {
+    component "Usuarios\n(users)" as DBUsers
+    component "Productos\n(products)" as DBProducts
+    component "Órdenes\n(orders)" as DBOrders
+    component "Carrito\n(cart)" as DBCart
+    component "Inventario\n(inventory)" as DBInventory
+    component "Deliveries\n(order_deliveries)" as DBDeliveries
+    component "Auditoría\n(audit_logs)" as DBAudit
+}
+
+' ===== CONEXIONES DEL FLUJO DE COMPRA =====
+Inicio --> Catalogo : Explorar catálogo
+Catalogo --> DetalleProducto : Ver producto
+DetalleProducto --> Carrito : Agregar al carrito
+DetalleProducto --> Login : Requiere cuenta\npara comprar
+Carrito --> Checkout : Proceder al pago
+Checkout --> Confirmacion : Pago exitoso
+Confirmacion --> UserDashboard : Ver en historial
+
+' ===== CONEXIONES DE AUTENTICACIÓN =====
+Login --> RoleRedirect : Autenticación exitosa
+Registro --> RoleRedirect : Registro exitoso
+RoleRedirect --> UserDashboard : Usuario normal
+RoleRedirect --> AdminDashboard : Administrador
+RoleRedirect --> DeliveryDashboard : Delivery
+Middleware --> RoleRedirect : Verificar permisos
+
+' ===== CONEXIONES DEL PANEL DE USUARIO =====
+UserDashboard --> UserPerfil : Gestionar perfil
+UserDashboard --> UserOrders : Ver órdenes
+UserDashboard --> UserAddresses : Gestionar direcciones
+UserOrders --> UserOrderDetail : Ver detalle
+UserOrders --> UserTracking : Seguir pedido
+UserTracking --> DeliveryNavigation : Ver ubicación delivery
+
+' ===== CONEXIONES DEL PANEL DE ADMIN =====
+AdminDashboard --> AdminProductsList : Gestionar productos
+AdminProductsList --> AdminAddProduct : Agregar producto
+AdminProductsList --> AdminCategories : Gestionar categorías
+AdminProductsList --> AdminCollections : Gestionar colecciones
+AdminProductsList --> AdminSizes : Gestionar tallas
+AdminProductsList --> AdminInventory : Control inventario
+
+AdminDashboard --> AdminOrders : Gestionar órdenes
+AdminOrders --> AdminPayments : Gestionar pagos
+AdminOrders --> AdminShipping : Gestionar envíos
+AdminOrders --> AdminDiscounts : Gestionar descuentos
+
+AdminDashboard --> AdminSliders : Gestionar sliders
+AdminDashboard --> AdminNews : Gestionar noticias
+AdminDashboard --> AdminReviews : Gestionar reseñas
+
+AdminDashboard --> AdminSalesReport : Ver informes ventas
+AdminDashboard --> AdminProductReport : Ver informes productos
+AdminDashboard --> AdminClientReport : Ver informes clientes
+
+AdminDashboard --> AdminClients : Gestionar clientes
+AdminDashboard --> AdminAdmins : Gestionar administradores
+
+' ===== CONEXIONES DEL PANEL DE DELIVERY =====
+DeliveryDashboard --> DeliveryOrders : Ver órdenes asignadas
+DeliveryOrders --> DeliveryActions : Gestionar entregas
+DeliveryActions --> DeliveryNavigation : Iniciar navegación GPS
+DeliveryNavigation --> DeliveryAPIStatus : Actualizar estado
+DeliveryNavigation --> DeliveryAPIGPS : Enviar ubicación GPS
+
+' ===== CONEXIONES CON BASE DE DATOS =====
+Inicio --> DBProducts : Consultar productos
+Catalogo --> DBProducts : Filtrar/buscar productos
+DetalleProducto --> DBProducts : Obtener detalles
+Carrito --> DBCart : Gestionar carrito
+Checkout --> DBOrders : Crear orden
+UserDashboard --> DBUsers : Datos usuario
+UserOrders --> DBOrders : Historial órdenes
+AdminProductsList --> DBProducts : CRUD productos
+AdminOrders --> DBOrders : Gestionar órdenes
+DeliveryOrders --> DBDeliveries : Órdenes asignadas
+DeliveryActions --> DBDeliveries : Actualizar estado
+
+' ===== CONEXIONES CON APIs =====
+DeliveryNavigation --> OpenStreetMap : Obtener rutas GPS
+Checkout --> Recaptcha : Validar seguridad
+UserPerfil --> EmailService : Enviar correos
+
+' ===== NOTAS EXPLICATIVAS =====
+note right of Inicio
+  Página principal con:
+  - Sliders promocionales
+  - Categorías destacadas
+  - Productos destacados
+  - Colecciones
+end note
+
+note right of Carrito
+  Gestiona items del carrito:
+  - Agregar/quitar productos
+  - Calcular totales
+  - Aplicar descuentos
+end note
+
+note right of Checkout
+  Procesa pagos mediante:
+  - Transferencia bancaria
+  - Validación de comprobantes
+end note
+
+note right of AdminDashboard
+  Panel completo con:
+  - Estadísticas en tiempo real
+  - Gestión de todo el sistema
+  - Reportes y análisis
+end note
+
+note right of DeliveryNavigation
+  Sistema GPS completo:
+  - Rutas en tiempo real
+  - Seguimiento del conductor
+  - Instrucciones de voz
+  - Actualización automática
+end note
+
+note bottom of DB
+  Base de datos relacional con:
+  - 80+ tablas implementadas
+  - Sistema de auditoría
+  - Integridad referencial
+  - Optimización de consultas
+end note
+
+@enduml

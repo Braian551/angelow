@@ -169,25 +169,12 @@ Para más detalles sobre cada carpeta, consultar:
 - **Sistema de favoritos**
 
 ### Proceso de Compra
-- **Múltiples métodos de pago**:
-  - Transferencia bancaria
-  - Pago contra entrega (solo Medellín)
+- **Método de pago único**: Transferencia bancaria
 - **Cálculo de envíos** automático
 - **Generación de facturas** PDF
 - **Seguimiento de pedidos** en tiempo real
 
 ## 💳 Sistema de Pagos
-
-### Métodos Disponibles
-1. **Transferencia Bancaria**
-   - Validación de comprobantes
-   - Subida de archivos segura
-   - Verificación manual
-
-2. **Pago Contra Entrega**
-   - Solo disponible para Medellín
-   - Validación de dirección
-   - Gestión de entregas
 
 ### Características
 - **Generación automática** de facturas PDF
