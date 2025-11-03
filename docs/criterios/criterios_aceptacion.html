@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criterios de Aceptación - Proyecto Angelow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #c59feb 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .info-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-item strong {
+            color: #667eea;
+        }
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            table-layout: fixed;
+        }
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        thead th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            vertical-align: middle;
+        }
+        thead th:last-child {
+            border-right: none;
+        }
+        tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.3s;
+        }
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        tbody tr:nth-child(even):hover {
+            background-color: #f0f0f0;
+        }
+        td {
+            padding: 14px 12px;
+            vertical-align: top;
+            border-right: 1px solid #e8e8e8;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        td:last-child {
+            border-right: none;
+        }
+        .id-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #764ba2;
+            background-color: #faf5ff;
+            text-align: center;
+        }
+        .scenario-cell {
+            font-weight: 600;
+            color: #667eea;
+        }
+        .title-cell {
+            font-weight: 500;
+            color: #333;
+        }
+        .context-cell {
+            font-style: italic;
+            color: #555;
+        }
+        .event-cell {
+            color: #28a745;
+            font-weight: 500;
+        }
+        .result-cell {
+            color: #007bff;
+            font-weight: 500;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 3px solid #667eea;
+            text-align: center;
+            color: #666;
+        }
+        .scenario-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-right: 5px;
+        }
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+            thead {
+                position: relative;
+            }
+        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .info-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            table {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CRITERIOS DE ACEPTACIÓN</h1>
+            <p>Sistema de Tienda Virtual de Ropa Infantil - Angelow</p>
+        </div>
+        
+        <div class="info-bar">
+            <div class="info-item">
+                <strong>Proyecto:</strong> Angelow E-commerce
+            </div>
+            <div class="info-item">
+                <strong>Fecha:</strong> Noviembre 2025
+            </div>
+            <div class="info-item">
+                <strong>Total Criterios:</strong> 40+
+            </div>
+            <div class="info-item">
+                <strong>Módulos:</strong> 6 Módulos principales
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">HU ID</th>
+                        <th style="width: 8%;">Escenario</th>
+                        <th style="width: 20%;">Título del Criterio</th>
+                        <th style="width: 20%;">Dado que (Contexto)</th>
+                        <th style="width: 22%;">Cuando (Evento)</th>
+                        <th style="width: 22%;">Entonces (Resultado)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- HU-01: Registro de nuevo cliente -->
+                    <tr>
+                        <td class="id-cell" rowspan="4">HU-01</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Registro exitoso con email válido</td>
+                        <td class="context-cell">Dado que soy un cliente nuevo en la página de registro</td>
+                        <td class="event-cell">Cuando completo el formulario con nombre, email válido, teléfono opcional, contraseña (mínimo 6 caracteres) y acepto términos</td>
+                        <td class="result-cell">Entonces el sistema verifica que el correo no esté registrado, crea la cuenta, envía un correo de bienvenida y te lleva a tu panel personal</td>
+
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">2</td>
+                        <td class="title-cell">Email ya registrado</td>
+                        <td class="context-cell">Dado que intento registrarme con un email existente</td>
+                        <td class="event-cell">Cuando envío el formulario</td>
+                        <td class="result-cell">Entonces el sistema muestra mensaje "Este correo ya está registrado" y mantiene el formulario abierto</td>
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">3</td>
+                        <td class="title-cell">Datos incompletos</td>
+                        <td class="context-cell">Dado que dejo campos obligatorios vacíos</td>
+                        <td class="event-cell">Cuando intento enviar el formulario</td>
+                        <td class="result-cell">Entonces el sistema muestra "Todos los campos obligatorios deben ser completados"</td>
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">4</td>
+                        <td class="title-cell">Contraseña muy corta</td>
+                        <td class="context-cell">Dado que ingreso una contraseña de menos de 6 caracteres</td>
+                        <td class="event-cell">Cuando envío el formulario</td>
+                        <td class="result-cell">Entonces el sistema muestra "La contraseña debe tener al menos 6 caracteres"</td>
+                    </tr>
+
+                    <!-- HU-02: Inicio de sesión -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-02</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Login exitoso</td>
+                        <td class="context-cell">Dado que tengo una cuenta registrada</td>
+                        <td class="event-cell">Cuando ingreso email y contraseña correctos</td>
+                        <td class="result-cell">Entonces el sistema verifica tus datos de acceso, inicia tu sesión y te lleva a tu área personal según tu tipo de usuario</td>
+
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">2</td>
+                        <td class="title-cell">Credenciales incorrectas</td>
+                        <td class="context-cell">Dado que ingreso datos inválidos</td>
+                        <td class="event-cell">Cuando intento iniciar sesión</td>
+                        <td class="result-cell">Entonces el sistema muestra "Datos de acceso incorrectos" y registra el intento fallido</td>
+
+                    </tr>
+
+                    <!-- HU-03: Edición de perfil -->
+                    <tr>
+                        <td class="id-cell">HU-03</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Actualización exitosa</td>
+                        <td class="context-cell">Dado que estoy autenticado en mi perfil</td>
+                        <td class="event-cell">Cuando modifico datos personales, direcciones o preferencias y guardo</td>
+                        <td class="result-cell">Entonces el sistema actualiza la base de datos y muestra mensaje de confirmación</td>
+                    </tr>
+
+                    <!-- HU-04: Recuperación de contraseña -->
+                    <tr>
+                        <td class="id-cell">HU-04</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Solicitud de recuperación</td>
+                        <td class="context-cell">Dado que olvidé mi contraseña</td>
+                        <td class="event-cell">Cuando ingreso mi email registrado en el formulario de recuperación</td>
+                        <td class="result-cell">Entonces el sistema crea un código especial, lo guarda temporalmente y envía un correo con un enlace seguro para cambiar la contraseña</td>
+
+                    </tr>
+
+                    <!-- HU-05: Búsqueda de productos -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-05</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Búsqueda por texto</td>
+                        <td class="context-cell">Dado que estoy en la página de catálogo</td>
+                        <td class="event-cell">Cuando ingreso términos de búsqueda</td>
+                        <td class="result-cell">Entonces el sistema busca en los nombres, descripciones y categorías de los productos</td>
+
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">2</td>
+                        <td class="title-cell">Sin resultados</td>
+                        <td class="context-cell">Dado que mi búsqueda no coincide con ningún producto</td>
+                        <td class="event-cell">Cuando realizo la búsqueda</td>
+                        <td class="result-cell">Entonces el sistema muestra mensaje "No se encontraron productos" y sugiere términos alternativos</td>
+                    </tr>
+
+                    <!-- HU-06: Detalles de producto -->
+                    <tr>
+                        <td class="id-cell">HU-06</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Visualización completa</td>
+                        <td class="context-cell">Dado que selecciono un producto del catálogo</td>
+                        <td class="event-cell">Cuando accedo a su página de detalles</td>
+                        <td class="result-cell">Entonces veo galería de imágenes, descripción completa, precio base, variantes disponibles (tallas, colores), y stock por variante</td>
+                    </tr>
+
+                    <!-- HU-07: Filtrado de productos -->
+                    <tr>
+                        <td class="id-cell">HU-07</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Filtros aplicados</td>
+                        <td class="context-cell">Dado que tengo resultados de búsqueda</td>
+                        <td class="event-cell">Cuando aplico filtros por categoría, género, precio mínimo/máximo, talla o color</td>
+                        <td class="result-cell">Entonces el sistema filtra y muestra solo los productos que cumplen con todos los criterios seleccionados</td>
+
+                    </tr>
+
+                    <!-- HU-08: Agregar al carrito -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-08</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Agregado exitoso</td>
+                        <td class="context-cell">Dado que selecciono producto con variantes específicas</td>
+                        <td class="event-cell">Cuando hago clic en "Agregar al carrito" con cantidad válida</td>
+                        <td class="result-cell">Entonces el sistema verifica que hay suficiente stock, calcula el precio incluyendo las opciones elegidas, agrega el producto al carrito y muestra un mensaje de confirmación</td>
+
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">2</td>
+                        <td class="title-cell">Stock insuficiente</td>
+                        <td class="context-cell">Dado que la cantidad solicitada excede el stock</td>
+                        <td class="event-cell">Cuando intento agregar al carrito</td>
+                        <td class="result-cell">Entonces el sistema muestra "Stock insuficiente" y sugiere cantidad máxima disponible</td>
+                    </tr>
+
+                    <!-- HU-09: Modificar carrito -->
+                    <tr>
+                        <td class="id-cell">HU-09</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Cambio de cantidad</td>
+                        <td class="context-cell">Dado que tengo items en el carrito</td>
+                        <td class="event-cell">Cuando modifico la cantidad de un producto</td>
+                        <td class="result-cell">Entonces el sistema recalcula los precios automáticamente y guarda los cambios</td>
+
+                    </tr>
+
+                    <!-- HU-10: Códigos de descuento -->
+                    <tr>
+                        <td class="id-cell">HU-10</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Descuento válido aplicado</td>
+                        <td class="context-cell">Dado que tengo un código de descuento activo y no usado</td>
+                        <td class="event-cell">Cuando lo aplico en el checkout</td>
+                        <td class="result-cell">Entonces el sistema verifica el código, calcula el descuento (por porcentaje o cantidad fija), actualiza el total y marca el código como utilizado</td>
+
+                    </tr>
+
+                    <!-- HU-11: Proceso de pago con transferencia -->
+                    <tr>
+                        <td class="id-cell" rowspan="3">HU-11</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Pago completado correctamente</td>
+                        <td class="context-cell">Dado que tengo productos en carrito y dirección seleccionada</td>
+                        <td class="event-cell">Cuando completo el formulario con número de referencia válido y subo comprobante (JPG/PNG/PDF < 5MB)</td>
+                        <td class="result-cell">Entonces el sistema crea un número único de pedido, registra la orden y los productos, guarda el comprobante de pago, marca la transacción como pendiente, vacía el carrito y te lleva a la página de confirmación</td>
+
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">2</td>
+                        <td class="title-cell">Comprobante faltante</td>
+                        <td class="context-cell">Dado que no subo el archivo de comprobante</td>
+                        <td class="event-cell">Cuando intento confirmar el pago</td>
+                        <td class="result-cell">Entonces el sistema muestra "Debes subir el comprobante de pago"</td>
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">3</td>
+                        <td class="title-cell">Archivo inválido</td>
+                        <td class="context-cell">Dado que subo archivo con formato no permitido o tamaño excesivo</td>
+                        <td class="event-cell">Cuando valido el formulario</td>
+                        <td class="result-cell">Entonces el sistema muestra error específico ("El archivo debe ser JPG, PNG o PDF" o "El archivo no puede ser mayor a 5MB")</td>
+                    </tr>
+
+                    <!-- HU-12: Cálculo de envío -->
+                    <tr>
+                        <td class="id-cell">HU-12</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Costo calculado automáticamente</td>
+                        <td class="context-cell">Dado que tengo dirección de envío seleccionada</td>
+                        <td class="event-cell">Cuando el sistema procesa el envío</td>
+                        <td class="result-cell">Entonces calcula el costo de envío según las reglas establecidas (según el precio y la zona) y muestra el total actualizado</td>
+
+                    </tr>
+
+                    <!-- HU-13: Selección de dirección -->
+                    <tr>
+                        <td class="id-cell">HU-13</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Dirección guardada seleccionada</td>
+                        <td class="context-cell">Dado que tengo direcciones guardadas en mi perfil</td>
+                        <td class="event-cell">Cuando selecciono una para el envío</td>
+                        <td class="result-cell">Entonces el sistema la utiliza para cálculo de costos y la guarda en la orden</td>
+                    </tr>
+
+                    <!-- HU-14: Generación de factura -->
+                    <tr>
+                        <td class="id-cell">HU-14</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Factura generada automáticamente</td>
+                        <td class="context-cell">Dado que el pago es aprobado por administrador</td>
+                        <td class="event-cell">Cuando se confirma la orden</td>
+                        <td class="result-cell">Entonces el sistema crea un comprobante en PDF con los datos fiscales, código QR, detalles de los productos y totales, y lo guarda en el sistema</td>
+
+                    </tr>
+
+                    <!-- HU-15: Estado de pedidos -->
+                    <tr>
+                        <td class="id-cell">HU-15</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Seguimiento en tiempo real</td>
+                        <td class="context-cell">Dado que tengo pedidos realizados</td>
+                        <td class="event-cell">Cuando accedo a "Mis pedidos"</td>
+                        <td class="result-cell">Entonces veo una lista con los estados: pendiente, pagado, preparando, enviando, entregado, con fechas y detalles</td>
+
+                    </tr>
+
+                    <!-- HU-16: Asignación de pedidos -->
+                    <tr>
+                        <td class="id-cell">HU-16</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Asignación exitosa</td>
+                        <td class="context-cell">Dado que un pedido está pagado y listo para envío</td>
+                        <td class="event-cell">Cuando el administrador lo asigna a un repartidor disponible</td>
+                        <td class="result-cell">Entonces el sistema asigna el pedido al repartidor, cambia el estado a 'enviando' y notifica al repartidor</td>
+
+                    </tr>
+
+                    <!-- HU-17: Lista de entregas -->
+                    <tr>
+                        <td class="id-cell">HU-17</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Visualización de asignaciones</td>
+                        <td class="context-cell">Dado que soy repartidor autenticado</td>
+                        <td class="event-cell">Cuando accedo al panel de delivery</td>
+                        <td class="result-cell">Entonces veo lista de órdenes asignadas con dirección completa, productos, total, e instrucciones especiales</td>
+                    </tr>
+
+                    <!-- HU-18: Actualización de estados -->
+                    <tr>
+                        <td class="id-cell">HU-18</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Cambio de estado</td>
+                        <td class="context-cell">Dado que tengo una entrega asignada</td>
+                        <td class="event-cell">Cuando actualizo el estado (en_camino, en_destino, entregado)</td>
+                        <td class="result-cell">Entonces el sistema registra la fecha y hora, actualiza el estado del pedido, envía una notificación al cliente y guarda el cambio en el historial</td>
+
+                    </tr>
+
+                    <!-- HU-19: Notificaciones al cliente -->
+                    <tr>
+                        <td class="id-cell">HU-19</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Notificación automática</td>
+                        <td class="context-cell">Dado que mi pedido cambió de estado</td>
+                        <td class="event-cell">Cuando el repartidor actualiza el progreso</td>
+                        <td class="result-cell">Entonces recibo email automático con detalles del cambio y posible hora de llegada</td>
+                    </tr>
+
+                    <!-- HU-20: Gestión de productos -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-20</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Creación de producto</td>
+                        <td class="context-cell">Dado que soy administrador autenticado</td>
+                        <td class="event-cell">Cuando creo un producto con nombre, descripción, precio, imágenes y variantes</td>
+                        <td class="result-cell">Entonces el sistema guarda el producto, sus imágenes y las opciones disponibles, y lo activa en la tienda</td>
+
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">2</td>
+                        <td class="title-cell">Edición de producto</td>
+                        <td class="context-cell">Dado que tengo un producto existente</td>
+                        <td class="event-cell">Cuando modifico sus datos y guardo</td>
+                        <td class="result-cell">Entonces el sistema actualiza toda la información relacionada y mantiene la coherencia de los datos</td>
+
+                    </tr>
+
+                    <!-- HU-21: Gestión de inventario -->
+                    <tr>
+                        <td class="id-cell">HU-21</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Actualización de stock</td>
+                        <td class="context-cell">Dado que modifico el stock de una variante</td>
+                        <td class="event-cell">Cuando guardo los cambios</td>
+                        <td class="result-cell">Entonces el sistema actualiza la cantidad disponible y registra el movimiento en el inventario</td>
+
+                    </tr>
+
+                    <!-- HU-22: Procesamiento de órdenes -->
+                    <tr>
+                        <td class="id-cell">HU-22</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Validación de pago</td>
+                        <td class="context-cell">Dado que recibo una nueva orden con comprobante</td>
+                        <td class="event-cell">Cuando reviso y apruebo el pago manualmente</td>
+                        <td class="result-cell">Entonces el sistema marca el pago como aprobado, cambia el estado del pedido a 'preparando' y envía una confirmación al cliente</td>
+
+                    </tr>
+
+                    <!-- HU-23: Generación de reportes -->
+                    <tr>
+                        <td class="id-cell">HU-23</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Reporte de ventas</td>
+                        <td class="context-cell">Dado que solicito reporte por fechas</td>
+                        <td class="event-cell">Cuando genero el informe</td>
+                        <td class="result-cell">Entonces el sistema revisa las órdenes y productos, calcula los totales y crea un reporte en PDF o Excel con gráficos</td>
+
+                    </tr>
+
+                    <!-- HU-24: Gestión de descuentos -->
+                    <tr>
+                        <td class="id-cell">HU-24</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Creación de código promocional</td>
+                        <td class="context-cell">Dado que configuro un descuento con código único, tipo (porcentaje/monto), valor, fechas de vigencia y condiciones</td>
+                        <td class="event-cell">Cuando lo activo</td>
+                        <td class="result-cell">Entonces el sistema guarda el código de descuento y permite usarlo al pagar según las reglas establecidas</td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p><strong>Proyecto Angelow</strong> - Sistema de Tienda Virtual de Ropa Infantil</p>
+            <p>Criterios de Aceptación Detallados - Actualizado: 2 de Noviembre, 2025</p>
+            <p>Total: <strong>40+ Criterios de Aceptación</strong> | <strong>24 Historias de Usuario</strong></p>
+            <p style="margin-top: 10px; font-size: 0.85em; color: #666;">
+                <strong>Módulos cubiertos:</strong> Gestión de Usuarios, Catálogo y Búsqueda, Carrito y Compras, Pedidos y Logística, Sistema de Delivery, Módulo Administrativo
+            </p>
+        </div>
+    </div>
+</body>
+</html>

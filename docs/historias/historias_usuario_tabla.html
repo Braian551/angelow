@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historias de Usuario y Criterios de Aceptación - Proyecto Angelow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #c59feb 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .info-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-item strong {
+            color: #667eea;
+        }
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            table-layout: fixed;
+        }
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        thead th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            vertical-align: middle;
+        }
+        thead th:last-child {
+            border-right: none;
+        }
+        tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.3s;
+        }
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        tbody tr:nth-child(even):hover {
+            background-color: #f0f0f0;
+        }
+        td {
+            padding: 14px 12px;
+            vertical-align: top;
+            border-right: 1px solid #e8e8e8;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        td:last-child {
+            border-right: none;
+        }
+        .id-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #764ba2;
+            background-color: #faf5ff;
+            text-align: center;
+        }
+        .role-cell {
+            font-weight: 600;
+            color: #667eea;
+        }
+        .description-cell {
+            color: #333;
+            line-height: 1.5;
+        }
+        .context-cell {
+            font-style: italic;
+            color: #555;
+        }
+        .event-cell {
+            color: #28a745;
+            font-weight: 500;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 3px solid #667eea;
+            text-align: center;
+            color: #666;
+        }
+        .scenario-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-right: 5px;
+        }
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+            thead {
+                position: relative;
+            }
+        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .info-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            table {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>HISTORIAS DE USUARIO Y CRITERIOS DE ACEPTACIÓN</h1>
+            <p>Sistema de Tienda Virtual de Ropa Infantil - Angelow</p>
+        </div>
+        
+        <div class="info-bar">
+            <div class="info-item">
+                <strong>Proyecto:</strong> Angelow E-commerce
+            </div>
+            <div class="info-item">
+                <strong>Fecha:</strong> Noviembre 2025
+            </div>
+            <div class="info-item">
+                <strong>Total Historias:</strong> 24 HU
+            </div>
+            <div class="info-item">
+                <strong>Módulos:</strong> 6 Módulos principales
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">ID de la Historia</th>
+                        <th style="width: 10%;">Rol</th>
+                        <th style="width: 12%;">Necesito / Funcionalidad</th>
+                        <th style="width: 12%;">Razón / Resultado</th>
+                        <th style="width: 5%;">Número de Escenario</th>
+                        <th style="width: 18%;">Criterio de Aceptación (Título)</th>
+                        <th style="width: 20%;">Contexto</th>
+                        <th style="width: 15%;">Evento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- HU-01: Registro de nuevo cliente -->
+                    <tr>
+                        <td class="id-cell" rowspan="4">HU-01</td>
+                        <td class="role-cell" rowspan="4">Como un cliente nuevo</td>
+                        <td class="description-cell" rowspan="4">Necesito registrarme en el sistema con mi correo electrónico, contraseña y datos básicos</td>
+                        <td class="description-cell" rowspan="4">Con la finalidad de poder acceder a todas las funcionalidades de compra en la tienda</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Registro exitoso con datos válidos</td>
+                        <td class="context-cell">En caso que complete el formulario con correo válido, contraseña de al menos 6 caracteres y acepte los términos</td>
+                        <td class="event-cell">cuando presiono registrar, mi cuenta se crea y recibo un correo de bienvenida</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">2</td>
+                        <td class="description-cell">Correo ya registrado</td>
+                        <td class="context-cell">En caso que intente registrarme con un correo que ya existe en el sistema</td>
+                        <td class="event-cell">cuando envío el formulario, el sistema me informa que el correo ya está registrado</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">3</td>
+                        <td class="description-cell">Campos obligatorios vacíos</td>
+                        <td class="context-cell">En caso que deje campos obligatorios sin completar</td>
+                        <td class="event-cell">cuando intento enviar, el sistema me pide completar todos los campos requeridos</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">4</td>
+                        <td class="description-cell">Contraseña muy corta</td>
+                        <td class="context-cell">En caso que ingrese una contraseña de menos de 6 caracteres</td>
+                        <td class="event-cell">cuando envío el formulario, el sistema me indica que la contraseña debe tener al menos 6 caracteres</td>
+                    </tr>
+
+                    <!-- HU-02: Inicio de sesión -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-02</td>
+                        <td class="role-cell" rowspan="2">Como un usuario registrado</td>
+                        <td class="description-cell" rowspan="2">Necesito iniciar sesión con mi correo y contraseña</td>
+                        <td class="description-cell" rowspan="2">Con la finalidad de acceder a mi cuenta personal y realizar compras</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Ingreso exitoso</td>
+                        <td class="context-cell">En caso que ingrese mi correo y contraseña correctos</td>
+                        <td class="event-cell">cuando presiono iniciar sesión, accedo a mi cuenta personal según mi rol</td>
+
+                    </tr>
+                    <tr>
+                        <td class="id-cell">2</td>
+                        <td class="description-cell">Datos de acceso incorrectos</td>
+
+                        <td class="context-cell">En caso que ingrese datos incorrectos</td>
+                        <td class="event-cell">cuando intento iniciar sesión, el sistema me muestra un mensaje indicando que los datos son incorrectos</td>
+
+                    </tr>
+
+                    <!-- HU-03: Edición de perfil -->
+                    <tr>
+                        <td class="id-cell">HU-03</td>
+                        <td class="role-cell">Como un usuario autenticado</td>
+                        <td class="description-cell">Necesito editar mi perfil personal, direcciones y preferencias</td>
+                        <td class="description-cell">Con la finalidad de mantener mi información actualizada</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Actualización exitosa</td>
+                        <td class="context-cell">En caso que modifique mis datos personales y los guarde</td>
+                        <td class="event-cell">cuando confirmo los cambios, el sistema actualiza mi información y me muestra un mensaje de confirmación</td>
+                    </tr>
+
+                    <!-- HU-04: Recuperación de contraseña -->
+                    <tr>
+                        <td class="id-cell">HU-04</td>
+                        <td class="role-cell">Como un usuario</td>
+                        <td class="description-cell">Necesito recuperar mi contraseña mediante correo electrónico</td>
+                        <td class="description-cell">Con la finalidad de restablecer el acceso si la olvido</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Solicitud de recuperación</td>
+                        <td class="context-cell">En caso que olvide mi contraseña e ingrese mi correo en el formulario de recuperación</td>
+                        <td class="event-cell">cuando envío la solicitud, recibo un correo con instrucciones para crear una nueva contraseña</td>
+                    </tr>
+
+                    <!-- HU-05: Búsqueda de productos -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-05</td>
+                        <td class="role-cell" rowspan="2">Como un cliente</td>
+                        <td class="description-cell" rowspan="2">Necesito buscar productos por categorías, colecciones o palabras clave</td>
+                        <td class="description-cell" rowspan="2">Con la finalidad de encontrar rápidamente lo que necesito comprar</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Búsqueda con resultados</td>
+                        <td class="context-cell">En caso que ingrese palabras de búsqueda válidas</td>
+                        <td class="event-cell">cuando presiono buscar, el sistema me muestra todos los productos relacionados</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">2</td>
+                        <td class="description-cell">Sin resultados</td>
+                        <td class="context-cell">En caso que no existan productos que coincidan con mi búsqueda</td>
+                        <td class="event-cell">cuando realizo la búsqueda, el sistema me informa que no hay resultados</td>
+                    </tr>
+
+                    <!-- HU-06: Detalles de producto -->
+                    <tr>
+                        <td class="id-cell">HU-06</td>
+                        <td class="role-cell">Como un cliente</td>
+                        <td class="description-cell">Necesito ver detalles completos de productos incluyendo imágenes, variantes y descripción</td>
+                        <td class="description-cell">Con la finalidad de tomar decisiones informadas antes de comprar</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Visualización completa</td>
+                        <td class="context-cell">En caso que seleccione un producto del catálogo</td>
+                        <td class="event-cell">cuando accedo a su página, veo todas las imágenes, descripción, precio, colores y tallas disponibles</td>
+                    </tr>
+
+                    <!-- HU-07: Filtrado de productos -->
+                    <tr>
+                        <td class="id-cell">HU-07</td>
+                        <td class="role-cell">Como un cliente</td>
+                        <td class="description-cell">Necesito filtrar productos por talla, color, precio y otras características</td>
+                        <td class="description-cell">Con la finalidad de refinar mis resultados de búsqueda</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Filtros aplicados</td>
+                        <td class="context-cell">En caso que tenga resultados de búsqueda y aplique filtros</td>
+                        <td class="event-cell">cuando selecciono filtros, el sistema muestra solo los productos que cumplen mis criterios</td>
+                    </tr>
+
+                    <!-- HU-08: Agregar al carrito -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-08</td>
+                        <td class="role-cell" rowspan="2">Como un cliente</td>
+                        <td class="description-cell" rowspan="2">Necesito agregar productos al carrito seleccionando sus variantes</td>
+                        <td class="description-cell" rowspan="2">Con la finalidad de preparar mi compra</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Producto agregado exitosamente</td>
+                        <td class="context-cell">En caso que seleccione un producto con color, talla y cantidad disponibles</td>
+                        <td class="event-cell">cuando presiono agregar al carrito, el producto aparece en mi carrito con las opciones seleccionadas</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">2</td>
+                        <td class="description-cell">Sin stock disponible</td>
+                        <td class="context-cell">En caso que la cantidad solicitada supere el inventario disponible</td>
+                        <td class="event-cell">cuando intento agregar, el sistema me informa cuántas unidades puedo comprar como máximo</td>
+                    </tr>
+
+                    <!-- HU-09: Modificar carrito -->
+                    <tr>
+                        <td class="id-cell">HU-09</td>
+                        <td class="role-cell">Como un cliente</td>
+                        <td class="description-cell">Necesito modificar cantidades o eliminar productos del carrito</td>
+                        <td class="description-cell">Con la finalidad de ajustar mi pedido antes de pagar</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Cambios aplicados</td>
+                        <td class="context-cell">En caso que tenga productos en el carrito y modifique cantidades o elimine artículos</td>
+                        <td class="event-cell">cuando realizo cambios, el carrito se actualiza automáticamente mostrando el nuevo total</td>
+                    </tr>
+
+                    <!-- HU-10: Códigos de descuento -->
+                    <tr>
+                        <td class="id-cell">HU-10</td>
+                        <td class="role-cell">Como un cliente</td>
+                        <td class="description-cell">Necesito aplicar códigos de descuento a mi compra</td>
+                        <td class="description-cell">Con la finalidad de obtener beneficios promocionales</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Descuento aplicado</td>
+                        <td class="context-cell">En caso que tenga un código de descuento válido y lo ingrese en el carrito</td>
+                        <td class="event-cell">cuando aplico el código, el total se actualiza mostrando el descuento aplicado</td>
+                    </tr>
+
+                    <!-- HU-11: Proceso de pago -->
+                    <tr>
+                        <td class="id-cell" rowspan="3">HU-11</td>
+                        <td class="role-cell" rowspan="3">Como un cliente</td>
+                        <td class="description-cell" rowspan="3">Necesito proceder al pago mediante transferencia bancaria</td>
+                        <td class="description-cell" rowspan="3">Con la finalidad de completar mi compra</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Pago completado correctamente</td>
+                        <td class="context-cell">En caso que suba el comprobante de transferencia y complete el número de referencia</td>
+                        <td class="event-cell">cuando confirmo el pago, mi pedido queda registrado y recibo un número de orden único</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">2</td>
+                        <td class="description-cell">Comprobante faltante</td>
+                        <td class="context-cell">En caso que no suba el archivo del comprobante de pago</td>
+                        <td class="event-cell">cuando intento confirmar, el sistema me solicita subir el comprobante</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">3</td>
+                        <td class="description-cell">Archivo inválido</td>
+                        <td class="context-cell">En caso que suba un archivo con formato no permitido o muy pesado</td>
+                        <td class="event-cell">cuando valido el archivo, el sistema me indica que solo acepta imágenes o PDF de máximo 5 MB</td>
+                    </tr>
+
+                    <!-- HU-12: Cálculo de envío -->
+                    <tr>
+                        <td class="id-cell">HU-12</td>
+                        <td class="role-cell">Como un cliente</td>
+                        <td class="description-cell">Necesito ver el cálculo automático de costos de envío</td>
+                        <td class="description-cell">Con la finalidad de conocer el total de mi pedido</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Costo calculado</td>
+                        <td class="context-cell">En caso que tenga productos en el carrito y seleccione una dirección de envío</td>
+                        <td class="event-cell">cuando ingreso mi dirección, el sistema calcula y muestra el costo de envío automáticamente</td>
+                    </tr>
+
+                    <!-- HU-13: Selección de dirección -->
+                    <tr>
+                        <td class="id-cell">HU-13</td>
+                        <td class="role-cell">Como un cliente</td>
+                        <td class="description-cell">Necesito seleccionar una dirección de envío entre mis direcciones guardadas</td>
+                        <td class="description-cell">Con la finalidad de recibir mis productos donde prefiera</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Dirección seleccionada</td>
+                        <td class="context-cell">En caso que tenga direcciones guardadas en mi perfil</td>
+                        <td class="event-cell">cuando selecciono una dirección, el sistema la utiliza para calcular costos y programar la entrega</td>
+                    </tr>
+
+                    <!-- HU-14: Factura electrónica -->
+                    <tr>
+                        <td class="id-cell">HU-14</td>
+                        <td class="role-cell">Como el sistema</td>
+                        <td class="description-cell">Necesito generar factura electrónica con datos oficiales</td>
+                        <td class="description-cell">Con la finalidad de documentar legalmente la transacción</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Factura generada</td>
+                        <td class="context-cell">En caso que el administrador apruebe el pago de una orden</td>
+                        <td class="event-cell">cuando se confirma la orden, el sistema genera automáticamente un comprobante en PDF con todos los detalles</td>
+                    </tr>
+
+                    <!-- HU-15: Estado de pedidos -->
+                    <tr>
+                        <td class="id-cell">HU-15</td>
+                        <td class="role-cell">Como un cliente</td>
+                        <td class="description-cell">Necesito ver el estado de mis pedidos</td>
+                        <td class="description-cell">Con la finalidad de conocer el avance de mi compra</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Seguimiento visible</td>
+                        <td class="context-cell">En caso que tenga pedidos realizados y acceda a "Mis pedidos"</td>
+                        <td class="event-cell">cuando consulto, veo el estado actual de cada pedido con fechas y detalles</td>
+                    </tr>
+
+                    <!-- HU-16: Asignación a repartidores -->
+                    <tr>
+                        <td class="id-cell">HU-16</td>
+                        <td class="role-cell">Como un administrador</td>
+                        <td class="description-cell">Necesito asignar pedidos aprobados a repartidores disponibles</td>
+                        <td class="description-cell">Con la finalidad de iniciar el proceso de entrega</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Asignación exitosa</td>
+                        <td class="context-cell">En caso que un pedido esté pagado y listo para envío</td>
+                        <td class="event-cell">cuando asigno un repartidor, el sistema registra la asignación y notifica al repartidor</td>
+                    </tr>
+
+                    <!-- HU-17: Lista de entregas -->
+                    <tr>
+                        <td class="id-cell">HU-17</td>
+                        <td class="role-cell">Como un repartidor</td>
+                        <td class="description-cell">Necesito ver mi lista de entregas asignadas con sus detalles</td>
+                        <td class="description-cell">Con la finalidad de planificar mi ruta de entrega</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Entregas visibles</td>
+                        <td class="context-cell">En caso que ingrese a mi panel de repartidor</td>
+                        <td class="event-cell">cuando accedo, veo todas mis entregas asignadas con dirección, productos y contacto del cliente</td>
+                    </tr>
+
+                    <!-- HU-18: Actualización de estado de entrega -->
+                    <tr>
+                        <td class="id-cell">HU-18</td>
+                        <td class="role-cell">Como un repartidor</td>
+                        <td class="description-cell">Necesito actualizar el estado de las entregas</td>
+                        <td class="description-cell">Con la finalidad de mantener informados a clientes y administración</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Estado actualizado</td>
+                        <td class="context-cell">En caso que cambie el estado de una entrega a "en camino", "en destino" o "entregado"</td>
+                        <td class="event-cell">cuando actualizo el estado, el sistema registra el cambio y notifica automáticamente al cliente</td>
+                    </tr>
+
+                    <!-- HU-19: Notificaciones de entrega -->
+                    <tr>
+                        <td class="id-cell">HU-19</td>
+                        <td class="role-cell">Como un cliente</td>
+                        <td class="description-cell">Necesito recibir notificaciones cuando mi pedido esté en camino</td>
+                        <td class="description-cell">Con la finalidad de preparar la recepción</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Notificación recibida</td>
+                        <td class="context-cell">En caso que el repartidor actualice el estado de mi pedido</td>
+                        <td class="event-cell">cuando cambia el estado, recibo un correo electrónico con los detalles de la entrega</td>
+                    </tr>
+
+                    <!-- HU-20: Gestión de productos -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-20</td>
+                        <td class="role-cell" rowspan="2">Como un administrador</td>
+                        <td class="description-cell" rowspan="2">Necesito gestionar productos del catálogo</td>
+                        <td class="description-cell" rowspan="2">Con la finalidad de mantener actualizada la tienda</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Producto creado</td>
+                        <td class="context-cell">En caso que cree un nuevo producto con nombre, descripción, precio, imágenes y variantes</td>
+                        <td class="event-cell">cuando guardo, el producto queda disponible en la tienda inmediatamente</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">2</td>
+                        <td class="description-cell">Producto editado</td>
+                        <td class="context-cell">En caso que modifique datos de un producto existente</td>
+                        <td class="event-cell">cuando guardo los cambios, la información se actualiza en toda la tienda</td>
+                    </tr>
+
+                    <!-- HU-21: Gestión de inventario -->
+                    <tr>
+                        <td class="id-cell">HU-21</td>
+                        <td class="role-cell">Como un administrador</td>
+                        <td class="description-cell">Necesito administrar el inventario y registrar entradas, salidas y devoluciones</td>
+                        <td class="description-cell">Con la finalidad de controlar el stock disponible</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Inventario actualizado</td>
+                        <td class="context-cell">En caso que actualice el inventario de un color o talla específica</td>
+                        <td class="event-cell">cuando guardo los cambios, el sistema registra el movimiento y actualiza las unidades disponibles</td>
+                    </tr>
+
+                    <!-- HU-22: Procesamiento de órdenes -->
+                    <tr>
+                        <td class="id-cell">HU-22</td>
+                        <td class="role-cell">Como un administrador</td>
+                        <td class="description-cell">Necesito procesar órdenes validando pagos y actualizando estados</td>
+                        <td class="description-cell">Con la finalidad de gestionar el flujo de ventas</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Pago validado</td>
+                        <td class="context-cell">En caso que reciba una orden con comprobante de transferencia</td>
+                        <td class="event-cell">cuando reviso y apruebo el pago, el sistema actualiza el estado y envía confirmación al cliente</td>
+                    </tr>
+
+                    <!-- HU-23: Generación de reportes -->
+                    <tr>
+                        <td class="id-cell">HU-23</td>
+                        <td class="role-cell">Como un administrador</td>
+                        <td class="description-cell">Necesito generar reportes de ventas, productos más vendidos y clientes</td>
+                        <td class="description-cell">Con la finalidad de analizar el desempeño del negocio</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Reporte generado</td>
+                        <td class="context-cell">En caso que solicite un reporte seleccionando fechas y parámetros</td>
+                        <td class="event-cell">cuando genero, el sistema crea un documento con gráficos y datos que puedo descargar</td>
+                    </tr>
+
+                    <!-- HU-24: Gestión de descuentos -->
+                    <tr>
+                        <td class="id-cell">HU-24</td>
+                        <td class="role-cell">Como un administrador</td>
+                        <td class="description-cell">Necesito gestionar códigos de descuento y promociones</td>
+                        <td class="description-cell">Con la finalidad de implementar estrategias comerciales</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Descuento creado</td>
+                        <td class="context-cell">En caso que cree un código promocional con porcentaje, fechas de vigencia y condiciones</td>
+                        <td class="event-cell">cuando lo activo, los clientes pueden usar el código en sus compras según las reglas definidas</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p><strong>Proyecto Angelow</strong> - Sistema de Tienda Virtual de Ropa Infantil</p>
+            <p>Historias de Usuario - Actualizado: 2 de Noviembre, 2025</p>
+            <p>Total: <strong>24 Historias de Usuario</strong> | <strong>40+ Criterios de Aceptación</strong></p>
+            <p style="margin-top: 10px; font-size: 0.85em; color: #666;">
+                <strong>Módulos cubiertos:</strong> Gestión de Usuarios, Catálogo y Búsqueda, Carrito y Compras, Pedidos y Logística, Sistema de Delivery, Módulo Administrativo
+            </p>
+        </div>
+    </div>
+</body>
+</html>

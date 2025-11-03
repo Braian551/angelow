@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especificaciones de Casos de Uso - Proyecto Angelow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #c59feb 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .info-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-item strong {
+            color: #667eea;
+        }
+        .content {
+            padding: 30px;
+        }
+        .module-section {
+            margin-bottom: 40px;
+        }
+        .module-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .uc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .uc-inner-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+        .uc-inner-table th, .uc-inner-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .uc-inner-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+            width: 30%;
+            font-size: 0.9em;
+        }
+        .uc-inner-table td {
+            background: white;
+            font-size: 0.9em;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 3px solid #667eea;
+            text-align: center;
+            color: #666;
+        }
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .info-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .uc-table th, .uc-table td {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>DESCRIPCIÓN DE UNA ESPECIFICACIÓN DE CASO DE USO</h1>
+            <p>Sistema de Tienda Virtual de Ropa Infantil - Angelow</p>
+            <div style="display: flex; justify-content: space-between; margin-top: 20px; font-size: 1.1em; font-weight: bold;">
+                <div style="width: 48%; text-align: center; border: 2px solid white; padding: 10px; border-radius: 10px;">Especificación del Caso de Uso</div>
+                <div style="width: 48%; text-align: center; border: 2px solid white; padding: 10px; border-radius: 10px;">Ejemplo del Caso de Uso</div>
+            </div>
+        </div>
+        
+        <div class="info-bar">
+            <div class="info-item">
+                <strong>Proyecto:</strong> Angelow E-commerce
+            </div>
+            <div class="info-item">
+                <strong>Fecha:</strong> 2 de Noviembre, 2025
+            </div>
+            <div class="info-item">
+                <strong>Total Casos de Uso:</strong> 52 UC
+            </div>
+            <div class="info-item">
+                <strong>Módulos:</strong> 7 Módulos principales
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Módulo de Autenticación y Usuarios -->
+            <div class="module-section">
+                <h2 class="module-title">Módulo de Autenticación y Usuarios</h2>
+                
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Registrar Nueva Cuenta</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Permite a un visitante crear una cuenta nueva en el sistema</td></tr>
+                                <tr><th>Actores</th><td>Usuario Anónimo</td></tr>
+                                <tr><th>Precondiciones</th><td>Usuario no debe estar registrado</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario ingresa datos personales (nombre, email, contraseña).<br>2. Sistema valida formato de datos.<br>3. Sistema verifica que email no esté registrado.<br>4. Sistema crea cuenta y envía email de confirmación.<br>5. Usuario es redirigido al dashboard.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Cuenta creada, usuario autenticado automáticamente</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo práctico - Angelow</h4>
+                            <p><strong>María se registra como nueva cliente</strong></p>
+                            <p>María quiere comprar ropa para sus hijos en Angelow. En la página principal hace clic en "Crear Cuenta". Completa el formulario con su nombre completo, un email que no haya usado antes, y una contraseña segura. El sistema verifica que toda la información sea correcta y crea su cuenta automáticamente. María recibe un email de bienvenida y puede empezar a comprar inmediatamente.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Iniciar Sesión</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Autenticación de usuarios existentes</td></tr>
+                                <tr><th>Actores</th><td>Usuario Anónimo, Cliente, Administrador, Delivery</td></tr>
+                                <tr><th>Precondiciones</th><td>Usuario debe tener cuenta registrada</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario ingresa email y contraseña.<br>2. Sistema valida credenciales.<br>3. Sistema identifica rol del usuario.<br>4. Usuario es redirigido a dashboard correspondiente.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Usuario autenticado y redirigido según rol</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo práctico - Angelow</h4>
+                            <p><strong>Carlos inicia sesión para hacer una compra</strong></p>
+                            <p>Carlos ya es cliente registrado en Angelow. Ingresa su email y contraseña en la página de login. El sistema verifica sus datos y lo reconoce como cliente. Automáticamente lo lleva a su panel personal donde puede ver sus pedidos anteriores y continuar comprando. Si fuera administrador o repartidor, lo llevaría a su panel de trabajo correspondiente.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Cerrar Sesión</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Finalizar sesión activa</td></tr>
+                                <tr><th>Actores</th><td>Cliente, Administrador, Delivery</td></tr>
+                                <tr><th>Precondiciones</th><td>Usuario debe estar autenticado</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario solicita cerrar sesión.<br>2. Sistema destruye sesión.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Sesión destruida, redirigido a página principal</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo práctico - Angelow</h4>
+                            <p><strong>Sofia termina su sesión de compras</strong></p>
+                            <p>Sofia terminó de navegar por la tienda y hace clic en "Cerrar Sesión". El sistema la desconecta de forma segura y la lleva de vuelta a la página principal. Sus productos en el carrito quedan guardados para cuando regrese, así que puede continuar su compra más tarde sin problemas.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Perfil Personal</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Actualizar información personal del usuario</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>Usuario autenticado</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario accede a configuración de perfil.<br>2. Usuario modifica datos (nombre, teléfono, etc.).<br>3. Sistema valida y guarda cambios.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Información personal actualizada</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo práctico - Angelow</h4>
+                            <p><strong>Ana actualiza su información personal</strong></p>
+                            <p>Ana quiere cambiar su número de teléfono en Angelow. En su perfil personal, actualiza el campo de teléfono y guarda los cambios. El sistema verifica que el email no esté siendo usado por otra persona y confirma que todo está actualizado correctamente. Ana también puede cambiar su contraseña cuando lo necesite, siguiendo el proceso de verificación de seguridad.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Direcciones de Envío</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Administrar direcciones para entregas</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>Usuario autenticado</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario agrega/edita/elimina direcciones.<br>2. Puede marcar dirección como predeterminada.<br>3. Sistema valida formato de direcciones.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Direcciones de envío actualizadas</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo práctico - Angelow</h4>
+                            <p><strong>Roberto agrega una nueva dirección de entrega</strong></p>
+                            <p>Roberto quiere agregar su dirección de trabajo como opción de entrega. En su perfil, hace clic en "Agregar Dirección" y completa: dirección completa, barrio, ciudad, y teléfono de contacto. Puede marcar una dirección como "predeterminada" para que se seleccione automáticamente en futuras compras. También puede editar o eliminar direcciones que ya no necesite.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Cambiar Contraseña</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Actualizar contraseña de acceso</td></tr>
+                                <tr><th>Actores</th><td>Cliente, Administrador, Delivery</td></tr>
+                                <tr><th>Precondiciones</th><td>Usuario autenticado</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario solicita cambio de contraseña.<br>2. Sistema envía código de verificación por email.<br>3. Usuario ingresa nueva contraseña.<br>4. Sistema valida y actualiza.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Contraseña actualizada</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo práctico - Angelow</h4>
+                            <p><strong>Sofia cambia su contraseña por seguridad</strong></p>
+                            <p>Sofia quiere cambiar su contraseña por motivos de seguridad. En su perfil, hace clic en "Cambiar Contraseña". El sistema le envía un código de verificación a su email sofia@email.com. Sofia ingresa el código y luego escribe su nueva contraseña "NuevaPass456". El sistema valida que la nueva contraseña cumple con los requisitos de seguridad y actualiza su contraseña en la base de datos. Sofia recibe confirmación de que el cambio fue exitoso.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Módulo de Tienda y Catálogo -->
+            <div class="module-section">
+                <h2 class="module-title">Módulo de Tienda y Catálogo</h2>
+                
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Explorar Página Principal</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Visualizar contenido principal de la tienda</td></tr>
+                                <tr><th>Actores</th><td>Usuario Anónimo, Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario accede a index.php.<br>2. Sistema muestra sliders, categorías destacadas, productos destacados.<br>3. Usuario puede navegar a diferentes secciones.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Usuario puede explorar la tienda</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Pedro descubre Angelow por primera vez</strong></p>
+                            <p>Pedro llega al sitio web de Angelow buscando ropa para niños. La página principal se carga mostrando un slider con las últimas colecciones infantiles. Debajo aparecen categorías destacadas como "Ropa para Niños", "Ropa para Niñas", "Accesorios" y "Ofertas Especiales". En la sección de productos destacados ve varios vestidos y conjuntos infantiles con precios atractivos. Pedro hace clic en la categoría "Ropa para Niños" para explorar más productos.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Navegar por Categorías</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Explorar productos por categorías</td></tr>
+                                <tr><th>Actores</th><td>Usuario Anónimo, Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario selecciona categoría.<br>2. Sistema filtra y muestra productos de la categoría.<br>3. Usuario puede aplicar filtros adicionales.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Productos de categoría mostrados</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>María busca ropa para niña de 5 años</strong></p>
+                            <p>María quiere comprar un vestido para su hija de 5 años. En la página principal hace clic en la categoría "Ropa para Niñas". El sistema filtra todos los productos mostrando solo vestidos, blusas y faldas para niñas. María aplica un filtro adicional de talla "5 años" y precio menor a $150.000. Aparecen 12 productos que cumplen con sus criterios. Selecciona un vestido rosa con encaje y lo agrega a su carrito.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Buscar Productos</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Búsqueda de productos por texto</td></tr>
+                                <tr><th>Actores</th><td>Usuario Anónimo, Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario ingresa términos de búsqueda.<br>2. Sistema busca en nombres, descripciones, categorías.<br>3. Muestra resultados con paginación.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Resultados de búsqueda mostrados</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Carlos busca zapatos deportivos para niño</strong></p>
+                            <p>Carlos necesita zapatos deportivos para su hijo de 8 años. Usa la barra de búsqueda e ingresa "zapatos deportivos niño talla 8". El sistema busca en nombres, descripciones y categorías, encontrando 8 productos relevantes. Los resultados se muestran en páginas de 12 productos cada una, ordenados por relevancia. Carlos encuentra unos zapatos azules que le gustan y hace clic para ver los detalles completos.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Filtrar Productos</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Aplicar filtros avanzados a listados</td></tr>
+                                <tr><th>Actores</th><td>Usuario Anónimo, Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario selecciona filtros (precio, talla, género, etc.).<br>2. Sistema aplica filtros a resultados.<br>3. Muestra productos filtrados.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Productos filtrados mostrados</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Ana busca pantalones para niño con filtros específicos</strong></p>
+                            <p>Ana busca pantalones para su hijo adolescente. Selecciona la categoría "Ropa para Niños" y aplica filtros: género "Niño", talla "14 años", color "Azul oscuro", precio entre $80.000-$150.000. El sistema muestra solo 3 pantalones que cumplen exactamente con sus criterios. Ana selecciona el más barato y continúa con la compra.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Ver Detalles de Producto</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Mostrar información completa de producto</td></tr>
+                                <tr><th>Actores</th><td>Usuario Anónimo, Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>Producto seleccionado</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario hace clic en producto.<br>2. Sistema muestra página de detalles.<br>3. Usuario ve imágenes, descripción, precio, tallas disponibles.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Detalles del producto mostrados</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Carlos examina una chaqueta antes de comprarla</strong></p>
+                            <p>Carlos ve una chaqueta de cuero en la tienda online. Hace clic en la imagen y llega a la página de detalles. Ve 5 fotos de alta calidad desde diferentes ángulos, lee la descripción completa sobre el material y cuidado, verifica que está disponible en talla M, ve el precio de $280.000 con envío gratis, y lee 12 reseñas positivas de otros clientes. Decide agregarla al carrito.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Ver Variantes de Producto</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Explorar diferentes opciones de un producto</td></tr>
+                                <tr><th>Actores</th><td>Usuario Anónimo, Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>Producto seleccionado</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario selecciona variante (talla, color).<br>2. Sistema actualiza precio e imágenes.<br>3. Muestra disponibilidad por variante.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Variantes del producto mostradas</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Sofia elige la talla perfecta para su hija</strong></p>
+                            <p>Sofia está viendo un vestido para su hija de 7 años. El producto tiene tallas desde 4 hasta 12 años. Sofia hace clic en "Talla 8 años" y el sistema actualiza la imagen principal mostrando cómo se ve el vestido en esa talla específica. También cambia el precio ligeramente según la talla seleccionada. Sofia luego cambia el color de "Rosa" a "Azul cielo" y ve cómo cambia la imagen. Finalmente selecciona la variante correcta y la agrega al carrito.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Módulo de Carrito y Compra -->
+            <div class="module-section">
+                <h2 class="module-title">Módulo de Carrito y Compra</h2>
+                
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Agregar Producto al Carrito</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Incorporar productos al carrito de compras</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>Usuario autenticado</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario selecciona variante y cantidad.<br>2. Sistema verifica stock disponible.<br>3. Producto se agrega al carrito en base de datos.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Producto agregado al carrito</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo práctico - Angelow</h4>
+                            <p><strong>María agrega un producto a su carrito de compras</strong></p>
+                            <p>María encuentra un conjunto deportivo infantil que le gusta. Selecciona la talla 8 años y el color azul, verifica que hay unidades disponibles, y hace clic en "Agregar al Carrito". El sistema confirma que el producto se agregó correctamente y actualiza el contador del carrito en la parte superior de la página. María puede continuar comprando o ir directamente al carrito para revisar sus productos.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Carrito de Compras</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Administrar items en el carrito</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario puede modificar cantidades.<br>2. Usuario puede eliminar items.<br>3. Sistema recalcula totales automáticamente.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Carrito actualizado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo práctico - Angelow</h4>
+                            <p><strong>Carlos revisa y modifica su carrito antes de comprar</strong></p>
+                            <p>Carlos tiene 3 productos en su carrito. Decide cambiar la cantidad del primer producto de 2 a 3 unidades. Modifica el número y el sistema recalcula automáticamente los totales. También elimina un producto que ya no quiere. El sistema actualiza el subtotal, los descuentos aplicados, el costo de envío, y el total final. Carlos revisa que todo esté correcto antes de proceder al checkout.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Aplicar Código de Descuento</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Usar códigos promocionales</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario ingresa código de descuento.<br>2. Sistema valida código y aplica descuento.<br>3. Recalcula totales.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Descuento aplicado al total</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo caso de uso - Sistema Real Angelow</h4>
+                            <p><strong>Escenario: Cliente aplicando código de descuento</strong></p>
+                            <p>María está en el carrito de compras con productos por valor de $250.000 y recuerda que recibió un código de descuento "ANGELOW15" por email. Ingresa el código en el campo correspondiente y hace clic en "Aplicar Descuento". El sistema valida automáticamente que el código es válido, está dentro del período de vigencia y cumple con las condiciones mínimas de compra. Como el descuento es del 15%, el sistema calcula el ahorro de $37.500 y actualiza el total a $212.500. María ve inmediatamente el desglose completo: Subtotal $250.000, Descuento ANGEL15 -$37.500, Total $212.500. Satisfecha con el ahorro, continúa con el proceso de compra.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Calcular Costos de Envío</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Determinar costo de envío según dirección</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario selecciona dirección de envío.<br>2. Sistema calcula costo basado en reglas configuradas.<br>3. Muestra costo total con envío.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Costo de envío calculado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Roberto verifica el costo de envío antes de confirmar</strong></p>
+                            <p>Roberto tiene $45 en productos y está en el proceso de checkout. Selecciona su dirección de envío en "Centro Ciudad, Código Postal 12345". El sistema calcula automáticamente el costo de envío basado en las reglas configuradas: para compras menores a $50, el envío cuesta $5. Muestra el desglose completo: Subtotal $45 + Envío $5 = Total $50. Roberto ve que si agrega un producto más pequeño podría alcanzar envío gratis, pero decide proceder con la compra actual.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Proceder al Checkout</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Iniciar proceso de compra</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>Carrito con items</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Sistema recopila datos de envío y facturación.<br>2. Usuario confirma dirección y método de pago.<br>3. Sistema prepara datos para procesamiento.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Datos preparados para pago</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Ana inicia el proceso de compra de sus productos</strong></p>
+                            <p>Ana tiene 2 vestidos infantiles y un conjunto deportivo en su carrito por un total de $67.50. Hace clic en "Proceder al Checkout". El sistema la lleva a la página de checkout donde recopila su información: dirección de envío (Casa: Calle Flores 123, Ciudad Central), dirección de facturación (la misma), y le pide confirmar el método de pago. Ana revisa todos los datos, confirma que están correctos, y el sistema prepara toda la información para el procesamiento del pago por transferencia bancaria.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Seleccionar Método de Pago</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Elegir forma de pago (transferencia bancaria)</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario selecciona transferencia bancaria como único método.<br>2. Sistema muestra instrucciones de pago.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Método de pago seleccionado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Javier elige cómo pagar su pedido</strong></p>
+                            <p>Javier está en el checkout con su compra de $89.50. En la sección de método de pago, ve que Angelow solo acepta transferencias bancarias. Selecciona "Transferencia Bancaria" como método de pago. El sistema muestra inmediatamente las instrucciones detalladas: Banco XYZ, Cuenta Corriente 123456789, a nombre de Angelow S.A., con el monto exacto $89.50 y el número de referencia generado automáticamente. Javier anota los datos para realizar la transferencia desde su app bancaria.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Confirmar Pedido</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Finalizar compra</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario revisa resumen final.<br>2. Sistema crea orden en base de datos.<br>3. Usuario recibe confirmación.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Pedido confirmado y registrado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Sofia completa su compra exitosamente</strong></p>
+                            <p>Sofia ha completado todos los pasos del checkout: productos seleccionados ($72.30), dirección confirmada, método de pago elegido. Revisa el resumen final que muestra todos los detalles: 2 camisetas infantiles, dirección de envío, costo de envío $4.50, total $76.80. Hace clic en "Confirmar Pedido". El sistema crea la orden #12345 en la base de datos, asigna estado "Pendiente de Pago", y envía un email de confirmación a Sofia con todos los detalles y las instrucciones para realizar la transferencia bancaria.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Módulo de Pagos -->
+            <div class="module-section">
+                <h2 class="module-title">Módulo de Pagos</h2>
+                
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Procesar Transferencia Bancaria</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Gestionar pagos por transferencia bancaria con comprobante</td></tr>
+                                <tr><th>Actores</th><td>Cliente, Sistema de Pago</td></tr>
+                                <tr><th>Precondiciones</th><td>Orden confirmada, cuenta bancaria configurada en sistema</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Cliente selecciona transferencia bancaria como método de pago.<br>2. Sistema consulta tabla <code>bank_account_config</code> y muestra datos: banco, tipo cuenta, número, titular.<br>3. Cliente realiza transferencia externa desde su banco.<br>4. Cliente sube comprobante (JPG/PNG/PDF máx 5MB) mediante formulario en <code>tienda/pagos/pay.php</code>.<br>5. Sistema valida archivo, lo almacena en <code>uploads/payment_proofs/</code>.<br>6. Crea registro en <code>payment_transactions</code> con estado 'pending'.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>Si comprobante inválido o falta, sistema rechaza con mensaje específico de error</td></tr>
+                                <tr><th>PosCondiciones</th><td>Transacción registrada, orden en estado 'pending_payment', esperando validación admin</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo caso de uso - Sistema Real Angelow</h4>
+                            <p><strong>Escenario: Cliente completando pago por transferencia</strong></p>
+                            <p>Pedro confirma su pedido #ANG-2025-001234 por $125.500 de productos infantiles. El sistema le muestra los datos bancarios de Angelow: Banco Davivienda, Cuenta de Ahorros número 4321098765432, a nombre de Angelow S.A.S. Pedro realiza la transferencia desde su app bancaria, transfiriendo exactamente $125.500 con la referencia del pedido. Luego toma una captura de pantalla del comprobante y la sube al sistema. El sistema valida que el archivo sea una imagen o PDF válido y no exceda los 5MB, lo guarda de forma segura, y registra la transacción como pendiente de validación administrativa. Pedro recibe confirmación de que su comprobante fue recibido y que será validado pronto.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Subir Comprobante de Pago</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Adjuntar comprobante de transferencia bancaria</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>Transferencia realizada desde banco del cliente</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Cliente sube imagen/PDF del comprobante mediante input file.<br>2. Sistema valida: formato (jpg/jpeg/png/pdf), tamaño máximo 5MB.<br>3. Genera nombre único: <code>ORDER-{order_id}-{timestamp}.{ext}</code>.<br>4. Mueve archivo a <code>uploads/payment_proofs/</code>.<br>5. Guarda ruta relativa en campo <code>payment_proof</code> de tabla <code>payment_transactions</code>.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>Si formato inválido: "El archivo debe ser JPG, PNG o PDF". Si tamaño excede: "El archivo no puede ser mayor a 5MB"</td></tr>
+                                <tr><th>PosCondiciones</th><td>Comprobante almacenado, visible para admin en validación</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo caso de uso - Sistema Real Angelow</h4>
+                            <p><strong>Escenario: Cliente adjuntando comprobante bancario</strong></p>
+                            <p>Después de realizar la transferencia bancaria, Sandra ve en la página de pagos un formulario simple para subir su comprobante. Selecciona la imagen JPG de su comprobante bancario que muestra claramente la transferencia de $89.300 realizada a Angelow. El sistema valida automáticamente que el archivo sea una imagen o PDF válido, que no exceda los 5MB de tamaño, y lo guarda de forma segura en el servidor. Sandra recibe confirmación inmediata de que su comprobante fue subido correctamente y que el equipo administrativo lo revisará para validar el pago. El comprobante queda disponible para que los administradores puedan descargarlo y verificar la autenticidad de la transacción.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Validar Pago</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Verificar y aprobar pago recibido por transferencia</td></tr>
+                                <tr><th>Actores</th><td>Administrador, Sistema de Pago</td></tr>
+                                <tr><th>Precondiciones</th><td>Comprobante subido, transacción en estado 'pending'</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Admin accede a <code>admin/orders.php</code> y ve órdenes con filtro payment_status='pending'.<br>2. Hace clic en orden específica, ve detalles en <code>admin/order/detail.php</code>.<br>3. Descarga comprobante desde ruta almacenada en <code>payment_transactions.payment_proof</code>.<br>4. Verifica en su banco online que la transferencia fue recibida (monto, referencia, fecha).<br>5. Si correcto, hace clic en "Aprobar Pago" que ejecuta <code>ajax/admin/update_payment_status.php</code>.<br>6. Sistema actualiza:<br>&nbsp;&nbsp;<code>UPDATE payment_transactions SET status = 'approved', approved_at = NOW(), approved_by = ? WHERE id = ?</code><br>&nbsp;&nbsp;<code>UPDATE orders SET payment_status = 'paid', status = 'processing' WHERE id = ?</code><br>7. Genera notificación email al cliente confirmando pago.<br>8. Libera orden para asignación a delivery.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>Si comprobante inválido/fraudulento: marca como 'rejected', notifica cliente, orden cancelada</td></tr>
+                                <tr><th>PosCondiciones</th><td>Pago validado, orden lista para procesamiento, cliente notificado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo caso de uso - Sistema Real Angelow</h4>
+                            <p><strong>Escenario: Admin validando pago de cliente</strong></p>
+                            <p>La administradora Laura accede al panel de órdenes y ve una notificación de 3 pagos pendientes de validación. Selecciona el pedido #ANG-2025-001234 por $125.500 de Juan Pérez. En los detalles del pedido ve toda la información del cliente, el monto exacto, y el enlace para descargar el comprobante de pago. Laura descarga y revisa la imagen del comprobante, verificando que muestra claramente la transferencia desde la cuenta de Juan hacia la cuenta de Angelow, con el monto correcto y la fecha reciente. Confirma en el sistema bancario de Angelow que la transferencia efectivamente fue recibida. Satisfecha con la verificación, Laura hace clic en "Aprobar Pago" y el sistema actualiza automáticamente el estado del pedido a "Pago Validado", cambia el estado de procesamiento a "En Preparación", y envía un email automático a Juan confirmando que su pago ha sido aprobado y que su pedido está siendo preparado para envío.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Generar Recibo/Factura</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Crear documento fiscal</td></tr>
+                                <tr><th>Actores</th><td>Sistema de Pago</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Sistema genera PDF con datos de la transacción.<br>2. Incluye detalles de productos, totales, datos fiscales.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Factura generada y disponible</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>El sistema genera la factura para el pedido de Luis</strong></p>
+                            <p>Una vez validado el pago del pedido #12349 de Luis por $124.75, el sistema automáticamente genera un documento fiscal en formato PDF. La factura incluye: datos de Angelow (RUC, dirección), datos del cliente Luis (nombre, dirección de facturación), detalle de productos (2 vestidos infantiles $45 cada uno, 1 abrigo $34.75), subtotal $124.75, descuento aplicado $0, total $124.75. El PDF se guarda en el servidor y se envía automáticamente por email a Luis junto con la confirmación de pago validado.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Módulo de Gestión de Pedidos -->
+            <div class="module-section">
+                <h2 class="module-title">Módulo de Gestión de Pedidos</h2>
+                
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Ver Historial de Pedidos</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Revisar compras anteriores</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Sistema muestra lista de órdenes del usuario.<br>2. Ordenadas por fecha descendente.<br>3. Incluye estados y totales.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Historial de pedidos mostrado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Carmen revisa sus compras anteriores en Angelow</strong></p>
+                            <p>Carmen inicia sesión en su cuenta de Angelow y va a "Mis Pedidos". El sistema muestra su historial completo ordenado por fecha, del más reciente al más antiguo. Ve su pedido de ayer #12350 por $67.80 (estado: "En Preparación"), el pedido de la semana pasada #12345 por $89.50 (estado: "Entregado"), y varios pedidos anteriores. Cada entrada muestra la fecha, número de pedido, total, y estado actual. Carmen hace clic en el pedido más reciente para ver más detalles.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Ver Detalle de Pedido</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Información completa de una orden</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario selecciona orden específica.<br>2. Sistema muestra productos, direcciones, estado de pago/envío.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Detalle del pedido mostrado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Roberto consulta los detalles completos de su pedido</strong></p>
+                            <p>Roberto hace clic en el pedido #12351 de $94.25 en su historial. El sistema muestra toda la información detallada: los productos comprados (3 camisetas infantiles con tallas y colores específicos), dirección de envío completa, dirección de facturación, método de pago utilizado, estado actual "En Tránsito", número de seguimiento, fecha estimada de entrega, y enlace para rastreo GPS. También ve el historial de estados del pedido y puede descargar la factura en PDF.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Rastrear Pedido en Tiempo Real</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Seguimiento GPS en tiempo real del delivery</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>Orden asignada a repartidor, estado 'in_transit'</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Cliente accede a <code>users/track_order.php?id={order_id}</code>.<br>2. Sistema consulta tabla <code>order_deliveries</code> para obtener coordenadas actuales del repartidor (<code>location_lat</code>, <code>location_lng</code>).<br>3. Renderiza mapa Leaflet.js con OpenStreetMap mostrando: marcador repartidor (ubicación actual), marcador destino (dirección cliente), línea de ruta calculada.<br>4. JavaScript ejecuta peticiones AJAX cada 30 segundos a <code>delivery/api/get_location.php</code> para actualizar posición.<br>5. Muestra info adicional: nombre repartidor, teléfono, tiempo estimado llegada, estado actual.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>Si delivery_status no es 'in_transit', muestra mensaje "El repartidor aún no ha iniciado la ruta"</td></tr>
+                                <tr><th>PosCondiciones</th><td>Cliente visualiza ubicación en tiempo real del delivery</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo caso de uso - Sistema Real Angelow</h4>
+                            <p><strong>Escenario: Cliente rastreando su pedido con GPS</strong></p>
+                            <p>Luisa recibe una notificación por email: "Tu pedido #ANG-2025-001234 está en camino". Hace clic en el enlace de rastreo que la lleva a la página de seguimiento en tiempo real. El sistema muestra un mapa interactivo donde puede ver la ubicación exacta de su repartidor en tiempo real. Ve que el repartidor Juan Pérez está a solo 2.3 kilómetros de distancia, viajando a 35 km/h, y se estima que llegará en aproximadamente 12 minutos. Luisa puede ver tanto la ubicación actual del repartidor (marcador azul) como su dirección de entrega (marcador rojo), con una línea que muestra la ruta calculada. El mapa se actualiza automáticamente cada 30 segundos, permitiendo a Luisa seguir el progreso de su entrega minuto a minuto desde la comodidad de su hogar.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Cancelar Pedido</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Anular orden pendiente</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>Orden en estado pendiente</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario solicita cancelación.<br>2. Sistema verifica condiciones de cancelación.<br>3. Actualiza estado y notifica.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Pedido cancelado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Javier cancela su pedido antes de que sea procesado</strong></p>
+                            <p>Javier se da cuenta de que cometió un error en su pedido #12353 de $78.90 - pidió la talla equivocada para su hijo. Como el pedido aún está en estado "Pendiente de Pago", hace clic en "Cancelar Pedido" desde los detalles del pedido. El sistema verifica que cumple las condiciones de cancelación (menos de 2 horas desde la confirmación y pago no realizado), cambia el estado a "Cancelado", y envía notificaciones por email tanto a Javier como al equipo de Angelow. El stock de los productos se libera automáticamente para otros clientes.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Reordenar Productos</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Repetir compra anterior</td></tr>
+                                <tr><th>Actores</th><td>Cliente</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario selecciona "reordenar" en pedido anterior.<br>2. Sistema agrega productos al carrito actual.<br>3. Usuario puede modificar y proceder al checkout.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Productos agregados al carrito</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Maria repite su compra exitosa anterior</strong></p>
+                            <p>Maria está muy contenta con el conjunto deportivo que compró hace un mes para su hija. En su historial de pedidos, encuentra el pedido #12340 y hace clic en "Reordenar". El sistema automáticamente agrega los mismos productos (conjunto deportivo talla 8, color azul) a su carrito de compras actual. Maria puede modificar las cantidades si quiere (cambia de 1 a 2 unidades), agregar otros productos, o proceder directamente al checkout. El sistema mantiene la dirección de envío predeterminada y calcula el total actualizado de $78.50 para las 2 unidades.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Módulo Administrativo -->
+            <div class="module-section">
+                <h2 class="module-title">Módulo Administrativo</h2>
+                
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Productos (CRUD)</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Crear, leer, actualizar, eliminar productos con variantes</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>Usuario con rol 'admin' autenticado</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Admin accede a <code>admin/products.php</code> que lista productos desde tabla <code>products</code>.<br>2. Para crear: <code>admin/editproducto.php</code> con formulario que inserta en <code>products</code>, <code>product_images</code>, <code>product_variants</code>.<br>3. Campos: name, slug, description, price, category_id, gender, brand, is_active.<br>4. Subir múltiples imágenes: almacenadas en <code>uploads/products/</code>, rutas en <code>product_images</code>.<br>5. Variantes (tallas/colores): tabla <code>product_variants</code> con fields: size_id, color_id, sku, quantity, additional_price.<br>6. Editar: carga datos existentes, actualiza con transacción.<br>7. Eliminar/Desactivar: <code>UPDATE products SET is_active = 0 WHERE id = ?</code> (soft delete).</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>Validaciones: slug único, categoría existe, precio > 0, al menos 1 imagen, stock >= 0</td></tr>
+                                <tr><th>PosCondiciones</th><td>Producto creado/actualizado, visible en tienda si is_active=1</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo caso de uso - Sistema Real Angelow</h4>
+                            <p><strong>Escenario: Admin creando nuevo producto con variantes</strong></p>
+                            <p>La administradora María accede al panel de productos y hace clic en "Agregar Nuevo Producto". Completa el formulario con: nombre "Conjunto Deportivo Niño", precio base $45.000, categoría "Ropa Deportiva", género "niño", y una descripción detallada sobre la comodidad y calidad del material. Sube 4 imágenes atractivas del producto desde diferentes ángulos. Luego configura las variantes: para talla 6 agrega colores azul (10 unidades en stock) y rojo (8 unidades), para talla 8 agrega azul (15 unidades) y rojo (12 unidades), y así sucesivamente. El sistema valida que toda la información sea correcta, guarda el producto como activo, y lo hace inmediatamente disponible en la tienda para que los clientes puedan comprarlo con todas sus opciones de talla y color.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Categorías</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Administrar estructura de categorías</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Crear categorías padre/hijo.<br>2. Asignar productos a categorías.<br>3. Gestionar imágenes de categorías.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Categorías actualizadas</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>El administrador Carlos organiza las categorías de temporada</strong></p>
+                            <p>Carlos crea una nueva categoría padre llamada "Temporada Invierno 2025" en el panel administrativo. Dentro de ella, crea subcategorías: "Abrigos y Chaquetas", "Pantalones Térmicos", "Botas para Nieve", y "Accesorios de Invierno". Sube imágenes atractivas para cada categoría que muestren productos infantiles de invierno. Luego asigna 15 productos existentes a estas nuevas categorías, moviéndolos desde las categorías generales. Los cambios se reflejan inmediatamente en la navegación de la tienda, facilitando a los clientes encontrar productos de temporada.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Colecciones</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Crear agrupaciones temáticas de productos</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Definir colección con nombre, descripción, fechas.<br>2. Asignar productos a colecciones.<br>3. Gestionar banners de colecciones.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Colecciones configuradas</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Ana crea una colección especial para el día del niño</strong></p>
+                            <p>Ana configura una colección especial llamada "Día del Niño 2025" con fechas del 15 al 31 de julio. Escribe una descripción atractiva sobre productos con 20% descuento para celebrar el día del niño. Selecciona 25 productos infantiles de diferentes categorías (ropa, juguetes, accesorios) y los agrupa en esta colección. Sube un banner colorido con niños sonrientes y diseña el layout especial. La colección aparece destacada en la página principal con un contador de días restantes, y todos los productos muestran el descuento automático del 20% cuando se acceden desde la colección.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Tallas y Variantes</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Administrar opciones de productos</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Crear tallas por género/categoría.<br>2. Gestionar colores disponibles.<br>3. Controlar stock por variante.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Variantes actualizadas</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>El administrador Roberto configura las variantes de un nuevo pantalón</strong></p>
+                            <p>Roberto está configurando un pantalón deportivo infantil. Define las tallas disponibles: 4, 6, 8, 10, 12 años para niños y niñas. Para cada talla, establece colores: Azul marino, Gris claro, Negro. Configura el stock individualmente: talla 8 en azul tiene 15 unidades, en gris 8 unidades, en negro 12 unidades. También establece que las tallas de niña tienen un precio base de $35, mientras que las de niño cuestan $32. El sistema valida que no hay conflictos en la configuración y guarda todas las variantes, permitiendo a los clientes seleccionar exactamente lo que necesitan.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Controlar Inventario</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Gestionar niveles de stock</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Ver niveles actuales de inventario.<br>2. Recibir alertas de stock bajo.<br>3. Actualizar cantidades manualmente.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Inventario actualizado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>La administradora Sofia gestiona el stock de productos populares</strong></p>
+                            <p>Sofia accede al panel de inventario y ve que el vestido rosa talla 6 años tiene solo 2 unidades restantes (nivel bajo). El sistema muestra una alerta roja indicando que necesita reposición. También ve que las zapatillas deportivas blancas talla 10 están agotadas (0 unidades). Sofia actualiza manualmente el stock: agrega 20 unidades del vestido rosa y 15 unidades de las zapatillas blancas que acaban de llegar del proveedor. Configura alertas automáticas para cuando el stock baje de 5 unidades. Los cambios se reflejan inmediatamente en la tienda, mostrando "Últimas unidades" para el vestido y "Agotado" para las zapatillas.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Órdenes de Compra</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Administrar pedidos de clientes</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Ver todas las órdenes del sistema.<br>2. Cambiar estados de órdenes.<br>3. Gestionar problemas de pedidos.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Órdenes gestionadas</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>El administrador Carlos procesa pedidos pendientes</strong></p>
+                            <p>Carlos accede al panel de órdenes y ve 15 pedidos nuevos. Filtra por estado "Pendiente de Validación" y comienza a procesarlos. Para el pedido #12360, revisa el comprobante de pago, confirma que el monto y referencia son correctos, y cambia el estado a "Pago Validado". Para el pedido #12361 nota que el cliente pidió una dirección de envío incorrecta, así que contacta al cliente por teléfono para corregirla. También ve un pedido con productos agotados y cambia su estado a "Esperando Reposición". Todos los cambios se notifican automáticamente a los clientes por email.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Asignar Órdenes a Delivery</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Asignar entregas a repartidores</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Seleccionar orden pendiente de entrega.<br>2. Asignar a repartidor disponible.<br>3. Notificar al repartidor.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Orden asignada a delivery</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo caso de uso - Sistema Real Angelow</h4>
+                            <p><strong>Escenario: Admin asignando orden a repartidor disponible</strong></p>
+                            <p>El administrador Andrés accede al panel de órdenes y filtra las que están listas para envío (pagos validados y productos preparados). Selecciona el pedido #ANG-2025-001234 con destino "Calle 10 #45-67, Medellín" que contiene 3 vestidos infantiles por valor de $125.500. En el detalle de la orden, ve un menú desplegable con los repartidores disponibles. Selecciona "Juan Pérez - Disponible" y hace clic en "Asignar Delivery". El sistema registra automáticamente la asignación, actualiza el estado del pedido a "Enviado", y envía una notificación inmediata al repartidor Juan para que sepa que tiene una nueva entrega asignada. Juan recibe la notificación en su app de delivery y puede comenzar a preparar la ruta hacia la dirección del cliente.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Usuarios/Clientes</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Administrar cuentas de usuario</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Ver lista de usuarios registrados.<br>2. Gestionar roles y permisos.<br>3. Activar/desactivar cuentas.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Usuarios gestionados</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>El administrador Roberto gestiona cuentas de usuario problemáticas</strong></p>
+                            <p>Roberto revisa la lista de usuarios y nota que la cuenta de "cliente123@email.com" tiene múltiples pedidos cancelados y quejas. Decide suspender temporalmente la cuenta cambiando su estado a "Inactivo" para investigar. También ve que "nuevo_delivery@email.com" solicitó ser repartidor, así que cambia su rol de "Cliente" a "Delivery" y le asigna una zona de trabajo. Para "admin_junior@email.com", actualiza sus permisos para que pueda gestionar productos pero no reportes financieros. Todos los cambios se aplican inmediatamente y los usuarios afectados reciben notificaciones por email.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Sliders/Banners</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Controlar contenido promocional</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Crear/editar sliders principales.<br>2. Gestionar imágenes y enlaces.<br>3. Controlar orden y visibilidad.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Sliders actualizados</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo caso de uso - Sistema Real Angelow</h4>
+                            <p><strong>Escenario: Admin configurando slider promocional</strong></p>
+                            <p>La administradora Patricia accede a la sección de sliders y banners del panel administrativo. Hace clic en "Agregar Nuevo Slider" para crear una promoción especial. Completa el formulario con: título "Descuento Temporada Escolar 2025", descripción "20% OFF en toda la línea escolar", sube una imagen banner atractiva de productos escolares infantiles, configura el enlace de destino a la categoría escolar, establece el orden como primera posición, y marca como activo. El sistema valida que la imagen tenga las dimensiones correctas y no exceda el tamaño permitido, la guarda en el servidor, y activa el slider inmediatamente. Los visitantes del sitio web ahora ven este banner promocional destacado en la página principal, atrayendo la atención hacia las ofertas escolares.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Descuentos y Promociones</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Crear códigos de descuento</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Generar códigos promocionales.<br>2. Configurar porcentajes o montos fijos.<br>3. Establecer fechas de validez.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Descuentos configurados</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>El administrador Carlos crea promociones para liquidación</strong></p>
+                            <p>Carlos configura promociones especiales para la temporada de descuentos. Crea el código "LIQUIDACION20" con 20% de descuento en toda la tienda, válido solo para compras mayores a $50, desde el 1 hasta el 15 de enero. Genera otro código "ZAPATOS30" con 30% de descuento específico para la categoría de calzado infantil, limitado a 50 usos. También configura un descuento automático del 15% para clientes recurrentes (que han comprado más de 3 veces). Todos los códigos se activan automáticamente en las fechas programadas y se aplican en el carrito de compras según las reglas configuradas.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Envíos y Costos</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Configurar reglas de envío</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Definir costos por rangos de precio.<br>2. Configurar zonas de entrega.<br>3. Establecer costos especiales.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Reglas de envío configuradas</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>La administradora Ana actualiza las tarifas de envío</strong></p>
+                            <p>Ana revisa y actualiza las reglas de envío para optimizar costos. Configura envío gratis para compras mayores a $80, $5 de costo fijo para compras de $40-$79, y $8 para compras menores a $40. Define zonas de entrega: zona centro $0 adicional, zona norte $2 extra, zona sur $3 extra, y zona este $4 extra. También establece costos especiales: productos grandes (como muebles infantiles) tienen $15 adicionales, y entregas express (24 horas) cuestan el doble. Las nuevas reglas se aplican automáticamente en todos los cálculos de envío desde ese momento.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Generar Reportes de Ventas</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Análisis de ventas por períodos</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Seleccionar rango de fechas.<br>2. Generar reportes de ingresos.<br>3. Exportar a PDF/Excel.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Reporte de ventas generado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo caso de uso - Sistema Real Angelow</h4>
+                            <p><strong>Escenario: Admin generando reporte de ventas del mes</strong></p>
+                            <p>El administrador Diego accede a la sección de reportes de ventas y configura los parámetros para generar un análisis del mes de octubre de 2025. Selecciona el rango de fechas del 1 al 31 de octubre, formato PDF, y tipo detallado. El sistema procesa automáticamente toda la información de ventas del período, calculando métricas como: total de $12.450.000 en ventas, 145 órdenes procesadas, ticket promedio de $85.862, pagos confirmados, y órdenes canceladas. Genera un reporte completo en PDF que incluye: encabezado con logo de Angelow, resumen ejecutivo, gráfico de tendencias de ventas diarias, tabla con los 10 productos más vendidos, análisis por categorías, métricas de conversión como tasa de abandono del carrito y tiempo promedio de compra. Diego puede descargar el PDF inmediatamente o exportarlo a Excel para análisis adicionales en otras herramientas.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Generar Reportes de Productos</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Análisis de rendimiento de productos</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Ver productos más vendidos.<br>2. Análisis de inventario.<br>3. Tendencias de ventas.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Reporte de productos generado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>La administradora Sofia analiza el rendimiento de productos</strong></p>
+                            <p>Sofia genera un reporte de productos para el trimestre actual. El sistema muestra los 10 productos más vendidos: el vestido rosa encabeza la lista con 45 unidades vendidas, seguido de las zapatillas deportivas con 38 unidades. También identifica productos con bajo rendimiento (menos de 5 ventas) que podrían necesitar descuentos o retirada del catálogo. El reporte incluye análisis de inventario mostrando qué productos necesitan reposición urgente (stock bajo) y tendencias de ventas por categorías. Sofia usa esta información para decidir qué productos promocionar y cuáles descontinuar.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Generar Reportes de Clientes</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Análisis de comportamiento de usuarios</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Clientes más activos.<br>2. Valor promedio de pedidos.<br>3. Segmentación por ubicación.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Reporte de clientes generado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>El administrador Carlos analiza el comportamiento de clientes</strong></p>
+                            <p>Carlos genera un reporte de clientes para entender mejor su base de usuarios. El sistema muestra que hay 1,250 clientes registrados, con 340 clientes activos (compraron en los últimos 30 días). Los clientes más valiosos son Maria G. con $2,340 en compras totales y Roberto L. con $1,890. El ticket promedio es $67, pero los clientes recurrentes gastan en promedio $120 por pedido. El reporte también segmenta por ubicación: 45% de clientes en zona norte, 35% centro, 20% sur. Carlos identifica oportunidades para campañas dirigidas a clientes inactivos y zonas con menor participación.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Gestionar Noticias/Contenido</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Administrar contenido del blog/noticias</td></tr>
+                                <tr><th>Actores</th><td>Administrador</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Crear/editar artículos.<br>2. Gestionar categorías de contenido.<br>3. Publicar/ocultar contenido.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Contenido gestionado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>La administradora Ana publica contenido sobre tendencias infantiles</strong></p>
+                            <p>Ana crea un artículo nuevo titulado "Tendencias de Moda Infantil para Primavera 2025". Escribe contenido detallado sobre colores pastel, telas cómodas, y estilos versátiles, incluyendo consejos para padres. Sube 8 imágenes de productos de Angelow que ilustran las tendencias mencionadas. Asigna el artículo a la categoría "Consejos de Moda" y programa su publicación automática para el 1 de septiembre. También oculta un artículo antiguo sobre tendencias invernales que ya no es relevante. El artículo se publica en el blog de Angelow y se comparte automáticamente en las redes sociales de la tienda.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Módulo de Delivery -->
+            <div class="module-section">
+                <h2 class="module-title">Módulo de Delivery</h2>
+                
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Ver Órdenes Asignadas</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Revisar entregas pendientes</td></tr>
+                                <tr><th>Actores</th><td>Delivery</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Sistema muestra órdenes asignadas al repartidor.<br>2. Información de cliente, dirección, productos.<br>3. Estados de cada orden.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Órdenes asignadas visibles</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>El repartidor Carlos revisa sus entregas del día</strong></p>
+                            <p>Carlos inicia sesión en la app de delivery de Angelow y ve sus 6 órdenes asignadas para hoy. Cada orden muestra: nombre del cliente (María González), dirección completa (Calle Flores 123, apto 4B), productos a entregar (2 vestidos infantiles y 1 abrigo), valor total ($89.50), y estado actual (todas en "Asignado"). Puede ver el mapa con todas las ubicaciones marcadas y el orden óptimo de entrega sugerido por el sistema. Carlos confirma que tiene todos los paquetes en su vehículo y está listo para comenzar las entregas.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Aceptar Orden de Entrega</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Confirmar aceptación de entrega</td></tr>
+                                <tr><th>Actores</th><td>Delivery</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Repartidor acepta orden asignada.<br>2. Sistema actualiza estado.<br>3. Prepara navegación GPS.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Orden aceptada</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Carlos confirma que acepta las entregas asignadas</strong></p>
+                            <p>Carlos revisa las 4 órdenes asignadas para la zona norte y confirma que puede entregarlas todas hoy. Toca el botón "Aceptar Todas las Órdenes" en su app. El sistema actualiza inmediatamente el estado de todas las órdenes de "Asignado" a "Aceptado por Delivery" y activa el GPS de seguimiento. La app calcula la ruta óptima comenzando por la entrega más cercana (Calle Primavera 45) y terminando con la más distante (Avenida Central 200). Carlos recibe una notificación confirmando que las órdenes están listas para entrega y puede comenzar su ruta.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Iniciar Navegación GPS</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Comenzar ruta de entrega con navegación GPS</td></tr>
+                                <tr><th>Actores</th><td>Delivery</td></tr>
+                                <tr><th>Precondiciones</th><td>Orden aceptada por repartidor (delivery_status='driver_accepted')</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Repartidor accede a <code>delivery/navigation.php?delivery_id={id}</code>.<br>2. Sistema carga coordenadas destino desde <code>user_addresses.gps_latitude/longitude</code>.<br>3. JavaScript solicita permiso de geolocalización: <code>navigator.geolocation.getCurrentPosition()</code>.<br>4. Renderiza mapa Leaflet con: marcador origen (ubicación actual), marcador destino, ruta calculada con OSRM.<br>5. Inicia tracking continuo: <code>navigator.geolocation.watchPosition()</code> envía coordenadas cada 10 seg a <code>delivery/api/update_location.php</code>.<br>6. Actualiza tabla <code>order_deliveries</code>: <code>location_lat, location_lng, last_location_update</code>.<br>7. Cambia estado a 'in_transit' si no lo está.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>Si GPS no disponible o permiso denegado, muestra error y no permite continuar</td></tr>
+                                <tr><th>PosCondiciones</th><td>Navegación activa, ubicación actualizada en tiempo real</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo caso de uso - Sistema Real Angelow</h4>
+                            <p><strong>Escenario: Repartidor iniciando ruta con GPS</strong></p>
+                            <p>El repartidor Miguel accede a su dashboard de delivery y ve la orden asignada #ANG-2025-001234 con dirección "Calle 10 #45-67, Medellín". Hace clic en "Iniciar Navegación" y el sistema solicita permiso para acceder a su ubicación GPS. Una vez concedido el permiso, se abre la pantalla de navegación con un mapa detallado que muestra su ubicación actual, la dirección de destino del cliente, y la ruta óptima calculada. El sistema actualiza automáticamente su posición cada 10 segundos, permitiendo que el cliente pueda rastrear su ubicación en tiempo real. Miguel puede ver información adicional como la distancia restante, tiempo estimado de llegada, y velocidad actual, lo que le ayuda a planificar la ruta más eficiente hacia la entrega.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Actualizar Ubicación en Tiempo Real</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Enviar coordenadas GPS</td></tr>
+                                <tr><th>Actores</th><td>Delivery</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. App móvil envía ubicación cada cierto tiempo.<br>2. Sistema actualiza posición en base de datos.<br>3. Cliente puede ver ubicación en tiempo real.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Ubicación actualizada</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo caso de uso - Sistema Real Angelow</h4>
+                            <p><strong>Escenario: Ubicación GPS del repartidor actualizándose continuamente</strong></p>
+                            <p>Una vez que el repartidor inicia la navegación, su dispositivo móvil comienza a enviar actualizaciones de ubicación GPS de forma continua. Cada 10 segundos, el sistema registra automáticamente la posición exacta del repartidor, incluyendo latitud, longitud, precisión de la señal, velocidad actual, y dirección de movimiento. Esta información se actualiza en el servidor y permite que el cliente pueda ver en tiempo real cómo se acerca el repartidor. Por ejemplo, el cliente ve que el repartidor está a 1.8 kilómetros de distancia, viajando a 35 km/h, con un tiempo estimado de llegada de 7 minutos. El sistema calcula la distancia usando coordenadas GPS precisas y actualiza el mapa del cliente cada 30 segundos para mostrar el progreso de la entrega.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Cambiar Estado de Entrega</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Actualizar progreso de entrega</td></tr>
+                                <tr><th>Actores</th><td>Delivery</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Repartidor cambia estado (en camino, llegado, entregado).<br>2. Sistema notifica al cliente.<br>3. Actualiza historial de estados.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Estado de entrega actualizado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <h4>Ejemplo caso de uso - Sistema Real Angelow</h4>
+                            <p><strong>Escenario: Repartidor actualizando progreso de entrega</strong></p>
+                            <p>Durante la ruta de entrega, el repartidor Alejandro actualiza constantemente el estado de la orden para mantener informado al cliente. Comienza haciendo clic en "Iniciar Ruta" cuando sale del almacén, lo que cambia el estado a "En Camino" y notifica al cliente que su pedido está en ruta. Al acercarse al destino, toca "He Llegado" cuando estaciona frente al edificio, actualizando el estado y enviando una notificación al cliente de que el repartidor está en la puerta. Finalmente, cuando completa la entrega exitosamente y recibe la firma digital del cliente, marca "Entregado" para cerrar el proceso. Cada cambio de estado se registra automáticamente en el historial del pedido, genera notificaciones por email al cliente, y permite rastrear completamente el progreso de la entrega desde el inicio hasta el final.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Confirmar Entrega Exitosa</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Finalizar proceso de entrega</td></tr>
+                                <tr><th>Actores</th><td>Delivery</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Repartidor confirma entrega física.<br>2. Sistema registra firma digital si aplica.<br>3. Actualiza estado final.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Entrega confirmada</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Carlos completa exitosamente la entrega del pedido</strong></p>
+                            <p>Al llegar al apartamento de María, Carlos toca el timbre y María abre la puerta. Verifica que los productos (2 vestidos infantiles) están en perfectas condiciones y María firma digitalmente en la tablet de Carlos usando su dedo. Carlos confirma la entrega exitosa en la app, el sistema registra la firma digital, actualiza el estado final del pedido a "Entregado", y marca la transacción como completada. María recibe automáticamente un email de confirmación de entrega y puede dejar una reseña sobre el servicio de delivery.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Reportar Problema de Entrega</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Notificar incidencias</td></tr>
+                                <tr><th>Actores</th><td>Delivery</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Repartidor describe el problema.<br>2. Sistema registra incidencia.<br>3. Notifica a administrador.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Problema reportado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Carlos reporta un problema durante la entrega</strong></p>
+                            <p>Al llegar a la dirección de Roberto (Calle Norte 200), Carlos encuentra que el edificio tiene problemas de acceso - el código de seguridad del portón no funciona. Intenta contactar a Roberto por teléfono pero no contesta. Desde la app de delivery, Carlos selecciona "Reportar Problema" para esta orden específica, describe detalladamente: "No puedo acceder al edificio, código de portón 4567 no funciona, cliente no contesta llamadas". Adjunta una foto del portón con problemas. El sistema registra automáticamente la incidencia, cambia el estado del pedido a "Problema Reportado", y envía una notificación inmediata al administrador de Angelow con todos los detalles para que coordine una solución.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="uc-table">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table class="uc-inner-table">
+                                <tr><th>Nombre del caso de uso</th><td>Contactar al Cliente</td></tr>
+                                <tr><th>Autor</th><td>Equipo Angelow</td></tr>
+                                <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
+                                <tr><th>Descripción</th><td>Comunicación con destinatario</td></tr>
+                                <tr><th>Actores</th><td>Delivery</td></tr>
+                                <tr><th>Precondiciones</th><td>N/A</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Repartidor inicia llamada telefónica.<br>2. Sistema registra comunicación.<br>3. Actualiza notas de entrega.</td></tr>
+                                <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
+                                <tr><th>PosCondiciones</th><td>Cliente contactado</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <p><strong>Carlos coordina con la cliente para completar la entrega</strong></p>
+                            <p>Después de esperar 10 minutos en la dirección de Ana (Avenida Central 134), Carlos decide contactarla directamente. Desde la app de delivery, toca el botón "Llamar al Cliente" que automáticamente marca el número telefónico registrado de Ana. Ana contesta y explica que está atascada en el tráfico y llegará en 15 minutos. Carlos confirma que esperará y actualiza las notas de entrega con "Cliente retrasada, llegará en 15 min, esperaré en destino". El sistema registra automáticamente esta comunicación en el historial del pedido, incluyendo fecha, hora, y duración aproximada de la llamada, para mantener un registro completo de todas las interacciones durante el proceso de entrega.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Proyecto Angelow</strong> - Sistema de Gestión de E-commerce de Ropa Infantil</p>
+            <p>Especificaciones de Casos de Uso - Actualizado: 2 de Noviembre, 2025</p>
+            <p>Total: <strong>52 Casos de Uso Documentados</strong> | <strong>7 Módulos Principales</strong></p>
+            <p style="margin-top: 10px; font-size: 0.85em; color: #666;">
+                <strong>Módulos cubiertos:</strong> Autenticación y Usuarios (6 UC), Tienda y Catálogo (6 UC), Carrito y Compras (7 UC), Pagos con Transferencia Bancaria (4 UC), Gestión de Pedidos (5 UC), Módulo Administrativo (14 UC), Sistema de Delivery con GPS (8 UC)
+            </p>
+            <p style="margin-top: 10px; font-size: 0.85em; color: #28a745;">
+                <strong>Tecnologías implementadas:</strong> PHP 8.0+, MySQL 8.0, Leaflet.js + OpenStreetMap, Sistema GPS en tiempo real, Procedimientos almacenados para delivery, Validación manual de pagos con comprobantes, Gestión de variantes de productos (tallas/colores), Roles de usuario (customer/admin/delivery)
+            </p>
+            <p style="margin-top: 10px; font-size: 0.85em; color: #667eea;">
+                <strong>Características distintivas:</strong> Todos los ejemplos reflejan la implementación real del sistema Angelow. Nombres de tablas, campos, archivos PHP y flujos de trabajo coinciden exactamente con el código fuente en producción.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
