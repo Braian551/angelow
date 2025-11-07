@@ -17,7 +17,6 @@ require_once __DIR__ . '/../conexion.php';
 function getDashboardByRole($role) {
     $dashboards = [
         'admin' => BASE_URL . '/admin/dashboardadmin.php',
-        'delivery' => BASE_URL . '/delivery/dashboarddeli.php',
         'user' => BASE_URL . '/users/dashboarduser.php',
         'customer' => BASE_URL . '/users/dashboarduser.php'
     ];
@@ -31,7 +30,6 @@ function getDashboardByRole($role) {
 function getAllowedPagesByRole($role) {
     $allowedPages = [
         'admin' => ['admin/', 'auth/logout.php'],
-        'delivery' => ['delivery/', 'auth/logout.php'],
         'user' => ['users/', 'tienda/', 'producto/', 'pagos/', 'donaciones/', 'auth/logout.php'],
         'customer' => ['users/', 'tienda/', 'producto/', 'pagos/', 'donaciones/', 'auth/logout.php']
     ];
@@ -128,7 +126,7 @@ function enforceRoleAccess() {
 
 /**
  * Verifica que el usuario tenga el rol requerido
- * Uso: requireRole('admin') o requireRole(['admin', 'delivery'])
+ * Uso: requireRole('admin') o requireRole(['admin', 'user'])
  */
 function requireRole($requiredRoles) {
     global $conn;

@@ -151,6 +151,17 @@ Para más detalles sobre cada carpeta, consultar:
 - Sanitización de inputs
 - Headers de seguridad
 
+### Roles de Usuario
+
+> **⚠️ Actualización Nov 2025**: El rol `delivery` ha sido eliminado del sistema principal y se gestiona en una aplicación separada. Ver [docs/DELIVERY_SEPARADO.md](docs/DELIVERY_SEPARADO.md)
+
+**Roles activos:**
+- **customer** - Cliente que realiza compras
+- **admin** - Administrador con acceso completo
+
+**Roles históricos:**
+- ~~delivery~~ - Repartidor (movido a aplicación separada)
+
 ## 🛒 Sistema de E-commerce
 
 ### Catálogo de Productos
@@ -382,4 +393,5 @@ Este proyecto es propiedad de Angelow Ropa Infantil. Todos los derechos reservad
 
 ---
 
-*Última actualización: Enero 2025*
+*Última actualización: Noviembre 7, 2025*
+*Versión: 2.0 (Delivery separado)*

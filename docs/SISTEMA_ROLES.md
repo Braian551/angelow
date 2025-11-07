@@ -1,5 +1,7 @@
 # Sistema de Autenticación y Roles - Angelow
 
+> **⚠️ NOTA IMPORTANTE (Nov 2025):** El rol `delivery` ha sido eliminado del sistema principal. Ver [DELIVERY_SEPARADO.md](./DELIVERY_SEPARADO.md) para más información.
+
 ## Descripción General
 
 Se ha implementado un sistema robusto de autenticación y control de acceso basado en roles para garantizar que cada usuario acceda únicamente a las páginas correspondientes a su rol.
@@ -14,13 +16,10 @@ Se ha implementado un sistema robusto de autenticación y control de acceso basa
   - Configuración del sistema
   - Reportes y estadísticas
 
-### 2. **delivery** - Repartidor/Transportista
-- **Dashboard:** `/delivery/dashboarddeli.php`
-- **Acceso a:**
-  - Todas las páginas en `/delivery/`
-  - Lista de órdenes asignadas
-  - Actualización de estado de entregas
-  - Historial de entregas
+### 2. ~~**delivery** - Repartidor/Transportista~~ (ELIMINADO - Nov 2025)
+- ~~**Dashboard:** `/delivery/dashboarddeli.php`~~
+- **Estado:** Gestionado en aplicación separada
+- **Ver:** [DELIVERY_SEPARADO.md](./DELIVERY_SEPARADO.md)
 
 ### 3. **user / customer** - Cliente
 - **Dashboard:** `/users/dashboarduser.php`
@@ -108,21 +107,6 @@ requireRole('admin');
 ?>
 ```
 
-### Ejemplo para página de Delivery:
-
-```php
-<?php
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../conexion.php';
-require_once __DIR__ . '/../auth/role_redirect.php';
-
-// Verificar que el usuario tenga rol de delivery
-requireRole('delivery');
-
-// Resto del código de la página...
-?>
-```
-
 ### Ejemplo para página de Usuario (múltiples roles):
 
 ```php
@@ -185,7 +169,7 @@ require_once __DIR__ . '/../auth/role_redirect.php';
 requireRole('admin');
 
 // Opción 2: Requerir uno de varios roles
-requireRole(['admin', 'delivery']);
+requireRole(['admin', 'customer']);
 
 // El resto del código solo se ejecutará si el usuario tiene el rol correcto
 ?>
@@ -211,18 +195,20 @@ requireRole(['admin', 'delivery']);
 
 ### Tabla users - Campo role
 
-Valores permitidos:
+**Valores permitidos (actualizado Nov 2025):**
 - `'admin'` - Administrador del sistema
-- `'delivery'` - Repartidor/transportista
-- `'user'` - Usuario cliente estándar
-- `'customer'` - Sinónimo de user (compatibilidad)
+- `'customer'` - Usuario cliente estándar
+- `'user'` - Sinónimo de customer (compatibilidad)
+
+**Valor eliminado:**
+- ~~`'delivery'`~~ - Gestionado en aplicación separada
 
 ```sql
 -- Verificar rol de un usuario
 SELECT id, name, email, role FROM users WHERE id = ?;
 
 -- Cambiar rol de un usuario
-UPDATE users SET role = 'delivery' WHERE id = ?;
+UPDATE users SET role = 'customer' WHERE id = ?;
 ```
 
 ## Notas Importantes
@@ -235,6 +221,7 @@ UPDATE users SET role = 'delivery' WHERE id = ?;
 
 ---
 
-**Última actualización:** Octubre 2025
-**Versión:** 1.0
+**Última actualización:** Noviembre 7, 2025
+**Versión:** 2.0 (Delivery separado)
 **Autor:** Sistema Angelow
+**Ver también:** [DELIVERY_SEPARADO.md](./DELIVERY_SEPARADO.md)

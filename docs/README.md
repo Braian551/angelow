@@ -11,7 +11,11 @@ Documentación general y guías de uso del sistema:
 - `GUIA_VOZ_ESPAÑOL.md` - Guía de configuración de voz en español
 - `INSTRUCCIONES_FINALES.md` - Instrucciones finales de implementación
 
-### � Migraciones (`migraciones/`)
+### 🏗️ Arquitectura del Sistema
+
+- **DELIVERY_SEPARADO.md** - Documentación sobre la separación del módulo de delivery como aplicación independiente (Nov 2025)
+
+### 🔄 Migraciones (`migraciones/`)
 Documentación sobre migraciones de base de datos:
 - `MIGRACION_007_COMPLETADA.md` - Migración 007 completada
 - `MIGRACION_009_ORDERS_ADDRESSES_FINAL.md` - Migración 009 de órdenes y direcciones
@@ -77,4 +81,4 @@ Para encontrar documentación específica, puedes buscar por:
 
 ---
 
-*Última actualización: 13 de Octubre, 2025*
+*Última actualización: 7 de Noviembre, 2025*

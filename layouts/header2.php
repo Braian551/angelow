@@ -27,24 +27,6 @@ if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
             }
         }
 
-
-         if ($user && $user['role'] === 'delivery') {
-            $current_page = basename($_SERVER['PHP_SELF']);
-            if ($current_page !== 'dashboardadmin.php') {
-                $redirect_url = defined('BASE_URL') 
-                    ? BASE_URL . '/delivery/dashboarddeli.php' 
-                    : '/delivery/dashboarddeli.php';
-                
-                header("Location: $redirect_url");
-                exit();
-            }
-        }
-
-
-
-
-
-
     } catch (PDOException $e) {
         error_log('Error al verificar rol de usuario: ' . $e->getMessage());
     }
