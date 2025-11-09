@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz de Requisitos - Parte 2: Productos e Inventario</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .info-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .info-item { display: flex; align-items: center; gap: 8px; }
+        .info-item strong { color: #667eea; }
+        .table-container { padding: 30px; overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        thead th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            vertical-align: middle;
+        }
+        thead th:last-child { border-right: none; }
+        tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.3s;
+        }
+        tbody tr:hover { background-color: #f5f5f5; }
+        tbody tr:nth-child(even) { background-color: #fafafa; }
+        tbody tr:nth-child(even):hover { background-color: #f0f0f0; }
+        td {
+            padding: 14px 12px;
+            vertical-align: top;
+            border-right: 1px solid #e8e8e8;
+            word-wrap: break-word;
+        }
+        td:last-child { border-right: none; }
+        .module-cell {
+            font-weight: 600;
+            color: #667eea;
+            background-color: #f0f4ff !important;
+            border-left: 4px solid #667eea;
+        }
+        .subprocess-cell { font-weight: 500; color: #555; }
+        .code-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #764ba2;
+            background-color: #faf5ff;
+        }
+        .description-cell { color: #333; line-height: 1.5; }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 3px solid #667eea;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MATRIZ DE REQUISITOS - PARTE 2</h1>
+            <p>Productos e Inventario - Sistema Angelow</p>
+        </div>
+        <div class="info-bar">
+            <div class="info-item"><strong>Módulos:</strong> Productos, Variantes, Categorías, Inventario, Imágenes</div>
+            <div class="info-item"><strong>Fecha:</strong> Noviembre 2025</div>
+            <div class="info-item"><strong>Requisitos:</strong> RF-017 a RF-037</div>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">Módulo</th>
+                        <th style="width: 10%;">Subproceso</th>
+                        <th style="width: 5%;">Nro.<br>RF</th>
+                        <th style="width: 25%;">Requisito Funcional</th>
+                        <th style="width: 5%;">Nro.<br>RN</th>
+                        <th style="width: 20%;">Reglas del Negocio</th>
+                        <th style="width: 5%;">Nro.<br>RI</th>
+                        <th style="width: 20%;">Requisitos de Información</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- GESTIÓN DE PRODUCTOS -->
+                    <tr>
+                        <td class="module-cell" rowspan="4">Gestión de Productos</td>
+                        <td class="subprocess-cell">Registrar producto</td>
+                        <td class="code-cell">RF-017</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores registrar nuevos productos con información básica: nombre, descripción, precio, categoría y género (niño/niña/bebé).
+                        </td>
+                        <td class="code-cell">RN-017</td>
+                        <td class="description-cell">Solo los administradores pueden crear productos en el catálogo. Todos los productos deben tener nombre, precio y categoría como datos obligatorios. La descripción ayuda a que los clientes conozcan mejor el producto.</td>
+                        <td class="code-cell">RI-017</td>
+                        <td class="description-cell">
+                            Nombre del producto, descripción detallada, precio base en pesos colombianos, identificador de la categoría, género (niño/niña/bebé/unisex), estado inicial (activo/inactivo) y fecha de creación.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Mostrar productos</td>
+                        <td class="code-cell">RF-018</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores visualizar el listado completo de todos los productos con su información principal, variantes y stock disponible.
+                        </td>
+                        <td class="code-cell">RN-018</td>
+                        <td class="description-cell">El listado de productos muestra información resumida de cada uno: nombre, imagen principal, precio, categoría, género, cantidad de variantes, stock total y estado (activo/inactivo). Puedes buscar y filtrar para encontrar productos específicos fácilmente.</td>
+                        <td class="code-cell">RI-018</td>
+                        <td class="description-cell">
+                            Listado de productos con: identificador, nombre, imagen principal, precio, categoría, género, cantidad de variantes de color, cantidad de variantes de talla, stock total, estado y opciones de acciones (editar, eliminar).
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Actualizar producto</td>
+                        <td class="code-cell">RF-019</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores modificar cualquier información de productos existentes: nombre, descripción, precio, categoría, género o estado.
+                        </td>
+                        <td class="code-cell">RN-019</td>
+                        <td class="description-cell">Los cambios en productos se reflejan inmediatamente en la tienda. Si cambias el precio, el nuevo precio se muestra de inmediato para los clientes. Todos los cambios quedan registrados en el historial de auditoría automáticamente.</td>
+                        <td class="code-cell">RI-019</td>
+                        <td class="description-cell">
+                            Identificador del producto a modificar, nuevos valores para: nombre, descripción, precio, categoría, género, estado, usuario administrador que realiza el cambio y fecha de última actualización.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Eliminar producto</td>
+                        <td class="code-cell">RF-020</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores eliminar productos del catálogo que ya no se comercializan.
+                        </td>
+                        <td class="code-cell">RN-020</td>
+                        <td class="description-cell">No puedes eliminar un producto que tenga pedidos pendientes o en proceso. El sistema te pedirá confirmación antes de eliminar para evitar borrados accidentales. La eliminación también borra todas sus variantes, imágenes y relaciones con colecciones.</td>
+                        <td class="code-cell">RI-020</td>
+                        <td class="description-cell">
+                            Identificador del producto a eliminar, verificación de ausencia de pedidos activos, eliminación en cascada de variantes e imágenes, usuario que elimina, motivo de eliminación y fecha de eliminación para auditoría.
+                        </td>
+                    </tr>
+                    <!-- VARIANTES DE COLOR -->
+                    <tr>
+                        <td class="module-cell" rowspan="3">Variantes de Color</td>
+                        <td class="subprocess-cell">Agregar variante de color</td>
+                        <td class="code-cell">RF-021</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores agregar variantes de color a productos, asociando cada color con un código SKU único.
+                        </td>
+                        <td class="code-cell">RN-021</td>
+                        <td class="description-cell">Cada combinación de producto y color genera un código SKU único automáticamente para control de inventario. Los colores disponibles se muestran con su representación visual real (código hexadecimal) para que los clientes vean el tono exacto.</td>
+                        <td class="code-cell">RI-021</td>
+                        <td class="description-cell">
+                            Identificador del producto, identificador del color (de catálogo de colores), código SKU único generado automáticamente, estado de la variante (activa/inactiva) y fecha de creación de la variante.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Mostrar variantes de color</td>
+                        <td class="code-cell">RF-022</td>
+                        <td class="description-cell">
+                            El sistema debe permitir visualizar todas las variantes de color de un producto con su información completa, imágenes específicas y stock disponible.
+                        </td>
+                        <td class="code-cell">RN-022</td>
+                        <td class="description-cell">Cada variante de color puede tener sus propias fotos exclusivas mostrando cómo luce el producto en ese color específico. El stock se controla de manera independiente por cada combinación de color y talla.</td>
+                        <td class="code-cell">RI-022</td>
+                        <td class="description-cell">
+                            Listado de variantes de color del producto con: color (nombre y código hexadecimal), código SKU, imágenes asociadas a esa variante, stock total de ese color (suma de todas las tallas) y estado.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Eliminar variante de color</td>
+                        <td class="code-cell">RF-023</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores eliminar variantes de color que ya no están disponibles, liberando espacio en el catálogo.
+                        </td>
+                        <td class="code-cell">RN-023</td>
+                        <td class="description-cell">No puedes eliminar una variante de color que esté en pedidos pendientes o en carritos de compra activos. El sistema te avisará cuántos carritos tienen ese producto y te pedirá confirmación antes de eliminar.</td>
+                        <td class="code-cell">RI-023</td>
+                        <td class="description-cell">
+                            Identificador de la variante de color, verificación de ausencia en pedidos activos y carritos, eliminación de imágenes asociadas, usuario administrador que elimina y fecha de eliminación.
+                        </td>
+                    </tr>
+                    <!-- VARIANTES DE TALLA -->
+                    <tr>
+                        <td class="module-cell" rowspan="3">Variantes de Talla</td>
+                        <td class="subprocess-cell">Agregar variante de talla</td>
+                        <td class="code-cell">RF-024</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores agregar variantes de talla a productos con control de stock independiente por talla.
+                        </td>
+                        <td class="code-cell">RN-024</td>
+                        <td class="description-cell">Cada talla de producto (XS, S, M, L, XL, 0-3M, 3-6M, etc.) tiene su propio inventario independiente. Al agregar una talla nueva, puedes definir cuántas unidades hay disponibles inicialmente.</td>
+                        <td class="code-cell">RI-024</td>
+                        <td class="description-cell">
+                            Identificador del producto, identificador de la talla (de catálogo de tallas), cantidad de stock inicial para esa talla, umbral de alerta de bajo inventario y fecha de creación de la variante.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Mostrar variantes de talla</td>
+                        <td class="code-cell">RF-025</td>
+                        <td class="description-cell">
+                            El sistema debe permitir visualizar todas las variantes de talla de un producto con su stock disponible actual y umbral de alerta.
+                        </td>
+                        <td class="code-cell">RN-025</td>
+                        <td class="description-cell">Las tallas se muestran en orden lógico (de menor a mayor tamaño). Si el stock de alguna talla está por debajo del umbral configurado, se resalta visualmente para alertar al administrador que debe reabastecer.</td>
+                        <td class="code-cell">RI-025</td>
+                        <td class="description-cell">
+                            Listado de variantes de talla del producto con: nombre de la talla, código de la talla, stock disponible actual, umbral de alerta, indicador visual de stock bajo y estado (activa/inactiva).
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Eliminar variante de talla</td>
+                        <td class="code-cell">RF-026</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores eliminar variantes de talla que ya no se ofrecen en el producto.
+                        </td>
+                        <td class="code-cell">RN-026</td>
+                        <td class="description-cell">Antes de eliminar una talla, el sistema verifica que no existan pedidos pendientes con esa talla específica. Si hay pedidos activos, no se permite la eliminación hasta que se completen o cancelen esos pedidos.</td>
+                        <td class="code-cell">RI-026</td>
+                        <td class="description-cell">
+                            Identificador de la variante de talla, verificación de ausencia en pedidos activos, registro del stock eliminado para auditoría, usuario que elimina y fecha de eliminación.
+                        </td>
+                    </tr>
+                    <!-- GESTIÓN DE CATEGORÍAS -->
+                    <tr>
+                        <td class="module-cell" rowspan="1">Categorías</td>
+                        <td class="subprocess-cell">Visualizar categorías</td>
+                        <td class="code-cell">RF-027</td>
+                        <td class="description-cell">
+                            El sistema debe permitir visualizar el listado completo de categorías de productos disponibles para organizar el catálogo.
+                        </td>
+                        <td class="code-cell">RN-027</td>
+                        <td class="description-cell">Las categorías organizan los productos para que los clientes encuentren fácilmente lo que buscan (vestidos, camisetas, pantalones, etc.). Todos los productos deben pertenecer a una categoría. Las categorías activas aparecen en el menú principal de la tienda.</td>
+                        <td class="code-cell">RI-027</td>
+                        <td class="description-cell">
+                            Listado de categorías con: identificador, nombre de la categoría, identificador de URL amigable (slug), descripción, cantidad de productos en esa categoría, estado (activa/inactiva) y orden de visualización en el menú.
+                        </td>
+                    </tr>
+                    <!-- INVENTARIO -->
+                    <tr>
+                        <td class="module-cell" rowspan="4">Gestión de Inventario</td>
+                        <td class="subprocess-cell">Ver inventario general</td>
+                        <td class="code-cell">RF-028</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores visualizar el inventario completo con stock de todas las variantes de productos, con alertas de bajo inventario.
+                        </td>
+                        <td class="code-cell">RN-028</td>
+                        <td class="description-cell">El inventario muestra stock en tiempo real de cada producto por color y talla. Los productos con stock bajo (según umbral configurado) se destacan con color rojo para alertar que necesitan reabastecimiento urgente.</td>
+                        <td class="code-cell">RI-028</td>
+                        <td class="description-cell">
+                            Listado de inventario con: producto, variante de color, variante de talla, stock disponible actual, umbral de alerta, indicador de stock bajo/crítico/agotado, fecha de última actualización del stock.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Ajustar stock manualmente</td>
+                        <td class="code-cell">RF-029</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores ajustar manualmente el stock de productos (agregar, reducir o transferir entre variantes) con motivo obligatorio.
+                        </td>
+                        <td class="code-cell">RN-029</td>
+                        <td class="description-cell">Cada ajuste manual de inventario requiere especificar el motivo (reabastecimiento, corrección, merma, devolución, etc.). Todos los movimientos quedan registrados automáticamente con quién lo hizo, cuándo y por qué.</td>
+                        <td class="code-cell">RI-029</td>
+                        <td class="description-cell">
+                            Identificador de la variante (producto+color+talla), tipo de movimiento (entrada/salida/transferencia), cantidad modificada, stock anterior, stock resultante, motivo del ajuste, usuario responsable y fecha del movimiento.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Ver historial de movimientos</td>
+                        <td class="code-cell">RF-030</td>
+                        <td class="description-cell">
+                            El sistema debe permitir consultar el historial completo de movimientos de inventario filtrable por producto, fecha, tipo de movimiento y usuario responsable.
+                        </td>
+                        <td class="code-cell">RN-030</td>
+                        <td class="description-cell">El historial de inventario es permanente e inalterable, permitiendo auditorías completas. Puedes ver todos los movimientos: ventas (automáticas), devoluciones, ajustes manuales, transferencias y correcciones, con trazabilidad completa.</td>
+                        <td class="code-cell">RI-030</td>
+                        <td class="description-cell">
+                            Historial de movimientos con: fecha y hora, producto y variante afectada, tipo de movimiento, cantidad, stock antes/después, motivo, usuario responsable, pedido relacionado (si aplica) y notas adicionales.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Actualización automática por ventas</td>
+                        <td class="code-cell">RF-031</td>
+                        <td class="description-cell">
+                            El sistema debe actualizar automáticamente el inventario cuando se confirma una orden de compra, descontando las unidades vendidas del stock.
+                        </td>
+                        <td class="code-cell">RN-031</td>
+                        <td class="description-cell">Cuando un cliente completa su compra, el inventario se descuenta automáticamente de cada variante comprada. Si el pago es rechazado o el pedido se cancela, el stock se reintegra automáticamente. Esto evita sobreventa.</td>
+                        <td class="code-cell">RI-031</td>
+                        <td class="description-cell">
+                            Movimiento automático de inventario: identificadores de las variantes vendidas, cantidades descontadas, número de pedido asociado, estado del pago, stock antes/después y fecha del movimiento automático.
+                        </td>
+                    </tr>
+                    <!-- IMÁGENES DE PRODUCTOS -->
+                    <tr>
+                        <td class="module-cell" rowspan="4">Imágenes de Productos</td>
+                        <td class="subprocess-cell">Subir imágenes generales</td>
+                        <td class="code-cell">RF-032</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores subir imágenes generales del producto que se mostrarán en el catálogo principal.
+                        </td>
+                        <td class="code-cell">RN-032</td>
+                        <td class="description-cell">Las imágenes deben estar en formato JPG, PNG o WEBP con tamaño máximo de 2 MB cada una. Puedes subir múltiples imágenes y definir cuál es la imagen principal que aparecerá en el listado de productos.</td>
+                        <td class="code-cell">RI-032</td>
+                        <td class="description-cell">
+                            Identificador del producto, archivo de imagen (JPG/PNG/WEBP, máximo 2MB), ruta de almacenamiento de la imagen, orden de visualización, indicador de imagen principal y fecha de subida.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Subir imágenes por variante de color</td>
+                        <td class="code-cell">RF-033</td>
+                        <td class="description-cell">
+                            El sistema debe permitir subir imágenes específicas para cada variante de color, mostrando cómo luce el producto en ese color exacto.
+                        </td>
+                        <td class="code-cell">RN-033</td>
+                        <td class="description-cell">Cada variante de color puede tener múltiples fotos exclusivas desde diferentes ángulos. Cuando un cliente selecciona un color en la tienda, las imágenes cambian automáticamente para mostrar ese color específico.</td>
+                        <td class="code-cell">RI-033</td>
+                        <td class="description-cell">
+                            Identificador de la variante de color, archivo de imagen, ruta de almacenamiento, orden de visualización de la imagen dentro de esa variante, indicador de imagen principal del color y fecha de subida.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Visualizar imágenes</td>
+                        <td class="code-cell">RF-034</td>
+                        <td class="description-cell">
+                            El sistema debe permitir ver todas las imágenes asociadas a un producto (generales y por variante de color) en una galería organizada.
+                        </td>
+                        <td class="code-cell">RN-034</td>
+                        <td class="description-cell">La galería de imágenes se organiza mostrando primero las imágenes generales del producto, seguidas por las imágenes específicas de cada variante de color. Puedes reordenar las imágenes arrastrándolas con el mouse.</td>
+                        <td class="code-cell">RI-034</td>
+                        <td class="description-cell">
+                            Galería completa de imágenes del producto: imágenes generales ordenadas, imágenes por variante de color agrupadas, indicador de imagen principal, orden de visualización y opciones de acciones (reordenar, eliminar).
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Eliminar imágenes</td>
+                        <td class="code-cell">RF-035</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores eliminar imágenes de productos o variantes, liberando espacio de almacenamiento.
+                        </td>
+                        <td class="code-cell">RN-035</td>
+                        <td class="description-cell">Cada producto debe tener al menos una imagen. El sistema no te permitirá eliminar la última imagen de un producto. Si quieres cambiarla, primero debes subir la nueva imagen y luego podrás eliminar la antigua.</td>
+                        <td class="code-cell">RI-035</td>
+                        <td class="description-cell">
+                            Identificador de la imagen a eliminar, ruta del archivo físico para eliminación, verificación de que no es la última imagen del producto, usuario que elimina y fecha de eliminación.
+                        </td>
+                    </tr>
+                    <!-- AUDITORÍA DE PRODUCTOS -->
+                    <tr>
+                        <td class="module-cell" rowspan="2">Auditoría de Productos</td>
+                        <td class="subprocess-cell">Registro automático de cambios</td>
+                        <td class="code-cell">RF-036</td>
+                        <td class="description-cell">
+                            El sistema debe registrar automáticamente todos los cambios en productos e inventario para mantener trazabilidad completa.
+                        </td>
+                        <td class="code-cell">RN-036</td>
+                        <td class="description-cell">Todos los cambios en productos (precio, descripción, categoría) e inventario (stock, movimientos) quedan registrados automáticamente con: qué cambió, valor anterior, valor nuevo, quién lo hizo y cuándo. Estos registros son permanentes e inalterables.</td>
+                        <td class="code-cell">RI-036</td>
+                        <td class="description-cell">
+                            Registro de auditoría con: identificador del producto, campo modificado, valor anterior, valor nuevo, tipo de cambio (producto/inventario), usuario responsable, fecha y hora del cambio y motivo (si aplica).
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Consulta de auditoría</td>
+                        <td class="code-cell">RF-037</td>
+                        <td class="description-cell">
+                            El sistema debe permitir a los administradores consultar el historial completo de cambios de cualquier producto o movimiento de inventario.
+                        </td>
+                        <td class="code-cell">RN-037</td>
+                        <td class="description-cell">Los reportes de auditoría son filtrados por: producto específico, rango de fechas, tipo de cambio y usuario ejecutor. Sirven para resolver disputas, identificar errores, analizar tendencias de precio y cumplir con auditorías contables.</td>
+                        <td class="code-cell">RI-037</td>
+                        <td class="description-cell">
+                            Historial completo de cambios filtrable con: producto, tipo de acción, valores antes/después, usuario, fecha/hora. Exportable a Excel o PDF para reportes formales de auditoría.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="footer">
+            <p><strong>Proyecto Angelow - Parte 2 de 6</strong></p>
+            <p>Productos e Inventario | Requisitos: RF-017 a RF-037</p>
+            <p style="margin-top: 10px; font-size: 0.85em; color: #666;">
+                Módulos: Productos, Variantes Color/Talla, Categorías, Inventario, Imágenes, Auditoría
+            </p>
+        </div>
+    </div>
+</body>
+</html>
