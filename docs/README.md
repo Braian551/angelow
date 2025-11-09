@@ -13,7 +13,11 @@ Documentación general y guías de uso del sistema:
 
 ### 🏗️ Arquitectura del Sistema
 
+- **DIAGRAMA_CLASES_UML.puml** - Diagrama de clases UML completo del sistema en formato PlantUML
+- **DIAGRAMA_CLASES_EXPLICACION.md** - Documentación detallada del diagrama de clases con todas las relaciones, atributos, métodos y convenciones
 - **DELIVERY_SEPARADO.md** - Documentación sobre la separación del módulo de delivery como aplicación independiente (Nov 2025)
+- **SISTEMA_ROLES.md** - Sistema de autenticación y roles (actualizado: solo customer y admin)
+- **RESUMEN_ELIMINACION_DELIVERY.md** - Resumen de la eliminación del rol delivery del sistema
 
 ### 🔄 Migraciones (`migraciones/`)
 Documentación sobre migraciones de base de datos:

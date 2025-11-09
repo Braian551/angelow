@@ -1,0 +1,561 @@
+@startuml Diagrama_Clases_AngeloW_Python_Herencia
+!define POSITIVECOLOR #10b981
+!define NEUTRALCOLOR #667eea
+!define NEGATIVECOLOR #ef4444
+
+' =====================================================
+' DIAGRAMA DE CLASES PARA PYTHON CON HERENCIA
+' Versión con herencia simple para simplificar programación
+' =====================================================
+
+' =====================================================
+' CLASE USUARIO (BASE)
+' =====================================================
+class Usuario {
+    -String __id
+    +String name
+    +String email
+    +String phone
+    #String _identification_type
+    #String _identification_number
+    -String __password
+    +String image
+    +String role
+    -Boolean __is_blocked
+    -String __remember_token
+    -DateTime __token_expiry
+    -DateTime __last_access
+    -Int __id
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(String name, String email, String phone, String password)
+    +login():: Boolean
+    +logout():: void
+    +updateProfile():: Boolean
+    +changePassword():: Boolean
+    +verifyPassword():: Boolean
+    +isBlocked():: Boolean
+    +getRole():: String
+    +authenticate():: Boolean
+    +updateLastAccess():: void
+    +setRememberToken():: void
+    +activar():: void
+    +desactivar():: void
+}
+
+' =====================================================
+' CLASES DE USUARIOS CON HERENCIA
+' =====================================================
+class Cliente {
+    __init__(String name, String email, String phone, String password)
+    +crearOrden():: Boolean
+    +verOrdenes():: Array
+    +agregarDireccion():: Boolean
+    +obtenerDirecciones():: Array
+    +actualizarDireccion():: Boolean
+    +eliminarDireccion():: Boolean
+    +verCarrito():: Array
+    +aplicarDescuento():: Boolean
+    +cancelarOrden():: Boolean
+}
+
+class Administrador {
+    #String _nivel_acceso
+    
+    __init__(String name, String email, String phone, String password, String nivel_acceso)
+    +gestionarProductos():: Array
+    +crearProducto():: Boolean
+    +editarProducto():: Boolean
+    +eliminarProducto():: Boolean
+    +gestionarOrdenes():: Array
+    +actualizarEstadoOrden():: Boolean
+    +gestionarCategorias():: Array
+    +crearCategoria():: Boolean
+    +gestionarDescuentos():: Array
+    +generarInformes():: Array
+    +gestionarUsuarios():: Array
+    +bloquearUsuario():: Boolean
+    +verEstadisticas():: Array
+    +configurarMetodosEnvio():: Array
+}
+
+' =====================================================
+' PRODUCTO Y SISTEMA DE VARIANTES
+' =====================================================
+class Producto {
+    -Int __id
+    #DateTime _created_at
+    #DateTime _updated_at
+    +String name
+    +String slug
+    +String description
+    +Decimal price
+    +Decimal compare_price
+    #Int _category_id
+    +String sku
+    +String barcode
+    +Boolean is_active
+    +Boolean is_featured
+    +Int stock_quantity
+    +Int low_stock_threshold
+    +Decimal weight_kg
+    +String dimensions_cm
+    +String material
+    +String care_instructions
+    +String tags
+    +String meta_title
+    +String meta_description
+    +Int view_count
+
+    __init__(String name, Decimal price, Int categoryId)
+    +agregarImagen():: Boolean
+    +agregarVarianteColor():: Boolean
+    +actualizarStock():: Boolean
+    +verificarStock():: Boolean
+    +obtenerPrecioFinal():: Decimal
+    +obtenerImagenPrincipal():: String
+    +obtenerVariantes():: Array
+    +actualizarDetalles():: Boolean
+    +activar():: void
+    +desactivar():: void
+    +estaActivo():: Boolean
+    +incrementarVistas():: void
+}
+
+class VarianteProducto {
+    -Int __id
+    #DateTime _created_at
+    #DateTime _updated_at
+    +Boolean is_default
+    +String sku
+    +String barcode
+    +Decimal price
+    +Decimal compare_price
+
+    __init__(Int productId, Int colorId, Int sizeId, Decimal price, Int quantity)
+    +activar():: void
+    +desactivar():: void
+}
+
+class VarianteColor {
+    -Int __color_id
+    
+    __init__(Int productId, Int colorId, Int sizeId, Decimal price, Int quantity)
+    +activar():: void
+    +desactivar():: void
+    +agregarImagenes():: Boolean
+    +obtenerImagenes():: Array
+    +establecerPorDefecto():: void
+    +agregarVarianteTalla():: Boolean
+}
+
+class VarianteTalla {
+    -Int __size_id
+    -Int __quantity
+    +Decimal weight_kg
+    
+    __init__(Int productId, Int colorId, Int sizeId, Decimal price, Int quantity)
+    +activar():: void
+    +desactivar():: void
+    +actualizarStock():: Boolean
+    +verificarDisponibilidad():: Boolean
+    +obtenerPrecio():: Decimal
+}
+
+class ImagenProducto {
+    -Int __id
+    -Int __product_id
+    +String image_path
+    +String alt_text
+    +Boolean is_primary
+    +Int order
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(Int productId, String imagePath, Boolean isPrimary)
+    +establecerPrincipal():: void
+    +actualizarOrden():: void
+}
+
+class ImagenVariante {
+    -Int __id
+    -Int __product_id
+    -Int __color_variant_id
+    +String image_path
+    +String alt_text
+    +Boolean is_primary
+    +Int order
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(Int productId, Int colorVariantId, String imagePath)
+    +establecerPrincipal():: void
+    +actualizarOrden():: void
+}
+
+' =====================================================
+' CARRITO Y COMPRAS
+' =====================================================
+class Carrito {
+    -Int __id
+    -String __user_id
+    -String __session_id
+    #DateTime _expires_at
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(String userId, String sessionId)
+    +agregarItem():: Boolean
+    +actualizarCantidad():: Boolean
+    +eliminarItem():: Boolean
+    +obtenerItems():: Array
+    +calcularTotal():: Decimal
+    +vaciar():: void
+    +transferirCarrito():: Boolean
+    +verificarStock():: Boolean
+}
+
+class ItemCarrito {
+    -Int __id
+    -Int __cart_id
+    -Int __product_id
+    -Int __color_variant_id
+    -Int __size_variant_id
+    +Int quantity
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(Int cartId, Int productId, Int quantity)
+    +actualizarCantidad():: Boolean
+    +calcularSubtotal():: Decimal
+    +obtenerDetallesProducto():: Array
+    +obtenerDetallesVariantes():: Array
+}
+
+class Orden {
+    -Int __id
+    -String __user_id
+    +String order_number
+    +String status
+    +String payment_status
+    -Int __shipping_address_id
+    -Int __shipping_method_id
+    +Decimal subtotal
+    +Decimal discount_amount
+    +Decimal shipping_cost
+    +Decimal tax
+    +Decimal total
+    +String notes
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(String userId, String orderNumber, Decimal total)
+    +agregarItem():: Boolean
+    +actualizarEstado():: Boolean
+    +actualizarEstadoPago():: Boolean
+    +calcularTotal():: Decimal
+    +aplicarDescuento():: void
+    +obtenerItems():: Array
+    +obtenerDireccionEnvio():: Array
+    +obtenerMetodoEnvio():: Array
+    +generarPDF():: String
+    +enviarConfirmacion():: Boolean
+    +cancelar():: Boolean
+}
+
+class ItemOrden {
+    -Int __id
+    -Int __order_id
+    -Int __product_id
+    -Int __color_variant_id
+    -Int __size_variant_id
+    +String product_name
+    +String variant_name
+    +Decimal price
+    +Int quantity
+    +Decimal total
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(Int orderId, Int productId, Decimal precio, Int cantidad)
+    +calcularTotal():: Decimal
+    +obtenerDetalles():: Array
+}
+
+' =====================================================
+' DIRECCIONES Y ENVÍO
+' =====================================================
+class Direccion {
+    -Int __id
+    -String __user_id
+    +String recipient_name
+    +String recipient_phone
+    +String address
+    +String complement
+    +String neighborhood
+    +String city
+    +String state
+    +String postal_code
+    +Decimal latitude
+    +Decimal longitude
+    +String delivery_instructions
+    +Boolean is_default
+    +Boolean is_active
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(String userId, String recipientName, String address)
+    +establecerPorDefecto():: void
+    +actualizar():: Boolean
+    +activar():: void
+    +desactivar():: void
+    +obtenerCoordenadas():: Array
+}
+
+class MetodoEnvio {
+    -Int __id
+    +String name
+    +String description
+    +Decimal base_cost
+    +Decimal cost_per_kg
+    +String delivery_time
+    +Boolean is_active
+    +Int display_order
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(String name, Decimal baseCost, String deliveryTime)
+    +calcularCosto():: Decimal
+    +activar():: void
+    +desactivar():: void
+    +actualizarOrden():: void
+}
+
+' =====================================================
+' PAGOS Y DESCUENTOS
+' =====================================================
+class TransaccionPago {
+    -Int __id
+    -Int __order_id
+    -String __user_id
+    +Decimal amount
+    +String status
+    +String payment_method
+    +String reference_number
+    +String payment_proof
+    +DateTime processed_at
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(Int orderId, String userId, Decimal monto)
+    +procesarPago():: Boolean
+    +verificarComprobante():: Boolean
+    +actualizarEstado():: Boolean
+    +aprobar():: Boolean
+    +rechazar():: Boolean
+}
+
+class CodigoDescuento {
+    -Int __id
+    +String code
+    +String description
+    -Int __discount_type_id
+    +Boolean is_active
+    +DateTime start_date
+    +DateTime end_date
+    +Int max_uses
+    +Int used_count
+    +Decimal min_order_amount
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(String code, Int discountTypeId)
+    +aplicar():: Decimal
+    +validar():: Boolean
+    +incrementarUso():: void
+    +activar():: void
+    +desactivar():: void
+    +estaVigente():: Boolean
+}
+
+class DescuentoPorcentaje {
+    -Int __id
+    -Int __discount_code_id
+    +Decimal percentage
+    +Decimal max_discount_amount
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(Int discountCodeId, Decimal percentage)
+    +calcularDescuento():: Decimal
+}
+
+class DescuentoMontoFijo {
+    -Int __id
+    -Int __discount_code_id
+    +Decimal amount
+    +Decimal min_order_amount
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(Int discountCodeId, Decimal amount)
+    +calcularDescuento():: Decimal
+}
+
+class DescuentoEnvioGratis {
+    -Int __id
+    -Int __discount_code_id
+    -Int __shipping_method_id
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(Int discountCodeId, Int shippingMethodId)
+    +aplicar():: Boolean
+}
+
+class DescuentoAplicado {
+    -Int __id
+    -String __user_id
+    -Int __discount_code_id
+    +String discount_code
+    +Decimal discount_amount
+    +Boolean is_used
+    +DateTime applied_at
+    +DateTime used_at
+    +DateTime expires_at
+    
+    __init__(String userId, Int discountCodeId, Decimal amount)
+    +marcarComoUsado():: void
+    +validarVigencia():: Boolean
+}
+
+' =====================================================
+' OTROS
+' =====================================================
+
+
+class Coleccion {
+    -Int __id
+    +String name
+    +String slug
+    +String description
+    +String image
+    +Boolean is_active
+    +DateTime start_date
+    +DateTime end_date
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(String name, String description)
+    +agregarProducto():: Boolean
+    +obtenerProductos():: Array
+    +activar():: void
+    +desactivar():: void
+}
+
+class Slider {
+    -Int __id
+    +String title
+    +String description
+    +String image
+    +String link
+    +Int display_order
+    +Boolean is_active
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(String title, String image)
+    +activar():: void
+    +desactivar():: void
+    +actualizarOrden():: void
+}
+
+class Noticia {
+    -Int __id
+    +String title
+    +String slug
+    +String content
+    +String image
+    -String __author_id
+    +Boolean is_published
+    +DateTime published_at
+    #DateTime _created_at
+    #DateTime _updated_at
+    
+    __init__(String title, String content, String authorId)
+    +publicar():: void
+    +despublicar():: void
+}
+
+' =====================================================
+' RELACIONES
+' =====================================================
+
+' Herencia (flecha única hacia la clase base)
+Cliente --|> Usuario : herencia
+Administrador --|> Usuario : herencia
+VarianteColor --|> VarianteProducto : herencia
+VarianteTalla --|> VarianteProducto : herencia
+
+' Composiciones y Agregaciones (Productos y Variantes)
+Producto "1" *-- "0..*" VarianteColor : contiene
+VarianteColor "1" *-- "0..*" VarianteTalla : contiene
+Producto "1" *-- "0..*" ImagenProducto : contiene
+VarianteColor "1" *-- "0..*" ImagenVariante : contiene
+
+' Asociaciones
+Cliente "1" *-- "0..*" Direccion : tiene
+Cliente "1" *-- "0..1" Carrito : posee
+Cliente "1" *-- "0..*" Orden : genera
+Orden "1" *-- "1..*" ItemOrden : contiene
+Carrito "1" *-- "0..*" ItemCarrito : contiene
+CodigoDescuento "1" *-- "0..*" DescuentoAplicado : registra
+Orden "1" --> "1" MetodoEnvio : emplea
+Orden "1" --> "1" Direccion : envia_a
+ItemOrden --> Producto : referencia
+ItemOrden --> VarianteColor : referencia
+ItemOrden --> VarianteTalla : referencia
+ItemCarrito --> Producto : referencia
+ItemCarrito --> VarianteColor : referencia
+ItemCarrito --> VarianteTalla : referencia
+Administrador --> Producto : trabaja_con
+Administrador --> Orden : trabaja_con
+Administrador --> CodigoDescuento : trabaja_con
+
+note top of Usuario
+    Clase base concreta para usuarios.
+    Cliente y Administrador heredan todos sus atributos y métodos.
+    Simplifica la programación evitando duplicación de código.
+end note
+
+note right of Producto
+    Clase que representa un producto en el sistema.
+    
+    SISTEMA DE VARIANTES CON HERENCIA:
+    VarianteProducto (clase base)
+    ├── VarianteColor (hereda atributos comunes)
+    └── VarianteTalla (hereda atributos comunes)
+    
+    Relaciones principales (según BD/código):
+    Producto "1" *-- "0..*" VarianteColor
+    VarianteColor "1" *-- "0..*" VarianteTalla
+    Producto "1" *-- "0..*" ImagenProducto
+    VarianteColor "1" *-- "0..*" ImagenVariante
+    
+    Las variantes usan herencia para compartir
+    atributos comunes (id, timestamps, precios, etc.).
+end note
+
+note as N1
+    <b>DIAGRAMA CON HERENCIA PARA PYTHON</b>
+    
+    • Herencia simple y natural en Python
+    • Usuario → Cliente, Administrador (comparten atributos)
+    • VarianteProducto → VarianteColor, VarianteTalla
+    • Evita duplicación de código
+    • Más fácil de mantener y extender
+    • Relaciones por composición mantienen la lógica de negocio
+end note
+
+@enduml

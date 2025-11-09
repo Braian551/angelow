@@ -27,6 +27,31 @@
 
 ## 🏗️ Arquitectura del Sistema
 
+### 📐 Diagrama de Clases UML
+
+El sistema está modelado con una arquitectura orientada a objetos completa:
+
+- **📄 Diagrama PlantUML**: [`docs/DIAGRAMA_CLASES_UML.puml`](docs/DIAGRAMA_CLASES_UML.puml)
+- **📚 Documentación completa**: [`docs/DIAGRAMA_CLASES_EXPLICACION.md`](docs/DIAGRAMA_CLASES_EXPLICACION.md)
+
+**Estructura principal:**
+```
+Usuario (abstracta)
+├── Cliente (customer)
+└── Administrador (admin)
+
+Producto
+└── VarianteColor (1:N)
+    └── VarianteTalla (1:N)
+
+CodigoDescuento
+├── DescuentoPorcentaje
+├── DescuentoMontoFijo
+└── DescuentoEnvioGratis
+```
+
+Para visualizar el diagrama completo con todas las clases, relaciones, atributos y métodos, consulta la documentación en [`docs/DIAGRAMA_CLASES_EXPLICACION.md`](docs/DIAGRAMA_CLASES_EXPLICACION.md).
+
 ### Tecnologías Utilizadas
 - **Backend**: PHP 8.0+
 - **Base de datos**: MySQL 8.0
