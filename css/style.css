@@ -572,7 +572,7 @@ button {
 
 /* ===== CATEGORÍAS DESTACADAS ===== */
 .featured-categories {
-  padding: 6rem 0;
+  padding: 6rem 2rem;
   background-color: var(--bg-dark);
 }
 
@@ -619,7 +619,7 @@ button {
 
 /* ===== PRODUCTOS DESTACADOS ===== */
 .featured-products {
-  padding: 6rem 0;
+  padding: 6rem 2rem;
 }
 
 .section-header {
@@ -840,7 +840,7 @@ button {
 
 /* ===== COLECCIONES DESTACADAS ===== */
 .featured-collections {
-  padding: 6rem 0;
+  padding: 6rem 2rem;
   background-color: var(--bg-dark);
 }
 

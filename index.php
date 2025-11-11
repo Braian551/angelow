@@ -237,13 +237,13 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- Banner promocional -->
     <?php if ($promo_banner): ?>
-        <section class="promo-banner">
+        <section class="promo-banner<?php echo (!empty($promo_banner['image'])) ? ' has-image' : ''; ?>"<?php if (!empty($promo_banner['image'])): ?> style="--promo-bg-image: url('<?= BASE_URL . '/' . htmlspecialchars($promo_banner['image']) ?>');"<?php endif; ?>>
             <?php if (!empty($promo_banner['image'])): ?>
-                <div class="promo-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.3; background-image: url('<?= BASE_URL . '/' . htmlspecialchars($promo_banner['image']) ?>'); background-size: cover; background-position: center;"></div>
+                <div class="promo-image"></div>
             <?php endif; ?>
-            <div class="promo-content" style="position: relative; z-index: 1;">
+            <div class="promo-content">
                 <?php if (!empty($promo_banner['icon'])): ?>
-                    <i class="fas <?= htmlspecialchars($promo_banner['icon']) ?> fa-3x" style="margin-bottom: 1rem;"></i>
+                    <i class="fas <?= htmlspecialchars($promo_banner['icon']) ?> fa-3x"></i>
                 <?php endif; ?>
                 <h2><?= htmlspecialchars($promo_banner['title']) ?></h2>
                 <?php if (!empty($promo_banner['subtitle'])): ?>

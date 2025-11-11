@@ -4,14 +4,29 @@
 
 /* Barra de anuncio superior - Estilos dinámicos */
 .announcement-bar {
-    padding: 12px 20px;
+    padding: 1.2rem 2rem;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 1.4rem;
     position: relative;
     z-index: 100;
-    /* Colores por defecto */
-    background-color: #2563eb;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    /* Colores por defecto - usa las variables del tema */
+    background: linear-gradient(135deg, var(--primary-dark, #6a96cf) 0%, var(--primary-color, #0077b6) 100%);
     color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .announcement-bar p {
@@ -19,22 +34,64 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 1.2rem;
+    animation: fadeIn 0.8s ease-in;
 }
 
 .announcement-bar i {
-    font-size: 1.1rem;
+    font-size: 1.6rem;
+    animation: pulse 2s infinite;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
 }
 
 /* Banner promocional - Estilos dinámicos */
 .promo-banner {
     position: relative;
-    padding: 60px 20px;
+    padding: 2rem 2rem;
     text-align: center;
     overflow: hidden;
-    /* Colores por defecto */
-    background-color: #1e40af;
+    margin: 2rem 0;
+    background-color: var(--primary-color);
     color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    animation: fadeInUp 0.6s ease-out;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.promo-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.05) 75%);
+    background-size: 20px 20px;
+    z-index: 0;
+    opacity: 0.3;
+    pointer-events: none;
 }
 
 .promo-banner .promo-image {
@@ -44,92 +101,292 @@
     width: 100%;
     height: 100%;
     z-index: 0;
+    opacity: 0.15;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.8);
+}
+
+.promo-banner.has-image .promo-image {
+    background-image: var(--promo-bg-image);
 }
 
 .promo-banner .promo-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     max-width: 800px;
     margin: 0 auto;
+    animation: fadeIn 1s ease-in;
 }
 
 .promo-banner h2 {
-    font-size: 2rem;
-    margin-bottom: 15px;
+    font-size: 2.4rem;
+    margin-bottom: 1.5rem;
     font-weight: 700;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+    line-height: 1.3;
 }
 
 .promo-banner p {
-    font-size: 1.1rem;
-    margin-bottom: 25px;
+    font-size: 1.4rem;
+    margin-bottom: 2rem;
     opacity: 0.95;
+    line-height: 1.5;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .promo-banner .btn {
     display: inline-block;
-    padding: 12px 30px;
-    background: rgba(255, 255, 255, 0.2);
-    color: inherit;
-    border: 2px solid currentColor;
-    border-radius: 5px;
+    padding: 1rem 2.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--primary-color, #0077b6);
+    border: 2px solid transparent;
+    border-radius: 25px;
     text-decoration: none;
     font-weight: 600;
+    font-size: 1.3rem;
+    letter-spacing: 0.3px;
     transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    text-transform: uppercase;
 }
 
 .promo-banner .btn:hover {
-    background: currentColor;
-    color: #fff;
+    background: white;
+    color: var(--primary-dark, #6a96cf);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border-color: white;
 }
 
 .promo-banner i.fa-3x {
     display: block;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 3.5rem;
+    animation: bounce 2s infinite;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .announcement-bar {
-        padding: 10px 15px;
-        font-size: 0.85rem;
-    }
-
-    .announcement-bar p {
-        flex-direction: column;
-        gap: 5px;
+        padding: 1rem 1.5rem;
+        font-size: 1.3rem;
     }
 
     .promo-banner {
-        padding: 40px 15px;
+        padding: 3rem 2rem;
+        margin: 1.5rem 0;
     }
 
     .promo-banner h2 {
-        font-size: 1.5rem;
+        font-size: 2rem;
     }
 
     .promo-banner p {
-        font-size: 1rem;
+        font-size: 1.3rem;
+    }
+
+    .promo-banner i.fa-3x {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .announcement-bar {
+        padding: 1rem 1.2rem;
+        font-size: 1.2rem;
+    }
+
+    .announcement-bar p {
+        flex-direction: row;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+    }
+
+    .promo-banner {
+        padding: 2.5rem 1.5rem;
+        margin: 1rem 0;
+        border-radius: 6px;
+    }
+
+    .promo-banner h2 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .promo-banner p {
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .promo-banner .btn {
+        padding: 0.9rem 2rem;
+        font-size: 1.2rem;
+    }
+
+    .promo-banner i.fa-3x {
+        font-size: 2.8rem;
+        margin-bottom: 1rem;
     }
 }
 
 @media (max-width: 480px) {
     .announcement-bar {
-        font-size: 0.8rem;
-        padding: 8px 10px;
+        font-size: 1.1rem;
+        padding: 0.8rem 1rem;
+    }
+
+    .announcement-bar p {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .announcement-bar i {
+        font-size: 1.4rem;
+    }
+
+    .promo-banner {
+        padding: 2rem 1rem;
+        margin: 0.5rem 0;
     }
 
     .promo-banner h2 {
-        font-size: 1.3rem;
+        font-size: 1.6rem;
+        margin-bottom: 0.8rem;
     }
 
     .promo-banner p {
-        font-size: 0.9rem;
+        font-size: 1.1rem;
+        margin-bottom: 1.2rem;
     }
 
     .promo-banner .btn {
-        padding: 10px 20px;
-        font-size: 0.9rem;
+        padding: 0.8rem 1.8rem;
+        font-size: 1.1rem;
+        width: 100%;
+        max-width: 250px;
     }
+
+    .promo-banner i.fa-3x {
+        font-size: 2.5rem;
+        margin-bottom: 0.8rem;
+    }
+}
+
+/* Estilos adicionales para mejorar la coherencia con el tema */
+.promo-banner .container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Asegurar que el banner no cause scroll horizontal */
+.promo-banner,
+.promo-banner * {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+.promo-banner {
+    width: 100%;
+    overflow-x: hidden;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Contener todos los elementos dentro del banner */
+.promo-banner .promo-content,
+.promo-banner .promo-image,
+.promo-banner::before {
+    max-width: 100%;
+    width: 100%;
+    left: 0;
+    right: 0;
+}
+
+/* Prevenir que cualquier transformación cause overflow */
+.promo-banner *,
+.announcement-bar * {
+    transform-origin: center;
+    will-change: transform;
+}
+
+/* Mejorar la legibilidad del texto */
+.promo-banner h2,
+.promo-banner p {
+    word-wrap: break-word;
+    hyphens: auto;
+    color: white;
+}
+
+/* Efecto sutil de brillo */
+.announcement-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 200%;
+    }
+}
+
+/* Mejora de accesibilidad */
+.announcement-bar:focus-within,
+.promo-banner:focus-within {
+    outline: 3px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+}
+
+/* Transición suave para cambios de color dinámicos */
+.announcement-bar,
+.promo-banner {
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Soporte para modo oscuro (si se implementa en el futuro) */
+@media (prefers-color-scheme: dark) {
+    .announcement-bar {
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .promo-banner {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* SOLUCIÓN DEFINITIVA PARA PREVENIR SCROLL HORIZONTAL */
+html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+.promo-banner,
+.announcement-bar {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.promo-banner * {
+    max-width: 100%;
+    box-sizing: border-box;
 }
