@@ -37,7 +37,6 @@ try {
     $stmtOrders = $conn->prepare($newOrdersQuery);
     $stmtOrders->execute([$userId]);
     $newOrdersCount = $stmtOrders->fetch(PDO::FETCH_ASSOC)['new_orders'];
-
 } catch (PDOException $e) {
     error_log("Error de base de datos: " . $e->getMessage());
     header('Location: ' . BASE_URL . '/error.php');
@@ -62,11 +61,11 @@ try {
             </li>
 
             <li class="nav-item with-submenu">
-                <a href="#productos">
+                <div class="menu-item">
                     <i class="fas fa-tshirt"></i>
                     <span>Productos</span>
                     <i class="fas fa-chevron-down submenu-toggle"></i>
-                </a>
+                </div>
                 <ul class="submenu">
                     <li><a href="<?= BASE_URL ?>/admin/products.php">Todos los productos</a></li>
                     <li><a href="<?= BASE_URL ?>/admin/subproducto.php">Agregar nuevo</a></li>
@@ -100,7 +99,7 @@ try {
                     <span>Reseñas</span>
                 </a>
             </li>
-             <li class="nav-item">
+            <li class="nav-item">
                 <a href="<?= BASE_URL ?>/admin/pagos/define_pay.php">
                     <i class="fas fa-money-bill-wave"></i>
                     <span>Pagos</span>
@@ -108,11 +107,11 @@ try {
             </li>
 
             <li class="nav-item with-submenu">
-                <a href="#envios">
+                <div class="menu-item">
                     <i class="fas fa-truck"></i>
                     <span>Envíos</span>
                     <i class="fas fa-chevron-down submenu-toggle"></i>
-                </a>
+                </div>
                 <ul class="submenu">
                     <li><a href="<?= BASE_URL ?>/admin/envio/shipping_rules.php">Reglas por precio</a></li>
                     <li><a href="<?= BASE_URL ?>/admin/envio/define_shipping.php">Definir envíos</a></li>
@@ -120,35 +119,32 @@ try {
             </li>
 
             <li class="nav-item with-submenu">
-                <a href="#descuento">
+                <div class="menu-item">
                     <i class="fas fa-percentage"></i>
                     <span>Descuentos</span>
                     <i class="fas fa-chevron-down submenu-toggle"></i>
-                </a>
+                </div>
                 <ul class="submenu">
                     <li><a href="<?= BASE_URL ?>/admin/descuento/bulk_discounts.php">Descuentos por cantidad</a></li>
                     <li><a href="<?= BASE_URL ?>/admin/descuento/generate_codes.php">Códigos de Descuento</a></li>
                 </ul>
             </li>
 
-            <li class="nav-item with-submenu">
-                <a href="#anuncios">
+
+
+            <li class="nav-item">
+                <a href="<?= BASE_URL ?>/admin/announcements/list.php">
                     <i class="fas fa-bullhorn"></i>
                     <span>Anuncios</span>
-                    <i class="fas fa-chevron-down submenu-toggle"></i>
                 </a>
-                <ul class="submenu">
-                    <li><a href="<?= BASE_URL ?>/admin/announcements/list.php">Todos los anuncios</a></li>
-                    <li><a href="<?= BASE_URL ?>/admin/announcements/add.php">Agregar anuncio</a></li>
-                </ul>
             </li>
 
             <li class="nav-item with-submenu">
-                <a href="#informes">
+                <div class="menu-item">
                     <i class="fas fa-chart-line"></i>
                     <span>Informes</span>
                     <i class="fas fa-chevron-down submenu-toggle"></i>
-                </a>
+                </div>
                 <ul class="submenu">
                     <li><a href="<?= BASE_URL ?>/admin/informes/ventas.php">Ventas</a></li>
                     <li><a href="<?= BASE_URL ?>/admin/informes/productos.php">Productos populares</a></li>
@@ -157,11 +153,11 @@ try {
             </li>
 
             <li class="nav-item with-submenu">
-                <a href="#configuracion">
+                <div class="menu-item">
                     <i class="fas fa-cog"></i>
                     <span>Configuración</span>
                     <i class="fas fa-chevron-down submenu-toggle"></i>
-                </a>
+                </div>
                 <ul class="submenu">
                     <li><a href="<?= BASE_URL ?>/admin/sliders/sliders_list.php">Sliders</a></li>
                     <li><a href="#general">General</a></li>
@@ -204,45 +200,57 @@ try {
                 item.classList.remove('active');
             });
 
-            // Buscar coincidencia en todos los niveles
-            document.querySelectorAll('.nav-menu a').forEach(link => {
+            // Buscar coincidencia en enlaces del submenú
+            document.querySelectorAll('.submenu a').forEach(link => {
                 const href = link.getAttribute('href');
                 if (href && href !== '#') {
                     if (currentPath.includes(href) || currentPage === href.split('/').pop()) {
-                        // Marcar el ítem como activo
+                        // Marcar el ítem padre como activo
+                        const parentMenu = link.closest('.with-submenu');
+                        if (parentMenu) {
+                            parentMenu.classList.add('active');
+                            const submenu = parentMenu.querySelector('.submenu');
+                            if (submenu) submenu.style.display = 'block';
+                            const toggle = parentMenu.querySelector('.submenu-toggle');
+                            if (toggle) toggle.style.transform = 'rotate(180deg)';
+                        }
+                    }
+                }
+            });
+
+            // Buscar coincidencia en enlaces principales (sin submenú)
+            document.querySelectorAll('.nav-menu > li > a').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href !== '#') {
+                    if (currentPath.includes(href) || currentPage === href.split('/').pop()) {
                         const parentItem = link.closest('li');
                         if (parentItem) {
                             parentItem.classList.add('active');
-
-                            // Si está en un submenú, abrir el menú padre
-                            const parentMenu = parentItem.closest('.with-submenu');
-                            if (parentMenu) {
-                                parentMenu.classList.add('active');
-                                const submenu = parentMenu.querySelector('.submenu');
-                                if (submenu) submenu.style.display = 'block';
-                                const toggle = parentMenu.querySelector('.submenu-toggle');
-                                if (toggle) toggle.style.transform = 'rotate(180deg)';
-                            }
                         }
                     }
                 }
             });
         }
 
-        // 2. Función mejorada para manejar TODOS los submenús al hacer clic en el icono
+        // 2. Función para manejar TODOS los submenús al hacer clic en el li completo
         function setupSubmenus() {
-            // Manejar clic en los iconos de submenú
-            document.querySelectorAll('.submenu-toggle').forEach(toggle => {
-                toggle.addEventListener('click', function(e) {
+            // Manejar clic en los elementos li con submenú
+            document.querySelectorAll('.with-submenu').forEach(menu => {
+                menu.addEventListener('click', function(e) {
+                    // Si se hizo clic en un enlace del submenú, permitir navegación
+                    if (e.target.closest('.submenu a')) {
+                        return;
+                    }
+
                     e.preventDefault();
                     e.stopPropagation();
 
-                    const menu = this.closest('.with-submenu');
-                    const submenu = menu.querySelector('.submenu');
+                    const submenu = this.querySelector('.submenu');
+                    const toggle = this.querySelector('.submenu-toggle');
 
                     // Cerrar otros submenús abiertos
                     document.querySelectorAll('.with-submenu').forEach(otherMenu => {
-                        if (otherMenu !== menu) {
+                        if (otherMenu !== this) {
                             otherMenu.classList.remove('active');
                             const otherSubmenu = otherMenu.querySelector('.submenu');
                             if (otherSubmenu) otherSubmenu.style.display = 'none';
@@ -252,29 +260,12 @@ try {
                     });
 
                     // Alternar el submenú actual
-                    menu.classList.toggle('active');
-                    submenu.style.display = menu.classList.contains('active') ? 'block' : 'none';
-                    this.style.transform = menu.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+                    this.classList.toggle('active');
+                    submenu.style.display = this.classList.contains('active') ? 'block' : 'none';
+                    if (toggle) {
+                        toggle.style.transform = this.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+                    }
                 });
-            });
-
-            // Manejar clic en los enlaces principales (para navegación)
-            document.querySelectorAll('.with-submenu > a').forEach(link => {
-                if (link.getAttribute('href') !== '#') {
-                    link.addEventListener('click', function(e) {
-                        // Solo si no se hizo clic en el toggle
-                        if (!e.target.classList.contains('submenu-toggle')) {
-                            // Cerrar todos los submenús al navegar
-                            document.querySelectorAll('.with-submenu').forEach(menu => {
-                                menu.classList.remove('active');
-                                const submenu = menu.querySelector('.submenu');
-                                if (submenu) submenu.style.display = 'none';
-                                const toggle = menu.querySelector('.submenu-toggle');
-                                if (toggle) toggle.style.transform = 'rotate(0deg)';
-                            });
-                        }
-                    });
-                }
             });
         }
 
@@ -282,7 +273,7 @@ try {
         function setupSidebarCollapse() {
             const sidebar = document.querySelector('.admin-sidebar');
             const closeBtn = document.querySelector('.close-sidebar');
-            
+
             if (!sidebar || !closeBtn) return;
 
             // Manejar el botón de cerrar
@@ -293,7 +284,7 @@ try {
             // Manejar el comportamiento responsive
             function handleResize() {
                 const isMobile = window.innerWidth <= 768;
-                
+
                 if (isMobile) {
                     sidebar.classList.add('mobile');
                 } else {
@@ -317,7 +308,7 @@ try {
             // Cerrar sidebar al hacer clic fuera en móvil
             document.addEventListener('click', function(e) {
                 const isMobile = window.innerWidth <= 768;
-                
+
                 if (isMobile && !sidebar.contains(e.target) && sidebar.classList.contains('mobile')) {
                     sidebar.classList.add('collapsed');
                 }

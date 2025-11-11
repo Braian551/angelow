@@ -203,34 +203,41 @@ button {
   position: relative;
 }
 
-.nav-item a {
+.nav-item a,
+.nav-item .menu-item {
   display: flex;
   align-items: center;
   padding: 1.2rem 2rem;
   color: rgba(255, 255, 255, 0.8);
   transition: var(--transition);
+  cursor: pointer;
+  text-decoration: none;
 }
 
-.nav-item i {
+.nav-item a i,
+.nav-item .menu-item i {
   margin-right: 1.5rem;
   font-size: 1.6rem;
   width: 2rem;
   text-align: center;
 }
 
-.nav-item span {
+.nav-item a span,
+.nav-item .menu-item span {
   white-space: nowrap;
 }
 
 /* Hover y active states */
 .nav-item a:hover,
+.nav-item .menu-item:hover,
 .nav-item.active > a,
-.nav-item.with-submenu.active > a {
+.nav-item.with-submenu.active > .menu-item {
   color: white;
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.nav-item.active > a {
+.nav-item.active > a,
+.nav-item.active > .menu-item {
   border-left: 3px solid var(--primary-color);
 }
 
