@@ -132,14 +132,14 @@ try {
             </li>
 
             <li class="nav-item with-submenu">
-                <a href="#noticias">
-                    <i class="fas fa-newspaper"></i>
-                    <span>Noticias</span>
+                <a href="#anuncios">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Anuncios</span>
                     <i class="fas fa-chevron-down submenu-toggle"></i>
                 </a>
                 <ul class="submenu">
-                    <li><a href="<?= BASE_URL ?>/admin/news/news_list.php">Todas las noticias</a></li>
-                    <li><a href="<?= BASE_URL ?>/admin/news/add_news.php">Agregar noticia</a></li>
+                    <li><a href="<?= BASE_URL ?>/admin/announcements/list.php">Todos los anuncios</a></li>
+                    <li><a href="<?= BASE_URL ?>/admin/announcements/add.php">Agregar anuncio</a></li>
                 </ul>
             </li>
 

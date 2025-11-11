@@ -4,6 +4,30 @@ require_once __DIR__ . '/conexion.php';
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/layouts/headerproducts.php';
 
+// Obtener anuncios activos para barra superior (solo el de mayor prioridad)
+$top_bar_query = "SELECT * FROM announcements 
+                  WHERE type = 'top_bar' 
+                  AND is_active = 1 
+                  AND (start_date IS NULL OR start_date <= NOW())
+                  AND (end_date IS NULL OR end_date >= NOW())
+                  ORDER BY priority DESC, created_at DESC 
+                  LIMIT 1";
+$top_bar_stmt = $conn->prepare($top_bar_query);
+$top_bar_stmt->execute();
+$top_bar_announcement = $top_bar_stmt->fetch(PDO::FETCH_ASSOC);
+
+// Obtener anuncios activos para banner promocional (solo el de mayor prioridad)
+$promo_banner_query = "SELECT * FROM announcements 
+                       WHERE type = 'promo_banner' 
+                       AND is_active = 1 
+                       AND (start_date IS NULL OR start_date <= NOW())
+                       AND (end_date IS NULL OR end_date >= NOW())
+                       ORDER BY priority DESC, created_at DESC 
+                       LIMIT 1";
+$promo_banner_stmt = $conn->prepare($promo_banner_query);
+$promo_banner_stmt->execute();
+$promo_banner = $promo_banner_stmt->fetch(PDO::FETCH_ASSOC);
+
 // Obtener sliders activos
 $sliders_query = "SELECT * FROM sliders WHERE is_active = 1 ORDER BY order_position ASC";
 $sliders_stmt = $conn->prepare($sliders_query);
@@ -54,7 +78,8 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="description" content="Tienda online de ropa infantil de alta calidad. Moda cómoda y segura para bebés, niñas y niños. Envíos a todo el país.">
     <meta name="keywords" content="ropa infantil, moda niños, ropa bebé, vestidos niñas, conjuntos niños, pijamas infantiles">
     <link rel="icon" href="images/logo.png" type="image/x-icon">
-<link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/announcements.css">
     <!-- Preconexión para mejorar performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -65,9 +90,16 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <body>
     <!-- Barra de anuncio superior -->
-    <div class="announcement-bar">
-        <p>¡Envío gratis en compras superiores a $50.000! | 3 cuotas sin interés</p>
-    </div>
+    <?php if ($top_bar_announcement): ?>
+        <div class="announcement-bar">
+            <p>
+                <?php if (!empty($top_bar_announcement['icon'])): ?>
+                    <i class="fas <?= htmlspecialchars($top_bar_announcement['icon']) ?>"></i>
+                <?php endif; ?>
+                <?= htmlspecialchars($top_bar_announcement['message']) ?>
+            </p>
+        </div>
+    <?php endif; ?>
 
 
 
@@ -204,13 +236,25 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
     </section>
 
     <!-- Banner promocional -->
-    <section class="promo-banner">
-        <div class="promo-content">
-            <h2>¡Compra 2 prendas y llévate la 3ra con 50% de descuento!</h2>
-            <p>Válido hasta el 30 de junio o hasta agotar existencias</p>
-            <a href="promo-3x2.html" class="btn">Aprovechar oferta</a>
-        </div>
-    </section>
+    <?php if ($promo_banner): ?>
+        <section class="promo-banner">
+            <?php if (!empty($promo_banner['image'])): ?>
+                <div class="promo-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.3; background-image: url('<?= BASE_URL . '/' . htmlspecialchars($promo_banner['image']) ?>'); background-size: cover; background-position: center;"></div>
+            <?php endif; ?>
+            <div class="promo-content" style="position: relative; z-index: 1;">
+                <?php if (!empty($promo_banner['icon'])): ?>
+                    <i class="fas <?= htmlspecialchars($promo_banner['icon']) ?> fa-3x" style="margin-bottom: 1rem;"></i>
+                <?php endif; ?>
+                <h2><?= htmlspecialchars($promo_banner['title']) ?></h2>
+                <?php if (!empty($promo_banner['subtitle'])): ?>
+                    <p><?= htmlspecialchars($promo_banner['subtitle']) ?></p>
+                <?php endif; ?>
+                <?php if (!empty($promo_banner['button_text']) && !empty($promo_banner['button_link'])): ?>
+                    <a href="<?= htmlspecialchars($promo_banner['button_link']) ?>" class="btn"><?= htmlspecialchars($promo_banner['button_text']) ?></a>
+                <?php endif; ?>
+            </div>
+        </section>
+    <?php endif; ?>
 
     <!-- Colecciones destacadas -->
     <section class="featured-collections">
@@ -246,35 +290,8 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </section>
 
-    <!-- Testimonios -->
-    <section class="testimonials">
-        <h2 class="section-title">Lo que dicen nuestros clientes</h2>
-        <div class="testimonials-slider">
-            <!-- Testimonio 1 -->
-            <div class="testimonial">
-                <div class="testimonial-content">
-                    <div class="testimonial-rating">★★★★★</div>
-                    <p class="testimonial-text">"La calidad de la ropa superó mis expectativas. Mi hija está encantada con sus vestidos y lo mejor es que resisten muy bien los lavados."</p>
-                    <p class="testimonial-author">- María G.</p>
-                </div>
-            </div>
-            <!-- Más testimonios aquí -->
-        </div>
-    </section>
 
-    <!-- Newsletter -->
-    <section class="newsletter">
-        <div class="newsletter-container">
-            <div class="newsletter-content">
-                <h2>Suscríbete a Nuestra Tienda</h2>
-                <p>Recibe ofertas exclusivas y novedades antes que nadie</p>
-                <form class="newsletter-form">
-                    <input type="email" placeholder="Tu correo electrónico" required>
-                    <button type="submit">Suscribirse</button>
-                </form>
-            </div>
-        </div>
-    </section>
+
 
     <!-- Footer -->
 

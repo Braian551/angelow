@@ -19,17 +19,28 @@ if (isset($_SESSION['alert'])) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gestión de Noticias - Panel de Administración</title>
+    <title>Gestión de Anuncios - Panel de Administración</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/productsadmin.css">
     <style>
-        /* Ajustes mínimos para tarjetas de noticias reutilizando estilos de productos */
         .product-card h3 { font-size: 1rem; }
         .product-stats { display: grid; grid-template-columns: repeat(2,1fr); gap: 6px; }
         .filters-card .filter-row { flex-wrap: wrap; }
+        .type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .type-top_bar { background: #3498db; color: white; }
+        .type-promo_banner { background: #e74c3c; color: white; }
     </style>
+    <script>
+        window.BASE_URL = '<?= BASE_URL ?>';
+    </script>
 </head>
 <body>
 <div class="admin-container">
@@ -41,10 +52,10 @@ if (isset($_SESSION['alert'])) {
         <div class="dashboard-content">
             <div class="page-header">
                 <h1>
-                    <i class="fas fa-newspaper"></i> Gestión de Noticias
+                    <i class="fas fa-bullhorn"></i> Gestión de Anuncios
                 </h1>
                 <div class="breadcrumb">
-                    <a href="<?= BASE_URL ?>/admin">Dashboard</a> / <span>Noticias</span>
+                    <a href="<?= BASE_URL ?>/admin">Dashboard</a> / <span>Anuncios</span>
                 </div>
             </div>
 
@@ -53,43 +64,34 @@ if (isset($_SESSION['alert'])) {
                 <form id="search-form">
                     <div class="filter-row">
                         <div class="filter-group">
-                            <input type="text" id="search-input" name="search" placeholder="Buscar noticias por título o contenido..." class="form-control">
+                            <input type="text" id="search-input" name="search" placeholder="Buscar anuncios por título o mensaje..." class="form-control">
                             <button type="submit" class="btn btn-search">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
 
                         <div class="filter-group">
+                            <select name="type" id="type-filter" class="form-control">
+                                <option value="">Todos los tipos</option>
+                                <option value="top_bar">Barra Superior</option>
+                                <option value="promo_banner">Banner Promocional</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
                             <select name="status" id="status-filter" class="form-control">
                                 <option value="">Todos los estados</option>
-                                <option value="active">Activas</option>
-                                <option value="inactive">Inactivas</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <select name="featured" id="featured-filter" class="form-control">
-                                <option value="">Todas</option>
-                                <option value="featured">Destacadas</option>
-                                <option value="not_featured">No destacadas</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <select name="published" id="published-filter" class="form-control">
-                                <option value="">Publicación</option>
-                                <option value="published">Publicadas</option>
-                                <option value="unpublished">Sin publicar</option>
+                                <option value="active">Activos</option>
+                                <option value="inactive">Inactivos</option>
                             </select>
                         </div>
 
                         <div class="filter-group">
                             <select name="order" id="order-filter" class="form-control">
+                                <option value="priority">Prioridad</option>
                                 <option value="newest">Más recientes</option>
                                 <option value="title_asc">Título (A-Z)</option>
                                 <option value="title_desc">Título (Z-A)</option>
-                                <option value="published_desc">Publicación (reciente)</option>
-                                <option value="published_asc">Publicación (antiguo)</option>
                             </select>
                         </div>
 
@@ -100,8 +102,8 @@ if (isset($_SESSION['alert'])) {
                             <a href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" class="btn btn-secondary">
                                 <i class="fas fa-sync-alt"></i> Limpiar
                             </a>
-                            <a href="<?= BASE_URL ?>/admin/news/add_news.php" class="btn btn-success">
-                                <i class="fas fa-plus"></i> Agregar noticia
+                            <a href="<?= BASE_URL ?>/admin/announcements/add.php" class="btn btn-success" id="add-announcement-btn">
+                                <i class="fas fa-plus"></i> Agregar anuncio
                             </a>
                         </div>
                     </div>
@@ -109,12 +111,12 @@ if (isset($_SESSION['alert'])) {
             </div>
 
             <div class="results-summary">
-                <p id="results-count">Cargando noticias...</p>
+                <p id="results-count">Cargando anuncios...</p>
             </div>
 
-            <!-- Listado de noticias (reusa grid de productos) -->
-            <div class="products-grid" id="news-container">
-                <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando noticias...</div>
+            <!-- Listado de anuncios -->
+            <div class="products-grid" id="announcements-container">
+                <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando anuncios...</div>
             </div>
 
             <div class="pagination" id="pagination-container"></div>
@@ -130,7 +132,7 @@ if (isset($_SESSION['alert'])) {
             <button class="modal-close">&times;</button>
         </div>
         <div class="modal-body">
-            <p>¿Eliminar esta noticia? Esta acción no se puede deshacer.</p>
+            <p>¿Eliminar este anuncio? Esta acción no se puede deshacer.</p>
         </div>
         <div class="modal-footer">
             <button class="btn btn-danger" id="confirm-delete">Eliminar</button>
@@ -141,6 +143,6 @@ if (isset($_SESSION['alert'])) {
 
 <script src="<?= BASE_URL ?>/js/dashboardadmin.js"></script>
 <script src="<?= BASE_URL ?>/js/alerta.js"></script>
-<?php require_once __DIR__ . '/../../js/admin/news/newsadmin.php'; ?>
+<script src="<?= BASE_URL ?>/js/admin/announcements/announcementsadmin.js"></script>
 </body>
 </html>
