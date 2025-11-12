@@ -79,7 +79,9 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="keywords" content="ropa infantil, moda niños, ropa bebé, vestidos niñas, conjuntos niños, pijamas infantiles">
     <link rel="icon" href="images/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/productos.css">
     <link rel="stylesheet" href="css/announcements.css">
+    <link rel="stylesheet" href="css/notificacion.css">
     <!-- Preconexión para mejorar performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -177,27 +179,28 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
     <section class="featured-products">
         <div class="section-header">
             <h2 class="section-title">Productos destacados</h2>
-            <a href="<?php echo BASE_URL; ?>/tienda/tienda.php" class="view-all">Ver todos</a>
+            <a href="<?php echo BASE_URL; ?>/tienda/productos.php" class="view-all">Ver todos</a>
         </div>
         
         <div class="products-grid">
             <?php if (!empty($products)): ?>
                 <?php foreach ($products as $product): ?>
-                    <div class="product-card">
+                    <div class="product-card" data-product-id="<?php echo $product['id']; ?>">
                         <?php if ($product['is_featured']): ?>
-                            <div class="product-badge">DESTACADO</div>
+                            <div class="product-badge">Destacado</div>
                         <?php elseif (!empty($product['compare_price']) && $product['compare_price'] > $product['price']): ?>
                             <?php 
                             $discount = round((($product['compare_price'] - $product['price']) / $product['compare_price']) * 100);
                             ?>
-                            <div class="product-badge"><?php echo $discount; ?>% OFF</div>
+                            <div class="product-badge sale"><?php echo $discount; ?>% OFF</div>
                         <?php endif; ?>
-                        <div class="product-wishlist">
-                            <button aria-label="Añadir a favoritos">
-                                <i class="far fa-heart"></i>
-                            </button>
-                        </div>
-                        <a href="<?php echo BASE_URL; ?>/producto/verproducto.php?id=<?php echo $product['id']; ?>" class="product-image">
+                        
+                        <!-- Botón de favoritos -->
+                        <button class="wishlist-btn" aria-label="Añadir a favoritos" data-product-id="<?php echo $product['id']; ?>">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        
+                        <a href="<?php echo BASE_URL; ?>/producto/verproducto.php?slug=<?php echo $product['slug']; ?>" class="product-image loading">
                             <?php if (!empty($product['main_image'])): ?>
                                 <img src="<?php echo htmlspecialchars(BASE_URL . '/' . $product['main_image']); ?>" 
                                      alt="<?php echo htmlspecialchars($product['name']); ?>">
@@ -206,26 +209,39 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
                                      alt="<?php echo htmlspecialchars($product['name']); ?>">
                             <?php endif; ?>
                         </a>
+                        
                         <div class="product-info">
                             <span class="product-category"><?php echo htmlspecialchars($product['category_name'] ?? 'Sin categoría'); ?></span>
                             <h3 class="product-title">
-                                <a href="<?php echo BASE_URL; ?>/producto/verproducto.php?id=<?php echo $product['id']; ?>">
+                                <a href="<?php echo BASE_URL; ?>/producto/verproducto.php?slug=<?php echo $product['slug']; ?>">
                                     <?php echo htmlspecialchars($product['name']); ?>
                                 </a>
                             </h3>
+                            
+                            <!-- Valoración -->
                             <div class="product-rating">
-                                <span class="stars">★★★★☆</span>
-                                <span class="count">(0)</span>
+                                <div class="stars">
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <span class="rating-count">(0)</span>
                             </div>
+                            
+                            <!-- Precio -->
                             <div class="product-price">
                                 <span class="current-price">$<?php echo number_format($product['price'], 0, ',', '.'); ?></span>
                                 <?php if (!empty($product['compare_price']) && $product['compare_price'] > $product['price']): ?>
                                     <span class="original-price">$<?php echo number_format($product['compare_price'], 0, ',', '.'); ?></span>
                                 <?php endif; ?>
                             </div>
-                            <button class="add-to-cart" onclick="location.href='<?php echo BASE_URL; ?>/producto/verproducto.php?id=<?php echo $product['id']; ?>'">
-                                Ver detalles
-                            </button>
+                            
+                            <!-- Botón de ver producto -->
+                            <a href="<?php echo BASE_URL; ?>/producto/verproducto.php?slug=<?php echo $product['slug']; ?>" class="view-product-btn">
+                                <i class="fas fa-eye"></i> Ver producto
+                            </a>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -372,6 +388,175 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Iniciar el slider automático
             startAutoSlide();
+
+            // ========== FUNCIONALIDAD DE PRODUCTOS ==========
+
+            // Función genérica para llamadas a la API
+            function callApi(endpoint, method, data, callback) {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+
+                if (method !== 'GET' && method !== 'HEAD') {
+                    options.body = JSON.stringify(data);
+                }
+
+                return fetch(endpoint, options)
+                    .then(response => {
+                        return response.text().then(text => {
+                            let jsonResponse;
+                            try {
+                                jsonResponse = JSON.parse(text);
+                            } catch (e) {
+                                jsonResponse = { success: false, error: text || 'Respuesta inválida del servidor' };
+                            }
+
+                            if (!response.ok) {
+                                const errorMessage = jsonResponse.error || `Error del servidor: ${response.status}`;
+                                throw new Error(errorMessage);
+                            }
+
+                            return jsonResponse;
+                        });
+                    })
+                    .then(result => {
+                        if (callback) callback(result);
+                        return result;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification(error.message, 'error');
+                        return { success: false, error: error.message };
+                    });
+            }
+
+            // Función para manejar la lista de deseos (wishlist)
+            function handleWishlist(action, productId, callback) {
+                const endpoint = `<?php echo BASE_URL; ?>/tienda/api/wishlist/${action}.php`;
+                callApi(endpoint, 'POST', { product_id: productId }, function(response) {
+                    if (response.success) {
+                        if (callback) callback(response);
+                    } else {
+                        if (callback) callback(response);
+                    }
+                });
+            }
+
+            // Notificación mejorada
+            function showNotification(message, type) {
+                const icons = {
+                    success: 'fa-check-circle',
+                    error: 'fa-times-circle',
+                    info: 'fa-info-circle'
+                };
+                
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <i class="fas ${icons[type] || 'fa-info-circle'}"></i>
+                    <span>${message}</span>
+                `;
+                
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.classList.add('fade-out');
+                    setTimeout(() => notification.remove(), 500);
+                }, 3000);
+            }
+
+            // Evento para botones de wishlist
+            document.querySelectorAll('.wishlist-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    <?php if (!isset($_SESSION['user_id'])): ?>
+                        showNotification('Debes iniciar sesión para usar la lista de deseos', 'error');
+                        return;
+                    <?php endif; ?>
+
+                    const productId = this.getAttribute('data-product-id');
+                    const isActive = this.classList.contains('active');
+
+                    handleWishlist(isActive ? 'remove' : 'add', productId, function(response) {
+                        if (response.success) {
+                            this.classList.toggle('active');
+                            const icon = this.querySelector('i');
+                            if (icon) {
+                                icon.classList.toggle('far');
+                                icon.classList.toggle('fas');
+                            }
+                            showNotification(
+                                isActive ? 'Producto eliminado de tu lista de deseos' : 'Producto añadido a tu lista de deseos',
+                                isActive ? 'info' : 'success'
+                            );
+                        }
+                    }.bind(this));
+                });
+            });
+
+            // Cargar wishlist del usuario
+            function loadWishlistProducts() {
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    callApi('<?php echo BASE_URL; ?>/tienda/api/wishlist/get-wishlist.php', 'GET', null, function(response) {
+                        if (response.success) {
+                            response.items.forEach(item => {
+                                const button = document.querySelector(`.wishlist-btn[data-product-id="${item.product_id}"]`);
+                                if (button) {
+                                    button.classList.add('active');
+                                    const icon = button.querySelector('i');
+                                    if (icon) {
+                                        icon.classList.remove('far');
+                                        icon.classList.add('fas');
+                                    }
+                                }
+                            });
+                        }
+                    });
+                <?php endif; ?>
+            }
+
+            // Función para manejar la carga de imágenes
+            function handleImageLoad(img) {
+                img.classList.add('loaded');
+                const parent = img.parentElement;
+                if (parent) {
+                    parent.classList.remove('loading');
+                }
+            }
+
+            // Función para manejar errores de carga de imágenes
+            function handleImageError(img) {
+                img.src = '<?php echo BASE_URL; ?>/images/default-product.jpg';
+                img.classList.add('loaded');
+                const parent = img.parentElement;
+                if (parent) {
+                    parent.classList.remove('loading');
+                }
+            }
+
+            // Inicializar imágenes
+            document.querySelectorAll('.product-image').forEach(container => {
+                const img = container.querySelector('img');
+                if (!img) return;
+                
+                container.classList.add('loading');
+                
+                if (img.complete) {
+                    handleImageLoad(img);
+                } else {
+                    img.addEventListener('load', function() {
+                        handleImageLoad(img);
+                    });
+                    img.addEventListener('error', function() {
+                        handleImageError(img);
+                    });
+                }
+            });
+
+            // Inicializar wishlist
+            loadWishlistProducts();
         });
     </script>
 
