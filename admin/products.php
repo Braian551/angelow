@@ -216,20 +216,15 @@ try {
         </div>
     </div>
 
-    <!-- Modal para confirmar eliminación -->
-    <div class="modal-overlay" id="delete-modal">
-        <div class="modal-content">
+    <!-- Modal para zoom de imagen -->
+    <div class="modal-overlay image-zoom-modal" id="image-zoom-modal">
+        <div class="modal-content zoom-content">
             <div class="modal-header">
-                <h3>Confirmar Eliminación</h3>
+                <h3 id="zoom-title">Imagen del Producto</h3>
                 <button class="modal-close">&times;</button>
             </div>
-            <div class="modal-body">
-                <p>¿Estás seguro que deseas eliminar este producto? Esta acción no se puede deshacer.</p>
-                <p class="text-danger"><strong>Advertencia:</strong> También se eliminarán todas las variantes e imágenes asociadas.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger" id="confirm-delete">Eliminar</button>
-                <button class="btn btn-secondary modal-close">Cancelar</button>
+            <div class="modal-body zoom-body">
+                <img id="zoom-image" src="" alt="Zoomed image">
             </div>
         </div>
     </div>
@@ -552,6 +547,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="quick-view-gallery">
                     <div class="main-image">
                         <img src="${images[0].url}" alt="${product.name}" id="main-product-image">
+                        <button class="image-zoom-btn" data-image="${images[0].url}" data-alt="${product.name}">
+                            <i class="fas fa-expand"></i>
+                        </button>
                     </div>
                     ${images.length > 1 ? `
                     <div class="thumbnail-gallery">
@@ -597,6 +595,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <th>Precio</th>
                                     <th>Stock</th>
                                     <th>Estado</th>
+                                    <th>Imagen</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -607,6 +606,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <td>$${Number(variant.price).toLocaleString('es-CO')}</td>
                                         <td>${variant.quantity}</td>
                                         <td><span class="status ${variant.is_active ? 'active' : 'inactive'}">${variant.is_active ? 'Activo' : 'Inactivo'}</span></td>
+                                        <td><button class="btn-zoom-variant" data-color-id="${variant.color_id}" data-color="${variant.color_name}" data-size="${variant.size_name}"><i class="fas fa-eye"></i></button></td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -657,6 +657,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.getElementById('quick-view-content').innerHTML = html;
         
+        // Almacenar imágenes para uso en funciones
+        window.currentImages = images;
+        
         // Actualizar el enlace de editar
         document.getElementById('edit-product-btn').href = `<?= BASE_URL ?>/admin/editproducto.php?id=${product.id}`;
         
@@ -668,6 +671,37 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupImageGallery() {
         const thumbnails = document.querySelectorAll('.thumbnail');
         const mainImage = document.getElementById('main-product-image');
+        const zoomBtn = document.querySelector('.image-zoom-btn');
+        
+        // Event listener para botón de zoom
+        if (zoomBtn) {
+            zoomBtn.addEventListener('click', function() {
+                const imageUrl = this.getAttribute('data-image');
+                const altText = this.getAttribute('data-alt');
+                openImageZoom(imageUrl, altText);
+            });
+        }
+        
+        // Event listeners para botones de zoom en variantes
+        document.querySelectorAll('.btn-zoom-variant').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const colorId = this.getAttribute('data-color-id');
+                const color = this.getAttribute('data-color');
+                const size = this.getAttribute('data-size');
+                
+                // Buscar imagen específica para el color (primaria primero)
+                let imageUrl = document.getElementById('main-product-image').src;
+                if (window.currentImages && colorId) {
+                    const variantImage = window.currentImages.find(img => img.color_variant_id == colorId && img.is_primary == 1) ||
+                                         window.currentImages.find(img => img.color_variant_id == colorId);
+                    if (variantImage) {
+                        imageUrl = variantImage.url;
+                    }
+                }
+                
+                openImageZoom(imageUrl, `Variante ${color} - ${size}`);
+            });
+        });
         
         thumbnails.forEach(thumb => {
             thumb.addEventListener('click', function() {
@@ -676,6 +710,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Cambiar imagen principal
                 mainImage.src = this.src;
+                
+                // Actualizar botón de zoom
+                if (zoomBtn) {
+                    zoomBtn.setAttribute('data-image', this.src);
+                    zoomBtn.setAttribute('data-alt', '${product.name}');
+                }
                 
                 // Actualizar thumbnail activo
                 thumbnails.forEach(t => t.classList.remove('active'));
@@ -798,6 +838,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Por ahora, solo cerramos el modal
         document.getElementById('delete-modal').classList.remove('active');
         alert('Funcionalidad de eliminación no implementada aún.');
+    }
+    
+    // Función para abrir imagen en zoom
+    function openImageZoom(imageUrl, altText) {
+        document.getElementById('zoom-image').src = imageUrl;
+        document.getElementById('zoom-image').alt = altText;
+        document.getElementById('zoom-title').textContent = altText;
+        document.getElementById('image-zoom-modal').classList.add('active');
     }
 
     // Lógica para modales (vista rápida, eliminación)

@@ -43,11 +43,14 @@ try {
         exit();
     }
 
-    // Obtener imágenes del producto
+    // Obtener imágenes del producto desde variant_images
     $imagesStmt = $conn->prepare("
-        SELECT * FROM product_images 
-        WHERE product_id = ?
-        ORDER BY `order`
+        SELECT vi.*, pcv.color_id, c.name AS color_name
+        FROM variant_images vi
+        LEFT JOIN product_color_variants pcv ON vi.color_variant_id = pcv.id
+        LEFT JOIN colors c ON pcv.color_id = c.id
+        WHERE vi.product_id = ?
+        ORDER BY vi.`order`
     ");
     $imagesStmt->execute([$productId]);
     $imagesRaw = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -57,7 +60,11 @@ try {
         return [
             'id' => $img['id'],
             'url' => BASE_URL . '/' . $img['image_path'],
-            'order' => $img['order']
+            'order' => $img['order'],
+            'color_variant_id' => $img['color_variant_id'],
+            'color_name' => $img['color_name'],
+            'alt_text' => $img['alt_text'],
+            'is_primary' => $img['is_primary']
         ];
     }, $imagesRaw);
 
