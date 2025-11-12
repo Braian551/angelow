@@ -50,7 +50,16 @@ try {
         ORDER BY `order`
     ");
     $imagesStmt->execute([$productId]);
-    $images = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
+    $imagesRaw = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Procesar imágenes para incluir URL completa
+    $images = array_map(function($img) {
+        return [
+            'id' => $img['id'],
+            'url' => BASE_URL . '/' . $img['image_path'],
+            'order' => $img['order']
+        ];
+    }, $imagesRaw);
 
     // Obtener variantes de color
     $colorVariantsStmt = $conn->prepare("

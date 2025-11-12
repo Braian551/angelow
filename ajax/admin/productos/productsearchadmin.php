@@ -1,14 +1,23 @@
 <?php
-ob_start();
 session_start();
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
 
-header('Content-Type: application/json');
+// Limpiar cualquier salida previa
+if (ob_get_level()) ob_end_clean();
+ob_start();
+
+header('Content-Type: application/json; charset=utf-8');
+
+// Log para debug
+error_log("productsearchadmin.php - Session ID: " . session_id());
+error_log("productsearchadmin.php - User ID: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NOT SET'));
 
 // Verificar autenticación y permisos
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['error' => 'Acceso no autorizado']);
+    error_log("productsearchadmin.php - No session user_id found");
+    ob_end_clean();
+    echo json_encode(['error' => 'Acceso no autorizado', 'session_id' => session_id()]);
     exit();
 }
 
@@ -18,20 +27,31 @@ try {
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch();
     
+    error_log("productsearchadmin.php - User found: " . ($user ? 'YES' : 'NO'));
+    error_log("productsearchadmin.php - User role: " . ($user ? $user['role'] : 'N/A'));
+    
     if (!$user || $user['role'] !== 'admin') {
-        echo json_encode(['error' => 'Permisos insuficientes']);
+        ob_end_clean();
+        echo json_encode([
+            'error' => 'Permisos insuficientes',
+            'user_id' => $_SESSION['user_id'],
+            'role' => $user ? $user['role'] : 'no user found'
+        ]);
         exit();
     }
 
     // Obtener y sanitizar parámetros
-    $search = isset($_GET['search']) ? '%'.trim($_GET['search']).'%' : null;
-    $category = isset($_GET['category']) ? (int)$_GET['category'] : null;
-    $status = isset($_GET['status']) ? ($_GET['status'] === 'active' ? 1 : 0) : null;
-    $gender = isset($_GET['gender']) ? $_GET['gender'] : null;
+    $search = (isset($_GET['search']) && trim($_GET['search']) !== '') ? '%'.trim($_GET['search']).'%' : null;
+    $category = (isset($_GET['category']) && $_GET['category'] !== '') ? (int)$_GET['category'] : null;
+    $status = (isset($_GET['status']) && $_GET['status'] !== '') ? ($_GET['status'] === 'active' ? 1 : 0) : null;
+    $gender = (isset($_GET['gender']) && trim($_GET['gender']) !== '') ? trim($_GET['gender']) : null;
     $order = isset($_GET['order']) ? $_GET['order'] : 'newest';
     $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
     $perPage = 12;
     $offset = ($page - 1) * $perPage;
+    
+    // Log para debug
+    error_log("productsearchadmin.php - Filters: search=" . ($search ?? 'null') . ", category=" . ($category ?? 'null') . ", status=" . ($status ?? 'null') . ", gender=" . ($gender ?? 'null'));
 
     // Construir consulta base con JOIN para obtener imágenes
     $sql = "SELECT 
@@ -62,32 +82,33 @@ try {
             WHERE 1=1";
 
     $params = [];
-    $types = '';
+    $types = [];
 
     // Aplicar filtros
     if ($search) {
         $sql .= " AND (p.name LIKE ? OR p.brand LIKE ?)";
         $params[] = $search;
         $params[] = $search;
-        $types .= 'ss';
+        $types[] = 's';
+        $types[] = 's';
     }
 
     if ($category) {
         $sql .= " AND p.category_id = ?";
         $params[] = $category;
-        $types .= 'i';
+        $types[] = 'i';
     }
 
     if ($status !== null) {
         $sql .= " AND p.is_active = ?";
         $params[] = $status;
-        $types .= 'i';
+        $types[] = 'i';
     }
 
     if ($gender) {
         $sql .= " AND p.gender = ?";
         $params[] = $gender;
-        $types .= 's';
+        $types[] = 's';
     }
 
     // Ordenación
@@ -105,7 +126,8 @@ try {
     $sql .= " LIMIT ? OFFSET ?";
     $params[] = $perPage;
     $params[] = $offset;
-    $types .= 'ii';
+    $types[] = 'i';
+    $types[] = 'i';
 
     // Consulta para contar total
     $countSql = "SELECT COUNT(*) FROM products p WHERE 1=1";
@@ -133,26 +155,28 @@ try {
     }
 
     // Ejecutar consultas
+    error_log("productsearchadmin.php - SQL: " . $sql);
+    error_log("productsearchadmin.php - Params count: " . count($params));
+    
     $stmt = $conn->prepare($sql);
     
     // Vincular parámetros dinámicamente
     foreach ($params as $index => $param) {
         $paramType = $types[$index] === 'i' ? PDO::PARAM_INT : PDO::PARAM_STR;
         $stmt->bindValue($index + 1, $param, $paramType);
+        error_log("productsearchadmin.php - Binding param " . ($index + 1) . ": " . $param . " (type: " . $types[$index] . ")");
     }
     
     $stmt->execute();
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    error_log("productsearchadmin.php - Products found: " . count($products));
 
     $countStmt = $conn->prepare($countSql);
     $countStmt->execute($countParams);
     $total = $countStmt->fetchColumn();
-
-    // Debug: add count to response
-    $debug = [
-        'query_count' => count($products),
-        'total_count' => (int)$total
-    ];
+    
+    error_log("productsearchadmin.php - Total count: " . $total);
 
     // Formatear respuesta
     $response = [
@@ -169,7 +193,7 @@ try {
                 'total_stock' => (int)$product['total_stock'],
                 'min_price' => (float)$product['min_price'],
                 'max_price' => (float)$product['max_price'],
-                'primary_image' => $product['primary_image'] ? BASE_URL . '/' . $product['primary_image'] : null,
+                                'primary_image' => $product['primary_image'] ? BASE_URL . '/' . $product['primary_image'] : null,
                 'created_at' => $product['created_at']
             ];
         }, $products),
@@ -181,14 +205,17 @@ try {
         ]
     ];
 
+    ob_end_clean();
     echo json_encode($response);
+    exit();
 
 } catch (PDOException $e) {
     error_log("Error en productsearchadmin.php: " . $e->getMessage());
+    ob_end_clean();
     echo json_encode([
         'error' => 'Error en la base de datos',
         'details' => DEBUG_MODE ? $e->getMessage() : null
     ]);
+    exit();
 }
-ob_end_flush();
 ?>

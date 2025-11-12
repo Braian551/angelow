@@ -37,6 +37,7 @@ try {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/orders/orders.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/products-grid.css">
 </head>
 
 <body>
@@ -178,17 +179,17 @@ try {
                     <p id="results-count">Cargando productos...</p>
 
                     <div class="quick-actions">
+                        <a href="<?= BASE_URL ?>/admin/subproducto.php" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Nuevo Producto
+                        </a>
                         <button class="btn btn-icon" id="export-products">
                             <i class="fas fa-file-export"></i> Exportar
-                        </button>
-                        <button class="btn btn-icon" id="bulk-actions">
-                            <i class="fas fa-tasks"></i> Acciones masivas
                         </button>
                     </div>
                 </div>
 
                 <!-- Listado de productos -->
-                <div class="orders-table-container" id="products-container">
+                <div class="products-container" id="products-container">
                     <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando productos...</div>
                 </div>
 
@@ -199,7 +200,7 @@ try {
     </div>
 
     <!-- Modal para vista rápida -->
-    <div class="modal-overlay" id="quick-view-modal">
+    <div class="modal-overlay quick-view-modal" id="quick-view-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Detalles del Producto</h3>
@@ -374,28 +375,58 @@ document.addEventListener('DOMContentLoaded', function() {
         params.append('page', page);
         
         const apiUrl = `<?= BASE_URL ?>/ajax/admin/productos/productsearchadmin.php?${params.toString()}`;
+        console.log('Loading products from:', apiUrl);
         
         fetch(apiUrl, {
             method: 'GET',
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json'
+            }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) throw new Error(data.error);
-                renderProducts(data.products);
-                updateResultsCount(data.meta.total, data.products.length);
-                renderPagination(data.meta.total, page, data.meta.per_page);
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                console.log('Response text:', text);
+                try {
+                    const data = JSON.parse(text);
+                    console.log('Parsed data:', data);
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    renderProducts(data.products);
+                    updateResultsCount(data.meta.total, data.products.length);
+                    renderPagination(data.meta.total, page, data.meta.perPage);
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    throw new Error('Error al procesar la respuesta: ' + e.message);
+                }
             })
             .catch(error => {
                 console.error('Error en loadProducts:', error);
-                productsContainer.innerHTML = `<div class="empty-state"><h3>Error al cargar productos</h3><p>${error.message}</p></div>`;
+                productsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error al cargar productos</h3>
+                        <p>${error.message}</p>
+                        <button onclick="loadProducts()" class="btn btn-primary">
+                            <i class="fas fa-sync"></i> Reintentar
+                        </button>
+                    </div>
+                `;
             })
             .finally(() => {
                 isLoading = false;
             });
     }
     
-    // Función para renderizar productos en una tabla
+    // Función para renderizar productos en tarjetas
     function renderProducts(products) {
         if (!products || products.length === 0) {
             productsContainer.innerHTML = `
@@ -411,61 +442,252 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        let tableHTML = `
-            <table class="orders-table" id="products-table">
-                <thead>
-                    <tr>
-                        <th><input type="checkbox" id="select-all"></th>
-                        <th>Producto</th>
-                        <th>Categoría</th>
-                        <th>Stock</th>
-                        <th>Precio</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
+        let gridHTML = '<div class="products-admin-grid">';
 
         products.forEach(product => {
             const imageUrl = product.primary_image || '<?= BASE_URL ?>/images/default-product.jpg';
             const statusText = product.is_active ? 'Activo' : 'Inactivo';
-            const statusClass = product.is_active ? 'status-paid' : 'status-cancelled'; // Re-usando clases de orders
+            const statusClass = product.is_active ? 'status-active' : 'status-inactive';
+            const priceRange = product.min_price === product.max_price 
+                ? `$${Number(product.min_price).toLocaleString('es-CO')}` 
+                : `$${Number(product.min_price).toLocaleString('es-CO')} - $${Number(product.max_price).toLocaleString('es-CO')}`;
 
-            tableHTML += `
-                <tr>
-                    <td><input type="checkbox" class="select-row" data-id="${product.id}"></td>
-                    <td>
-                        <div class="product-cell">
-                            <img src="${imageUrl}" alt="${product.name}" class="product-cell-img" onerror="this.src='<?= BASE_URL ?>/images/default-product.jpg'">
-                            <div class="product-cell-info">
-                                <a href="<?= BASE_URL ?>/admin/editproducto.php?id=${product.id}" class="product-name">${product.name}</a>
-                                <span class="product-sku">SKU: ${product.sku || 'N/A'}</span>
+            gridHTML += `
+                <div class="product-admin-card" data-id="${product.id}">
+                    <div class="product-admin-select">
+                        <input type="checkbox" class="select-row" data-id="${product.id}">
+                    </div>
+                    
+                    <div class="product-admin-status">
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+
+                    <div class="product-admin-image">
+                        <img src="${imageUrl}" alt="${product.name}" onerror="this.src='<?= BASE_URL ?>/images/default-product.jpg'">
+                        <div class="product-admin-overlay">
+                            <button class="btn-overlay btn-quick-view" data-id="${product.id}" title="Vista Rápida">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="product-admin-body">
+                        <div class="product-admin-header">
+                            <h3 class="product-admin-title">
+                                <a href="<?= BASE_URL ?>/admin/editproducto.php?id=${product.id}">${product.name}</a>
+                            </h3>
+                            <span class="product-admin-id">ID: ${product.id}</span>
+                        </div>
+
+                        <div class="product-admin-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-tag"></i>
+                                <span>${product.category_name || 'Sin categoría'}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-palette"></i>
+                                <span>${product.variant_count} variante${product.variant_count !== 1 ? 's' : ''}</span>
                             </div>
                         </div>
-                    </td>
-                    <td>${product.category_name || 'N/A'}</td>
-                    <td>${product.total_stock}</td>
-                    <td>$${Number(product.min_price).toFixed(2)} - $${Number(product.max_price).toFixed(2)}</td>
-                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                    <td>
-                        <div class="actions-cell">
-                            <a href="<?= BASE_URL ?>/admin/editproducto.php?id=${product.id}" class="btn-action" title="Editar"><i class="fas fa-edit"></i></a>
-                            <button class="btn-action btn-quick-view" data-id="${product.id}" title="Vista Rápida"><i class="fas fa-eye"></i></button>
-                            <button class="btn-action btn-delete" data-id="${product.id}" title="Eliminar"><i class="fas fa-trash"></i></button>
+
+                        <div class="product-admin-info">
+                            <div class="info-item">
+                                <label>Stock Total:</label>
+                                <span class="stock-value ${product.total_stock < 10 ? 'low-stock' : ''}">${product.total_stock} unidades</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Precio:</label>
+                                <span class="price-value">${priceRange}</span>
+                            </div>
                         </div>
-                    </td>
-                </tr>
+                    </div>
+
+                    <div class="product-admin-actions">
+                        <a href="<?= BASE_URL ?>/admin/editproducto.php?id=${product.id}" class="btn-action btn-edit" title="Editar">
+                            <i class="fas fa-edit"></i>
+                            <span>Editar</span>
+                        </a>
+                        <button class="btn-action btn-delete" data-id="${product.id}" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                            <span>Eliminar</span>
+                        </button>
+                    </div>
+                </div>
             `;
         });
 
-        tableHTML += `
-                </tbody>
-            </table>
-        `;
-        productsContainer.innerHTML = tableHTML;
+        gridHTML += '</div>';
+        productsContainer.innerHTML = gridHTML;
 
         assignButtonEvents();
+    }
+    
+    // Función para abrir vista rápida
+    function openQuickView(productId) {
+        fetch(`<?= BASE_URL ?>/admin/api/productos/get_product_details.php?id=${productId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderQuickView(data);
+                    document.getElementById('quick-view-modal').classList.add('active');
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cargar los detalles del producto');
+            });
+    }
+    
+    // Función para renderizar vista rápida
+    function renderQuickView(data) {
+        const product = data.product;
+        const images = data.images;
+        const variants = data.variants;
+        
+        let imagesHtml = '';
+        if (images.length > 0) {
+            imagesHtml = `
+                <div class="quick-view-gallery">
+                    <div class="main-image">
+                        <img src="${images[0].url}" alt="${product.name}" id="main-product-image">
+                    </div>
+                    ${images.length > 1 ? `
+                    <div class="thumbnail-gallery">
+                        ${images.map((img, index) => `
+                            <img src="${img.url}" alt="Thumbnail ${index + 1}" class="thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        let variantsHtml = '';
+        if (variants.length > 0) {
+            const colors = [...new Set(variants.map(v => v.color_name))];
+            const sizes = [...new Set(variants.map(v => v.size_name))];
+            
+            variantsHtml = `
+                <div class="variants-section">
+                    <h4>Variantes</h4>
+                    ${colors.length > 0 ? `
+                    <div class="variant-group">
+                        <label>Colores:</label>
+                        <div class="color-options">
+                            ${colors.map(color => `<span class="color-tag">${color}</span>`).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    ${sizes.length > 0 ? `
+                    <div class="variant-group">
+                        <label>Tallas:</label>
+                        <div class="size-options">
+                            ${sizes.map(size => `<span class="size-tag">${size}</span>`).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    <div class="variant-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Color</th>
+                                    <th>Talla</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${variants.map(variant => `
+                                    <tr>
+                                        <td>${variant.color_name}</td>
+                                        <td>${variant.size_name}</td>
+                                        <td>$${Number(variant.price).toLocaleString('es-CO')}</td>
+                                        <td>${variant.quantity}</td>
+                                        <td><span class="status ${variant.is_active ? 'active' : 'inactive'}">${variant.is_active ? 'Activo' : 'Inactivo'}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+        
+        const html = `
+            <div class="quick-view-content">
+                ${imagesHtml}
+                <div class="quick-view-info">
+                    <div class="product-header">
+                        <h2>${product.name}</h2>
+                        <span class="product-id">ID: ${product.id}</span>
+                    </div>
+                    
+                    <div class="product-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span>Categoría: ${product.category_name || 'Sin categoría'}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-palette"></i>
+                            <span>${variants.length} variante${variants.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-boxes"></i>
+                            <span>Stock total: ${data.total_stock} unidades</span>
+                        </div>
+                    </div>
+                    
+                    <div class="product-description">
+                        <h4>Descripción</h4>
+                        <p>${product.description || 'Sin descripción'}</p>
+                    </div>
+                    
+                    <div class="product-pricing">
+                        <h4>Precios</h4>
+                        <p>Rango: $${Number(data.min_price).toLocaleString('es-CO')} - $${Number(data.max_price).toLocaleString('es-CO')}</p>
+                    </div>
+                    
+                    ${variantsHtml}
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('quick-view-content').innerHTML = html;
+        
+        // Actualizar el enlace de editar
+        document.getElementById('edit-product-btn').href = `<?= BASE_URL ?>/admin/editproducto.php?id=${product.id}`;
+        
+        // Eventos para galería de imágenes
+        setupImageGallery();
+    }
+    
+    // Función para configurar galería de imágenes
+    function setupImageGallery() {
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const mainImage = document.getElementById('main-product-image');
+        
+        thumbnails.forEach(thumb => {
+            thumb.addEventListener('click', function() {
+                const index = this.getAttribute('data-index');
+                const images = document.querySelectorAll('.thumbnail');
+                
+                // Cambiar imagen principal
+                mainImage.src = this.src;
+                
+                // Actualizar thumbnail activo
+                thumbnails.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    }
+    
+    // Función para confirmar eliminación
+    function confirmDelete(productId) {
+        document.getElementById('confirm-delete').setAttribute('data-id', productId);
+        document.getElementById('delete-modal').classList.add('active');
     }
     
     // Actualizar contador de resultados
@@ -477,10 +699,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderPagination(totalProducts, currentPage, perPage) {
         const totalPages = Math.ceil(totalProducts / perPage);
         
+        // Ocultar paginación si hay menos de 13 productos (1 página)
         if (totalPages <= 1) {
-            paginationContainer.innerHTML = '';
+            paginationContainer.style.display = 'none';
             return;
         }
+        
+        paginationContainer.style.display = 'flex';
         
         let html = '';
         const maxVisiblePages = 5;
@@ -529,7 +754,21 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Asignar eventos a los botones
     function assignButtonEvents() {
-        // Lógica de vista rápida y eliminación
+        // Vista rápida
+        document.querySelectorAll('.btn-quick-view').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productId = this.getAttribute('data-id');
+                openQuickView(productId);
+            });
+        });
+
+        // Eliminación
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productId = this.getAttribute('data-id');
+                confirmDelete(productId);
+            });
+        });
     }
     
     // Event listeners para filtros
@@ -549,7 +788,40 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
+    // Función para eliminar producto
+    function deleteProduct(productId) {
+        if (!confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.')) {
+            return;
+        }
+        
+        // Aquí iría la lógica para eliminar el producto via AJAX
+        // Por ahora, solo cerramos el modal
+        document.getElementById('delete-modal').classList.remove('active');
+        alert('Funcionalidad de eliminación no implementada aún.');
+    }
+
     // Lógica para modales (vista rápida, eliminación)
+    // Cerrar modales
+    document.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.modal-overlay').classList.remove('active');
+        });
+    });
+    
+    // Cerrar modal al hacer clic en overlay
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+    });
+    
+    // Confirmar eliminación
+    document.getElementById('confirm-delete').addEventListener('click', function() {
+        const productId = this.getAttribute('data-id');
+        deleteProduct(productId);
+    });
 });
 </script>
 </body>
