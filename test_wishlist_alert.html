@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-url" content="">
+    <title>Test Wishlist Alerts</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/user/alert_user.css">
+    <link rel="stylesheet" href="css/notificacion.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 50px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .test-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 10px;
+            background: #0077b6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .test-btn:hover {
+            background: #005a8d;
+            transform: translateY(-2px);
+        }
+        
+        .wishlist-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .wishlist-btn i {
+            font-size: 24px;
+            color: #ff6b6b;
+        }
+        
+        .wishlist-btn.active {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            border-color: #ff6b6b;
+        }
+        
+        .wishlist-btn.active i {
+            color: white;
+        }
+        
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        h2 {
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .console-log {
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .console-log p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sistema de alertas -->
+    <div class="user-alert-overlay" id="userAlertOverlay">
+        <div class="user-alert-container">
+            <div class="user-alert-content">
+                <div class="user-alert-icon-wrapper">
+                    <i class="user-alert-icon" id="userAlertIcon"></i>
+                </div>
+                <h3 class="user-alert-title" id="userAlertTitle"></h3>
+                <p class="user-alert-message" id="userAlertMessage"></p>
+                <div class="user-alert-countdown" id="userAlertCountdown" style="display: none;">
+                    <span id="alertCountdown">(10)</span>
+                </div>
+                <div class="user-alert-actions" id="userAlertActions">
+                    <!-- Botones dinámicos -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h1>🧪 Test del Sistema de Alertas - Wishlist</h1>
+        <p style="color: #666; margin-bottom: 30px;">
+            <strong>🎯 Cambios implementados:</strong> Las alertas de éxito ahora son <strong>notificaciones toast</strong> en lugar de modales grandes.
+        </p>
+        
+        <div class="test-section">
+            <h2>1. Probar Alertas con Iconos Expresivos</h2>
+            <button class="test-btn" onclick="testSuccess()">✅ Éxito (Check animado)</button>
+            <button class="test-btn" onclick="testError()">❌ Error (Shake animado)</button>
+            <button class="test-btn" onclick="testWarning()">⚠️ Advertencia (Bounce)</button>
+            <button class="test-btn" onclick="testInfo()">ℹ️ Información (3D Rotate)</button>
+            <button class="test-btn" onclick="testQuestion()">❓ Pregunta (Twist)</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>2. Probar Notificaciones Toast (Éxito)</h2>
+            <button class="test-btn" onclick="testToastSuccess()">✅ Toast Éxito (Agregar a Wishlist)</button>
+            <button class="test-btn" onclick="testToastError()">❌ Toast Error</button>
+            <button class="test-btn" onclick="testToastWarning()">⚠️ Toast Warning</button>
+            <button class="test-btn" onclick="testToastInfo()">ℹ️ Toast Info</button>
+            <button class="test-btn" onclick="testToastClearSuccess()">🗑️ Toast Limpiar Lista</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>3. Probar Wishlist (Ahora con Notificaciones Toast)</h2>
+            <button class="wishlist-btn" data-product-id="1">
+                <i class="fas fa-heart"></i>
+            </button>
+            <button class="wishlist-btn active" data-product-id="2">
+                <i class="fas fa-heart"></i>
+            </button>
+            <button class="wishlist-btn" data-product-id="3">
+                <i class="fas fa-heart"></i>
+            </button>
+            <p style="margin-top: 15px; color: #666;">
+                <small>Nota: Al agregar productos, verás una <strong>notificación toast</strong> en lugar de una alerta modal</small>
+            </p>
+        </div>
+        
+        <div class="test-section">
+            <h2>4. Probar Confirmaciones</h2>
+            <button class="test-btn" onclick="testConfirmation()">🗑️ Limpiar Lista</button>
+            <button class="test-btn" onclick="testLoginAlert()">🔐 Login Requerido</button>
+        </div>
+        
+        <div class="console-log" id="consoleLog">
+            <p style="color: #0ff;">📋 Console Log (últimos eventos):</p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/user/alert_user.js"></script>
+    
+    <script>
+        // Interceptar console.log para mostrar en pantalla
+        const originalLog = console.log;
+        const logDiv = document.getElementById('consoleLog');
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const p = document.createElement('p');
+            p.textContent = args.join(' ');
+            logDiv.appendChild(p);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        };
+        
+        // Tests de alertas con iconos expresivos
+        function testSuccess() {
+            window.wishlistManager.alertSystem.show({
+                type: 'success',
+                title: '¡Operación Exitosa!',
+                message: 'El icono hace una animación de check con rotación y bounce. ¡Todo salió perfecto!',
+                actions: [{
+                    text: '¡Genial!',
+                    type: 'primary',
+                    icon: 'fas fa-thumbs-up'
+                }]
+            });
+        }
+        
+        function testError() {
+            window.wishlistManager.alertSystem.show({
+                type: 'error',
+                title: '¡Error Crítico!',
+                message: 'El icono hace un shake animado para llamar la atención. Algo salió mal.',
+                actions: [{
+                    text: 'Entendido',
+                    type: 'danger',
+                    icon: 'fas fa-exclamation-triangle'
+                }]
+            });
+        }
+        
+        function testWarning() {
+            window.wishlistManager.alertSystem.show({
+                type: 'warning',
+                title: '¡Advertencia!',
+                message: 'El icono hace un bounce vertical. Ten cuidado con esta acción.',
+                actions: [
+                    {
+                        text: 'Cancelar',
+                        type: 'secondary',
+                        icon: 'fas fa-times'
+                    },
+                    {
+                        text: 'Continuar',
+                        type: 'warning',
+                        icon: 'fas fa-arrow-right'
+                    }
+                ]
+            });
+        }
+        
+        function testInfo() {
+            window.wishlistManager.alertSystem.show({
+                type: 'info',
+                title: 'Información Importante',
+                message: 'El icono hace una rotación 3D en Y. Aquí tienes datos relevantes.',
+                autoClose: 5
+            });
+        }
+        
+        function testQuestion() {
+            window.wishlistManager.alertSystem.show({
+                type: 'question',
+                title: '¿Estás Seguro?',
+                message: 'El icono hace un twist animado. ¿Quieres continuar con esta acción?',
+                actions: [
+                    {
+                        text: 'No',
+                        type: 'secondary',
+                        icon: 'fas fa-times'
+                    },
+                    {
+                        text: 'Sí, continuar',
+                        type: 'primary',
+                        icon: 'fas fa-check'
+                    }
+                ]
+            });
+        }
+        
+        // Tests de toast
+        function testToastSuccess() {
+            window.wishlistManager.notificationSystem.show(
+                '¡Producto agregado a tu lista de deseos!',
+                'success',
+                { duration: 3000 }
+            );
+        }
+        
+        function testToastError() {
+            window.wishlistManager.notificationSystem.show(
+                'Error al procesar la solicitud',
+                'error',
+                { duration: 3000 }
+            );
+        }
+        
+        function testToastWarning() {
+            window.wishlistManager.notificationSystem.show(
+                'Advertencia: Stock limitado',
+                'warning',
+                { duration: 3000 }
+            );
+        }
+        
+        function testToastClearSuccess() {
+            window.wishlistManager.notificationSystem.show(
+                '¡Lista de deseos limpiada exitosamente!',
+                'success',
+                {
+                    duration: 3000,
+                    clickable: true,
+                    onClick: () => {
+                        alert('Simulando recarga de página');
+                    }
+                }
+            );
+        }
+        
+        // Tests de confirmaciones
+        function testConfirmation() {
+            window.wishlistManager.clearAllWishlist();
+        }
+        
+        function testLoginAlert() {
+            window.wishlistManager.showLoginAlert();
+        }
+        
+        console.log('✅ Página de prueba cargada correctamente');
+        console.log('🎯 Haz click en los botones para probar las alertas');
+    </script>
+</body>
+</html>

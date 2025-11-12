@@ -56,12 +56,14 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-url" content="<?= BASE_URL ?>">
     <title>Mi Lista de Deseos - Angelow</title>
     <meta name="description" content="Tu lista de productos favoritos en Angelow.">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/productos.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/wishlist.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/notificacion.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/user/alert_user.css">
 </head>
 
 <body>
@@ -188,168 +190,8 @@ try {
 
     <?php include __DIR__ . '/../layouts/footer.php'; ?>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Función genérica para llamadas a la API
-            function callApi(endpoint, method, data, callback) {
-                const options = {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                };
-
-                if (method !== 'GET' && method !== 'HEAD') {
-                    options.body = JSON.stringify(data);
-                }
-
-                return fetch(endpoint, options)
-                    .then(response => {
-                        return response.text().then(text => {
-                            let jsonResponse;
-                            try {
-                                jsonResponse = JSON.parse(text);
-                            } catch (e) {
-                                jsonResponse = { success: false, error: text || 'Respuesta inválida del servidor' };
-                            }
-
-                            if (!response.ok) {
-                                const errorMessage = jsonResponse.error || `Error del servidor: ${response.status}`;
-                                throw new Error(errorMessage);
-                            }
-
-                            return jsonResponse;
-                        });
-                    })
-                    .then(result => {
-                        if (callback) callback(result);
-                        return result;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showUserError(error.message);
-                        return { success: false, error: error.message };
-                    });
-            }
-
-            // Función para manejar la lista de deseos
-            function handleWishlist(action, productId, callback) {
-                const endpoint = `<?= BASE_URL ?>/tienda/api/wishlist/${action}.php`;
-                callApi(endpoint, 'POST', { product_id: productId }, function(response) {
-                    if (callback) callback(response);
-                });
-            }
-
-            // Evento para botones de wishlist individuales
-            document.querySelectorAll('.wishlist-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const productId = this.getAttribute('data-product-id');
-                    const productCard = this.closest('.product-card');
-
-                    // Confirmar eliminación con alerta personalizada
-                    showUserConfirm(
-                        '¿Deseas eliminar este producto de tu lista de deseos?',
-                        function() {
-                            handleWishlist('remove', productId, function(response) {
-                                if (response.success) {
-                                    showUserSuccess('Producto eliminado de tu lista de deseos');
-                                    setTimeout(() => {
-                                        location.reload();
-                                    }, 1500);
-                                } else {
-                                    showUserError('No se pudo eliminar el producto. Inténtalo nuevamente.');
-                                }
-                            });
-                        },
-                        {
-                            confirmText: 'Sí, eliminar',
-                            cancelText: 'Cancelar'
-                        }
-                    );
-                });
-            });
-
-            // Botón para limpiar toda la lista
-            const clearAllBtn = document.getElementById('clearAllWishlist');
-            if (clearAllBtn) {
-                clearAllBtn.addEventListener('click', function() {
-                    showUserConfirm(
-                        '¿Estás seguro de que deseas eliminar todos los productos de tu lista de deseos? Esta acción no se puede deshacer.',
-                        function() {
-                            const productIds = Array.from(document.querySelectorAll('.product-card')).map(card => 
-                                card.getAttribute('data-product-id')
-                            );
-
-                            let completed = 0;
-                            let hasError = false;
-
-                            productIds.forEach(productId => {
-                                handleWishlist('remove', productId, function(response) {
-                                    completed++;
-                                    if (!response.success) {
-                                        hasError = true;
-                                    }
-                                    
-                                    if (completed === productIds.length) {
-                                        if (hasError) {
-                                            showUserError('Algunos productos no se pudieron eliminar. Por favor, recarga la página.');
-                                        } else {
-                                            showUserSuccess('Lista de deseos limpiada exitosamente');
-                                            setTimeout(() => {
-                                                location.reload();
-                                            }, 1500);
-                                        }
-                                    }
-                                });
-                            });
-                        },
-                        {
-                            confirmText: 'Sí, limpiar todo',
-                            cancelText: 'No, cancelar'
-                        }
-                    );
-                });
-            }
-
-            // Función para manejar la carga de imágenes
-            function handleImageLoad(img) {
-                img.classList.add('loaded');
-                const parent = img.parentElement;
-                if (parent) {
-                    parent.classList.remove('loading');
-                }
-            }
-
-            // Función para manejar errores de carga de imágenes
-            function handleImageError(img) {
-                img.src = '<?= BASE_URL ?>/images/default-product.jpg';
-                img.classList.add('loaded');
-                const parent = img.parentElement;
-                if (parent) {
-                    parent.classList.remove('loading');
-                }
-            }
-
-            // Inicializar imágenes
-            document.querySelectorAll('.product-image').forEach(container => {
-                const img = container.querySelector('img');
-                if (!img) return;
-                
-                container.classList.add('loading');
-                
-                if (img.complete) {
-                    handleImageLoad(img);
-                } else {
-                    img.addEventListener('load', function() {
-                        handleImageLoad(img);
-                    });
-                    img.addEventListener('error', function() {
-                        handleImageError(img);
-                    });
-                }
-            });
-        });
-    </script>
+    <!-- Sistema de alertas y wishlist -->
+    <script src="<?= BASE_URL ?>/js/user/alert_user.js"></script>
 </body>
 
 </html>
