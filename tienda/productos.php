@@ -192,7 +192,7 @@ try {
                         // Determinar precio a mostrar
                         $displayPrice = $product['min_price'] ?? ($product['price'] ?? 0);
                     ?>
-                        <div class="product-card" data-product-id="<?= $product['id'] ?>">
+                        <div class="product-card <?= strtolower($categoryName) === 'ropa deportiva' ? 'no-hover' : '' ?>" data-product-id="<?= $product['id'] ?>">
                             <!-- Badge para productos destacados -->
                             <?php if ($product['is_featured']): ?>
                                 <div class="product-badge">Destacado</div>
