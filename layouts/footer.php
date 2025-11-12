@@ -51,10 +51,10 @@
         
         <div class="footer-bottom">
             <!-- <div class="payment-methods">
-                <img src="<?= BASE_URL ?>/images/productos/visa.png" alt="Visa">
-                <img src="<?= BASE_URL ?>/images/productos/mastercard.png" alt="Mastercard">
-                <img src="<?= BASE_URL ?>/images/productos/american-express.png" alt="American Express">
-                <img src="<?= BASE_URL ?>/images/productos/paypal.png" alt="PayPal">
+                <i class="fab fa-cc-visa" style="font-size: 24px; color: #1a1f71;"></i>
+                <i class="fab fa-cc-mastercard" style="font-size: 24px; color: #eb001b;"></i>
+                <i class="fab fa-cc-amex" style="font-size: 24px; color: #006fcf;"></i>
+                                <i class="fab fa-cc-paypal" style="font-size: 24px; color: #003087;"></i>
             </div> -->
             <p class="copyright">&copy; 2025 Angelow. Todos los derechos reservados.</p>
         </div>

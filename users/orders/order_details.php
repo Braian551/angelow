@@ -54,7 +54,7 @@ try {
     <div class="order-items-grid">
         <?php foreach ($items as $item): ?>
             <div class="order-item-card glass-effect">
-                <img src="<?= BASE_URL ?>/images/productos/<?= htmlspecialchars($item['product_image'] ?? 'default-product.jpg') ?>" alt="<?= htmlspecialchars($item['product_name'] ?? 'Producto') ?>">
+                <img src="<?= BASE_URL ?>/uploads/productos/<?= htmlspecialchars($item['product_image'] ?? 'default-product.jpg') ?>" alt="<?= htmlspecialchars($item['product_name'] ?? 'Producto') ?>">
                 <div class="item-info">
                     <h4><?= htmlspecialchars($item['product_name'] ?? 'Producto') ?></h4>
                     <p>Cantidad: <?= $item['quantity'] ?></p>

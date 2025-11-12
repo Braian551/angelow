@@ -107,7 +107,7 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                             </button>
                         </div>
                         <a href="<?= BASE_URL ?>/producto-vestido-verano.html" class="product-image">
-                            <img src="<?= BASE_URL ?>/images/productos/conjunto_niña.jpg" alt="Vestido de verano para niña">
+                            <img src="<?= BASE_URL ?>/images/default-product.jpg" alt="Vestido de verano para niña">
                         </a>
                         <div class="product-info">
                             <span class="product-category">Conjunto</span>
@@ -128,7 +128,7 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                             </button>
                         </div>
                         <a href="<?= BASE_URL ?>/producto-vestido-verano.html" class="product-image">
-                            <img src="<?= BASE_URL ?>/images/productos/pijamas.jpg" alt="Pijama infantil">
+                            <img src="<?= BASE_URL ?>/images/default-product.jpg" alt="Pijama infantil">
                         </a>
                         <div class="product-info">
                             <span class="product-category">Pijama</span>
@@ -149,7 +149,7 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                             </button>
                         </div>
                         <a href="<?= BASE_URL ?>/producto-vestido-verano.html" class="product-image">
-                            <img src="<?= BASE_URL ?>/images/productos/deportivo.jpg" alt="Ropa deportiva">
+                            <img src="<?= BASE_URL ?>/images/default-product.jpg" alt="Ropa deportiva">
                         </a>
                         <div class="product-info">
                             <span class="product-category">Deportivo</span>

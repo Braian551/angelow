@@ -21,8 +21,23 @@
 
             return fetch(endpoint, options)
                 .then(response => {
-                    if (!response.ok) throw new Error('Error en la respuesta del servidor');
-                    return response.json();
+                    return response.text().then(text => {
+                        let jsonResponse;
+                        try {
+                            jsonResponse = JSON.parse(text);
+                        } catch (e) {
+                            // Si no es JSON válido, crear una respuesta de error
+                            jsonResponse = { success: false, error: text || 'Respuesta inválida del servidor' };
+                        }
+
+                        if (!response.ok) {
+                            // Usar el mensaje de error del JSON si existe, sino el texto de la respuesta
+                            const errorMessage = jsonResponse.error || `Error del servidor: ${response.status}`;
+                            throw new Error(errorMessage);
+                        }
+
+                        return jsonResponse;
+                    });
                 })
                 .then(result => {
                     if (callback) callback(result);
@@ -30,7 +45,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showNotification('Error de conexión', 'error');
+                    showNotification(error.message, 'error');
                     return { success: false, error: error.message };
                 });
         }
@@ -51,12 +66,24 @@
         // Función para manejar la lista de deseos (wishlist)
         function handleWishlist(action, productId, callback) {
             const endpoint = `<?= BASE_URL ?>/tienda/api/wishlist/${action}.php`;
-            callApi(endpoint, 'POST', { product_id: productId }, callback);
+            callApi(endpoint, 'POST', { product_id: productId }, function(response) {
+                if (response.success) {
+                    if (callback) callback(response);
+                } else {
+                    // El error ya se muestra en callApi, solo llamar callback si existe
+                    if (callback) callback(response);
+                }
+            });
         }
 
         // Evento para botones de wishlist
         document.querySelectorAll('.wishlist-btn').forEach(button => {
             button.addEventListener('click', function() {
+                <?php if (!isset($_SESSION['user_id'])): ?>
+                    showNotification('Debes iniciar sesión para usar la lista de deseos', 'error');
+                    return;
+                <?php endif; ?>
+
                 const productId = this.getAttribute('data-product-id');
                 const isActive = this.classList.contains('active');
 
@@ -73,7 +100,8 @@
                             isActive ? 'info' : 'success'
                         );
                     } else {
-                        showNotification(response.error || 'Error al actualizar favoritos', 'error');
+                        // El error ya se mostró en callApi, no mostrar otro mensaje
+                        console.log('Error en wishlist:', response.error);
                     }
                 }.bind(this));
             });
@@ -270,6 +298,11 @@
             // Reasignar eventos a los nuevos botones de wishlist
             document.querySelectorAll('.wishlist-btn').forEach(button => {
                 button.addEventListener('click', function() {
+                    <?php if (!isset($_SESSION['user_id'])): ?>
+                        showNotification('Debes iniciar sesión para usar la lista de deseos', 'error');
+                        return;
+                    <?php endif; ?>
+
                     const productId = this.getAttribute('data-product-id');
                     const isActive = this.classList.contains('active');
 
@@ -286,7 +319,8 @@
                                 isActive ? 'info' : 'success'
                             );
                         } else {
-                            showNotification(response.error || 'Error al actualizar favoritos', 'error');
+                            // El error ya se mostró en callApi
+                            console.log('Error en wishlist:', response.error);
                         }
                     }.bind(this));
                 });

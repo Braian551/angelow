@@ -123,7 +123,7 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php else: ?>
                 <!-- Slider por defecto si no hay datos -->
                 <div class="hero-slide active">
-                    <img src="images/productos/coleccion organica.jpg" alt="Colección Verano 2025">
+                        <img src="uploads/productos/687c39ea4c00e_coleccion organica.jpg" alt="Colección Verano 2025">
                     <div class="hero-content">
                         <h1>Colección Verano 2025</h1>
                         <p>Descubre los diseños más frescos para esta temporada</p>
@@ -162,11 +162,11 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php else: ?>
                 <!-- Categorías por defecto -->
                 <a href="#" class="category-card">
-                    <img src="images/productos/vestido.jpg" alt="Vestidos para niñas">
+                        <img src="images/default-product.jpg" alt="Vestidos para niñas">
                     <h3>Vestidos</h3>
                 </a>
                 <a href="#" class="category-card">
-                    <img src="images/productos/conjuto.jpeg" alt="Conjuntos para niños">
+                        <img src="images/default-product.jpg" alt="Conjuntos para niños">
                     <h3>Conjuntos</h3>
                 </a>
             <?php endif; ?>
@@ -281,7 +281,7 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php else: ?>
                 <!-- Colecciones por defecto -->
                 <a href="#" class="collection-card">
-                    <img src="images/productos/coleccion playera.jpg" alt="Colección playa">
+                        <img src="uploads/productos/687c248b90bab_coleccion playera.jpg" alt="Colección playa">
                     <div class="collection-overlay">
                         <h3>Colección Playa</h3>
                     </div>

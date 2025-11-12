@@ -210,7 +210,7 @@ requireRole('admin');
                     <div class="products-grid">
                         <div class="product-card">
                             <div class="product-image">
-                                <img src="<?= BASE_URL ?>/images/productos/conjunto_niña.jpg" alt="Conjunto Niña">
+                                <img src="<?= BASE_URL ?>/images/default-product.jpg" alt="Conjunto Niña">
                                 <span class="stock-badge danger">Solo 2</span>
                             </div>
                             <div class="product-info">
@@ -225,7 +225,7 @@ requireRole('admin');
                         
                         <div class="product-card">
                             <div class="product-image">
-                                <img src="<?= BASE_URL ?>/images/productos/pijamas.jpg" alt="Pijama Niño">
+                                <img src="<?= BASE_URL ?>/images/default-product.jpg" alt="Pijama Niño">
                                 <span class="stock-badge warning">Solo 4</span>
                             </div>
                             <div class="product-info">
@@ -240,7 +240,7 @@ requireRole('admin');
                         
                         <div class="product-card">
                             <div class="product-image">
-                                <img src="<?= BASE_URL ?>/images/productos/vestido.jpg" alt="Vestido Niña">
+                                <img src="<?= BASE_URL ?>/images/default-product.jpg" alt="Vestido Niña">
                                 <span class="stock-badge danger">Solo 1</span>
                             </div>
                             <div class="product-info">
@@ -255,7 +255,7 @@ requireRole('admin');
                         
                         <div class="product-card">
                             <div class="product-image">
-                                <img src="<?= BASE_URL ?>/images/productos/deportivo.jpg" alt="Conjunto Deportivo">
+                                <img src="<?= BASE_URL ?>/images/default-product.jpg" alt="Conjunto Deportivo">
                                 <span class="stock-badge warning">Solo 3</span>
                             </div>
                             <div class="product-info">

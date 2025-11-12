@@ -113,7 +113,7 @@ $currentSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''
                         </ul>
                     </div>
                     <div class="mega-menu-column">
-                        <img src="/images/mega-menu-ninas.jpg" alt="Colección niñas">
+                        <img src="<?= BASE_URL ?>/images/ropa.png" alt="Colección niñas">
                     </div>
                 </div>
             </li>

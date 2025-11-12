@@ -95,7 +95,7 @@ if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
                         </ul>
                     </div>
                     <div class="mega-menu-column">
-                        <img src="/images/mega-menu-ninas.jpg" alt="Colección niñas">
+                        <img src="<?= BASE_URL ?>/images/ropa.png" alt="Colección niñas">
                     </div>
                 </div>
             </li>

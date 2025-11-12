@@ -22,7 +22,7 @@ $userId = $isLoggedIn ? $_SESSION['user_id'] : null;
 
 try {
     // Llamar al procedimiento almacenado
-    $stmt = $conn->prepare("CALL GetFilteredProducts(?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("CALL GetFilteredProducts(?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bindValue(1, $searchQuery, PDO::PARAM_STR);
     $stmt->bindValue(2, $categoryFilter, $categoryFilter !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
     $stmt->bindValue(3, $genderFilter, $genderFilter !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
@@ -33,22 +33,25 @@ try {
     $stmt->bindValue(8, $offset, PDO::PARAM_INT);
     $stmt->bindValue(9, $userId, $userId !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
     $stmt->execute();
-    
+
     // Obtener los productos
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     // Obtener el conteo total (segundo conjunto de resultados)
     $stmt->nextRowset();
     $totalResult = $stmt->fetch(PDO::FETCH_ASSOC);
     $totalProducts = $totalResult['total'];
     $totalPages = ceil($totalProducts / $limit);
-    
+
 } catch (PDOException $e) {
     error_log("Error fetching products: " . $e->getMessage());
     $products = [];
     $totalProducts = 0;
     $totalPages = 1;
 }
+
+// Cerrar el cursor del procedimiento antes de ejecutar otras consultas
+$stmt->closeCursor();
 
 // Obtener categorías para el filtro
 $categories = [];
@@ -182,10 +185,9 @@ try {
                     </div>
                 <?php else: ?>
                     <?php foreach ($products as $product):
-                        // Obtener información de valoración
-                        $ratingInfo = $productRatings[$product['id']] ?? null;
-                        $avgRating = $ratingInfo ? round($ratingInfo['avg_rating'], 1) : 0;
-                        $reviewCount = $ratingInfo ? $ratingInfo['review_count'] : 0;
+                        // Obtener información de valoración desde el producto
+                        $avgRating = isset($product['avg_rating']) ? round($product['avg_rating'], 1) : 0;
+                        $reviewCount = isset($product['review_count']) ? $product['review_count'] : 0;
 
                         // Determinar precio a mostrar
                         $displayPrice = $product['min_price'] ?? ($product['price'] ?? 0);
