@@ -246,7 +246,79 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p style="grid-column: 1/-1; text-align: center; padding: 2rem;">No hay productos disponibles en este momento.</p>
+                <!-- Shimmer loading placeholders -->
+                <div class="product-card shimmer">
+                    <div class="shimmer-wishlist"></div>
+                    <div class="shimmer-image"></div>
+                    <div class="shimmer-info">
+                        <div class="shimmer-category"></div>
+                        <div class="shimmer-title"></div>
+                        <div class="shimmer-title"></div>
+                        <div class="shimmer-rating"></div>
+                        <div class="shimmer-price"></div>
+                        <div class="shimmer-button"></div>
+                    </div>
+                </div>
+                <div class="product-card shimmer">
+                    <div class="shimmer-wishlist"></div>
+                    <div class="shimmer-image"></div>
+                    <div class="shimmer-info">
+                        <div class="shimmer-category"></div>
+                        <div class="shimmer-title"></div>
+                        <div class="shimmer-title"></div>
+                        <div class="shimmer-rating"></div>
+                        <div class="shimmer-price"></div>
+                        <div class="shimmer-button"></div>
+                    </div>
+                </div>
+                <div class="product-card shimmer">
+                    <div class="shimmer-wishlist"></div>
+                    <div class="shimmer-image"></div>
+                    <div class="shimmer-info">
+                        <div class="shimmer-category"></div>
+                        <div class="shimmer-title"></div>
+                        <div class="shimmer-title"></div>
+                        <div class="shimmer-rating"></div>
+                        <div class="shimmer-price"></div>
+                        <div class="shimmer-button"></div>
+                    </div>
+                </div>
+                <div class="product-card shimmer">
+                    <div class="shimmer-wishlist"></div>
+                    <div class="shimmer-image"></div>
+                    <div class="shimmer-info">
+                        <div class="shimmer-category"></div>
+                        <div class="shimmer-title"></div>
+                        <div class="shimmer-title"></div>
+                        <div class="shimmer-rating"></div>
+                        <div class="shimmer-price"></div>
+                        <div class="shimmer-button"></div>
+                    </div>
+                </div>
+                <div class="product-card shimmer">
+                    <div class="shimmer-wishlist"></div>
+                    <div class="shimmer-image"></div>
+                    <div class="shimmer-info">
+                        <div class="shimmer-category"></div>
+                        <div class="shimmer-title"></div>
+                        <div class="shimmer-title"></div>
+                        <div class="shimmer-rating"></div>
+                        <div class="shimmer-price"></div>
+                        <div class="shimmer-button"></div>
+                    </div>
+                </div>
+                <div class="product-card shimmer">
+                    <div class="shimmer-wishlist"></div>
+                    <div class="shimmer-image"></div>
+                    <div class="shimmer-info">
+                        <div class="shimmer-category"></div>
+                        <div class="shimmer-title"></div>
+                        <div class="shimmer-title"></div>
+                        <div class="shimmer-rating"></div>
+                        <div class="shimmer-price"></div>
+                        <div class="shimmer-button"></div>
+                    </div>
+                </div>
             <?php endif; ?>
         </div>
     </section>
