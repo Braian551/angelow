@@ -1170,14 +1170,14 @@
 }
 
 .shimmer-category {
-  height: 14px;
+  height: 20px;
   width: 100px;
   margin-bottom: 0.1rem;
   border-radius: 4px;
 }
 
 .shimmer-title {
-  height: 18px;
+  height: 24px;
   width: 100%;
   margin-bottom: 0.1rem;
   border-radius: 4px;
@@ -1189,14 +1189,14 @@
 }
 
 .shimmer-rating {
-  height: 16px;
+  height: 22px;
   width: 120px;
   margin-bottom: 0.6rem;
   border-radius: 4px;
 }
 
 .shimmer-price {
-  height: 28px;
+  height: 38px;
   width: 100px;
   margin-bottom: 1.2rem;
   border-radius: 4px;
@@ -1234,19 +1234,19 @@
   }
   
   .shimmer-category {
-    height: 13px;
+    height: 18px;
   }
   
   .shimmer-title {
-    height: 16px;
+    height: 20px;
   }
   
   .shimmer-rating {
-    height: 14px;
+    height: 20px;
   }
   
   .shimmer-price {
-    height: 24px;
+    height: 34px;
   }
   
   .shimmer-button {
@@ -1264,19 +1264,19 @@
   }
   
   .shimmer-category {
-    height: 12px;
+    height: 16px;
   }
   
   .shimmer-title {
-    height: 15px;
+    height: 18px;
   }
   
   .shimmer-rating {
-    height: 13px;
+    height: 18px;
   }
   
   .shimmer-price {
-    height: 22px;
+    height: 30px;
   }
   
   .shimmer-button {
