@@ -133,6 +133,48 @@
   background-color: rgba(255, 51, 51, 0.1);
 }
 
+/* ===== NOTIFICATION BADGE ===== */
+.notification-badge {
+  position: absolute;
+    /* top
+Specifies how far an absolutely positioned box's top margin edge is offset below the top edge of the box's 'containing block'.
+
+Widely available across major browsers (Baseline since January 2018)
+Learn more
+
+Don't show
+: 8px; */
+    right: 15px;
+    background: var(--dashboard-primary);
+    color: white;
+    border-radius: 50%;
+    min-width: 22px;
+    height: 22px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.user-menu li {
+  position: relative;
+}
+
 /* ===== CONTENIDO PRINCIPAL ===== */
 .user-main-content {
   flex: 1;

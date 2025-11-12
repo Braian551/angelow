@@ -162,12 +162,7 @@
     border: 1px solid var(--border-color, #e0e0e0);
     border-radius: 8px;
     transition: var(--transition);
-    border-left: 3px solid transparent;
-}
-
-.notification-item.unread {
-    background: rgba(0, 180, 216, 0.02);
-    border-left-color: var(--accent-color, #00b4d8);
+    border-left: 3px solid var(--primary-color, #0077b6);
 }
 
 .notification-item:hover {

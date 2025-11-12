@@ -22,6 +22,17 @@ try {
     error_log("Error al obtener notificaciones no leídas: " . $e->getMessage());
 }
 
+// Marcar todas las notificaciones como leídas al entrar a la página
+if ($unread_count > 0) {
+    try {
+        $stmt_mark_read = $pdo->prepare("UPDATE notifications SET is_read = 1, read_at = NOW() WHERE user_id = ? AND is_read = 0");
+        $stmt_mark_read->execute([$user_id]);
+        $unread_count = 0; // Actualizar el conteo localmente
+    } catch (PDOException $e) {
+        error_log("Error al marcar notificaciones como leídas: " . $e->getMessage());
+    }
+}
+
 // Filtros
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
 $type_filter = isset($_GET['type']) ? $_GET['type'] : 'all';
@@ -106,14 +117,14 @@ try {
                 <div class="stat-card unread">
                     <i class="fas fa-envelope-open"></i>
                     <div class="stat-info">
-                        <span class="stat-number"><?= $unread_count ?></span>
+                        <span class="stat-number">0</span>
                         <span class="stat-label">Sin leer</span>
                     </div>
                 </div>
                 <div class="stat-card read">
                     <i class="fas fa-check-double"></i>
                     <div class="stat-info">
-                        <span class="stat-number"><?= count($notifications) - $unread_count ?></span>
+                        <span class="stat-number"><?= count($notifications) ?></span>
                         <span class="stat-label">Leídas</span>
                     </div>
                 </div>
@@ -139,11 +150,7 @@ try {
                 </div>
 
                 <div class="actions">
-                    <?php if ($unread_count > 0): ?>
-                        <button class="btn-action" onclick="markAllAsRead()">
-                            <i class="fas fa-check-double"></i> Marcar todas como leídas
-                        </button>
-                    <?php endif; ?>
+                    <!-- Todas las notificaciones se marcan automáticamente como leídas al cargar la página -->
                 </div>
             </div>
 
@@ -151,7 +158,7 @@ try {
             <div class="notifications-list">
                 <?php if (count($notifications) > 0): ?>
                     <?php foreach ($notifications as $notification): ?>
-                        <div class="notification-item <?= $notification['is_read'] ? 'read' : 'unread' ?>" data-id="<?= $notification['id'] ?>">
+                        <div class="notification-item read" data-id="<?= $notification['id'] ?>">
                             <div class="notification-icon <?= $notification['related_entity_type'] ?? 'system' ?>">
                                 <?php
                                 $icon = 'fa-bell';
@@ -194,11 +201,6 @@ try {
                             </div>
 
                             <div class="notification-actions">
-                                <?php if (!$notification['is_read']): ?>
-                                    <button class="btn-mark-read" onclick="markAsRead(<?= $notification['id'] ?>)" title="Marcar como leída">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                <?php endif; ?>
                                 <button class="btn-delete" onclick="deleteNotification(<?= $notification['id'] ?>)" title="Eliminar">
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -236,28 +238,13 @@ try {
             .then(data => {
                 if (data.success) {
                     const item = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
-                    item.classList.remove('unread');
-                    item.classList.add('read');
-                    item.querySelector('.btn-mark-read').remove();
-                    updateUnreadCount();
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
-        function markAllAsRead() {
-            if (!confirm('¿Marcar todas las notificaciones como leídas?')) return;
-
-            fetch('<?= BASE_URL ?>/users/api/mark_all_read.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
+                    if (item) {
+                        item.classList.remove('unread');
+                        item.classList.add('read');
+                        const markReadBtn = item.querySelector('.btn-mark-read');
+                        if (markReadBtn) markReadBtn.remove();
+                        updateUnreadCount();
+                    }
                 }
             })
             .catch(error => console.error('Error:', error));
@@ -286,20 +273,19 @@ try {
         }
 
         function viewNotification(notificationId, type, entityId) {
-            markAsRead(notificationId);
+            // No necesitamos marcar como leída ya que todas se marcan automáticamente al cargar
 
             if (type === 'order' && entityId) {
-                setTimeout(() => {
-                    window.location.href = `<?= BASE_URL ?>/users/order_detail.php?id=${entityId}`;
-                }, 300);
+                window.location.href = `<?= BASE_URL ?>/users/order_detail.php?id=${entityId}`;
             }
         }
 
         function updateUnreadCount() {
-            const unreadItems = document.querySelectorAll('.notification-item.unread').length;
-            document.querySelector('.stat-card.unread .stat-number').textContent = unreadItems;
-            document.querySelector('.stat-card.read .stat-number').textContent = 
-                document.querySelectorAll('.notification-item').length - unreadItems;
+            // Todas las notificaciones ya están marcadas como leídas al cargar la página
+            // Esta función se mantiene por compatibilidad con acciones futuras
+            const totalItems = document.querySelectorAll('.notification-item').length;
+            document.querySelector('.stat-card.unread .stat-number').textContent = '0';
+            document.querySelector('.stat-card.read .stat-number').textContent = totalItems;
         }
     </script>
 </body>

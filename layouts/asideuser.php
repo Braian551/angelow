@@ -18,6 +18,21 @@
     {
         return strpos($current_url, $item_url) !== false;
     }
+
+    // Obtener conteo de notificaciones no leídas
+    $unread_notifications = 0;
+    if (isset($_SESSION['user_id'])) {
+        try {
+            require_once __DIR__ . '/../conexion.php';
+            $pdo = $conn;
+            $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND is_read = 0");
+            $stmt->execute([$_SESSION['user_id']]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $unread_notifications = (int)$result['count'];
+        } catch (PDOException $e) {
+            $unread_notifications = 0;
+        }
+    }
 ?>
   <aside class="user-sidebar">
       <div class="user-profile-summary">
@@ -54,6 +69,9 @@
               <li class="<?= isMenuItemActive($menu_items['notifications'], $current_url) ? 'active' : '' ?>">
                   <a href="<?= BASE_URL ?><?= $menu_items['notifications'] ?>">
                      <i class="fas fa-bell"></i> Notificaciones
+                     <?php if ($unread_notifications > 0): ?>
+                         <span class="notification-badge"><?= $unread_notifications > 99 ? '99+' : $unread_notifications ?></span>
+                     <?php endif; ?>
                   </a>
               </li>
               <li class="<?= isMenuItemActive($menu_items['addresses'], $current_url) ? 'active' : '' ?>">
