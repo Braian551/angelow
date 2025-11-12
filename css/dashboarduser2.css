@@ -499,3 +499,314 @@ Don't show
     font-size: 2.2rem;
   }
 }
+
+/* ===== ESTILOS PARA PRODUCTOS EN EL DASHBOARD ===== */
+.personalized-recommendations {
+  background: white;
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: var(--dashboard-shadow-sm);
+  margin-top: 3rem;
+}
+
+.personalized-recommendations .section-header {
+  margin-bottom: 2.5rem;
+}
+
+.personalized-recommendations .section-subtitle {
+  color: #666;
+  font-size: 1.4rem;
+  margin-top: 0.8rem;
+  font-weight: 400;
+}
+
+.recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2.5rem;
+}
+
+/* Reutilizar estilos de product-card de productos.css */
+.recommendations-grid .product-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.recommendations-grid .product-card:hover {
+  transform: translateY(-8px);
+}
+
+/* Asegurar que los botones de wishlist funcionen correctamente */
+.recommendations-grid .wishlist-btn {
+  transition: all 0.2s ease;
+}
+
+.recommendations-grid .wishlist-btn:active {
+  transform: scale(0.9);
+}
+
+/* Estilos para las imágenes de productos */
+.recommendations-grid .product-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.recommendations-grid .product-image.loading::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Estilos para tarjetas de pedidos recientes */
+.recent-orders {
+  background: white;
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: var(--dashboard-shadow-sm);
+  margin-top: 3rem;
+}
+
+.recent-orders .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--dashboard-border);
+}
+
+.recent-orders .section-header h2 {
+  font-size: 2.4rem;
+  color: var(--dashboard-text);
+  font-weight: 700;
+}
+
+.recent-orders .view-all {
+  color: var(--dashboard-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--dashboard-transition);
+}
+
+.recent-orders .view-all:hover {
+  color: var(--dashboard-primary-dark);
+  transform: translateX(3px);
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.order-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.order-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  border-color: var(--dashboard-primary);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.order-number {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.order-number strong {
+  font-size: 1.6rem;
+  color: #111827;
+  font-weight: 600;
+}
+
+.order-date {
+  color: #6b7280;
+  font-size: 1.3rem;
+}
+
+.order-status {
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-processing {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-shipped {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.status-completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.order-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.order-info {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: #6b7280;
+  font-size: 1.4rem;
+}
+
+.order-info i {
+  color: #9ca3af;
+}
+
+.order-total {
+  font-size: 1.8rem;
+  color: #111827;
+  font-weight: 600;
+}
+
+.order-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-view-order {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: #FE5000;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.4rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-view-order:hover {
+  background: #e64800;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(254, 80, 0, 0.3);
+}
+
+/* Empty state */
+.no-orders {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.no-orders i {
+  font-size: 6rem;
+  color: #d1d5db;
+  margin-bottom: 2rem;
+}
+
+.no-orders p {
+  font-size: 1.6rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+.no-orders .btn {
+  display: inline-block;
+  padding: 1.2rem 2.4rem;
+  background: var(--dashboard-primary);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.5rem;
+  transition: var(--dashboard-transition);
+}
+
+.no-orders .btn:hover {
+  background: var(--dashboard-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 119, 182, 0.3);
+}
+
+/* Responsive para productos */
+@media (max-width: 1024px) {
+  .recommendations-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .recommendations-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .personalized-recommendations,
+  .recent-orders {
+    padding: 2rem 1.5rem;
+  }
+
+  .order-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .order-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
