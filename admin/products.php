@@ -565,13 +565,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>`
             ];
             
-            Object.keys(imagesByColor).forEach((color, index) => {
+            Object.keys(imagesByColor).forEach(color => {
                 if (color !== 'General') {
                     const firstImage = imagesByColor[color][0];
                     const hexCode = firstImage.hex_code || '#CCCCCC';
-                    if (index > 0 || colorButtons.length > 1) {
-                        colorButtons.push('<span class="button-separator">, </span>');
-                    }
                     colorButtons.push(`
                         <button class="color-filter-btn" data-color="${color}" title="${color}">
                             <span class="color-circle" style="background-color: ${hexCode};"></span>
@@ -584,7 +581,7 @@ document.addEventListener('DOMContentLoaded', function() {
             imagesHtml = `
                 <div class="quick-view-gallery">
                     <div class="gallery-filters">
-                        ${colorButtons}
+                        ${colorButtons.join('')}
                     </div>
                     
                     <div class="main-image">
@@ -594,10 +591,22 @@ document.addEventListener('DOMContentLoaded', function() {
                         </button>
                     </div>
                     
-                    <div class="thumbnail-gallery" id="thumbnail-gallery" style="display: none;">
-                        ${images.map((img, index) => `
-                            <img src="${img.url}" alt="${img.alt_text || 'Imagen ' + (index + 1)}" class="thumbnail ${img.id === primaryImage.id ? 'active' : ''}" data-index="${img.id}" data-color="${img.color_name || 'General'}">
-                        `).join('')}
+                    <div class="thumbnail-gallery-container">
+                        <button class="gallery-arrow left" id="gallery-left" aria-label="Ver imágenes anteriores">
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7.5 2L3.5 6L7.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="thumbnail-gallery" id="thumbnail-gallery">
+                            ${images.map((img, index) => `
+                                <img src="${img.url}" alt="${img.alt_text || 'Imagen ' + (index + 1)}" class="thumbnail ${img.id === primaryImage.id ? 'active' : ''}" data-index="${img.id}" data-color="${img.color_name || 'General'}">
+                            `).join('')}
+                        </div>
+                        <button class="gallery-arrow right" id="gallery-right" aria-label="Ver siguientes imágenes">
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4.5 2L8.5 6L4.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             `;
@@ -713,6 +722,63 @@ document.addEventListener('DOMContentLoaded', function() {
         const thumbnails = document.querySelectorAll('.thumbnail');
         const mainImage = document.getElementById('main-product-image');
         const zoomBtn = document.querySelector('.image-zoom-btn');
+        const thumbnailGallery = document.getElementById('thumbnail-gallery');
+        const galleryLeft = document.getElementById('gallery-left');
+        const galleryRight = document.getElementById('gallery-right');
+        
+        // Función para mostrar/ocultar flechas según cantidad y desbordamiento
+        function toggleGalleryArrows() {
+            if (thumbnailGallery && galleryLeft && galleryRight) {
+                const visibleThumbs = Array.from(document.querySelectorAll('.thumbnail')).filter(
+                    thumb => thumb.style.display !== 'none'
+                );
+                const hasOverflow = thumbnailGallery.scrollWidth > thumbnailGallery.clientWidth;
+                
+                if (hasOverflow && visibleThumbs.length > 2) {
+                    galleryLeft.classList.add('show');
+                    galleryRight.classList.add('show');
+                    updateArrowStates();
+                } else {
+                    galleryLeft.classList.remove('show');
+                    galleryRight.classList.remove('show');
+                }
+            }
+        }
+        
+        // Función para actualizar el estado de las flechas (habilitado/deshabilitado)
+        function updateArrowStates() {
+            if (thumbnailGallery && galleryLeft && galleryRight) {
+                const scrollLeft = thumbnailGallery.scrollLeft;
+                const maxScroll = thumbnailGallery.scrollWidth - thumbnailGallery.clientWidth;
+                
+                galleryLeft.disabled = scrollLeft <= 0;
+                galleryRight.disabled = scrollLeft >= maxScroll - 1;
+            }
+        }
+        
+        // Event listener para scroll de galería
+        if (thumbnailGallery) {
+            thumbnailGallery.addEventListener('scroll', updateArrowStates);
+        }
+        
+        // Event listeners para flechas de galería
+        if (galleryLeft) {
+            galleryLeft.addEventListener('click', () => {
+                if (thumbnailGallery) {
+                    const scrollAmount = thumbnailGallery.clientWidth * 0.75;
+                    thumbnailGallery.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                }
+            });
+        }
+        
+        if (galleryRight) {
+            galleryRight.addEventListener('click', () => {
+                if (thumbnailGallery) {
+                    const scrollAmount = thumbnailGallery.clientWidth * 0.75;
+                    thumbnailGallery.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                }
+            });
+        }
         
         // Event listener para botón de zoom
         if (zoomBtn) {
@@ -727,7 +793,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.color-filter-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const selectedColor = this.getAttribute('data-color');
-                const thumbnailGallery = document.getElementById('thumbnail-gallery');
                 
                 // Actualizar botones activos
                 document.querySelectorAll('.color-filter-btn').forEach(b => b.classList.remove('active'));
@@ -736,6 +801,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (selectedColor === 'General') {
                     // Para "Principal", mostrar solo la imagen principal, ocultar miniaturas
                     thumbnailGallery.style.display = 'none';
+                    // Ocultar flechas cuando no hay galería
+                    if (galleryLeft) galleryLeft.classList.remove('show');
+                    if (galleryRight) galleryRight.classList.remove('show');
                     // Cambiar a la imagen primaria
                     const primaryImage = window.currentImages.find(img => img.is_primary == 1) || window.currentImages[0];
                     if (primaryImage) {
@@ -759,11 +827,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     });
                     
-                    // Cambiar imagen principal a la primera visible
+                    // Cambiar imagen principal a la primera visible y hacer scroll
                     const firstVisible = document.querySelector('.thumbnail[style*="block"]');
                     if (firstVisible) {
                         firstVisible.click();
+                        firstVisible.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
                     }
+                    
+                    // Mostrar/ocultar flechas según desbordamiento
+                    setTimeout(toggleGalleryArrows, 200); // Delay para que se calcule correctamente
                 }
             });
         });
@@ -789,6 +861,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.classList.add('active');
                 }
             });
+        });
+        
+        // Inicializar estado de las flechas
+        setTimeout(() => {
+            toggleGalleryArrows();
+            updateArrowStates();
+        }, 100);
+        
+        // Actualizar flechas cuando cambie el tamaño de la ventana
+        window.addEventListener('resize', () => {
+            toggleGalleryArrows();
+            updateArrowStates();
         });
     }
     
