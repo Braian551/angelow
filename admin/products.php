@@ -543,21 +543,62 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let imagesHtml = '';
         if (images.length > 0) {
+            // Agrupar imágenes por color
+            const imagesByColor = {};
+            const colorVariants = {};
+            images.forEach(img => {
+                const color = img.color_name || 'General';
+                if (!imagesByColor[color]) {
+                    imagesByColor[color] = [];
+                }
+                imagesByColor[color].push(img);
+                colorVariants[img.color_variant_id] = color;
+            });
+
+            // Imagen principal (primera imagen primaria o primera general)
+            const primaryImage = images.find(img => img.is_primary == 1) || images[0];
+
+            // Botones de filtro por color
+            const colorButtons = [
+                `<button class="color-filter-btn active" data-color="General">
+                    <span class="color-text">Principal</span>
+                </button>`
+            ];
+            
+            Object.keys(imagesByColor).forEach((color, index) => {
+                if (color !== 'General') {
+                    const firstImage = imagesByColor[color][0];
+                    const hexCode = firstImage.hex_code || '#CCCCCC';
+                    if (index > 0 || colorButtons.length > 1) {
+                        colorButtons.push('<span class="button-separator">, </span>');
+                    }
+                    colorButtons.push(`
+                        <button class="color-filter-btn" data-color="${color}" title="${color}">
+                            <span class="color-circle" style="background-color: ${hexCode};"></span>
+                            <span class="color-text">${color}</span>
+                        </button>
+                    `);
+                }
+            });
+
             imagesHtml = `
                 <div class="quick-view-gallery">
+                    <div class="gallery-filters">
+                        ${colorButtons}
+                    </div>
+                    
                     <div class="main-image">
-                        <img src="${images[0].url}" alt="${product.name}" id="main-product-image">
-                        <button class="image-zoom-btn" data-image="${images[0].url}" data-alt="${product.name}">
+                        <img src="${primaryImage.url}" alt="${primaryImage.alt_text || product.name}" id="main-product-image">
+                        <button class="image-zoom-btn" data-image="${primaryImage.url}" data-alt="${primaryImage.alt_text || product.name}">
                             <i class="fas fa-expand"></i>
                         </button>
                     </div>
-                    ${images.length > 1 ? `
-                    <div class="thumbnail-gallery">
+                    
+                    <div class="thumbnail-gallery" id="thumbnail-gallery" style="display: none;">
                         ${images.map((img, index) => `
-                            <img src="${img.url}" alt="Thumbnail ${index + 1}" class="thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
+                            <img src="${img.url}" alt="${img.alt_text || 'Imagen ' + (index + 1)}" class="thumbnail ${img.id === primaryImage.id ? 'active' : ''}" data-index="${img.id}" data-color="${img.color_name || 'General'}">
                         `).join('')}
                     </div>
-                    ` : ''}
                 </div>
             `;
         }
@@ -682,44 +723,71 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Event listeners para botones de zoom en variantes
-        document.querySelectorAll('.btn-zoom-variant').forEach(btn => {
+        // Event listeners para botones de filtro de color
+        document.querySelectorAll('.color-filter-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                const colorId = this.getAttribute('data-color-id');
-                const color = this.getAttribute('data-color');
-                const size = this.getAttribute('data-size');
+                const selectedColor = this.getAttribute('data-color');
+                const thumbnailGallery = document.getElementById('thumbnail-gallery');
                 
-                // Buscar imagen específica para el color (primaria primero)
-                let imageUrl = document.getElementById('main-product-image').src;
-                if (window.currentImages && colorId) {
-                    const variantImage = window.currentImages.find(img => img.color_variant_id == colorId && img.is_primary == 1) ||
-                                         window.currentImages.find(img => img.color_variant_id == colorId);
-                    if (variantImage) {
-                        imageUrl = variantImage.url;
+                // Actualizar botones activos
+                document.querySelectorAll('.color-filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                if (selectedColor === 'General') {
+                    // Para "Principal", mostrar solo la imagen principal, ocultar miniaturas
+                    thumbnailGallery.style.display = 'none';
+                    // Cambiar a la imagen primaria
+                    const primaryImage = window.currentImages.find(img => img.is_primary == 1) || window.currentImages[0];
+                    if (primaryImage) {
+                        document.getElementById('main-product-image').src = primaryImage.url;
+                        document.getElementById('main-product-image').alt = primaryImage.alt_text || '${product.name}';
+                        document.querySelector('.image-zoom-btn').setAttribute('data-image', primaryImage.url);
+                        document.querySelector('.image-zoom-btn').setAttribute('data-alt', primaryImage.alt_text || '${product.name}');
+                        // Marcar como activa la principal
+                        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                    }
+                } else {
+                    // Para colores específicos, mostrar miniaturas filtradas
+                    thumbnailGallery.style.display = 'flex';
+                    const thumbnails = document.querySelectorAll('.thumbnail');
+                    thumbnails.forEach(thumb => {
+                        const thumbColor = thumb.getAttribute('data-color');
+                        if (thumbColor === selectedColor) {
+                            thumb.style.display = 'block';
+                        } else {
+                            thumb.style.display = 'none';
+                        }
+                    });
+                    
+                    // Cambiar imagen principal a la primera visible
+                    const firstVisible = document.querySelector('.thumbnail[style*="block"]');
+                    if (firstVisible) {
+                        firstVisible.click();
                     }
                 }
-                
-                openImageZoom(imageUrl, `Variante ${color} - ${size}`);
             });
         });
         
         thumbnails.forEach(thumb => {
             thumb.addEventListener('click', function() {
-                const index = this.getAttribute('data-index');
-                const images = document.querySelectorAll('.thumbnail');
+                const imgId = this.getAttribute('data-index');
+                const image = window.currentImages.find(img => img.id == imgId);
                 
-                // Cambiar imagen principal
-                mainImage.src = this.src;
-                
-                // Actualizar botón de zoom
-                if (zoomBtn) {
-                    zoomBtn.setAttribute('data-image', this.src);
-                    zoomBtn.setAttribute('data-alt', '${product.name}');
+                if (image) {
+                    // Cambiar imagen principal
+                    mainImage.src = image.url;
+                    mainImage.alt = image.alt_text || '${product.name}';
+                    
+                    // Actualizar botón de zoom
+                    if (zoomBtn) {
+                        zoomBtn.setAttribute('data-image', image.url);
+                        zoomBtn.setAttribute('data-alt', image.alt_text || '${product.name}');
+                    }
+                    
+                    // Actualizar thumbnail activo
+                    thumbnails.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
                 }
-                
-                // Actualizar thumbnail activo
-                thumbnails.forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
             });
         });
     }

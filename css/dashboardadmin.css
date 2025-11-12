@@ -1108,6 +1108,48 @@ button {
   gap: 12px;
 }
 
+.gallery-filters {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.color-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 2px solid var(--blue-primary);
+  background: white;
+  color: var(--blue-primary);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.color-filter-btn:hover {
+  background: var(--blue-bg);
+}
+
+.color-filter-btn.active {
+  background: var(--blue-primary);
+  color: white;
+}
+
+.color-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  display: inline-block;
+}
+
+.color-text {
+  white-space: nowrap;
+}
+
 .main-image {
   position: relative;
   border-radius: 12px;

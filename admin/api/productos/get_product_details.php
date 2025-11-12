@@ -45,7 +45,7 @@ try {
 
     // Obtener imágenes del producto desde variant_images
     $imagesStmt = $conn->prepare("
-        SELECT vi.*, pcv.color_id, c.name AS color_name
+        SELECT vi.*, pcv.color_id, c.name AS color_name, c.hex_code
         FROM variant_images vi
         LEFT JOIN product_color_variants pcv ON vi.color_variant_id = pcv.id
         LEFT JOIN colors c ON pcv.color_id = c.id
@@ -55,18 +55,44 @@ try {
     $imagesStmt->execute([$productId]);
     $imagesRaw = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Procesar imágenes para incluir URL completa
-    $images = array_map(function($img) {
-        return [
-            'id' => $img['id'],
-            'url' => BASE_URL . '/' . $img['image_path'],
-            'order' => $img['order'],
-            'color_variant_id' => $img['color_variant_id'],
-            'color_name' => $img['color_name'],
-            'alt_text' => $img['alt_text'],
-            'is_primary' => $img['is_primary']
-        ];
-    }, $imagesRaw);
+    // Si no hay imágenes en variant_images, usar product_images como fallback
+    if (empty($imagesRaw)) {
+        $imagesStmt = $conn->prepare("
+            SELECT * FROM product_images 
+            WHERE product_id = ?
+            ORDER BY `order`
+        ");
+        $imagesStmt->execute([$productId]);
+        $imagesRaw = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Procesar imágenes de product_images
+        $images = array_map(function($img) {
+            return [
+                'id' => $img['id'],
+                'url' => BASE_URL . '/' . $img['image_path'],
+                'order' => $img['order'],
+                'color_variant_id' => null,
+                'color_name' => 'General',
+                'hex_code' => null,
+                'alt_text' => $img['alt_text'] ?? 'Imagen del producto',
+                'is_primary' => $img['is_primary'] ?? 0
+            ];
+        }, $imagesRaw);
+    } else {
+        // Procesar imágenes de variant_images
+        $images = array_map(function($img) {
+            return [
+                'id' => $img['id'],
+                'url' => BASE_URL . '/' . $img['image_path'],
+                'order' => $img['order'],
+                'color_variant_id' => $img['color_variant_id'],
+                'color_name' => $img['color_name'],
+                'hex_code' => $img['hex_code'],
+                'alt_text' => $img['alt_text'],
+                'is_primary' => $img['is_primary']
+            ];
+        }, $imagesRaw);
+    }
 
     // Obtener variantes de color
     $colorVariantsStmt = $conn->prepare("
