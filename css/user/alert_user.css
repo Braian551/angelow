@@ -1,0 +1,258 @@
+/* ====================================
+   Sistema de Alertas para Usuarios
+   Diseño moderno y elegante
+   ==================================== */
+
+/* Overlay principal */
+.user-alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.user-alert-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Contenedor de la alerta */
+.user-alert-container {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 420px;
+    width: 90%;
+    overflow: hidden;
+    transform: scale(0.8);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.user-alert-overlay.active .user-alert-container {
+    transform: scale(1);
+}
+
+/* Contenido de la alerta */
+.user-alert-content {
+    padding: 3rem 2.5rem 2.5rem;
+    text-align: center;
+}
+
+/* Icono de la alerta */
+.user-alert-icon-wrapper {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    animation: iconPulse 1.5s ease-in-out infinite;
+}
+
+.user-alert-icon {
+    font-size: 4rem;
+    color: #fff;
+}
+
+/* Animación del icono */
+@keyframes iconPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Título de la alerta */
+.user-alert-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 1rem;
+    line-height: 1.3;
+}
+
+/* Mensaje de la alerta */
+.user-alert-message {
+    font-size: 1.5rem;
+    color: #666;
+    margin: 0 0 2.5rem;
+    line-height: 1.6;
+}
+
+/* Acciones (botones) */
+.user-alert-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.user-alert-btn {
+    padding: 1.2rem 3rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 130px;
+    outline: none;
+}
+
+.user-alert-btn-primary {
+    background: var(--primary-color);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 119, 182, 0.4);
+}
+
+.user-alert-btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 119, 182, 0.5);
+}
+
+.user-alert-btn-primary:active {
+    transform: translateY(0);
+}
+
+.user-alert-btn-secondary {
+    background: #f5f5f5;
+    color: #666;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-alert-btn-secondary:hover {
+    background: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+/* Variantes de alerta por tipo */
+
+/* Success - Verde */
+.user-alert-container.success .user-alert-icon-wrapper {
+    background: var(--success-color);
+    box-shadow: 0 8px 25px rgba(75, 181, 67, 0.4);
+}
+
+.user-alert-container.success .user-alert-title {
+    color: var(--success-color);
+}
+
+/* Error - Rojo */
+.user-alert-container.error .user-alert-icon-wrapper {
+    background: var(--error-color);
+    box-shadow: 0 8px 25px rgba(255, 51, 51, 0.4);
+}
+
+.user-alert-container.error .user-alert-title {
+    color: var(--error-color);
+}
+
+/* Warning - Amarillo */
+.user-alert-container.warning .user-alert-icon-wrapper {
+    background: var(--warning-color);
+    box-shadow: 0 8px 25px rgba(255, 204, 0, 0.4);
+}
+
+.user-alert-container.warning .user-alert-title {
+    color: var(--warning-color);
+}
+
+/* Info - Azul principal */
+.user-alert-container.info .user-alert-icon-wrapper {
+    background: var(--primary-color);
+    box-shadow: 0 8px 25px rgba(0, 119, 182, 0.4);
+}
+
+.user-alert-container.info .user-alert-title {
+    color: var(--primary-color);
+}
+
+/* Confirm - Azul secundario */
+.user-alert-container.confirm .user-alert-icon-wrapper {
+    background: var(--secondary-color);
+    box-shadow: 0 8px 25px rgba(72, 202, 228, 0.4);
+}
+
+.user-alert-container.confirm .user-alert-title {
+    color: var(--secondary-color);
+}
+
+/* Botón de cancelar para confirmaciones */
+.user-alert-btn-cancel {
+    background: #e0e0e0;
+    color: #666;
+}
+
+.user-alert-btn-cancel:hover {
+    background: #bdbdbd;
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .user-alert-container {
+        max-width: 95%;
+        border-radius: 12px;
+    }
+    
+    .user-alert-content {
+        padding: 2.5rem 2rem 2rem;
+    }
+    
+    .user-alert-icon-wrapper {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .user-alert-icon {
+        font-size: 3rem;
+    }
+    
+    .user-alert-title {
+        font-size: 1.9rem;
+    }
+    
+    .user-alert-message {
+        font-size: 1.4rem;
+    }
+    
+    .user-alert-actions {
+        flex-direction: column;
+    }
+    
+    .user-alert-btn {
+        width: 100%;
+        padding: 1.1rem 2rem;
+    }
+}
+
+/* Animación de entrada suave */
+@keyframes slideInDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.user-alert-overlay.active .user-alert-container {
+    animation: slideInDown 0.4s ease-out;
+}

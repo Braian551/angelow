@@ -60,166 +60,12 @@ try {
     <meta name="description" content="Tu lista de productos favoritos en Angelow.">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/productos.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/wishlist.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/notificacion.css">
-    <style>
-        .main-header {
-            position: relative;
-        }
-
-        .wishlist-page-container {
-            max-width: 1600px;
-            margin: 3rem auto;
-            padding: 0 2rem;
-            min-height: 70vh;
-        }
-
-        .wishlist-header {
-            margin-bottom: 3rem;
-            text-align: center;
-        }
-
-        .wishlist-header h1 {
-            font-size: 3rem;
-            color: var(--text-dark);
-            margin-bottom: 1rem;
-            font-weight: 700;
-        }
-
-        .wishlist-header p {
-            font-size: 1.6rem;
-            color: var(--text-light);
-        }
-
-        .wishlist-stats {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            margin-bottom: 3rem;
-            flex-wrap: wrap;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 2rem 3rem;
-            border-radius: 12px;
-            box-shadow: var(--product-card-shadow);
-            text-align: center;
-        }
-
-        .stat-card .stat-value {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-card .stat-label {
-            font-size: 1.4rem;
-            color: var(--text-light);
-        }
-
-        .empty-wishlist {
-            text-align: center;
-            padding: 6rem 2rem;
-            background: white;
-            border-radius: 18px;
-            box-shadow: var(--product-card-shadow);
-        }
-
-        .empty-wishlist i {
-            font-size: 8rem;
-            color: var(--primary-light);
-            margin-bottom: 2rem;
-            opacity: 0.7;
-        }
-
-        .empty-wishlist h2 {
-            font-size: 2.4rem;
-            color: var(--text-dark);
-            margin-bottom: 1rem;
-        }
-
-        .empty-wishlist p {
-            font-size: 1.6rem;
-            color: var(--text-light);
-            margin-bottom: 2rem;
-        }
-
-        .empty-wishlist .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.8rem;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1.4rem 3rem;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1.5rem;
-            transition: var(--transition-medium);
-            text-decoration: none;
-        }
-
-        .empty-wishlist .btn:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 119, 182, 0.3);
-        }
-
-        .wishlist-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding: 1.5rem 2rem;
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--product-card-shadow);
-        }
-
-        .clear-all-btn {
-            background: linear-gradient(135deg, #e63946, #d62828);
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1.4rem;
-            cursor: pointer;
-            transition: var(--transition-medium);
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .clear-all-btn:hover {
-            background: linear-gradient(135deg, #d62828, #c41e29);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
-        }
-
-        @media (max-width: 768px) {
-            .wishlist-header h1 {
-                font-size: 2.4rem;
-            }
-
-            .wishlist-stats {
-                gap: 1.5rem;
-            }
-
-            .stat-card {
-                padding: 1.5rem 2rem;
-            }
-
-            .wishlist-actions {
-                flex-direction: column;
-                gap: 1rem;
-            }
-        }
-    </style>
 </head>
 
 <body>
+    <?php require_once __DIR__ . '/alertas/alert_user.php'; ?>
     <div class="wishlist-page-container">
         <!-- Header de la página -->
         <div class="wishlist-header">
@@ -228,23 +74,31 @@ try {
         </div>
 
         <?php if (!empty($wishlistProducts)): ?>
-            <!-- Estadísticas -->
-            <div class="wishlist-stats">
-                <div class="stat-card">
-                    <span class="stat-value"><?= count($wishlistProducts) ?></span>
-                    <span class="stat-label">Producto<?= count($wishlistProducts) != 1 ? 's' : '' ?> guardado<?= count($wishlistProducts) != 1 ? 's' : '' ?></span>
+            <!-- Acciones y Estadísticas -->
+            <div class="wishlist-controls">
+                <!-- Acciones (izquierda - mayor espacio) -->
+                <div class="wishlist-actions">
+                    <div class="total-products">
+                        <p><?= count($wishlistProducts) ?> producto<?= count($wishlistProducts) != 1 ? 's' : '' ?> en tu lista</p>
+                    </div>
+                    <button class="clear-all-btn" id="clearAllWishlist">
+                        <i class="fas fa-trash"></i>
+                        Limpiar lista
+                    </button>
                 </div>
-            </div>
 
-            <!-- Acciones -->
-            <div class="wishlist-actions">
-                <div class="total-products">
-                    <p><?= count($wishlistProducts) ?> producto<?= count($wishlistProducts) != 1 ? 's' : '' ?> en tu lista</p>
+                <!-- Estadísticas (derecha - menos espacio) -->
+                <div class="wishlist-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value"><?= count($wishlistProducts) ?></span>
+                            <span class="stat-label">Producto<?= count($wishlistProducts) != 1 ? 's' : '' ?> guardado<?= count($wishlistProducts) != 1 ? 's' : '' ?></span>
+                        </div>
+                    </div>
                 </div>
-                <button class="clear-all-btn" id="clearAllWishlist">
-                    <i class="fas fa-trash"></i>
-                    Limpiar lista
-                </button>
             </div>
 
             <!-- Grid de productos -->
@@ -319,13 +173,15 @@ try {
         <?php else: ?>
             <!-- Lista vacía -->
             <div class="empty-wishlist">
-                <i class="fas fa-heart-broken"></i>
-                <h2>Tu lista de deseos está vacía</h2>
-                <p>Agrega productos a tu lista de deseos para guardarlos aquí</p>
-                <a href="<?= BASE_URL ?>/tienda/productos.php" class="btn">
-                    <i class="fas fa-shopping-bag"></i>
-                    Explorar productos
-                </a>
+                <div class="empty-wishlist-content">
+                    <i class="fas fa-heart-broken"></i>
+                    <h2>Tu lista de deseos está vacía</h2>
+                    <p>Agrega productos a tu lista de deseos para guardarlos aquí</p>
+                    <a href="<?= BASE_URL ?>/tienda/productos.php" class="btn">
+                        <i class="fas fa-shopping-bag"></i>
+                        Explorar productos
+                    </a>
+                </div>
             </div>
         <?php endif; ?>
     </div>
@@ -371,7 +227,7 @@ try {
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        showNotification(error.message, 'error');
+                        showUserError(error.message);
                         return { success: false, error: error.message };
                     });
             }
@@ -384,68 +240,32 @@ try {
                 });
             }
 
-            // Notificación mejorada
-            function showNotification(message, type) {
-                const icons = {
-                    success: 'fa-check-circle',
-                    error: 'fa-times-circle',
-                    info: 'fa-info-circle'
-                };
-                
-                const notification = document.createElement('div');
-                notification.className = `notification ${type}`;
-                notification.innerHTML = `
-                    <i class="fas ${icons[type] || 'fa-info-circle'}"></i>
-                    <span>${message}</span>
-                `;
-                
-                document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    notification.classList.add('fade-out');
-                    setTimeout(() => notification.remove(), 500);
-                }, 3000);
-            }
-
             // Evento para botones de wishlist individuales
             document.querySelectorAll('.wishlist-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     const productId = this.getAttribute('data-product-id');
                     const productCard = this.closest('.product-card');
 
-                    handleWishlist('remove', productId, function(response) {
-                        if (response.success) {
-                            // Animar y eliminar la tarjeta
-                            productCard.style.transform = 'scale(0.8)';
-                            productCard.style.opacity = '0';
-                            
-                            setTimeout(() => {
-                                productCard.remove();
-                                
-                                // Verificar si quedan productos
-                                const remainingProducts = document.querySelectorAll('.product-card').length;
-                                if (remainingProducts === 0) {
-                                    location.reload();
+                    // Confirmar eliminación con alerta personalizada
+                    showUserConfirm(
+                        '¿Deseas eliminar este producto de tu lista de deseos?',
+                        function() {
+                            handleWishlist('remove', productId, function(response) {
+                                if (response.success) {
+                                    showUserSuccess('Producto eliminado de tu lista de deseos');
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 1500);
                                 } else {
-                                    // Actualizar contador
-                                    const totalProducts = document.querySelector('.total-products p');
-                                    if (totalProducts) {
-                                        totalProducts.textContent = `${remainingProducts} producto${remainingProducts != 1 ? 's' : ''} en tu lista`;
-                                    }
-                                    const statValue = document.querySelector('.stat-value');
-                                    if (statValue) {
-                                        statValue.textContent = remainingProducts;
-                                    }
-                                    const statLabel = document.querySelector('.stat-label');
-                                    if (statLabel) {
-                                        statLabel.textContent = `Producto${remainingProducts != 1 ? 's' : ''} guardado${remainingProducts != 1 ? 's' : ''}`;
-                                    }
+                                    showUserError('No se pudo eliminar el producto. Inténtalo nuevamente.');
                                 }
-                            }, 300);
-                            
-                            showNotification('Producto eliminado de tu lista de deseos', 'info');
+                            });
+                        },
+                        {
+                            confirmText: 'Sí, eliminar',
+                            cancelText: 'Cancelar'
                         }
-                    });
+                    );
                 });
             });
 
@@ -453,24 +273,41 @@ try {
             const clearAllBtn = document.getElementById('clearAllWishlist');
             if (clearAllBtn) {
                 clearAllBtn.addEventListener('click', function() {
-                    if (!confirm('¿Estás seguro de que deseas eliminar todos los productos de tu lista de deseos?')) {
-                        return;
-                    }
+                    showUserConfirm(
+                        '¿Estás seguro de que deseas eliminar todos los productos de tu lista de deseos? Esta acción no se puede deshacer.',
+                        function() {
+                            const productIds = Array.from(document.querySelectorAll('.product-card')).map(card => 
+                                card.getAttribute('data-product-id')
+                            );
 
-                    const productIds = Array.from(document.querySelectorAll('.product-card')).map(card => 
-                        card.getAttribute('data-product-id')
+                            let completed = 0;
+                            let hasError = false;
+
+                            productIds.forEach(productId => {
+                                handleWishlist('remove', productId, function(response) {
+                                    completed++;
+                                    if (!response.success) {
+                                        hasError = true;
+                                    }
+                                    
+                                    if (completed === productIds.length) {
+                                        if (hasError) {
+                                            showUserError('Algunos productos no se pudieron eliminar. Por favor, recarga la página.');
+                                        } else {
+                                            showUserSuccess('Lista de deseos limpiada exitosamente');
+                                            setTimeout(() => {
+                                                location.reload();
+                                            }, 1500);
+                                        }
+                                    }
+                                });
+                            });
+                        },
+                        {
+                            confirmText: 'Sí, limpiar todo',
+                            cancelText: 'No, cancelar'
+                        }
                     );
-
-                    let completed = 0;
-                    productIds.forEach(productId => {
-                        handleWishlist('remove', productId, function(response) {
-                            completed++;
-                            if (completed === productIds.length) {
-                                showNotification('Lista de deseos limpiada exitosamente', 'success');
-                                setTimeout(() => location.reload(), 1000);
-                            }
-                        });
-                    });
                 });
             }
 
