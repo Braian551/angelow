@@ -148,6 +148,12 @@ try {
     $countStmt->execute($countParams);
     $total = $countStmt->fetchColumn();
 
+    // Debug: add count to response
+    $debug = [
+        'query_count' => count($products),
+        'total_count' => (int)$total
+    ];
+
     // Formatear respuesta
     $response = [
         'success' => true,
