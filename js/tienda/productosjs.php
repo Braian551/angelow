@@ -195,15 +195,11 @@
 
         // Función para cargar productos via AJAX
         function loadProducts(params = {}) {
-            const mainContent = document.querySelector('.products-main-content');
-            mainContent.classList.add('loading');
-            
-            // Mostrar loader
-            const loader = document.createElement('div');
-            loader.className = 'loader-overlay';
-            loader.innerHTML = '<div class="loader"></div>';
-            mainContent.appendChild(loader);
-            
+            const productsGrid = document.querySelector('.products-grid');
+
+            // Mostrar placeholders shimmer
+            showShimmerPlaceholders(productsGrid);
+
             callApi('<?= BASE_URL ?>/tienda/ajax/filter_products.php', 'POST', params)
                 .then(response => {
                     if (response.success) {
@@ -212,10 +208,39 @@
                         updateProductCount(response);
                     }
                 })
-                .finally(() => {
-                    mainContent.classList.remove('loading');
-                    loader.remove();
+                .catch(error => {
+                    // En caso de error, mostrar mensaje de error
+                    productsGrid.innerHTML = `
+                        <div class="no-products">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Error al cargar los productos. Inténtalo de nuevo.</p>
+                            <button onclick="loadProducts(${JSON.stringify(params).replace(/"/g, '&quot;')})" class="btn">Reintentar</button>
+                        </div>
+                    `;
                 });
+        }
+
+        // Función para mostrar placeholders shimmer
+        function showShimmerPlaceholders(container) {
+            // Crear 12 placeholders (una página completa)
+            let shimmerHtml = '';
+            for (let i = 0; i < 12; i++) {
+                shimmerHtml += `
+                    <div class="product-card shimmer">
+                        <div class="shimmer-wishlist"></div>
+                        <div class="shimmer-image"></div>
+                        <div class="shimmer-info">
+                            <div class="shimmer-category"></div>
+                            <div class="shimmer-title"></div>
+                            <div class="shimmer-title"></div>
+                            <div class="shimmer-rating"></div>
+                            <div class="shimmer-price"></div>
+                            <div class="shimmer-button"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = shimmerHtml;
         }
 
         // Actualizar la cuadrícula de productos
