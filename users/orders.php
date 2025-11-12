@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
-require_once __DIR__ . '/../layouts/header2.php';
+require_once __DIR__ . '/../layouts/headerproducts.php';
 require_once __DIR__ . '/../layouts/functions.php';
 require_once __DIR__ . '/../auth/role_redirect.php';
 

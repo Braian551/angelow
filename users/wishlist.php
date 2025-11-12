@@ -63,12 +63,20 @@ try {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/productos.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/wishlist.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/notificacion.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboarduser2.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/user/alert_user.css">
 </head>
 
 <body>
-    <?php require_once __DIR__ . '/alertas/alert_user.php'; ?>
-    <div class="wishlist-page-container">
+    <div class="user-dashboard-container">
+        <?php require_once __DIR__ . '/../layouts/asideuser.php'; ?>
+
+        <!-- Contenido principal -->
+        <main class="user-main-content">
+            <?php require_once __DIR__ . '/alertas/alert_user.php'; ?>
+
+            <div class="wishlist-page-container">
+      
         <!-- Header de la página -->
         <div class="wishlist-header">
             <h1><i class="fas fa-heart"></i> Mi Lista de Deseos</h1>
@@ -186,6 +194,8 @@ try {
                 </div>
             </div>
         <?php endif; ?>
+    </div>
+
     </div>
 
     <?php include __DIR__ . '/../layouts/footer.php'; ?>

@@ -10,7 +10,6 @@
         'notifications' => '/users/notifications.php',
         'addresses' => '/users/addresses.php',
         'wishlist' => '/users/wishlist.php',
-        'donations' => '/donaciones/donaciones.php',
         'settings' => '/users/settings.php'
     ];
 
@@ -67,11 +66,7 @@
                       <i class="fas fa-heart"></i> Favoritos
                   </a>
               </li>
-              <li class="<?= isMenuItemActive($menu_items['donations'], $current_url) ? 'active' : '' ?>">
-                  <a href="<?= BASE_URL ?><?= $menu_items['donations'] ?>">
-                      <i class="fas fa-hand-holding-heart"></i> Donaciones
-                  </a>
-              </li>
+             
               <li class="<?= isMenuItemActive($menu_items['settings'], $current_url) ? 'active' : '' ?>">
                   <a href="<?= BASE_URL ?><?= $menu_items['settings'] ?>">
                       <i class="fas fa-user-cog"></i> Configuración
