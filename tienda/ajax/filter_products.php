@@ -83,7 +83,11 @@ try {
 // Preparar respuesta
 $response = [
     'success' => true,
-    'products' => $products,
+    'products' => array_map(function($product) {
+        // Asegurar que is_favorite sea un integer
+        $product['is_favorite'] = (int)$product['is_favorite'];
+        return $product;
+    }, $products),
     'totalProducts' => $totalProducts,
     'totalPages' => $totalPages,
     'currentPage' => $page,

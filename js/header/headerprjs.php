@@ -247,5 +247,29 @@
 
         // Actualizar el contador cada 5 minutos
         setInterval(updateCartCount, 5 * 60 * 1000);
+
+        // Función para mostrar mensaje de inicio de sesión requerido
+        window.showLoginRequired = function(event, feature) {
+            event.preventDefault();
+            
+            // Crear notificación
+            const notification = document.createElement('div');
+            notification.className = 'notification error';
+            notification.innerHTML = `
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Debes iniciar sesión para acceder a ${feature}</span>
+            `;
+            
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => {
+                    notification.remove();
+                    // Redirigir al login después de mostrar el mensaje
+                    window.location.href = '<?= BASE_URL ?>/auth/login.php?redirect=' + encodeURIComponent(window.location.pathname);
+                }, 500);
+            }, 2000);
+        };
     });
 </script>

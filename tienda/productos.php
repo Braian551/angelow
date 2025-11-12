@@ -37,6 +37,14 @@ try {
     // Obtener los productos
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Convertir is_favorite a integer para consistencia
+    $products = array_map(function($product) {
+        if (isset($product['is_favorite'])) {
+            $product['is_favorite'] = (int)$product['is_favorite'];
+        }
+        return $product;
+    }, $products);
+
     // Obtener el conteo total (segundo conjunto de resultados)
     $stmt->nextRowset();
     $totalResult = $stmt->fetch(PDO::FETCH_ASSOC);

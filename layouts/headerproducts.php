@@ -75,9 +75,15 @@ $currentSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''
             <a href="<?= BASE_URL ?>/users/dashboarduser.php" aria-label="Mi cuenta">
                 <i class="fas fa-user"></i>
             </a>
-            <a href="<?= BASE_URL ?>/favoritos.html" aria-label="Favoritos">
-                <i class="fas fa-heart"></i>
-            </a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="<?= BASE_URL ?>/users/wishlist.php" aria-label="Favoritos">
+                    <i class="fas fa-heart"></i>
+                </a>
+            <?php else: ?>
+                <a href="#" onclick="showLoginRequired(event, 'favoritos')" aria-label="Favoritos">
+                    <i class="fas fa-heart"></i>
+                </a>
+            <?php endif; ?>
             <a href="<?= BASE_URL ?>/tienda/pagos/cart.php" aria-label="Carrito" class="cart-link">
                 <i class="fas fa-shopping-cart"></i>
                 <?php if (isset($_SESSION['cart_count']) && $_SESSION['cart_count'] > 0): ?>
