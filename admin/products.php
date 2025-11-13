@@ -645,7 +645,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <th>Precio</th>
                                     <th>Stock</th>
                                     <th>Estado</th>
-                                    <th>Imagen</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -656,7 +655,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <td>$${Number(variant.price).toLocaleString('es-CO')}</td>
                                         <td>${variant.quantity}</td>
                                         <td><span class="status ${variant.is_active ? 'active' : 'inactive'}">${variant.is_active ? 'Activo' : 'Inactivo'}</span></td>
-                                        <td><button class="btn-zoom-variant" data-color-id="${variant.color_id}" data-color="${variant.color_name}" data-size="${variant.size_name}"><i class="fas fa-eye"></i></button></td>
                                     </tr>
                                 `).join('')}
                             </tbody>
