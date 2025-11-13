@@ -1252,7 +1252,7 @@ button {
   gap: 8px;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 4px 0;
+  padding: 4px 4px;
   scroll-behavior: smooth;
   flex: 1;
   scrollbar-width: thin;

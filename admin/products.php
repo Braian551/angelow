@@ -636,6 +636,40 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                     ` : ''}
+                    <style>
+                        @media (max-width: 768px) {
+                            .variant-table table, .variant-table thead, .variant-table tbody, .variant-table th, .variant-table td, .variant-table tr {
+                                display: block;
+                            }
+                            .variant-table thead tr {
+                                position: absolute;
+                                top: -9999px;
+                                left: -9999px;
+                            }
+                            .variant-table tr {
+                                border: 1px solid #ccc;
+                                margin-bottom: 10px;
+                                padding: 10px;
+                            }
+                            .variant-table td {
+                                border: none;
+                                border-bottom: 1px solid #eee;
+                                position: relative;
+                                padding-left: 50%;
+                                text-align: left;
+                            }
+                            .variant-table td:before {
+                                position: absolute;
+                                top: 6px;
+                                left: 6px;
+                                width: 45%;
+                                padding-right: 10px;
+                                white-space: nowrap;
+                                font-weight: bold;
+                                content: attr(data-label);
+                            }
+                        }
+                    </style>
                     <div class="variant-table">
                         <table>
                             <thead>
@@ -650,11 +684,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tbody>
                                 ${variants.map(variant => `
                                     <tr>
-                                        <td>${variant.color_name}</td>
-                                        <td>${variant.size_name}</td>
-                                        <td>$${Number(variant.price).toLocaleString('es-CO')}</td>
-                                        <td>${variant.quantity}</td>
-                                        <td><span class="status ${variant.is_active ? 'active' : 'inactive'}">${variant.is_active ? 'Activo' : 'Inactivo'}</span></td>
+                                        <td data-label="Color">${variant.color_name}</td>
+                                        <td data-label="Talla">${variant.size_name}</td>
+                                        <td data-label="Precio">$${Number(variant.price).toLocaleString('es-CO')}</td>
+                                        <td data-label="Stock">${variant.quantity}</td>
+                                        <td data-label="Estado"><span class="status ${variant.is_active ? 'active' : 'inactive'}">${variant.is_active ? 'Activo' : 'Inactivo'}</span></td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -666,6 +700,29 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const html = `
             <div class="quick-view-content">
+                <style>
+                    @media (max-width: 768px) {
+                        .quick-view-content {
+                            display: flex;
+                            flex-direction: column;
+                        }
+                        .quick-view-gallery {
+                            width: 100%;
+                            margin-bottom: 20px;
+                        }
+                        .quick-view-info {
+                            width: 100%;
+                        }
+                        .quick-view-modal .modal-content {
+                            width: 95%;
+                            max-width: none;
+                            margin: 10px;
+                        }
+                        .quick-view-modal .modal-body {
+                            padding: 15px;
+                        }
+                    }
+                </style>
                 ${imagesHtml}
                 <div class="quick-view-info">
                     <div class="product-header">
