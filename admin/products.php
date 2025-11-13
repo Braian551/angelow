@@ -599,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </button>
                         <div class="thumbnail-gallery" id="thumbnail-gallery">
                             ${images.map((img, index) => `
-                                <img src="${img.url}" alt="${img.alt_text || 'Imagen ' + (index + 1)}" class="thumbnail ${img.id === primaryImage.id ? 'active' : ''}" data-index="${img.id}" data-color="${img.color_name || 'General'}">
+                                <img src="${img.url}" alt="${img.alt_text || 'Imagen ' + (index + 1)}" class="thumbnail ${img.id === primaryImage.id ? 'active' : ''}" data-index="${img.id}" data-color="${img.color_name || 'General'}" style="${(img.color_name && img.color_name !== 'General') ? 'display: none;' : ''}">
                             `).join('')}
                         </div>
                         <button class="gallery-arrow right" id="gallery-right" aria-label="Ver siguientes imágenes">
@@ -798,26 +798,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('.color-filter-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 
+                const thumbnails = document.querySelectorAll('.thumbnail');
+                
                 if (selectedColor === 'General') {
-                    // Para "Principal", mostrar solo la imagen principal, ocultar miniaturas
-                    thumbnailGallery.style.display = 'none';
-                    // Ocultar flechas cuando no hay galería
-                    if (galleryLeft) galleryLeft.classList.remove('show');
-                    if (galleryRight) galleryRight.classList.remove('show');
+                    // Para "Principal", mostrar solo miniaturas sin color específico (General)
+                    thumbnails.forEach(thumb => {
+                        const thumbColor = thumb.getAttribute('data-color');
+                        if (thumbColor === 'General' || !thumbColor) {
+                            thumb.style.display = 'block';
+                        } else {
+                            thumb.style.display = 'none';
+                        }
+                    });
+                    
                     // Cambiar a la imagen primaria
                     const primaryImage = window.currentImages.find(img => img.is_primary == 1) || window.currentImages[0];
                     if (primaryImage) {
                         document.getElementById('main-product-image').src = primaryImage.url;
-                        document.getElementById('main-product-image').alt = primaryImage.alt_text || '${product.name}';
+                        document.getElementById('main-product-image').alt = primaryImage.alt_text || 'Imagen del producto';
                         document.querySelector('.image-zoom-btn').setAttribute('data-image', primaryImage.url);
-                        document.querySelector('.image-zoom-btn').setAttribute('data-alt', primaryImage.alt_text || '${product.name}');
-                        // Marcar como activa la principal
-                        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                        document.querySelector('.image-zoom-btn').setAttribute('data-alt', primaryImage.alt_text || 'Imagen del producto');
+                        
+                        // Marcar como activa la miniatura principal
+                        thumbnails.forEach(t => t.classList.remove('active'));
+                        const primaryThumb = document.querySelector(`.thumbnail[data-index="${primaryImage.id}"]`);
+                        if (primaryThumb) {
+                            primaryThumb.classList.add('active');
+                        }
                     }
                 } else {
-                    // Para colores específicos, mostrar miniaturas filtradas
-                    thumbnailGallery.style.display = 'flex';
-                    const thumbnails = document.querySelectorAll('.thumbnail');
+                    // Para colores específicos, mostrar solo miniaturas de ese color
                     thumbnails.forEach(thumb => {
                         const thumbColor = thumb.getAttribute('data-color');
                         if (thumbColor === selectedColor) {
@@ -827,16 +837,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     });
                     
-                    // Cambiar imagen principal a la primera visible y hacer scroll
-                    const firstVisible = document.querySelector('.thumbnail[style*="block"]');
+                    // Cambiar imagen principal a la primera visible
+                    const firstVisible = document.querySelector(`.thumbnail[data-color="${selectedColor}"]`);
                     if (firstVisible) {
                         firstVisible.click();
                         firstVisible.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
                     }
-                    
-                    // Mostrar/ocultar flechas según desbordamiento
-                    setTimeout(toggleGalleryArrows, 200); // Delay para que se calcule correctamente
                 }
+                
+                // Actualizar flechas de navegación
+                setTimeout(() => {
+                    toggleGalleryArrows();
+                    updateArrowStates();
+                }, 100);
             });
         });
         
