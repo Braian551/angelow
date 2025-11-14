@@ -111,9 +111,9 @@ try {
         <main class="admin-content">
             <?php include __DIR__ . '/../../layouts/headeradmin1.php'; ?>
 
-            <div class="dashboard-content collections-dashboard">
+            <div class="dashboard-content collections-dashboard collections-page">
                 <div class="page-header">
-                    <div>
+                    <div class="collections-header-left">
                         <h1>
                             <i class="fas fa-layer-group"></i>
                             Gestión de Colecciones
@@ -257,11 +257,11 @@ try {
                         <table class="data-table collections-table">
                             <thead>
                                 <tr>
-                                    <th>Colección</th>
-                                    <th>Productos asociados</th>
-                                    <th>Lanzamiento</th>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Productos</th>
                                     <th>Estado</th>
-                                    <th class="text-right">Acciones</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -287,62 +287,45 @@ try {
                                             $updatedAt = $collection['updated_at'] ?: $collection['created_at'];
                                         ?>
                                         <tr data-collection-id="<?= $collection['id'] ?>">
-                                            <td>
-                                            <div class="collection-info">
-                                                <div class="collection-thumb">
-                                                    <?php if (!empty($collection['image'])): ?>
-                                                        <img src="<?= BASE_URL ?>/<?= htmlspecialchars($collection['image']) ?>" alt="<?= htmlspecialchars($collection['name']) ?>">
-                                                    <?php else: ?>
-                                                        <span class="thumb-placeholder"><i class="fas fa-image"></i></span>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <div class="collection-meta">
-                                                    <div class="collection-name-row">
-                                                        <strong><?= htmlspecialchars($collection['name']) ?></strong>
-                                                        <span class="collection-id">ID #<?= $collection['id'] ?></span>
-                                                    </div>
-                                                    <div class="collection-slug">Slug: <code><?= htmlspecialchars($collection['slug']) ?></code></div>
-                                                    <small class="collection-created">Creada el <?= date('d/m/Y', strtotime($collection['created_at'])) ?></small>
-                                                </div>
-                                            </div>
+                                            <td class="collection-name-cell">
+                                                <?= htmlspecialchars($collection['name']) ?>
+                                            </td>
+                                            <td class="collection-description">
+                                                <?php
+                                                    $description = trim($collection['description'] ?? '');
+                                                    if ($description === '') {
+                                                        echo '<span class="text-muted">Sin descripción</span>';
+                                                    } else {
+                                                        $excerpt = mb_strimwidth($description, 0, 140, '...', 'UTF-8');
+                                                        echo htmlspecialchars($excerpt);
+                                                    }
+                                                ?>
                                             </td>
                                             <td>
                                                 <div class="products-meta">
                                                     <span class="badge badge-info">
                                                         <?= $productCount ?> <?= $productCount === 1 ? 'producto' : 'productos' ?>
                                                     </span>
-                                                    <small>Directos: <?= (int) $collection['direct_product_count'] ?> · Asociados: <?= (int) $collection['pivot_product_count'] ?></small>
                                                     <?php if ($inUse): ?>
-                                                        <small class="usage-note"><i class="fas fa-link"></i> En uso - no se puede eliminar</small>
+                                                        <small class="usage-note"><i class="fas fa-link"></i> En uso</small>
                                                     <?php endif; ?>
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class="launch-date">
-                                                    <i class="fas fa-calendar"></i>
-                                                    <?= $launchDate ?>
+                                                <span class="status-badge <?= $collection['is_active'] ? 'status-active' : 'status-inactive' ?>">
+                                                    <?= $collection['is_active'] ? 'Activa' : 'Inactiva' ?>
                                                 </span>
                                             </td>
-                                            <td>
-                                                <div class="status-cell">
-                                                    <span class="status-badge <?= $collection['is_active'] ? 'status-active' : 'status-inactive' ?>">
-                                                        <?= $collection['is_active'] ? 'Activa' : 'Inactiva' ?>
-                                                    </span>
-                                                    <small>Actualizada <?= date('d/m/Y H:i', strtotime($updatedAt)) ?></small>
-                                                </div>
-                                            </td>
-                                            <td class="actions text-right">
+                                            <td class="actions">
                                                 <div class="table-actions">
                                                     <a href="edit_collection.php?id=<?= $collection['id'] ?>" class="btn btn-sm btn-edit" title="Editar colección">
                                                         <i class="fas fa-edit"></i>
-                                                        Editar
                                                     </a>
                                                     <button type="button"
                                                             class="btn btn-sm btn-status js-collection-toggle"
                                                             data-id="<?= $collection['id'] ?>"
                                                             data-active="<?= $collection['is_active'] ? '1' : '0' ?>">
                                                         <i class="fas fa-power-off"></i>
-                                                        <span><?= $collection['is_active'] ? 'Desactivar' : 'Activar' ?></span>
                                                     </button>
                                                     <button type="button"
                                                             class="btn btn-sm btn-delete js-collection-delete"
@@ -350,7 +333,6 @@ try {
                                                             data-name="<?= htmlspecialchars($collection['name'], ENT_QUOTES, 'UTF-8') ?>"
                                                             data-in-use="<?= $inUse ? '1' : '0' ?>">
                                                         <i class="fas fa-trash"></i>
-                                                        <span>Eliminar</span>
                                                     </button>
                                                 </div>
                                             </td>

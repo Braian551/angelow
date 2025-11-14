@@ -64,10 +64,10 @@ $productCount = $productCountStmt->fetch(PDO::FETCH_ASSOC)['count'];
         <main class="admin-content">
             <?php include __DIR__ . '/../../layouts/headeradmin1.php'; ?>
 
-            <div class="dashboard-content">
+            <div class="dashboard-content collections-dashboard collections-page">
             <div class="page-header">
                 <div class="header-content">
-                    <div class="header-left">
+                    <div class="collections-header-left">
                         <a href="collections_list.php" class="back-button">
                             <i class="fas fa-arrow-left"></i>
                             Volver
