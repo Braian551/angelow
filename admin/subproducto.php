@@ -316,6 +316,7 @@ if (isset($_SESSION['alert'])) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/orders/orders.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/subproducto.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
 </head>
 <body>
     <div class="admin-container">
@@ -497,8 +498,8 @@ if (isset($_SESSION['alert'])) {
                                         </div>
 
                                         <div class="form-group checkbox-group">
-                                            <input type="radio" name="variant_is_default" value="0" checked>
-                                            <label>Hacer variante principal</label>
+                                            <input type="radio" name="variant_is_default" value="0" id="variant_default_0" checked>
+                                            <label for="variant_default_0">Hacer variante principal</label>
                                         </div>
 
                                         <div class="form-group full-width">
@@ -537,8 +538,10 @@ if (isset($_SESSION['alert'])) {
         </main>
     </div>
 
+    <?php require_once __DIR__ . '/../alertas/confirmation_modal.php'; ?>
     <script src="<?= BASE_URL ?>/js/dashboardadmin.js"></script>
     <script src="<?= BASE_URL ?>/js/alerta.js"></script>
+    <script src="<?= BASE_URL ?>/js/components/confirmationModal.js"></script>
     <?php require_once __DIR__ . '/../js/admin/subp/subprductojs.php' ?>
 </body>
 </html>

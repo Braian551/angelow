@@ -602,8 +602,9 @@ if (isset($_SESSION['alert'])) {
                                             </div>
 
                                             <div class="form-group checkbox-group">
-                                                <input type="radio" name="variant_is_default" value="<?= $index ?>" <?= $variant['is_default'] ? 'checked' : '' ?>>
-                                                <label>Hacer variante principal</label>
+                                                <?php $defaultRadioId = 'variant_default_' . $index; ?>
+                                                <input type="radio" name="variant_is_default" value="<?= $index ?>" id="<?= $defaultRadioId ?>" <?= $variant['is_default'] ? 'checked' : '' ?>>
+                                                <label for="<?= $defaultRadioId ?>">Hacer variante principal</label>
                                             </div>
 
                                             <div class="form-group full-width">
