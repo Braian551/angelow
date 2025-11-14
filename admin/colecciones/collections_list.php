@@ -14,6 +14,7 @@ $filters = [
 ];
 
 $activeFilters = count(array_filter($filters, static fn ($value) => $value !== ''));
+$activeFiltersLabel = $activeFilters === 1 ? '1 filtro activo' : $activeFilters . ' filtros activos';
 
 try {
     $statsStmt = $conn->query(<<<SQL
@@ -136,8 +137,14 @@ try {
                             <i class="fas fa-sliders-h"></i>
                             <h3>Filtros de búsqueda</h3>
                         </div>
-                        <div class="filters-meta">
-                            <span id="active-filters-count"><?= $activeFilters ?> <?= $activeFilters === 1 ? 'filtro activo' : 'filtros activos' ?></span>
+                        <div class="filters-controls">
+                            <div class="active-filters" id="active-filters-count" data-filters-counter>
+                                <i class="fas fa-filter"></i>
+                                <span><?= $activeFiltersLabel ?></span>
+                            </div>
+                            <button type="button" class="filters-toggle" id="toggle-filters" aria-label="Mostrar/Ocultar filtros" aria-expanded="true">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
                         </div>
                     </div>
                     <form id="collections-filter-form" class="filters-form" method="GET">
@@ -161,40 +168,48 @@ try {
                             </button>
                         </div>
 
-                        <div class="filters-row">
-                            <div class="filter-group">
-                                <label for="status-filter" class="filter-label">
-                                    <i class="fas fa-toggle-on"></i>
-                                    Estado
-                                </label>
-                                <select id="status-filter" name="status" class="filter-select">
-                                    <option value="" <?= $filters['status'] === '' ? 'selected' : '' ?>>Todos los estados</option>
-                                    <option value="active" <?= $filters['status'] === 'active' ? 'selected' : '' ?>>Activas</option>
-                                    <option value="inactive" <?= $filters['status'] === 'inactive' ? 'selected' : '' ?>>Inactivas</option>
-                                </select>
+                        <div class="filters-advanced" id="advanced-filters">
+                            <div class="filters-row">
+                                <div class="filter-group">
+                                    <label for="status-filter" class="filter-label">
+                                        <i class="fas fa-toggle-on"></i>
+                                        Estado
+                                    </label>
+                                    <select id="status-filter" name="status" class="filter-select">
+                                        <option value="" <?= $filters['status'] === '' ? 'selected' : '' ?>>Todos los estados</option>
+                                        <option value="active" <?= $filters['status'] === 'active' ? 'selected' : '' ?>>Activas</option>
+                                        <option value="inactive" <?= $filters['status'] === 'inactive' ? 'selected' : '' ?>>Inactivas</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="usage-filter" class="filter-label">
+                                        <i class="fas fa-link"></i>
+                                        Uso en productos
+                                    </label>
+                                    <select id="usage-filter" name="usage" class="filter-select">
+                                        <option value="" <?= $filters['usage'] === '' ? 'selected' : '' ?>>Todas</option>
+                                        <option value="with-products" <?= $filters['usage'] === 'with-products' ? 'selected' : '' ?>>Con productos</option>
+                                        <option value="without-products" <?= $filters['usage'] === 'without-products' ? 'selected' : '' ?>>Sin productos</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="filter-group">
-                                <label for="usage-filter" class="filter-label">
-                                    <i class="fas fa-link"></i>
-                                    Uso en productos
-                                </label>
-                                <select id="usage-filter" name="usage" class="filter-select">
-                                    <option value="" <?= $filters['usage'] === '' ? 'selected' : '' ?>>Todas</option>
-                                    <option value="with-products" <?= $filters['usage'] === 'with-products' ? 'selected' : '' ?>>Con productos</option>
-                                    <option value="without-products" <?= $filters['usage'] === 'without-products' ? 'selected' : '' ?>>Sin productos</option>
-                                </select>
-                            </div>
-                        </div>
 
-                        <div class="filters-actions-bar">
-                            <button type="button" class="btn-clear-filters" id="clear-filters">
-                                <i class="fas fa-times-circle"></i>
-                                Limpiar filtros
-                            </button>
-                            <button type="submit" class="btn-apply-filters">
-                                <i class="fas fa-check-circle"></i>
-                                Aplicar filtros
-                            </button>
+                            <div class="filters-actions-bar">
+                                <div class="active-filters active-filters-inline" data-filters-counter>
+                                    <i class="fas fa-filter"></i>
+                                    <span><?= $activeFiltersLabel ?></span>
+                                </div>
+                                <div class="filters-buttons">
+                                    <button type="button" class="btn-clear-filters" id="clear-filters">
+                                        <i class="fas fa-times-circle"></i>
+                                        Limpiar filtros
+                                    </button>
+                                    <button type="submit" class="btn-apply-filters">
+                                        <i class="fas fa-check-circle"></i>
+                                        Aplicar filtros
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>

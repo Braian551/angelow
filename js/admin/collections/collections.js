@@ -17,6 +17,8 @@ const CollectionsAdmin = (() => {
         const clearFiltersBtn = document.getElementById(selectors.clearFilters);
         const searchInput = document.getElementById(selectors.searchInput);
         const clearSearchBtn = document.getElementById(selectors.clearSearch);
+        const filtersToggle = document.getElementById('toggle-filters');
+        const advancedFilters = document.getElementById('advanced-filters');
 
         if (!form) {
             return;
@@ -45,6 +47,13 @@ const CollectionsAdmin = (() => {
                 searchInput.value = '';
                 toggleClearVisibility();
                 form.submit();
+            });
+        }
+
+        if (filtersToggle && advancedFilters) {
+            filtersToggle.addEventListener('click', () => {
+                const collapsed = advancedFilters.classList.toggle('collapsed');
+                filtersToggle.setAttribute('aria-expanded', String(!collapsed));
             });
         }
     }
