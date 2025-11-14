@@ -162,7 +162,7 @@ try {
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
-                            <button type="submit" class="search-submit-btn">
+                            <button type="submit" class="btn btn-primary search-submit-btn">
                                 <i class="fas fa-search"></i>
                                 <span>Buscar</span>
                             </button>
@@ -200,11 +200,11 @@ try {
                                     <span><?= $activeFiltersLabel ?></span>
                                 </div>
                                 <div class="filters-buttons">
-                                    <button type="button" class="btn-clear-filters" id="clear-filters">
+                                    <button type="button" class="btn btn-outline btn-clear-filters" id="clear-filters">
                                         <i class="fas fa-times-circle"></i>
                                         Limpiar filtros
                                     </button>
-                                    <button type="submit" class="btn-apply-filters">
+                                    <button type="submit" class="btn btn-primary btn-apply-filters">
                                         <i class="fas fa-check-circle"></i>
                                         Aplicar filtros
                                     </button>

@@ -51,9 +51,18 @@ const CollectionsAdmin = (() => {
         }
 
         if (filtersToggle && advancedFilters) {
-            filtersToggle.addEventListener('click', () => {
-                const collapsed = advancedFilters.classList.toggle('collapsed');
+            const setFiltersVisibility = (collapsed) => {
+                advancedFilters.classList.toggle('collapsed', collapsed);
                 filtersToggle.setAttribute('aria-expanded', String(!collapsed));
+                filtersToggle.setAttribute('aria-label', collapsed ? 'Mostrar filtros avanzados' : 'Ocultar filtros avanzados');
+            };
+
+            const initialCollapsed = filtersToggle.getAttribute('aria-expanded') === 'false';
+            setFiltersVisibility(initialCollapsed);
+
+            filtersToggle.addEventListener('click', () => {
+                const nextState = !advancedFilters.classList.contains('collapsed');
+                setFiltersVisibility(nextState);
             });
         }
     }
