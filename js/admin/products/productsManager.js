@@ -19,8 +19,14 @@ class ProductsManager {
             clearSearchBtn: document.getElementById('clear-search'),
             filterForm: document.getElementById('search-form'),
             quickViewModal: document.getElementById('quick-view-modal'),
-            imageZoomModal: document.getElementById('image-zoom-modal')
+            imageZoomModal: document.getElementById('image-zoom-modal'),
+            confirmationModal: document.getElementById('confirmation-modal'),
+            confirmationMessage: document.getElementById('confirmation-message'),
+            confirmActionBtn: document.getElementById('confirm-action'),
+            cancelConfirmationBtn: document.getElementById('cancel-confirmation')
         };
+        
+        this.pendingAction = null;
         
         this.init();
     }
@@ -71,6 +77,24 @@ class ProductsManager {
                 }
             });
         });
+        
+        // Modal de confirmación
+        if (this.elements.cancelConfirmationBtn) {
+            this.elements.cancelConfirmationBtn.addEventListener('click', () => {
+                this.elements.confirmationModal.classList.remove('active');
+                this.pendingAction = null;
+            });
+        }
+        
+        if (this.elements.confirmActionBtn) {
+            this.elements.confirmActionBtn.addEventListener('click', () => {
+                this.elements.confirmationModal.classList.remove('active');
+                if (this.pendingAction) {
+                    this.pendingAction();
+                    this.pendingAction = null;
+                }
+            });
+        }
     }
     
     async loadProducts(page = 1) {
@@ -201,7 +225,7 @@ class ProductsManager {
                             <i class="fas fa-edit"></i>
                             <span>Editar</span>
                         </a>
-                        <button class="btn-action btn-toggle-status" data-id="${product.id}" data-status="${product.is_active}" title="${product.is_active ? 'Desactivar producto' : 'Activar producto'}">
+                        <button class="btn-action btn-toggle-status ${product.is_active ? 'btn-secondary' : 'btn-success'}" data-id="${product.id}" data-status="${product.is_active}" title="${product.is_active ? 'Desactivar producto' : 'Activar producto'}">
                             <i class="fas fa-${product.is_active ? 'eye-slash' : 'eye'}"></i>
                             <span>${product.is_active ? 'Desactivar' : 'Activar'}</span>
                         </button>
@@ -470,14 +494,13 @@ class ProductsManager {
     }
     
     confirmToggleStatus(productId, currentStatus) {
-        const action = currentStatus ? 'desactivar' : 'activar';
-        const actionText = currentStatus ? 'desactivado' : 'activado';
+        const confirmMessage = currentStatus 
+            ? '¿Estás seguro de que deseas desactivar este producto? El producto será desactivado y no aparecerá en la tienda.'
+            : '¿Estás seguro de que deseas activar este producto? El producto será activado y volverá a aparecer en la tienda.';
         
-        if (!confirm(`¿Estás seguro de que deseas ${action} este producto? El producto será ${actionText} y ${currentStatus ? 'no aparecerá' : 'volverá a aparecer'} en la tienda.`)) {
-            return;
-        }
-        
-        this.toggleProductStatus(productId, !currentStatus);
+        this.elements.confirmationMessage.textContent = confirmMessage;
+        this.pendingAction = () => this.toggleProductStatus(productId, !currentStatus);
+        this.elements.confirmationModal.classList.add('active');
     }
     
     async toggleProductStatus(productId, newStatus) {
@@ -495,26 +518,17 @@ class ProductsManager {
             const result = await response.json();
             
             if (result.success) {
-                // Mostrar mensaje de éxito
-                if (window.showAlert) {
-                    window.showAlert(result.message, 'success');
-                } else {
-                    alert(result.message);
-                }
-                
-                // Recargar productos
-                this.loadProducts(this.currentPage);
+                // Recargar la página para mostrar la alerta de admin
+                window.location.reload();
             } else {
-                throw new Error(result.message || 'Error desconocido');
+                // En caso de error, también recargar para mostrar la alerta
+                window.location.reload();
             }
             
         } catch (error) {
             console.error('Error al cambiar estado del producto:', error);
-            if (window.showAlert) {
-                window.showAlert('Error al cambiar el estado del producto: ' + error.message, 'error');
-            } else {
-                alert('Error al cambiar el estado del producto: ' + error.message);
-            }
+            // Recargar la página para mostrar la alerta de error
+            window.location.reload();
         }
     }
     

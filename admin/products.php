@@ -229,6 +229,21 @@ try {
         </div>
     </div>
 
+    <!-- Modal de confirmación -->
+    <div class="modal-overlay confirmation-modal" id="confirmation-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmar acción</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="confirmation-message"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close" id="cancel-confirmation">Cancelar</button>
+                <button class="btn btn-danger" id="confirm-action">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="<?= BASE_URL ?>/js/dashboardadmin.js"></script>
     <script src="<?= BASE_URL ?>/js/alerta.js"></script>
     <script src="<?= BASE_URL ?>/js/admin/components/filterManager.js"></script>

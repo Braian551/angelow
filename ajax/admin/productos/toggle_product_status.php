@@ -41,12 +41,25 @@ try {
         $result = $controller->deleteProduct($productId);
     }
 
+    // Establecer alerta en sesión
+    $_SESSION['alert'] = [
+        'message' => $result['message'],
+        'type' => $result['success'] ? 'success' : 'error'
+    ];
+
     ob_end_clean();
     echo json_encode($result);
     exit();
 
 } catch (Exception $e) {
     error_log("Error en toggle_product_status.php: " . $e->getMessage());
+    
+    // Establecer alerta de error en sesión
+    $_SESSION['alert'] = [
+        'message' => $e->getMessage(),
+        'type' => 'error'
+    ];
+    
     ob_end_clean();
     echo json_encode([
         'success' => false,
