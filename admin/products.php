@@ -238,8 +238,8 @@ try {
             </div>
             <div class="modal-body" id="confirmation-message"></div>
             <div class="modal-footer">
-                <button class="btn btn-secondary modal-close" id="cancel-confirmation">Cancelar</button>
-                <button class="btn btn-danger" id="confirm-action">Confirmar</button>
+                <button class="btn btn-danger modal-close" id="cancel-confirmation">Cancelar</button>
+                <button class="btn btn-primary" id="confirm-action">Confirmar</button>
             </div>
         </div>
     </div>
