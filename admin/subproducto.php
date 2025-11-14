@@ -480,10 +480,6 @@ if (isset($_SESSION['alert'])) {
                                                         <input type="hidden" name="variant_barcode[0][<?= $size['id'] ?>]" value="">
 
                                                         <div class="size-label"><?= htmlspecialchars($size['name']) ?></div>
-                                                        <div class="size-details" style="display: none;">
-                                                            <span class="price"></span>
-                                                            <span class="quantity"></span>
-                                                        </div>
                                                     </div>
                                                 <?php endforeach; ?>
                                             </div>

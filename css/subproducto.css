@@ -932,26 +932,26 @@ margin: 0;
 /* ===== TALLAS COMO CUADRADOS SELECCIONABLES ===== */
 .sizes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 8px;
   margin-top: 12px;
 }
 
 .size-option {
   border: 2px solid var(--border-color);
   border-radius: var(--radius-sm);
-  padding: 10px 6px;
+  padding: 8px 4px;
   text-align: center;
   cursor: pointer;
   transition: var(--transition);
   position: relative;
   background-color: var(--bg-light);
-  min-height: 72px;
+  min-height: 56px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 .size-option:hover {
@@ -973,39 +973,10 @@ margin: 0;
 }
 
 .size-label {
-  font-size: 1.3rem;
-  font-weight: 500;
+  font-size: 1.2rem;
+  font-weight: 600;
   color: var(--text-dark);
   transition: var(--transition);
-  margin-bottom: 2px;
-}
-
-.size-details {
-  display: none;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 1.1rem;
-  color: var(--text-light);
-}
-
-.size-details span {
-  display: block;
-}
-
-.size-details .price::before {
-  content: "$";
-  font-size: 0.9rem;
-  margin-right: 1px;
-}
-
-.size-details .quantity::before {
-  content: "Stock:";
-  font-size: 0.9rem;
-  margin-right: 4px;
-}
-
-.size-option.selected .size-details {
-  display: flex;
 }
 
 /* ===== Modal de tallas mejorado ===== */

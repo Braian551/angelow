@@ -585,10 +585,6 @@ if (isset($_SESSION['alert'])) {
                                                             <input type="hidden" name="variant_barcode[<?= $index ?>][<?= $size['id'] ?>]" value="<?= isset($size_data[$size['id']]) ? $size_data[$size['id']]['barcode'] : '' ?>">
 
                                                             <div class="size-label"><?= htmlspecialchars($size['name']) ?></div>
-                                                            <div class="size-details">
-                                                                <span class="price"><?= isset($size_data[$size['id']]) ? number_format($size_data[$size['id']]['price'], 0, '', '.') : '' ?></span>
-                                                                <span class="quantity"><?= isset($size_data[$size['id']]) ? $size_data[$size['id']]['quantity'] : '' ?></span>
-                                                            </div>
                                                         </div>
                                                     <?php endforeach; ?>
                                                 </div>

@@ -147,15 +147,6 @@
             hiddenInputs[5].name = `variant_barcode[${activeVariantIndex}][${activeSizeId}]`;
             hiddenInputs[5].value = modalBarcode.value;
 
-            const sizeDetails = activeSizeOption.querySelector('.size-details');
-            if (sizeDetails) {
-                sizeDetails.style.display = 'flex';
-                const priceLabel = sizeDetails.querySelector('.price');
-                const quantityLabel = sizeDetails.querySelector('.quantity');
-                if (priceLabel) priceLabel.textContent = formatPesosColombianos(priceValue);
-                if (quantityLabel) quantityLabel.textContent = modalQuantity.value;
-            }
-
             activeSizeOption.classList.add('selected');
             updateCombinationDisplay(activeSizeOption.closest('.variant-card'));
 
@@ -291,10 +282,6 @@
                                     <input type="hidden" name="variant_barcode[${newIndex}][<?= $size['id'] ?>]" value="">
                                     
                                     <div class="size-label"><?= htmlspecialchars($size['name']) ?></div>
-                                    <div class="size-details">
-                                        <span class="price"></span>
-                                        <span class="quantity"></span>
-                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
