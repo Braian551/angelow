@@ -123,12 +123,7 @@ try {
                             <a href="<?= BASE_URL ?>/admin">Dashboard</a> / <span>Colecciones</span>
                         </div>
                     </div>
-                    <div class="header-actions">
-                        <a href="add_collection.php" class="btn btn-primary">
-                            <i class="fas fa-plus"></i>
-                            Nueva Colección
-                        </a>
-                    </div>
+                
                 </div>
 
                 <div class="card filters-card">
@@ -215,21 +210,13 @@ try {
                 </div>
 
                 <div class="results-summary">
-                    <div class="results-info">
-                        <p id="results-count">
-                            <?= $resultsCount === 1 ? '1 colección encontrada' : $resultsCount . ' colecciones encontradas' ?>
-                        </p>
-                        <span class="results-helper">Total registradas: <?= (int) $stats['total'] ?></span>
-                    </div>
+                 
                     <div class="quick-actions">
                         <a href="add_collection.php" class="btn btn-primary">
                             <i class="fas fa-plus"></i>
                             Crear colección
                         </a>
-                        <a href="<?= BASE_URL ?>/docs/GUIA_RAPIDA_ANUNCIOS.md" class="btn btn-outline" target="_blank">
-                            <i class="fas fa-book"></i>
-                            Guía rápida
-                        </a>
+                   
                     </div>
                 </div>
 
