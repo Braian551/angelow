@@ -189,25 +189,24 @@
             });
         });
 
-        let variantCounter = 1;
 
         document.getElementById('add-variant-btn').addEventListener('click', function() {
-            variantCounter++;
+            const newIndex = document.querySelectorAll('.variant-card').length;
 
             const newVariant = document.createElement('div');
             newVariant.className = 'variant-card';
-            newVariant.setAttribute('data-variant-index', variantCounter - 1);
+            newVariant.setAttribute('data-variant-index', newIndex);
 
             newVariant.innerHTML = `
             <div class="variant-header">
-                <h3><i class="fas fa-palette"></i> Variante #${variantCounter}</h3>
+                <h3><i class="fas fa-palette"></i> Variante #${newIndex + 1}</h3>
                 <button type="button" class="btn btn-danger remove-variant">
                     <i class="fas fa-trash"></i> Eliminar
                 </button>
             </div>
 
             <div class="variant-body">
-                <div class="variant-combination" id="combination-display-${variantCounter - 1}">
+                <div class="variant-combination" id="combination-display-${newIndex}">
                     <i class="fas fa-info-circle"></i> Seleccione color y tallas
                 </div>
                 
@@ -226,15 +225,15 @@
 
                     <div class="form-group full-width">
                         <label><i class="fas fa-ruler"></i> Tallas y Stock *</label>
-                        <div class="sizes-grid" id="size-container-${variantCounter - 1}">
+                        <div class="sizes-grid" id="size-container-${newIndex}">
                             <?php foreach ($sizes as $size): ?>
                                 <div class="size-option" data-size-id="<?= $size['id'] ?>">
-                                    <input type="hidden" name="variant_size[<?= $size['id'] ?>][${variantCounter - 1}]" value="">
-                                    <input type="hidden" name="variant_price[${variantCounter - 1}][<?= $size['id'] ?>]" value="">
-                                    <input type="hidden" name="variant_quantity[${variantCounter - 1}][<?= $size['id'] ?>]" value="">
-                                    <input type="hidden" name="variant_compare_price[${variantCounter - 1}][<?= $size['id'] ?>]" value="">
-                                    <input type="hidden" name="variant_sku[${variantCounter - 1}][<?= $size['id'] ?>]" value="">
-                                    <input type="hidden" name="variant_barcode[${variantCounter - 1}][<?= $size['id'] ?>]" value="">
+                                    <input type="hidden" name="variant_size[<?= $size['id'] ?>][${newIndex}]" value="">
+                                    <input type="hidden" name="variant_price[${newIndex}][<?= $size['id'] ?>]" value="">
+                                    <input type="hidden" name="variant_quantity[${newIndex}][<?= $size['id'] ?>]" value="">
+                                    <input type="hidden" name="variant_compare_price[${newIndex}][<?= $size['id'] ?>]" value="">
+                                    <input type="hidden" name="variant_sku[${newIndex}][<?= $size['id'] ?>]" value="">
+                                    <input type="hidden" name="variant_barcode[${newIndex}][<?= $size['id'] ?>]" value="">
                                     
                                     <div class="size-label"><?= htmlspecialchars($size['name']) ?></div>
                                     <div class="size-details" style="display: none;">
@@ -248,30 +247,30 @@
 
                     <div class="form-group">
                         <label>SKU Base</label>
-                        <input type="text" name="variant_sku[${variantCounter - 1}]" class="sku-input" readonly>
+                        <input type="text" name="variant_sku[${newIndex}]" class="sku-input" readonly>
                         <small class="sku-generate-text">Se generará automáticamente</small>
                     </div>
 
                     <div class="form-group">
                         <label>Código de barras base</label>
-                        <input type="text" name="variant_barcode[${variantCounter - 1}]">
+                        <input type="text" name="variant_barcode[${newIndex}]">
                     </div>
 
                     <div class="form-group checkbox-group">
-                        <input type="radio" name="variant_is_default" value="${variantCounter - 1}" id="variant_default_${variantCounter - 1}">
-                        <label for="variant_default_${variantCounter - 1}">Hacer variante principal</label>
+                        <input type="radio" name="variant_is_default" value="${newIndex}" id="variant_default_${newIndex}">
+                        <label for="variant_default_${newIndex}">Hacer variante principal</label>
                     </div>
 
                     <div class="form-group full-width">
                         <label><i class="fas fa-images"></i> Imágenes de la variante *</label>
                         <div class="image-uploader">
-                            <div class="upload-area" id="upload-area-${variantCounter - 1}">
+                            <div class="upload-area" id="upload-area-${newIndex}">
                                 <i class="fas fa-cloud-upload-alt"></i>
                                 <p>Arrastra y suelta imágenes aquí o haz clic para seleccionar</p>
                                 <div class="file-info"></div>
-                                <input type="file" name="variant_images[${variantCounter - 1}][]" multiple accept="image/*" class="file-input" required>
+                                <input type="file" name="variant_images[${newIndex}][]" multiple accept="image/*" class="file-input" required>
                             </div>
-                            <div class="preview-container" id="preview-container-${variantCounter - 1}"></div>
+                            <div class="preview-container" id="preview-container-${newIndex}"></div>
                         </div>
                         <small>Estas imágenes se asociarán a este color para todas las tallas</small>
                     </div>
@@ -281,58 +280,21 @@
 
             document.getElementById('variants-container').appendChild(newVariant);
 
-            setupSkuGeneration(newVariant);
-            setupCombinationDisplay(newVariant);
-            setupSizeOptions(newVariant);
-            initImageUploader(variantCounter - 1);
-
-            const radioBtn = newVariant.querySelector('input[type="radio"]');
-            radioBtn.addEventListener('change', function() {
-                if (this.checked) {
-                    document.querySelectorAll('input[name="variant_is_default"]').forEach(rb => {
-                        if (rb !== this) rb.checked = false;
-                    });
-                }
-            });
-
-            newVariant.querySelector('.remove-variant').addEventListener('click', function() {
-                if (confirm('¿Estás seguro de eliminar esta variante?')) {
-                    const isDefault = newVariant.querySelector('input[type="radio"]:checked');
-
-                    newVariant.remove();
-                    const variants = document.querySelectorAll('.variant-card');
-                    variants.forEach((variant, index) => {
-                        variant.setAttribute('data-variant-index', index);
-                        variant.querySelector('h3').textContent = `Variante #${index + 1}`;
-
-                        const radio = variant.querySelector('input[type="radio"]');
-                        if (radio) {
-                            radio.value = index;
-                            radio.id = `variant_default_${index}`;
-                            const label = variant.querySelector('label[for^="variant_default_"]');
-                            if (label) {
-                                label.htmlFor = `variant_default_${index}`;
-                            }
-
-                            if (isDefault && index === 0) {
-                                radio.checked = true;
-                            }
-                        }
-                    });
-                    variantCounter = variants.length;
-                }
-            });
+            attachVariantEvents(newVariant);
+            initImageUploader(newIndex);
+            reindexVariants();
         });
 
         function setupSizeOptions(variantElement) {
             const sizeOptions = variantElement.querySelectorAll('.size-option');
-            const variantIndex = variantElement.getAttribute('data-variant-index');
 
             sizeOptions.forEach(option => {
                 option.addEventListener('click', function() {
                     const sizeId = this.getAttribute('data-size-id');
 
-                    showSizeModal(this, variantIndex, sizeId);
+                    const currentVariantIndex = variantElement.getAttribute('data-variant-index');
+
+                    showSizeModal(this, currentVariantIndex, sizeId);
                 });
             });
         }
@@ -435,23 +397,153 @@
             });
         }
 
-        const firstVariant = document.querySelector('.variant-card');
-        if (firstVariant) {
-            setupSkuGeneration(firstVariant);
-            setupCombinationDisplay(firstVariant);
-            setupSizeOptions(firstVariant);
+        function updateRemoveButtonsVisibility() {
+            const variants = document.querySelectorAll('.variant-card');
+            const showButtons = variants.length > 1;
 
-            const radioBtn = firstVariant.querySelector('input[type="radio"]');
-            if (radioBtn) {
-                radioBtn.addEventListener('change', function() {
-                    if (this.checked) {
-                        document.querySelectorAll('input[name="variant_is_default"]').forEach(rb => {
-                            if (rb !== this) rb.checked = false;
-                        });
+            variants.forEach(variant => {
+                const btn = variant.querySelector('.remove-variant');
+                if (btn) {
+                    btn.style.display = showButtons ? 'block' : 'none';
+                }
+            });
+        }
+
+        function reindexVariants() {
+            const variants = document.querySelectorAll('.variant-card');
+
+            variants.forEach((variant, index) => {
+                variant.setAttribute('data-variant-index', index);
+
+                const header = variant.querySelector('.variant-header h3');
+                if (header) {
+                    header.innerHTML = `<i class="fas fa-palette"></i> Variante #${index + 1}`;
+                }
+
+                const combination = variant.querySelector('.variant-combination');
+                if (combination) {
+                    combination.id = `combination-display-${index}`;
+                }
+
+                const sizesGrid = variant.querySelector('.sizes-grid');
+                if (sizesGrid) {
+                    sizesGrid.id = `size-container-${index}`;
+                }
+
+                variant.querySelectorAll('.size-option').forEach(option => {
+                    const sizeId = option.getAttribute('data-size-id');
+                    if (!sizeId) return;
+
+                    const hiddenInputs = option.querySelectorAll('input[type="hidden"]');
+                    if (hiddenInputs.length >= 6) {
+                        hiddenInputs[0].name = `variant_size[${sizeId}][${index}]`;
+                        hiddenInputs[1].name = `variant_price[${index}][${sizeId}]`;
+                        hiddenInputs[2].name = `variant_quantity[${index}][${sizeId}]`;
+                        hiddenInputs[3].name = `variant_compare_price[${index}][${sizeId}]`;
+                        hiddenInputs[4].name = `variant_sku[${index}][${sizeId}]`;
+                        hiddenInputs[5].name = `variant_barcode[${index}][${sizeId}]`;
                     }
                 });
-            }
+
+                const skuInput = variant.querySelector('.sku-input');
+                if (skuInput) {
+                    skuInput.name = `variant_sku[${index}]`;
+                }
+
+                const barcodeInput = variant.querySelector('input[type="text"][name^="variant_barcode"]');
+                if (barcodeInput) {
+                    barcodeInput.name = `variant_barcode[${index}]`;
+                }
+
+                const radio = variant.querySelector('input[name="variant_is_default"]');
+                if (radio) {
+                    radio.value = index;
+                    radio.id = `variant_default_${index}`;
+                    const radioContainer = radio.closest('.checkbox-group');
+                    if (radioContainer) {
+                        const label = radioContainer.querySelector('label');
+                        if (label) {
+                            label.setAttribute('for', radio.id);
+                        }
+                    }
+                }
+
+                const uploadArea = variant.querySelector('.upload-area');
+                if (uploadArea) {
+                    uploadArea.id = `upload-area-${index}`;
+                    const fileInput = uploadArea.querySelector('.file-input');
+                    if (fileInput) {
+                        fileInput.name = `variant_images[${index}][]`;
+                    }
+                }
+
+                const previewContainer = variant.querySelector('.preview-container');
+                if (previewContainer) {
+                    previewContainer.id = `preview-container-${index}`;
+                }
+            });
+
+            updateRemoveButtonsVisibility();
+            updateColorSelects();
         }
+
+        function setupVariantRemoval(variantElement) {
+            const removeBtn = variantElement.querySelector('.remove-variant');
+            if (!removeBtn) return;
+
+            removeBtn.addEventListener('click', function() {
+                const totalVariants = document.querySelectorAll('.variant-card').length;
+                if (totalVariants <= 1) {
+                    showAlert('Debe existir al menos una variante', 'error');
+                    return;
+                }
+
+                if (!confirm('¿Estás seguro de eliminar esta variante?')) {
+                    return;
+                }
+
+                const radio = variantElement.querySelector('input[name="variant_is_default"]');
+                const wasDefault = radio && radio.checked;
+
+                variantElement.remove();
+                reindexVariants();
+
+                if (wasDefault) {
+                    const firstRadio = document.querySelector('.variant-card input[name="variant_is_default"]');
+                    if (firstRadio) {
+                        firstRadio.checked = true;
+                    }
+                }
+            });
+        }
+
+        function setupDefaultVariantRadio(variantElement) {
+            const radioBtn = variantElement.querySelector('input[name="variant_is_default"]');
+            if (!radioBtn) return;
+
+            radioBtn.addEventListener('change', function() {
+                if (this.checked) {
+                    document.querySelectorAll('input[name="variant_is_default"]').forEach(rb => {
+                        if (rb !== this) rb.checked = false;
+                    });
+                }
+            });
+        }
+
+        function attachVariantEvents(variantElement) {
+            setupSkuGeneration(variantElement);
+            setupCombinationDisplay(variantElement);
+            setupSizeOptions(variantElement);
+            setupVariantRemoval(variantElement);
+            setupDefaultVariantRadio(variantElement);
+        }
+
+        document.querySelectorAll('.variant-card').forEach((variant, index) => {
+            variant.setAttribute('data-variant-index', index);
+            attachVariantEvents(variant);
+            initImageUploader(index);
+        });
+        updateRemoveButtonsVisibility();
 
         function initImageUploader(index, isMain = false) {
             const uploadArea = isMain ?
@@ -618,7 +710,6 @@
             }
         }
 
-        initImageUploader(0);
         initImageUploader(null, true);
 
         // Handler for deleting existing images
