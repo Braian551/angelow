@@ -105,7 +105,6 @@ class ProductsController {
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.id
                 $whereClause
-                GROUP BY p.id
                 ORDER BY " . $orderBy . "
                 LIMIT :limit OFFSET :offset
             ";
