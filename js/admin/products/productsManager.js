@@ -201,9 +201,9 @@ class ProductsManager {
                             <i class="fas fa-edit"></i>
                             <span>Editar</span>
                         </a>
-                        <button class="btn-action btn-delete" data-id="${product.id}" title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                            <span>Eliminar</span>
+                        <button class="btn-action btn-toggle-status" data-id="${product.id}" data-status="${product.is_active}" title="${product.is_active ? 'Desactivar producto' : 'Activar producto'}">
+                            <i class="fas fa-${product.is_active ? 'eye-slash' : 'eye'}"></i>
+                            <span>${product.is_active ? 'Desactivar' : 'Activar'}</span>
                         </button>
                     </div>
                 </div>
@@ -225,11 +225,12 @@ class ProductsManager {
             });
         });
         
-        // Eliminación
-        document.querySelectorAll('.btn-delete').forEach(btn => {
+        // Toggle status (activar/desactivar)
+        document.querySelectorAll('.btn-toggle-status').forEach(btn => {
             btn.addEventListener('click', () => {
                 const productId = btn.getAttribute('data-id');
-                this.confirmDelete(productId);
+                const currentStatus = btn.getAttribute('data-status') === '1';
+                this.confirmToggleStatus(productId, currentStatus);
             });
         });
     }
@@ -468,13 +469,53 @@ class ProductsManager {
         this.elements.imageZoomModal.classList.add('active');
     }
     
-    confirmDelete(productId) {
-        if (!confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.')) {
+    confirmToggleStatus(productId, currentStatus) {
+        const action = currentStatus ? 'desactivar' : 'activar';
+        const actionText = currentStatus ? 'desactivado' : 'activado';
+        
+        if (!confirm(`¿Estás seguro de que deseas ${action} este producto? El producto será ${actionText} y ${currentStatus ? 'no aparecerá' : 'volverá a aparecer'} en la tienda.`)) {
             return;
         }
         
-        // TODO: Implementar eliminación via AJAX
-        alert('Funcionalidad de eliminación pendiente de implementar.');
+        this.toggleProductStatus(productId, !currentStatus);
+    }
+    
+    async toggleProductStatus(productId, newStatus) {
+        try {
+            const formData = new FormData();
+            formData.append('product_id', productId);
+            formData.append('action', newStatus ? 'activate' : 'deactivate');
+            
+            const response = await fetch(`${this.baseUrl}/ajax/admin/productos/toggle_product_status.php`, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Mostrar mensaje de éxito
+                if (window.showAlert) {
+                    window.showAlert(result.message, 'success');
+                } else {
+                    alert(result.message);
+                }
+                
+                // Recargar productos
+                this.loadProducts(this.currentPage);
+            } else {
+                throw new Error(result.message || 'Error desconocido');
+            }
+            
+        } catch (error) {
+            console.error('Error al cambiar estado del producto:', error);
+            if (window.showAlert) {
+                window.showAlert('Error al cambiar el estado del producto: ' + error.message, 'error');
+            } else {
+                alert('Error al cambiar el estado del producto: ' + error.message);
+            }
+        }
     }
     
     updateResultsCount(total, showing) {

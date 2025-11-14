@@ -298,4 +298,34 @@ class ProductsController {
             return ['success' => false, 'message' => 'Error al desactivar producto'];
         }
     }
+    
+    /**
+     * Activar producto
+     * @param int $productId ID del producto
+     * @return array Resultado de la operación
+     */
+    public function activateProduct($productId) {
+        try {
+            $this->db->beginTransaction();
+            
+            // Activar el producto
+            $sql = "UPDATE products SET is_active = 1 WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':id' => $productId]);
+            
+            // Activar variantes de talla
+            $sql = "UPDATE product_size_variants SET is_active = 1 WHERE color_variant_id IN (SELECT id FROM product_color_variants WHERE product_id = :id)";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':id' => $productId]);
+            
+            $this->db->commit();
+            
+            return ['success' => true, 'message' => 'Producto activado correctamente'];
+            
+        } catch (PDOException $e) {
+            $this->db->rollBack();
+            error_log("Error al activar producto: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Error al activar producto'];
+        }
+    }
 }
