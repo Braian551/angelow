@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
     let currentPage = 1;
-    let currentFilters = {};
+    // let currentFilters = {}; // Removido - ya no hay filtros
     let deleteAnnouncementId = null;
 
     const container = document.getElementById('announcements-container');
     const paginationContainer = document.getElementById('pagination-container');
     const resultsCount = document.getElementById('results-count');
-    const searchForm = document.getElementById('search-form');
+    // const searchForm = document.getElementById('search-form'); // Removido - formulario eliminado
     const deleteModal = document.getElementById('delete-modal');
     const confirmDeleteBtn = document.getElementById('confirm-delete');
 
@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadAnnouncements(page = 1) {
         currentPage = page;
         const params = new URLSearchParams({
-            page: currentPage,
-            ...currentFilters
+            page: currentPage
+            // Removidos filtros ya que no hay formulario de búsqueda
         });
 
         container.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando anuncios...</div>';
@@ -151,45 +151,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Confirmar eliminación
     window.confirmDelete = function(id) {
+        if (!deleteModal) {
+            console.warn('Delete modal is missing; cannot confirm deletion.');
+            return;
+        }
         deleteAnnouncementId = id;
         deleteModal.classList.add('active');
     };
 
     // Eliminar anuncio
-    confirmDeleteBtn.addEventListener('click', function() {
-        if (!deleteAnnouncementId) return;
+    if (confirmDeleteBtn && deleteModal) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            if (!deleteAnnouncementId) return;
 
-        const formData = new FormData();
-        formData.append('id', deleteAnnouncementId);
+            const formData = new FormData();
+            formData.append('id', deleteAnnouncementId);
 
-        fetch(`${window.BASE_URL}/admin/announcements/delete.php`, {
-            method: 'POST',
-            body: formData,
-            credentials: 'same-origin'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAlert('Anuncio eliminado exitosamente', 'success');
-                deleteModal.classList.remove('active');
-                loadAnnouncements(currentPage);
-            } else {
-                showAlert(data.message || 'Error al eliminar', 'error');
-            }
-        })
-        .catch(error => {
-            showAlert('Error al eliminar el anuncio', 'error');
+            fetch(`${window.BASE_URL}/admin/announcements/delete.php`, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Anuncio eliminado exitosamente', 'success');
+                    deleteModal.classList.remove('active');
+                    loadAnnouncements(currentPage);
+                } else {
+                    showAlert(data.message || 'Error al eliminar', 'error');
+                }
+            })
+            .catch(error => {
+                showAlert('Error al eliminar el anuncio', 'error');
+            });
         });
-    });
+    } else {
+        console.warn('Delete modal elements not found; delete actions are disabled.');
+    }
 
     // Cerrar modal
     document.querySelectorAll('.modal-close').forEach(btn => {
         btn.addEventListener('click', () => {
-            deleteModal.classList.remove('active');
+            if (deleteModal) {
+                deleteModal.classList.remove('active');
+            }
         });
     });
 
-    // Formulario de búsqueda
+    // Formulario de búsqueda - REMOVIDO porque ya no existe el formulario
+    /*
     searchForm.addEventListener('submit', function(e) {
         e.preventDefault();
         currentFilters = {
@@ -200,6 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         loadAnnouncements(1);
     });
+    */
 
     // Funciones auxiliares
     function formatDate(dateString) {

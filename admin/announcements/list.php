@@ -23,21 +23,7 @@ if (isset($_SESSION['alert'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/productsadmin.css">
-    <style>
-        .product-card h3 { font-size: 1rem; }
-        .product-stats { display: grid; grid-template-columns: repeat(2,1fr); gap: 6px; }
-        .filters-card .filter-row { flex-wrap: wrap; }
-        .type-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        .type-top_bar { background: #3498db; color: white; }
-        .type-promo_banner { background: #e74c3c; color: white; }
-    </style>
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/announcements.css">
     <script>
         window.BASE_URL = '<?= BASE_URL ?>';
     </script>
@@ -61,53 +47,11 @@ if (isset($_SESSION['alert'])) {
 
             <!-- Filtros y búsqueda -->
             <div class="card filters-card">
-                <form id="search-form">
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <input type="text" id="search-input" name="search" placeholder="Buscar anuncios por título o mensaje..." class="form-control">
-                            <button type="submit" class="btn btn-search">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-
-                        <div class="filter-group">
-                            <select name="type" id="type-filter" class="form-control">
-                                <option value="">Todos los tipos</option>
-                                <option value="top_bar">Barra Superior</option>
-                                <option value="promo_banner">Banner Promocional</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <select name="status" id="status-filter" class="form-control">
-                                <option value="">Todos los estados</option>
-                                <option value="active">Activos</option>
-                                <option value="inactive">Inactivos</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <select name="order" id="order-filter" class="form-control">
-                                <option value="priority">Prioridad</option>
-                                <option value="newest">Más recientes</option>
-                                <option value="title_asc">Título (A-Z)</option>
-                                <option value="title_desc">Título (Z-A)</option>
-                            </select>
-                        </div>
-
-                        <div class="filcen">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-filter"></i> Filtrar
-                            </button>
-                            <a href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" class="btn btn-secondary">
-                                <i class="fas fa-sync-alt"></i> Limpiar
-                            </a>
-                            <a href="<?= BASE_URL ?>/admin/announcements/add.php" class="btn btn-success" id="add-announcement-btn">
-                                <i class="fas fa-plus"></i> Agregar anuncio
-                            </a>
-                        </div>
-                    </div>
-                </form>
+                <div class="filcen">
+                    <a href="<?= BASE_URL ?>/admin/announcements/add.php" class="btn btn-success" id="add-announcement-btn">
+                        <i class="fas fa-plus"></i> Agregar anuncio
+                    </a>
+                </div>
             </div>
 
             <div class="results-summary">
