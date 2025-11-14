@@ -12,6 +12,8 @@ conexionservidor.php
 config.php
 config3.php
 auth/google_auth.php
+#microservicios
+angelow/
 
 # Database
 *.sql
