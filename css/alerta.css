@@ -105,9 +105,11 @@
 }
 
 .alert-button.outline:hover {
-    background-color: var(--bg-dark);
-    color: var(--primary-dark);
-    border-color: var(--primary-light);
+    background-color: var(--primary-dark);
+    color: white;
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
 }
 
 .alert-close {
