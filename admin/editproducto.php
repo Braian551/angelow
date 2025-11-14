@@ -541,8 +541,8 @@ if (isset($_SESSION['alert'])) {
                                                     }
                                                     ?>
                                                     <?php foreach ($sizes as $size): ?>
-                                                        <div class="size-option" data-size-id="<?= $size['id'] ?>">
-                                                            <input type="hidden" name="variant_size[<?= $size['id'] ?>][<?= $index ?>]" value="<?= isset($size_data[$size['id']]) ? '1' : '' ?>">
+                                                        <div class="size-option <?= isset($size_data[$size['id']]) ? 'selected' : '' ?>" data-size-id="<?= $size['id'] ?>">
+                                                            <input type="hidden" name="variant_size[<?= $size['id'] ?>][<?= $index ?>]" value="<?= isset($size_data[$size['id']]) ? $size['id'] : '' ?>">
                                                             <input type="hidden" name="variant_price[<?= $index ?>][<?= $size['id'] ?>]" value="<?= isset($size_data[$size['id']]) ? $size_data[$size['id']]['price'] : '' ?>">
                                                             <input type="hidden" name="variant_quantity[<?= $index ?>][<?= $size['id'] ?>]" value="<?= isset($size_data[$size['id']]) ? $size_data[$size['id']]['quantity'] : '' ?>">
                                                             <input type="hidden" name="variant_compare_price[<?= $index ?>][<?= $size['id'] ?>]" value="<?= isset($size_data[$size['id']]) ? $size_data[$size['id']]['compare_price'] : '' ?>">
