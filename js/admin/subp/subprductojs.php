@@ -621,6 +621,27 @@
         initImageUploader(0);
         initImageUploader(null, true);
 
+        // Handler for deleting existing images
+        document.querySelectorAll('.existing-image .remove-image').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const preview = this.closest('.image-preview');
+                const imageId = preview.getAttribute('data-image-id');
+                const isMain = preview.closest('#main-preview-container') !== null;
+                const inputName = isMain ? 'delete_main_images[]' : 'delete_variant_images[]';
+
+                let deleteInput = document.querySelector(`input[name="${inputName}"][value="${imageId}"]`);
+                if (!deleteInput) {
+                    deleteInput = document.createElement('input');
+                    deleteInput.type = 'hidden';
+                    deleteInput.name = inputName;
+                    deleteInput.value = imageId;
+                    document.getElementById('product-form').appendChild(deleteInput);
+                }
+                preview.remove();
+            });
+        });
+
         document.getElementById('product-form').addEventListener('submit', function(e) {
             document.querySelectorAll('.price-input').forEach(input => {
                 input.value = parsePesosColombianos(input.value);

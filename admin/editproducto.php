@@ -121,6 +121,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $conn->beginTransaction();
 
+        // Handle deletions
+        if (!empty($_POST['delete_main_images'])) {
+            foreach ($_POST['delete_main_images'] as $image_id) {
+                $stmt = $conn->prepare("SELECT image_path FROM product_images WHERE id = ? AND product_id = ?");
+                $stmt->execute([$image_id, $product_id]);
+                $img = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($img) {
+                    $file_path = __DIR__ . '/../' . $img['image_path'];
+                    if (file_exists($file_path)) {
+                        unlink($file_path);
+                    }
+                    $conn->prepare("DELETE FROM product_images WHERE id = ?")->execute([$image_id]);
+                }
+            }
+        }
+
+        if (!empty($_POST['delete_variant_images'])) {
+            foreach ($_POST['delete_variant_images'] as $image_id) {
+                $stmt = $conn->prepare("SELECT image_path FROM variant_images WHERE id = ?");
+                $stmt->execute([$image_id]);
+                $img = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($img) {
+                    $file_path = __DIR__ . '/../' . $img['image_path'];
+                    if (file_exists($file_path)) {
+                        unlink($file_path);
+                    }
+                    $conn->prepare("DELETE FROM variant_images WHERE id = ?")->execute([$image_id]);
+                }
+            }
+        }
+
         // Validaciones básicas
         if (empty($_POST['name'])) {
             throw new Exception("El nombre del producto es requerido");
@@ -456,8 +487,11 @@ if (isset($_SESSION['alert'])) {
                                     <div class="preview-container" id="main-preview-container">
                                         <?php if (!empty($main_images)): ?>
                                             <?php foreach ($main_images as $image): ?>
-                                                <div class="image-preview">
+                                                <div class="image-preview existing-image" data-image-id="<?= $image['id'] ?>">
                                                     <img src="<?= BASE_URL ?>/<?= $image['image_path'] ?>" alt="<?= htmlspecialchars($image['alt_text']) ?>">
+                                                    <button type="button" class="remove-image" title="Eliminar imagen">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
                                                 </div>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
@@ -596,8 +630,11 @@ if (isset($_SESSION['alert'])) {
                                                         }
                                                         ?>
                                                         <?php foreach ($variant_images as $image): ?>
-                                                            <div class="image-preview">
+                                                            <div class="image-preview existing-image" data-image-id="<?= $image['id'] ?>">
                                                                 <img src="<?= BASE_URL ?>/<?= $image['image_path'] ?>" alt="<?= htmlspecialchars($image['alt_text']) ?>">
+                                                                <button type="button" class="remove-image" title="Eliminar imagen">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
