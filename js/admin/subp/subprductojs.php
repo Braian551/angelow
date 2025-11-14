@@ -58,16 +58,29 @@
                 basePrice = parsePesosColombianos(basePriceInput.value);
             }
 
-            modalPrice.value = basePrice ? formatPesosColombianos(basePrice) : '';
-            modalQuantity.value = '';
-            modalComparePrice.value = '';
-            modalBarcode.value = '';
+            // Check if size is already selected
+            const isSelected = sizeOption.classList.contains('selected');
+            if (isSelected) {
+                // Load existing values
+                const hiddenInputs = sizeOption.querySelectorAll('input[type="hidden"]');
+                modalPrice.value = hiddenInputs[1].value ? formatPesosColombianos(hiddenInputs[1].value) : formatPesosColombianos(basePrice);
+                modalQuantity.value = hiddenInputs[2].value || '';
+                modalComparePrice.value = hiddenInputs[3].value ? formatPesosColombianos(hiddenInputs[3].value) : '';
+                modalSku.value = hiddenInputs[4].value || '';
+                modalBarcode.value = hiddenInputs[5].value || '';
+            } else {
+                // Set defaults
+                modalPrice.value = basePrice ? formatPesosColombianos(basePrice) : '';
+                modalQuantity.value = '';
+                modalComparePrice.value = '';
+                modalBarcode.value = '';
 
-            const productName = document.getElementById('name').value;
-            const colorSelect = sizeOption.closest('.variant-card').querySelector('.color-select');
-            const colorId = colorSelect.value;
+                const productName = document.getElementById('name').value;
+                const colorSelect = sizeOption.closest('.variant-card').querySelector('.color-select');
+                const colorId = colorSelect.value;
 
-            modalSku.value = generarSKU(productName, colorId, sizeId);
+                modalSku.value = generarSKU(productName, colorId, sizeId);
+            }
 
             modal.style.display = 'block';
 
@@ -318,10 +331,6 @@
             sizeOptions.forEach(option => {
                 option.addEventListener('click', function() {
                     const sizeId = this.getAttribute('data-size-id');
-
-                    if (this.classList.contains('selected')) {
-                        return;
-                    }
 
                     showSizeModal(this, variantIndex, sizeId);
                 });
