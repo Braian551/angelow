@@ -19,14 +19,8 @@ class ProductsManager {
             clearSearchBtn: document.getElementById('clear-search'),
             filterForm: document.getElementById('search-form'),
             quickViewModal: document.getElementById('quick-view-modal'),
-            imageZoomModal: document.getElementById('image-zoom-modal'),
-            confirmationModal: document.getElementById('confirmation-modal'),
-            confirmationMessage: document.getElementById('confirmation-message'),
-            confirmActionBtn: document.getElementById('confirm-action'),
-            cancelConfirmationBtn: document.getElementById('cancel-confirmation')
+            imageZoomModal: document.getElementById('image-zoom-modal')
         };
-        
-        this.pendingAction = null;
         
         this.init();
     }
@@ -78,23 +72,6 @@ class ProductsManager {
             });
         });
         
-        // Modal de confirmación
-        if (this.elements.cancelConfirmationBtn) {
-            this.elements.cancelConfirmationBtn.addEventListener('click', () => {
-                this.elements.confirmationModal.classList.remove('active');
-                this.pendingAction = null;
-            });
-        }
-        
-        if (this.elements.confirmActionBtn) {
-            this.elements.confirmActionBtn.addEventListener('click', () => {
-                this.elements.confirmationModal.classList.remove('active');
-                if (this.pendingAction) {
-                    this.pendingAction();
-                    this.pendingAction = null;
-                }
-            });
-        }
     }
     
     async loadProducts(page = 1) {
@@ -497,10 +474,22 @@ class ProductsManager {
         const confirmMessage = currentStatus 
             ? '¿Estás seguro de que deseas desactivar este producto? El producto será desactivado y no aparecerá en la tienda.'
             : '¿Estás seguro de que deseas activar este producto? El producto será activado y volverá a aparecer en la tienda.';
-        
-        this.elements.confirmationMessage.textContent = confirmMessage;
-        this.pendingAction = () => this.toggleProductStatus(productId, !currentStatus);
-        this.elements.confirmationModal.classList.add('active');
+
+        if (typeof window.openConfirmationModal === 'function') {
+            window.openConfirmationModal({
+                message: confirmMessage,
+                title: currentStatus ? 'Desactivar producto' : 'Activar producto',
+                confirmText: currentStatus ? 'Desactivar' : 'Activar',
+                cancelText: 'Cancelar',
+                type: currentStatus ? 'warning' : 'success',
+                onConfirm: () => this.toggleProductStatus(productId, !currentStatus)
+            });
+            return;
+        }
+
+        if (confirm(confirmMessage)) {
+            this.toggleProductStatus(productId, !currentStatus);
+        }
     }
     
     async toggleProductStatus(productId, newStatus) {

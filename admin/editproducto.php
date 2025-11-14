@@ -394,6 +394,7 @@ if (isset($_SESSION['alert'])) {
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/orders/orders.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/subproducto.css">
 </head>
 <body>
@@ -584,9 +585,9 @@ if (isset($_SESSION['alert'])) {
                                                             <input type="hidden" name="variant_barcode[<?= $index ?>][<?= $size['id'] ?>]" value="<?= isset($size_data[$size['id']]) ? $size_data[$size['id']]['barcode'] : '' ?>">
 
                                                             <div class="size-label"><?= htmlspecialchars($size['name']) ?></div>
-                                                            <div class="size-details" style="display: <?= isset($size_data[$size['id']]) ? 'block' : 'none' ?>;">
-                                                                <span class="price">€<?= isset($size_data[$size['id']]) ? number_format($size_data[$size['id']]['price'], 2) : '' ?></span>
-                                                                <span class="quantity">Stock: <?= isset($size_data[$size['id']]) ? $size_data[$size['id']]['quantity'] : '' ?></span>
+                                                            <div class="size-details">
+                                                                <span class="price"><?= isset($size_data[$size['id']]) ? number_format($size_data[$size['id']]['price'], 0, '', '.') : '' ?></span>
+                                                                <span class="quantity"><?= isset($size_data[$size['id']]) ? $size_data[$size['id']]['quantity'] : '' ?></span>
                                                             </div>
                                                         </div>
                                                     <?php endforeach; ?>
@@ -665,8 +666,10 @@ if (isset($_SESSION['alert'])) {
         </main>
     </div>
 
+    <?php require_once __DIR__ . '/../alertas/confirmation_modal.php'; ?>
     <script src="<?= BASE_URL ?>/js/dashboardadmin.js"></script>
     <script src="<?= BASE_URL ?>/js/alerta.js"></script>
+    <script src="<?= BASE_URL ?>/js/components/confirmationModal.js"></script>
     <?php require_once __DIR__ . '/../js/admin/subp/subprductojs.php' ?>
 </body>
 </html>

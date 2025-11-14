@@ -1,14 +1,22 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Incluir el modal al DOM
-        const sizeModal = document.createElement('div');
-        sizeModal.innerHTML = `<?php include __DIR__ . '/../../../admin/modals/sub/size_modal.php'; ?>`;
-        document.body.appendChild(sizeModal);
+        const sizeModalWrapper = document.createElement('div');
+        sizeModalWrapper.innerHTML = `<?php include __DIR__ . '/../../../admin/modals/sub/size_modal.php'; ?>`;
+        document.body.appendChild(sizeModalWrapper);
 
-        // Variables para el modal
-        let currentSizeOption = null;
-        let currentVariantIndex = null;
-        let currentSizeId = null;
+        const sizeModal = document.getElementById('size-modal');
+        const modalPrice = document.getElementById('modal-price');
+        const modalQuantity = document.getElementById('modal-quantity');
+        const modalComparePrice = document.getElementById('modal-compare-price');
+        const modalSku = document.getElementById('modal-sku');
+        const modalBarcode = document.getElementById('modal-barcode');
+        const modalSaveButton = document.querySelector('#size-modal .save-size');
+        const modalCloseTriggers = document.querySelectorAll('#size-modal [data-size-modal-close]');
+
+        let activeSizeOption = null;
+        let activeVariantIndex = null;
+        let activeSizeId = null;
 
         function formatPesosColombianos(number) {
             if (number === null || number === undefined || number === '') return '0';
@@ -44,107 +52,154 @@
 
         initializePriceInputs();
 
-        function showSizeModal(sizeOption, variantIndex, sizeId) {
-            const modal = document.getElementById('size-modal');
-            const modalPrice = document.getElementById('modal-price');
-            const modalQuantity = document.getElementById('modal-quantity');
-            const modalComparePrice = document.getElementById('modal-compare-price');
-            const modalSku = document.getElementById('modal-sku');
-            const modalBarcode = document.getElementById('modal-barcode');
+        function closeSizeModal() {
+            if (!sizeModal) return;
+            sizeModal.classList.remove('open');
+            sizeModal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('modal-open');
+            activeSizeOption = null;
+            activeVariantIndex = null;
+            activeSizeId = null;
+        }
+
+        if (modalCloseTriggers.length) {
+            modalCloseTriggers.forEach(trigger => {
+                trigger.addEventListener('click', closeSizeModal);
+            });
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && sizeModal && sizeModal.classList.contains('open')) {
+                closeSizeModal();
+            }
+        });
+
+        function openSizeModal(sizeOption, variantIndex, sizeId) {
+            if (!sizeModal || !sizeOption) return;
+
+            activeSizeOption = sizeOption;
+            activeVariantIndex = variantIndex;
+            activeSizeId = sizeId;
 
             const basePriceInput = document.getElementById('price');
-            let basePrice = 0;
-            if (basePriceInput && basePriceInput.value) {
-                basePrice = parsePesosColombianos(basePriceInput.value);
-            }
+            const basePrice = basePriceInput && basePriceInput.value ? parsePesosColombianos(basePriceInput.value) : 0;
 
-            // Check if size is already selected
-            const isSelected = sizeOption.classList.contains('selected');
+            const hiddenInputs = sizeOption.querySelectorAll('input[type="hidden"]');
+            const isSelected = sizeOption.classList.contains('selected') && hiddenInputs.length >= 6;
+
             if (isSelected) {
-                // Load existing values
-                const hiddenInputs = sizeOption.querySelectorAll('input[type="hidden"]');
                 modalPrice.value = hiddenInputs[1].value ? formatPesosColombianos(hiddenInputs[1].value) : formatPesosColombianos(basePrice);
                 modalQuantity.value = hiddenInputs[2].value || '';
                 modalComparePrice.value = hiddenInputs[3].value ? formatPesosColombianos(hiddenInputs[3].value) : '';
                 modalSku.value = hiddenInputs[4].value || '';
                 modalBarcode.value = hiddenInputs[5].value || '';
             } else {
-                // Set defaults
                 modalPrice.value = basePrice ? formatPesosColombianos(basePrice) : '';
                 modalQuantity.value = '';
                 modalComparePrice.value = '';
                 modalBarcode.value = '';
 
-                const productName = document.getElementById('name').value;
-                const colorSelect = sizeOption.closest('.variant-card').querySelector('.color-select');
-                const colorId = colorSelect.value;
+                const nameInput = document.getElementById('name');
+                const productName = nameInput ? nameInput.value : '';
+                const variantCard = sizeOption.closest('.variant-card');
+                const colorSelect = variantCard ? variantCard.querySelector('.color-select') : null;
+                const colorId = colorSelect ? colorSelect.value : null;
 
                 modalSku.value = generarSKU(productName, colorId, sizeId);
             }
 
-            modal.style.display = 'block';
+            sizeModal.classList.add('open');
+            sizeModal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+            modalPrice?.focus();
+        }
 
-            const closeButtons = modal.querySelectorAll('.close-modal');
-            closeButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    modal.style.display = 'none';
-                });
+        function handleSaveSize() {
+            if (!activeSizeOption || activeVariantIndex === null || !activeSizeId) {
+                closeSizeModal();
+                return;
+            }
+
+            if (!modalPrice.value || !modalQuantity.value) {
+                showAlert('Debes ingresar precio y cantidad', 'error');
+                return;
+            }
+
+            const priceValue = parsePesosColombianos(modalPrice.value);
+            const comparePriceValue = modalComparePrice.value ? parsePesosColombianos(modalComparePrice.value) : null;
+
+            const hiddenInputs = activeSizeOption.querySelectorAll('input[type="hidden"]');
+            if (hiddenInputs.length < 6) {
+                closeSizeModal();
+                return;
+            }
+
+            hiddenInputs[0].name = `variant_size[${activeSizeId}][${activeVariantIndex}]`;
+            hiddenInputs[0].value = activeSizeId;
+            hiddenInputs[1].name = `variant_price[${activeVariantIndex}][${activeSizeId}]`;
+            hiddenInputs[1].value = priceValue;
+            hiddenInputs[2].name = `variant_quantity[${activeVariantIndex}][${activeSizeId}]`;
+            hiddenInputs[2].value = modalQuantity.value;
+            hiddenInputs[3].name = `variant_compare_price[${activeVariantIndex}][${activeSizeId}]`;
+            hiddenInputs[3].value = comparePriceValue ?? '';
+            hiddenInputs[4].name = `variant_sku[${activeVariantIndex}][${activeSizeId}]`;
+            hiddenInputs[4].value = modalSku.value;
+            hiddenInputs[5].name = `variant_barcode[${activeVariantIndex}][${activeSizeId}]`;
+            hiddenInputs[5].value = modalBarcode.value;
+
+            const sizeDetails = activeSizeOption.querySelector('.size-details');
+            if (sizeDetails) {
+                sizeDetails.style.display = 'flex';
+                const priceLabel = sizeDetails.querySelector('.price');
+                const quantityLabel = sizeDetails.querySelector('.quantity');
+                if (priceLabel) priceLabel.textContent = formatPesosColombianos(priceValue);
+                if (quantityLabel) quantityLabel.textContent = modalQuantity.value;
+            }
+
+            activeSizeOption.classList.add('selected');
+            updateCombinationDisplay(activeSizeOption.closest('.variant-card'));
+
+            closeSizeModal();
+        }
+
+        if (modalSaveButton) {
+            modalSaveButton.addEventListener('click', handleSaveSize);
+        }
+
+        function attachCurrencyFormatter(input) {
+            if (!input) return;
+            input.addEventListener('input', function(e) {
+                const value = e.target.value.replace(/\./g, '');
+                if (!isNaN(value) || value === '') {
+                    e.target.value = formatPesosColombianos(value);
+                }
             });
+        }
 
-            const saveBtn = modal.querySelector('.save-size');
-            saveBtn.onclick = function() {
-                if (!modalPrice.value || !modalQuantity.value) {
-                    showAlert('Debes ingresar precio y cantidad', 'error');
+        attachCurrencyFormatter(modalPrice);
+        attachCurrencyFormatter(modalComparePrice);
+
+        const variantsContainer = document.getElementById('variants-container');
+        if (variantsContainer) {
+            variantsContainer.addEventListener('click', function(event) {
+                const sizeOption = event.target.closest('.size-option');
+                if (!sizeOption || !variantsContainer.contains(sizeOption)) {
                     return;
                 }
 
-                const priceValue = parsePesosColombianos(modalPrice.value);
-                const comparePriceValue = modalComparePrice.value ? parsePesosColombianos(modalComparePrice.value) : null;
-
-                const hiddenInputs = sizeOption.querySelectorAll('input[type="hidden"]');
-                
-                // Actualizar los nombres y valores de los inputs ocultos
-                hiddenInputs[0].name = `variant_size[${sizeId}][${variantIndex}]`;
-                hiddenInputs[0].value = sizeId;
-                hiddenInputs[1].name = `variant_price[${variantIndex}][${sizeId}]`;
-                hiddenInputs[1].value = priceValue;
-                hiddenInputs[2].name = `variant_quantity[${variantIndex}][${sizeId}]`;
-                hiddenInputs[2].value = modalQuantity.value;
-                hiddenInputs[3].name = `variant_compare_price[${variantIndex}][${sizeId}]`;
-                hiddenInputs[3].value = comparePriceValue;
-                hiddenInputs[4].name = `variant_sku[${variantIndex}][${sizeId}]`;
-                hiddenInputs[4].value = modalSku.value;
-                hiddenInputs[5].name = `variant_barcode[${variantIndex}][${sizeId}]`;
-                hiddenInputs[5].value = modalBarcode.value;
-
-                const sizeDetails = sizeOption.querySelector('.size-details');
-                if (sizeDetails) {
-                    sizeDetails.querySelector('.price').textContent = formatPesosColombianos(priceValue);
-                    sizeDetails.querySelector('.quantity').textContent = modalQuantity.value;
+                const variantCard = sizeOption.closest('.variant-card');
+                if (!variantCard) {
+                    return;
                 }
 
-                sizeOption.classList.add('selected');
-                modal.style.display = 'none';
-
-                updateCombinationDisplay(sizeOption.closest('.variant-card'));
-            };
-
-            modal.querySelector('.modal-overlay').addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-
-            modalPrice.addEventListener('input', function(e) {
-                const value = e.target.value.replace(/\./g, '');
-                if (!isNaN(value) || value === '') {
-                    e.target.value = formatPesosColombianos(value);
+                const variantIndex = variantCard.getAttribute('data-variant-index');
+                const sizeId = sizeOption.getAttribute('data-size-id');
+                if (!sizeId) {
+                    return;
                 }
-            });
 
-            modalComparePrice.addEventListener('input', function(e) {
-                const value = e.target.value.replace(/\./g, '');
-                if (!isNaN(value) || value === '') {
-                    e.target.value = formatPesosColombianos(value);
-                }
+                event.preventDefault();
+                openSizeModal(sizeOption, variantIndex, sizeId);
             });
         }
 
@@ -236,7 +291,7 @@
                                     <input type="hidden" name="variant_barcode[${newIndex}][<?= $size['id'] ?>]" value="">
                                     
                                     <div class="size-label"><?= htmlspecialchars($size['name']) ?></div>
-                                    <div class="size-details" style="display: none;">
+                                    <div class="size-details">
                                         <span class="price"></span>
                                         <span class="quantity"></span>
                                     </div>
@@ -284,20 +339,6 @@
             initImageUploader(newIndex);
             reindexVariants();
         });
-
-        function setupSizeOptions(variantElement) {
-            const sizeOptions = variantElement.querySelectorAll('.size-option');
-
-            sizeOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    const sizeId = this.getAttribute('data-size-id');
-
-                    const currentVariantIndex = variantElement.getAttribute('data-variant-index');
-
-                    showSizeModal(this, currentVariantIndex, sizeId);
-                });
-            });
-        }
 
         function setupSkuGeneration(variantElement) {
             const productNameInput = document.getElementById('name');
@@ -498,21 +539,35 @@
                     return;
                 }
 
-                if (!confirm('¿Estás seguro de eliminar esta variante?')) {
+                const removeVariant = () => {
+                    const radio = variantElement.querySelector('input[name="variant_is_default"]');
+                    const wasDefault = radio && radio.checked;
+
+                    variantElement.remove();
+                    reindexVariants();
+
+                    if (wasDefault) {
+                        const firstRadio = document.querySelector('.variant-card input[name="variant_is_default"]');
+                        if (firstRadio) {
+                            firstRadio.checked = true;
+                        }
+                    }
+                };
+
+                if (typeof window.openConfirmationModal === 'function') {
+                    window.openConfirmationModal({
+                        message: 'Esta variante y sus tallas asociadas se eliminarán definitivamente.',
+                        title: 'Eliminar variante',
+                        confirmText: 'Eliminar',
+                        cancelText: 'Cancelar',
+                        type: 'warning',
+                        onConfirm: removeVariant
+                    });
                     return;
                 }
 
-                const radio = variantElement.querySelector('input[name="variant_is_default"]');
-                const wasDefault = radio && radio.checked;
-
-                variantElement.remove();
-                reindexVariants();
-
-                if (wasDefault) {
-                    const firstRadio = document.querySelector('.variant-card input[name="variant_is_default"]');
-                    if (firstRadio) {
-                        firstRadio.checked = true;
-                    }
+                if (confirm('¿Estás seguro de eliminar esta variante?')) {
+                    removeVariant();
                 }
             });
         }
@@ -533,7 +588,6 @@
         function attachVariantEvents(variantElement) {
             setupSkuGeneration(variantElement);
             setupCombinationDisplay(variantElement);
-            setupSizeOptions(variantElement);
             setupVariantRemoval(variantElement);
             setupDefaultVariantRadio(variantElement);
         }
