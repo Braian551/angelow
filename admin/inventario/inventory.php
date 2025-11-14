@@ -106,6 +106,7 @@ $lowStockItems = getLowStockItems($conn, 5); // Umbral de bajo stock
 $stockHistory = $product_id ? getStockHistory($conn, $product_id) : [];
 $productDetails = $product_id ? getProductDetails($conn, $product_id) : null;
 $productVariants = $product_id ? getProductVariantsWithStock($conn, $product_id) : [];
+$totalInventoryUnits = array_sum(array_column($products, 'total_stock'));
 
 // Mostrar alerta almacenada en sesión si existe
 if (isset($_SESSION['alert'])) {
@@ -124,6 +125,7 @@ if (isset($_SESSION['alert'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Inventario - Panel de Administración</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/style-admin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/inventario/inventory.css">
@@ -251,13 +253,50 @@ if (isset($_SESSION['alert'])) {
                     </div>
                 <?php else: ?>
                     <!-- Vista general del inventario -->
+                    <div class="card filters-card">
+                        <div class="filters-header">
+                            <div class="filters-title">
+                                <i class="fas fa-sliders-h"></i>
+                                <h3>Búsqueda de inventario</h3>
+                            </div>
+                        </div>
+                        <form id="inventory-search-form" class="filters-form">
+                            <div class="search-bar">
+                                <div class="search-input-wrapper">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" placeholder="Buscar por producto, categoría o estado" id="search-inventory" name="search" class="search-input" autocomplete="off">
+                                    <button type="button" class="search-clear" id="clear-inventory-search" style="display: none;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <button type="submit" class="search-submit-btn">
+                                    <i class="fas fa-search"></i>
+                                    <span>Buscar</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="results-summary">
+                        <div class="results-info">
+                            <i class="fas fa-clipboard-list"></i>
+                            <p><?= count($products) ?> productos monitoreados • <?= $totalInventoryUnits ?> unidades totales</p>
+                        </div>
+                        <div class="quick-actions">
+                            <a href="<?= BASE_URL ?>/admin/products.php" class="btn-action btn-export">
+                                <i class="fas fa-box-open"></i>
+                                <span>Ver productos</span>
+                            </a>
+                            <a href="<?= BASE_URL ?>/admin/subproducto.php" class="btn-action btn-bulk">
+                                <i class="fas fa-plus"></i>
+                                <span>Nuevo producto</span>
+                            </a>
+                        </div>
+                    </div>
+
                     <div class="card">
                         <div class="card-header">
                             <h3>Resumen de Inventario</h3>
-                            <div class="search-box2">
-                                <input type="text" placeholder="Buscar productos..." id="search-inventory">
-                                <button><i class="fas fa-search"></i></button>
-                            </div>
                         </div>
                         <div class="card-body">
                             <div class="inventory-stats">
@@ -287,7 +326,7 @@ if (isset($_SESSION['alert'])) {
                                     </div>
                                     <div class="stat-info">
                                         <h3>Stock total</h3>
-                                        <span class="stat-value"><?= array_sum(array_column($products, 'total_stock')) ?></span>
+                                        <span class="stat-value"><?= $totalInventoryUnits ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -496,6 +535,8 @@ if (isset($_SESSION['alert'])) {
      document.addEventListener('DOMContentLoaded', function() {
     // Buscador de inventario - Versión corregida
     const searchInput = document.getElementById('search-inventory');
+    const searchForm = document.getElementById('inventory-search-form');
+    const clearSearchBtn = document.getElementById('clear-inventory-search');
     const tableBody = document.getElementById('inventory-table-body');
     const noResults = document.getElementById('no-results');
     
@@ -504,6 +545,10 @@ if (isset($_SESSION['alert'])) {
             const searchTerm = this.value.toLowerCase().trim();
             const rows = tableBody.querySelectorAll('tr');
             let hasVisibleRows = false;
+            
+            if (clearSearchBtn) {
+                clearSearchBtn.style.display = searchTerm.length ? 'inline-flex' : 'none';
+            }
             
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
@@ -533,6 +578,22 @@ if (isset($_SESSION['alert'])) {
                 noResults.style.display = 'none';
             }
         });
+
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                searchInput.dispatchEvent(new Event('input'));
+            });
+        }
+
+        if (clearSearchBtn) {
+            clearSearchBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                this.style.display = 'none';
+                searchInput.dispatchEvent(new Event('input'));
+                searchInput.focus();
+            });
+        }
     }
             // Tabs
             document.querySelectorAll('.tab-btn').forEach(btn => {

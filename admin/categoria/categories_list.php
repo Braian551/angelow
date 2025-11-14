@@ -465,8 +465,8 @@ if (isset($_SESSION['alert'])) {
                         </a>
                         <?php if ($categoria['product_count'] == 0): ?>
                             <a href="categories_list.php?action=delete&id=<?= $categoria['id'] ?>" 
-                               class="btn btn-sm btn-delete" title="Eliminar" 
-                               onclick="return confirm('¿Estás seguro de eliminar esta categoría?')">
+                               class="btn btn-sm btn-delete js-category-delete" 
+                               data-category-name="<?= htmlspecialchars($categoria['name']) ?>" title="Eliminar">
                                 <i class="fas fa-trash"></i>
                             </a>
                         <?php endif; ?>
@@ -492,10 +492,47 @@ if (isset($_SESSION['alert'])) {
         </main>
     </div>
 
+    <?php require_once __DIR__ . '/../../alertas/confirmation_modal.php'; ?>
+
     <script src="<?= BASE_URL ?>/js/dashboardadmin.js"></script>
     <script src="<?= BASE_URL ?>/js/alerta.js"></script>
+    <script src="<?= BASE_URL ?>/js/components/confirmationModal.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const escapeHtml = (value = '') => value.replace(/[&<>"']/g, (char) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[char] || char));
+        const confirmationAvailable = typeof window.openConfirmationModal === 'function';
+
+        // Confirmación para eliminar categorías
+        document.querySelectorAll('.js-category-delete').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const deleteUrl = this.getAttribute('href');
+                const categoryName = this.dataset.categoryName || 'esta categoría';
+                const message = `¿Estás seguro de eliminar la categoría <strong>${escapeHtml(categoryName)}</strong>?`;
+
+                if (confirmationAvailable) {
+                    window.openConfirmationModal({
+                        title: 'Eliminar categoría',
+                        message,
+                        confirmText: 'Eliminar',
+                        cancelText: 'Cancelar',
+                        type: 'warning',
+                        onConfirm: () => {
+                            window.location.href = deleteUrl;
+                        }
+                    });
+                } else if (confirm(`¿Estás seguro de eliminar la categoría ${categoryName}?`)) {
+                    window.location.href = deleteUrl;
+                }
+            });
+        });
+
         // Buscador de categorías
         const searchInput = document.getElementById('search-categories');
         if (searchInput) {
@@ -556,9 +593,8 @@ if (isset($_SESSION['alert'])) {
         if (removeImageBtn) {
             removeImageBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                if (confirm('¿Estás seguro de eliminar esta imagen?')) {
-                    const categoryId = this.dataset.id;
-                    
+                const categoryId = this.dataset.id;
+                const handleRemoval = () => {
                     fetch(`categories_list.php?action=remove-image&id=${categoryId}`)
                         .then(response => response.json())
                         .then(data => {
@@ -567,7 +603,10 @@ if (isset($_SESSION['alert'])) {
                                 if (container) {
                                     container.remove();
                                 }
-                                document.getElementById('image').value = '';
+                                const imageField = document.getElementById('image');
+                                if (imageField) {
+                                    imageField.value = '';
+                                }
                                 showAlert('Imagen eliminada correctamente', 'success');
                             } else {
                                 showAlert('Error al eliminar la imagen', 'error');
@@ -577,6 +616,19 @@ if (isset($_SESSION['alert'])) {
                             console.error('Error:', error);
                             showAlert('Error al eliminar la imagen', 'error');
                         });
+                };
+
+                if (confirmationAvailable) {
+                    window.openConfirmationModal({
+                        title: 'Eliminar imagen',
+                        message: '¿Deseas eliminar la imagen asociada a esta categoría?',
+                        confirmText: 'Eliminar',
+                        cancelText: 'Cancelar',
+                        type: 'warning',
+                        onConfirm: handleRemoval
+                    });
+                } else if (confirm('¿Estás seguro de eliminar esta imagen?')) {
+                    handleRemoval();
                 }
             });
         }

@@ -1,17 +1,17 @@
 <?php
 // Obtener productos con información de inventario
 function getProductsWithInventory($conn) {
-    $sql = "SELECT p.id, p.name, p.is_active, 
-                   c.name AS category_name,
-                   COUNT(DISTINCT pcv.id) AS variant_count,
-                   SUM(psv.quantity) AS total_stock,
-                   SUM(CASE WHEN psv.quantity <= 5 THEN 1 ELSE 0 END) AS low_stock_count
-            FROM products p
-            JOIN categories c ON p.category_id = c.id
-            LEFT JOIN product_color_variants pcv ON p.id = pcv.product_id
-            LEFT JOIN product_size_variants psv ON pcv.id = psv.color_variant_id
-            GROUP BY p.id
-            ORDER BY p.name";
+        $sql = "SELECT p.id, p.name, p.is_active, 
+                 c.name AS category_name,
+                 COUNT(DISTINCT pcv.id) AS variant_count,
+                 COALESCE(SUM(psv.quantity), 0) AS total_stock,
+                 COALESCE(SUM(CASE WHEN psv.quantity <= 5 THEN 1 ELSE 0 END), 0) AS low_stock_count
+             FROM products p
+             JOIN categories c ON p.category_id = c.id
+             LEFT JOIN product_color_variants pcv ON p.id = pcv.product_id
+             LEFT JOIN product_size_variants psv ON pcv.id = psv.color_variant_id
+             GROUP BY p.id, p.name, p.is_active, c.name
+             ORDER BY p.name";
     
     $stmt = $conn->prepare($sql);
     $stmt->execute();

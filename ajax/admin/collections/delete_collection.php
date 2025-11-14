@@ -38,17 +38,17 @@ try {
         throw new Exception('Colección no encontrada');
     }
     
-    // Verificar si hay productos asociados
-    $productCheckSql = "SELECT COUNT(*) as count FROM product_collections WHERE collection_id = ?";
-    $productCheckStmt = $conn->prepare($productCheckSql);
-    $productCheckStmt->execute([$collectionId]);
-    $productCount = $productCheckStmt->fetch(PDO::FETCH_ASSOC)['count'];
-    
-    // Eliminar asociaciones de productos
-    if ($productCount > 0) {
-        $deleteAssocSql = "DELETE FROM product_collections WHERE collection_id = ?";
-        $deleteAssocStmt = $conn->prepare($deleteAssocSql);
-        $deleteAssocStmt->execute([$collectionId]);
+    // Verificar si hay productos asociados (tabla pivote y referencia directa)
+    $pivotStmt = $conn->prepare("SELECT COUNT(*) FROM product_collections WHERE collection_id = ?");
+    $pivotStmt->execute([$collectionId]);
+    $pivotCount = (int) $pivotStmt->fetchColumn();
+
+    $directStmt = $conn->prepare("SELECT COUNT(*) FROM products WHERE collection_id = ?");
+    $directStmt->execute([$collectionId]);
+    $directCount = (int) $directStmt->fetchColumn();
+
+    if (($pivotCount + $directCount) > 0) {
+        throw new Exception('No se puede eliminar la colección porque está asociada a productos.');
     }
     
     // Eliminar imagen si existe

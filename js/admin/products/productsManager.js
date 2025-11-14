@@ -74,12 +74,43 @@ class ProductsManager {
         
     }
     
+    renderLoadingState() {
+        if (!this.elements.productsContainer) return;
+
+        const skeletonCard = `
+            <div class="product-skeleton-card">
+                <div class="skeleton skeleton-thumb"></div>
+                <div class="skeleton-body">
+                    <div class="skeleton skeleton-line w-80"></div>
+                    <div class="skeleton skeleton-line w-60"></div>
+                    <div class="skeleton-tags">
+                        <span class="skeleton skeleton-pill"></span>
+                        <span class="skeleton skeleton-pill"></span>
+                    </div>
+                    <div class="skeleton skeleton-line w-70"></div>
+                    <div class="skeleton skeleton-line w-40"></div>
+                </div>
+                <div class="skeleton-actions">
+                    <span class="skeleton skeleton-btn"></span>
+                    <span class="skeleton skeleton-btn"></span>
+                </div>
+            </div>
+        `;
+
+        const skeletonMarkup = new Array(6).fill(skeletonCard).join('');
+        this.elements.productsContainer.innerHTML = `
+            <div class="products-skeleton" aria-hidden="true">
+                ${skeletonMarkup}
+            </div>
+        `;
+    }
+
     async loadProducts(page = 1) {
         if (this.isLoading) return;
         
         this.isLoading = true;
         this.currentPage = page;
-        this.elements.productsContainer.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando productos...</div>';
+        this.renderLoadingState();
         
         try {
             const params = new URLSearchParams(new FormData(this.elements.filterForm));

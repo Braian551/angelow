@@ -307,8 +307,8 @@ if (isset($_SESSION['alert'])) {
                                                         </a>
                                                         <?php if ($talla['product_count'] == 0): ?>
                                                             <a href="sizes.php?action=delete&id=<?= $talla['id'] ?>"
-                                                                class="btn btn-sm btn-delete" title="Eliminar"
-                                                                onclick="return confirm('¿Estás seguro de eliminar esta talla?')">
+                                                                class="btn btn-sm btn-delete js-size-delete" title="Eliminar"
+                                                                data-size-name="<?= htmlspecialchars($talla['name']) ?>">
                                                                 <i class="fas fa-trash"></i>
                                                             </a>
                                                         <?php endif; ?>
@@ -335,33 +335,74 @@ if (isset($_SESSION['alert'])) {
         </main>
     </div>
 
+    <?php require_once __DIR__ . '/../../alertas/confirmation_modal.php'; ?>
+
     <script src="<?= BASE_URL ?>/js/dashboardadmin.js"></script>
     <script src="<?= BASE_URL ?>/js/alerta.js"></script>
+    <script src="<?= BASE_URL ?>/js/components/confirmationModal.js"></script>
     <script>
    document.addEventListener('DOMContentLoaded', function() {
     // Buscador de tallas
-    document.getElementById('search-sizes').addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const rows = document.querySelectorAll('.data-table tbody tr');
-        let hasResults = false;
-        
-        rows.forEach(row => {
-            const name = row.getAttribute('data-searchable');
-            if (name.includes(searchTerm)) {
-                row.style.display = '';
-                hasResults = true;
-            } else {
-                row.style.display = 'none';
+    const searchInput = document.getElementById('search-sizes');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.data-table tbody tr');
+            let hasResults = false;
+            
+            rows.forEach(row => {
+                const name = row.getAttribute('data-searchable');
+                if (name.includes(searchTerm)) {
+                    row.style.display = '';
+                    hasResults = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Mostrar u ocultar mensaje de no resultados
+            const noResults = document.getElementById('no-results');
+            if (noResults) {
+                if (!hasResults && searchTerm.length > 0) {
+                    noResults.style.display = 'flex';
+                } else {
+                    noResults.style.display = 'none';
+                }
             }
         });
-        
-        // Mostrar u ocultar mensaje de no resultados
-        const noResults = document.getElementById('no-results');
-        if (!hasResults && searchTerm.length > 0) {
-            noResults.style.display = 'flex';
-        } else {
-            noResults.style.display = 'none';
-        }
+    }
+
+    const confirmationAvailable = typeof window.openConfirmationModal === 'function';
+    const escapeHtml = (value = '') => value.replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[char] || char));
+
+    document.querySelectorAll('.js-size-delete').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const deleteUrl = this.getAttribute('href');
+            const sizeName = this.dataset.sizeName || 'esta talla';
+            const confirmDeletion = () => {
+                window.location.href = deleteUrl;
+            };
+
+            if (confirmationAvailable) {
+                window.openConfirmationModal({
+                    title: 'Eliminar talla',
+                    message: `¿Deseas eliminar la talla <strong>${escapeHtml(sizeName)}</strong>?`,
+                    confirmText: 'Eliminar',
+                    cancelText: 'Cancelar',
+                    type: 'warning',
+                    onConfirm: confirmDeletion
+                });
+            } else if (confirm(`¿Estás seguro de eliminar la talla ${sizeName}?`)) {
+                confirmDeletion();
+            }
+        });
     });
 });
     </script>

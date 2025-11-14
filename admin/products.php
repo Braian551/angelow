@@ -190,7 +190,27 @@ try {
 
                 <!-- Listado de productos -->
                 <div class="products-container" id="products-container">
-                    <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando productos...</div>
+                    <div class="products-skeleton" aria-hidden="true">
+                        <?php for ($i = 0; $i < 6; $i++): ?>
+                            <div class="product-skeleton-card">
+                                <div class="skeleton skeleton-thumb"></div>
+                                <div class="skeleton-body">
+                                    <div class="skeleton skeleton-line w-80"></div>
+                                    <div class="skeleton skeleton-line w-60"></div>
+                                    <div class="skeleton-tags">
+                                        <span class="skeleton skeleton-pill"></span>
+                                        <span class="skeleton skeleton-pill"></span>
+                                    </div>
+                                    <div class="skeleton skeleton-line w-70"></div>
+                                    <div class="skeleton skeleton-line w-40"></div>
+                                </div>
+                                <div class="skeleton-actions">
+                                    <span class="skeleton skeleton-btn"></span>
+                                    <span class="skeleton skeleton-btn"></span>
+                                </div>
+                            </div>
+                        <?php endfor; ?>
+                    </div>
                 </div>
 
                 <!-- Paginación -->
