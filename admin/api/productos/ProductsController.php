@@ -34,7 +34,7 @@ class ProductsController {
      */
     public function getProducts($filters = [], $page = 1, $perPage = 12) {
         try {
-            $where = ["p.is_active = 1"];
+            $where = [];
             $params = [];
             
             // Filtro de búsqueda
@@ -51,8 +51,11 @@ class ProductsController {
             
             // Filtro de estado
             if (!empty($filters['status'])) {
-                $where[] = "p.is_active = :status";
-                $params[':status'] = $filters['status'] === 'active' ? 1 : 0;
+                if ($filters['status'] === 'active') {
+                    $where[] = "p.is_active = 1";
+                } elseif ($filters['status'] === 'inactive') {
+                    $where[] = "p.is_active = 0";
+                }
             }
             
             // Filtro de género
@@ -64,8 +67,11 @@ class ProductsController {
             // Construir ORDER BY
             $orderBy = $this->buildOrderBy($filters['order'] ?? 'newest');
             
+            // Construir WHERE clause
+            $whereClause = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+            
             // Contar total de productos
-            $countSql = "SELECT COUNT(DISTINCT p.id) as total FROM products p WHERE " . implode(" AND ", $where);
+            $countSql = "SELECT COUNT(DISTINCT p.id) as total FROM products p $whereClause";
             $countStmt = $this->db->prepare($countSql);
             $countStmt->execute($params);
             $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
@@ -98,7 +104,7 @@ class ProductsController {
                     (SELECT image_path FROM product_images WHERE product_id = p.id ORDER BY `order` LIMIT 1) AS primary_image
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.id
-                WHERE " . implode(" AND ", $where) . "
+                $whereClause
                 GROUP BY p.id
                 ORDER BY " . $orderBy . "
                 LIMIT :limit OFFSET :offset
