@@ -2222,14 +2222,12 @@ body {
 .filter-select:hover,
 .filter-input:hover {
   border-color: rgba(0, 119, 182, 0.3);
-  background: white;
 }
 
 .filter-select:focus,
 .filter-input:focus {
   outline: none;
   border-color: rgba(0, 119, 182, 0.45);
-  background: white;
 }
 
 .filter-select:active,
