@@ -40,18 +40,20 @@ if (!$user || $user['role'] !== 'admin') {
             <?php include __DIR__ . '/../../layouts/headeradmin1.php'; ?>
 
             <div class="dashboard-content collections-dashboard collections-page">
+            <a href="collections_list.php" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Volver
+            </a>
             <div class="page-header">
-                <div class="header-content">
-                    <div class="collections-header-left">
-                        <a href="collections_list.php" class="back-button">
-                            <i class="fas fa-arrow-left"></i>
-                            Volver
-                        </a>
+                <div class="collections-header-left">
+                    <div class="title-section">
                         <h1 class="page-title">
                             <i class="fas fa-plus-circle"></i>
                             Nueva Colección
                         </h1>
-                        <p class="page-subtitle">Crea una nueva colección de productos</p>
+                        <div class="breadcrumb">
+                            <a href="<?= BASE_URL ?>/admin">Dashboard</a> / <span>Colecciones</span>
+                        </div>
                     </div>
                 </div>
             </div>

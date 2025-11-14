@@ -65,18 +65,20 @@ $productCount = $productCountStmt->fetch(PDO::FETCH_ASSOC)['count'];
             <?php include __DIR__ . '/../../layouts/headeradmin1.php'; ?>
 
             <div class="dashboard-content collections-dashboard collections-page">
+            <a href="collections_list.php" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Volver
+            </a>
             <div class="page-header">
-                <div class="header-content">
-                    <div class="collections-header-left">
-                        <a href="collections_list.php" class="back-button">
-                            <i class="fas fa-arrow-left"></i>
-                            Volver
-                        </a>
+                <div class="collections-header-left">
+                    <div class="title-section">
                         <h1 class="page-title">
                             <i class="fas fa-edit"></i>
                             Editar Colección
                         </h1>
-                        <p class="page-subtitle">Modifica la información de la colección</p>
+                        <div class="breadcrumb">
+                            <a href="<?= BASE_URL ?>/admin">Dashboard</a> / <span>Colecciones</span>
+                        </div>
                     </div>
                 </div>
             </div>

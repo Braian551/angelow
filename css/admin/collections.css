@@ -32,6 +32,15 @@
     background: var(--primary-color);
 }
 
+.collections-page .title-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.collections-page > .back-button {
+    margin-bottom: var(--space-md);
+}
+
 .collections-page .results-summary {
     display: flex;
     justify-content: space-between;
