@@ -1,11 +1,3 @@
-                        // If the Questions tab is already active, ensure the injected pane is visible
-                        if (document.querySelector('.tab-btn[data-tab="questions"].active')) {
-                            const injected = document.getElementById('questions');
-                            if (injected) {
-                                injected.classList.add('active');
-                                injected.style.display = 'block';
-                            }
-                        }
 <script>
     $(document).ready(function() {
         // Variables globales
@@ -619,6 +611,17 @@
                                 <div class="questions-list" data-qa-questions-count="${initialQuestions.length}"></div>
                             </div>
                         `);
+                        // If the Questions tab is already active, ensure the injected pane is visible
+                        try {
+                            const activeTab = document.querySelector('.tab-btn.active');
+                            if (activeTab && activeTab.dataset && activeTab.dataset.tab === 'questions') {
+                                const injected = document.getElementById('questions');
+                                if (injected) {
+                                    injected.classList.add('active');
+                                    injected.style.display = 'block';
+                                }
+                            }
+                        } catch (err) { console.warn('Error checking active tab after injection', err); }
                     } else {
                         console.warn('No .tabs-content found to insert fallback questions');
                     }

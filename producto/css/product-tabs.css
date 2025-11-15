@@ -710,6 +710,43 @@
   background-color: var(--primary-color);
 }
 
+/* Container for all questions to match other content blocks */
+.questions-list {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Avatar + user info */
+.user-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex: 0 0 56px;
+  border: 1px solid var(--border-color);
+}
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+.user-info strong {
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+.user-info .time {
+  color: var(--text-light);
+  font-size: 1.2rem;
+}
+
 .question-form-container {
   padding: 3.5rem;
   background-color: white;
@@ -769,8 +806,9 @@
 }
 
 .question-item {
-  padding: 3rem 0;
+  padding: 2rem 0;
   border-bottom: 1px solid var(--border-color);
+  display: block;
 }
 
 .question-content {
@@ -850,9 +888,21 @@
   display: none;
 }
 
-.answer-list {
+.answer-list,
+.answers-list {
   margin-top: 2rem;
   padding-left: 3rem;
+}
+
+/* Smaller screens - collapse metadata styling */
+@media (max-width: 768px) {
+  .question-meta {
+    gap: 1rem;
+  }
+
+  .questions-list {
+    padding: 1.2rem;
+  }
 }
 
 .answer-item {
@@ -1151,4 +1201,14 @@
     min-width: 100%;
     flex: 1 0 100%;
   }
+}
+
+/* Backwards-compatible badge class used in templates */
+.badge.seller {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
