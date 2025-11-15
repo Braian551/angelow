@@ -20,8 +20,12 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Obtener datos del request
-$input = json_decode(file_get_contents('php://input'), true);
+$raw = file_get_contents('php://input');
+$input = json_decode($raw, true);
+// Si no viene como JSON, permitir application/x-www-form-urlencoded
+if (!is_array($input)) {
+    parse_str($raw, $input);
+}
 $productId = $input['product_id'] ?? null;
 $userId = $_SESSION['user_id'];
 

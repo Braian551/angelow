@@ -390,8 +390,16 @@ display: inline-flex
 }
 
 .btn-sm {
-  padding: 0.8rem 1.6rem;
-  font-size: 1.3rem;
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-bounce);
+  font-size: 1.4rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn i {
@@ -418,12 +426,15 @@ display: inline-flex
   width: 100%;
   border-collapse: collapse;
   font-size: 1.4rem;
-  min-width: 800px;
+  /* Mantener consistencia con otras tablas admin (e.g., sizes/orders)
+     Usamos min-width 600 para evitar scroll horizontal innecesario */
+  min-width: 600px;
 }
 
 .data-table th {
-text-align: left;
-    padding: 1.2rem 1.6rem;
+  text-align: left;
+  /* Alinear padding con el resto de tablas admin */
+  padding: 1.4rem 1.6rem;
     background-color: var(--primary-color);
     color: white;
     font-weight: 600;
@@ -433,8 +444,16 @@ text-align: left;
     top: 0;
 }
 
+.data-table th:first-child {
+  border-top-left-radius: var(--radius-lg);
+}
+
+.data-table th:last-child {
+  border-top-right-radius: var(--radius-lg);
+}
+
 .data-table td {
-  padding: 1.2rem 1.6rem;
+  padding: 1.4rem 1.6rem;
   border-bottom: 1px solid var(--gray-200);
   vertical-align: middle;
   color: var(--gray-700);
@@ -446,7 +465,8 @@ text-align: left;
 }
 
 .data-table tr:hover td {
-  background-color: var(--gray-50);
+  background-color: var(--bg-hover);
+  transform: scale(1.005);
 }
 
 /* Estilos especiales para celdas */
@@ -467,7 +487,62 @@ text-align: left;
 
 .data-table .actions {
   display: flex;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
+  height: 100%;
+  min-height: 60px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Wrapper used on collections; reuse in inventory for action layout */
+.table-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+
+.table-actions .btn-sm {
+  width: 3.4rem;
+  height: 3.4rem;
+  padding: 0;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition-bounce);
+  /* Ajuste: eliminar box-shadow para mantener consistencia con otros listados */
+  box-shadow: none;
+}
+
+.table-actions .btn-sm::before {
+  content: '';
+  position:absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.12);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.5, 1.6, 0.4, 0.7);
+  z-index: 0;
+}
+
+.table-actions .btn-sm i { position: relative; z-index: 1; }
+
+.table-actions .btn-sm:hover::before { transform: scaleX(1); transform-origin: left; }
+
+/* Si el botón dentro de table-actions tiene la clase btn-status, forzamos
+   el estilo de estado para que se vea igual que en Collections/Orders */
+.table-actions .btn-sm.btn-status {
+  background-color: rgba(2, 132, 199, 0.1);
+  color: var(--info-color);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+}
+
+.table-actions .btn-sm.btn-status:hover {
+  background-color: rgba(2, 132, 199, 0.2);
+  color: var(--primary-hover);
+  transform: translateY(-2px) scale(1.05);
 }
 
 /* ===== BADGES MEJORADOS ===== */
