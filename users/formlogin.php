@@ -2,7 +2,9 @@
 session_start();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
-require_once __DIR__ . '/../layouts/header3.php';
+// For legacy login page keep layout minimal — no global header/footer.
+// header3.php previously enforced redirects and admin checks; we will skip it here.
+// require_once __DIR__ . '/../layouts/header3.php';
 
 // Mostrar errores de login si existen
 if (isset($_SESSION['login_error'])) {
