@@ -5,17 +5,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     productImages.forEach(img => {
         img.addEventListener('load', function() {
-            this.closest('.product-image').classList.remove('loading');
+            // Marcar la imagen como cargada y eliminar el placeholder loading
+            this.classList.add('loaded');
+            const parent = this.closest('.product-image');
+            if (parent) parent.classList.remove('loading');
         });
 
         img.addEventListener('error', function() {
+            // Mostrar imagen por defecto si falla la carga y marcar como cargada
             this.src = '<?= BASE_URL ?>/images/default-product.jpg';
-            this.closest('.product-image').classList.remove('loading');
+            this.classList.add('loaded');
+            const parent = this.closest('.product-image');
+            if (parent) parent.classList.remove('loading');
         });
 
         // Si la imagen ya está cargada
         if (img.complete) {
-            img.closest('.product-image').classList.remove('loading');
+            // Si la imagen ya está cargada, asegurarse de remover loading y añadir loaded
+            img.classList.add('loaded');
+            const parent = img.closest('.product-image');
+            if (parent) parent.classList.remove('loading');
         }
     });    // ===== FUNCIONALIDAD DE WISHLIST =====
     const wishlistButtons = document.querySelectorAll('.wishlist-btn');
