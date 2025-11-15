@@ -364,9 +364,11 @@ if (isset($_SESSION['alert'])) {
                         </span>
                     </td>
                     <td class="actions">
-                        <a href="inventory.php?product_id=<?= $product['id'] ?>" class="btn btn-sm btn-view">
-                            <i class="fas fa-eye"></i> Ver
-                        </a>
+                        <div class="table-actions">
+                            <a href="inventory.php?product_id=<?= $product['id'] ?>" class="btn btn-sm btn-status" title="Ver producto" aria-label="Ver producto">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -405,9 +407,11 @@ if (isset($_SESSION['alert'])) {
                                                             <strong><?= $item['quantity'] ?></strong>
                                                         </td>
                                                         <td class="actions">
-                                                            <a href="inventory.php?product_id=<?= $item['product_id'] ?>" class="btn btn-sm btn-primary">
-                                                                <i class="fas fa-edit"></i> Reabastecer
-                                                            </a>
+                                                            <div class="table-actions">
+                                                                <a href="inventory.php?product_id=<?= $item['product_id'] ?>" class="btn btn-sm btn-primary">
+                                                                    <i class="fas fa-edit"></i> Reabastecer
+                                                                </a>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 <?php endforeach; ?>
