@@ -1,3 +1,11 @@
+                        // If the Questions tab is already active, ensure the injected pane is visible
+                        if (document.querySelector('.tab-btn[data-tab="questions"].active')) {
+                            const injected = document.getElementById('questions');
+                            if (injected) {
+                                injected.classList.add('active');
+                                injected.style.display = 'block';
+                            }
+                        }
 <script>
     $(document).ready(function() {
         // Variables globales
@@ -89,15 +97,17 @@
         // Mostrar notificación
         function showNotification(message, type) {
             const isCartSuccess = type === 'success' && message.toLowerCase().includes('carrito');
-            const notification = $(`
-        <div class="floating-notification ${type} ${isCartSuccess ? 'clickable' : ''}" ${isCartSuccess ? `style="cursor: pointer;"` : ''}>
-            <div class="notification-content">
-                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-                <span>${message}</span>
-            </div>
-            <button class="close-notification">&times;</button>
-        </div>
-    `);
+            // Build HTML without nested template literals to avoid syntax issues
+            const notificationHtml =
+                '<div class="floating-notification ' + type + ' ' + (isCartSuccess ? 'clickable' : '') + '"' + (isCartSuccess ? ' style="cursor: pointer;"' : '') + '>' +
+                '<div class="notification-content">' +
+                    '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i>' +
+                    '<span>' + message + '</span>' +
+                '</div>' +
+                '<button class="close-notification">&times;</button>' +
+                '</div>';
+
+            const notification = $(notificationHtml);
 
             $('body').append(notification);
 
@@ -422,10 +432,247 @@
             $('#question-form-container').slideUp();
         });
 
+        // Enviar pregunta via AJAX (evita recarga completa)
+        $('#question-form').submit(function(e) {
+            e.preventDefault();
+
+            const form = $(this);
+            const question = $('#question-text').val().trim();
+            const productId = form.find('input[name="product_id"]').val();
+
+            if (question.length < 10) {
+                showNotification('La pregunta debe tener al menos 10 caracteres', 'error');
+                return;
+            }
+
+            const payload = { product_id: productId, question };
+
+            // Deshabilitar botones
+            form.find('button[type="submit"]').prop('disabled', true);
+
+            fetch('<?= BASE_URL ?>/api/submit_question.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message || 'Pregunta enviada correctamente', 'success');
+
+                    // Limpiar formulario y cerrar
+                    $('#question-text').val('');
+                    $('#question-form-container').slideUp();
+
+                    // Optionally: añadir la pregunta recibida a la lista (si vino en la respuesta)
+                    // Refresh questions list from server to ensure up-to-date display
+                    fetch('<?= BASE_URL ?>/api/get_questions.php?product_id=' + productId)
+                        .then(r => r.json())
+                        .then(newRes => {
+                            if (newRes.success) {
+                                renderQuestions(newRes.data || []);
+                            } else {
+                                console.error('Could not fetch updated questions', newRes.error);
+                            }
+                        }).catch(err => console.error(err));
+                } else {
+                    showNotification(data.message || data.error || 'Error al enviar la pregunta', 'error');
+                }
+            })
+            .catch(err => {
+                console.error('Error submit question:', err);
+                showNotification('Error de conexión. Intenta de nuevo más tarde', 'error');
+            })
+            .finally(() => {
+                form.find('button[type="submit"]').prop('disabled', false);
+            });
+        });
+
         // Botón responder pregunta
         $(document).on('click', '.answer-btn', function() {
             $(this).siblings('.answer-form-container').slideToggle();
         });
+
+        function renderQuestions(questions) {
+            console.log('renderQuestions called, questions length:', questions.length);
+            let container = $('.questions-list');
+            
+            // If the regular selector didn't find the container, try a scoped selector or a direct DOM query.
+            if (!container.length) {
+                const fallback = document.querySelector('#questions .questions-list') || document.querySelector('.questions-list');
+                console.log('renderQuestions: fallback queryAll length:', document.querySelectorAll('.questions-list').length);
+                if (fallback) {
+                    container = $(fallback);
+                } else {
+                    console.warn('renderQuestions: could not find .questions-list in DOM');
+                    return; // nothing to render into
+                }
+            }
+            container.empty();
+
+            if (!questions || questions.length === 0) {
+                console.log('renderQuestions: no questions, showing placeholder');
+                container.html('<div class="no-questions"><i class="fas fa-question-circle"></i><p>No hay preguntas sobre este producto. Sé el primero en preguntar.</p></div>');
+                return;
+            }
+
+            console.log('renderQuestions debug:', typeof questions, Array.isArray(questions), questions);
+            try {
+            questions.forEach(q => {
+                const userName = q.user_name || 'Usuario';
+                // Prefer a known existing placeholder -> default-avatar.png
+                const userImage = q.user_image ? '<?= BASE_URL ?>/' + q.user_image : '<?= BASE_URL ?>/images/default-avatar.png';
+
+                const qItem = $('<div>').addClass('question-item');
+                const qMeta = $('<div>').addClass('question-meta');
+                const avatar = $('<div>').addClass('user-avatar').append($('<img>').attr('src', userImage).attr('alt', userName));
+                const userInfo = $('<div>').addClass('user-info').append($('<strong>').text(userName)).append($('<span>').addClass('time').text(q.created_at ? new Date(q.created_at).toLocaleString() : ''));
+                qMeta.append(avatar).append(userInfo);
+
+                const qText = $('<div>').addClass('question-text').append($('<p>').html($('<div/>').text(q.question).html()));
+
+                qItem.append(qMeta).append(qText);
+
+                if (q.answers && q.answers.length) {
+                    const answersList = $('<div>').addClass('answers-list');
+                    q.answers.forEach(a => {
+                        const answerItem = $('<div>').addClass('answer-item');
+                        const meta = $('<div>').addClass('answer-meta');
+                        meta.append($('<strong>').text(a.user_name || 'Usuario'));
+                        if (a.is_seller) meta.append(' ').append($('<span>').addClass('badge seller').text('Vendedor'));
+                        meta.append(' ').append($('<span>').addClass('time').text(a.created_at ? new Date(a.created_at).toLocaleString() : ''));
+                        answerItem.append(meta).append($('<p>').html($('<div/>').text(a.answer).html()));
+                        answersList.append(answerItem);
+                    });
+                    qItem.append(answersList);
+                }
+
+                if (<?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>) {
+                    const actions = $('<div>').addClass('question-actions');
+                    actions.append($('<button>').addClass('answer-btn btn small').text('Responder'));
+                    qItem.append(actions);
+                }
+
+                // Try jQuery append and native append as fallback
+                try {
+                    container.append(qItem);
+                    // Force visibility in case CSS/other scripts hide children
+                    container.show();
+                    container.find('.question-item').css('display', 'block');
+                    // If jQuery append didn't create DOM nodes (some libs may prevent jQuery insertion),
+                    // use raw HTML fallback
+                    if (container.find('.question-item').length === 0) {
+                        console.warn('renderQuestions: appended items not visible; using HTML fallback');
+                        const fallbackHtml = questions.map(q2 => {
+                            const uName = q2.user_name || 'Usuario';
+                            const uImg = q2.user_image ? '<?= BASE_URL ?>/' + q2.user_image : '<?= BASE_URL ?>/images/default-avatar.png';
+                            const answersHtml = (q2.answers || []).map(a => `<div class="answer-item"><div class="answer-meta"><strong>${(a.user_name||'Usuario')}</strong>${a.is_seller ? ' <span class="badge seller">Vendedor</span>' : ''} <span class="time">${a.created_at ? new Date(a.created_at).toLocaleString() : ''}</span></div><p>${(a.answer || '')}</p></div>`).join('');
+                            return `<div class="question-item"><div class="question-meta"><div class="user-avatar"><img src="${uImg}" alt="${uName}"></div><div class="user-info"><strong>${uName}</strong><span class="time">${q2.created_at ? new Date(q2.created_at).toLocaleString() : ''}</span></div></div><div class="question-text"><p>${(q2.question || '')}</p></div>${answersHtml}</div>`;
+                        }).join('');
+                        container.html(fallbackHtml);
+                    }
+                    console.log('renderQuestions debug append: container jQuery length:', container.length, 'native elem:', container.get(0), 'qItem native:', qItem.get(0));
+                    console.log('renderQuestions debug check find:', container.find('.question-item').length);
+                } catch (e) {
+                    console.warn('jQuery append failed, trying native append', e);
+                    try {
+                        document.querySelector('.questions-list').appendChild(qItem.get(0));
+                    } catch (err) {
+                        console.error('native append also failed', err);
+                    }
+                }
+            console.log('renderQuestions: appended qItem for id=', q.id, 'container children now=', container.children().length);
+            });
+            } catch(e) {
+                console.error('renderQuestions loop error:', e);
+            }
+            console.log('renderQuestions: finished, DOM count=', container.find('.question-item').length);
+            // For debugging: log the container children
+            console.log('renderQuestions: container children:', container.children().toArray().map(e => e.outerHTML ? e.outerHTML.slice(0,150) : e.innerText));
+            console.log('renderQuestions: container element:', document.querySelector('.questions-list'));
+
+                // Update tab counter
+                const tabBtn = document.querySelector('.tab-btn[data-tab="questions"]');
+                if (tabBtn) {
+                    const text = tabBtn.textContent.replace(/\(.*\)/, '').trim();
+                    tabBtn.textContent = text + ' (' + questions.length + ')';
+                }
+        }
+
+        // On load, ensure questions are rendered consistently with the server data
+        try {
+            const initialQuestions = <?= json_encode($questionsData ?: []) ?>;
+            // Delay slightly to avoid race with layout scripts and ensure the .questions-list is in DOM
+            setTimeout(() => {
+                console.log('renderQuestions delayed call, initial questions', initialQuestions.length);
+                // If .questions-list is missing but server returned questions, create a fallback container
+                if (!document.querySelector('.questions-list') && initialQuestions.length) {
+                    console.warn('No .questions-list found - injecting fallback #questions/.questions-list');
+                    const tabContent = document.querySelector('.tabs-content');
+                    if (tabContent) {
+                        tabContent.insertAdjacentHTML('beforeend', `
+                            <div id="questions" class="tab-pane">
+                                <div class="questions-header"><h3>Preguntas y respuestas</h3></div>
+                                <div class="questions-list" data-qa-questions-count="${initialQuestions.length}"></div>
+                            </div>
+                        `);
+                    } else {
+                        console.warn('No .tabs-content found to insert fallback questions');
+                    }
+                }
+                renderQuestions(initialQuestions);
+                // After rendering, log the computed HTML for debugging
+                try {
+                    const listing = document.querySelector('#questions .questions-list');
+                    console.log('post-render .questions-list innerHTML length:', listing ? listing.innerHTML.length : 'no-listing');
+                } catch (err) { console.error('post-render debugging failed', err); }
+            }, 50);
+            
+            // Ensure questions are re-rendered when the Questions tab is activated
+            $(document).on('click', '.tab-btn[data-tab="questions"]', function() {
+                console.log('Questions tab clicked, rendering questions if missing');
+                try { renderQuestions(initialQuestions); } catch (e) { console.error('render on tab click failed', e); }
+            });
+
+            // If the container is dynamically injected or later emptied by other scripts, use a MutationObserver
+            const questionsParent = document.querySelector('#questions');
+            if (questionsParent && typeof MutationObserver !== 'undefined') {
+                const observer = new MutationObserver((mutations, obs) => {
+                    const qlist = questionsParent.querySelector('.questions-list');
+                    if (qlist && qlist.children.length === 0 && initialQuestions.length > 0) {
+                        console.log('MutationObserver detected empty .questions-list; re-rendering questions');
+                        try { renderQuestions(initialQuestions); } catch (e) { console.error('Observer render failed', e); }
+                        // stop observing after a successful re-render to avoid loops
+                        obs.disconnect();
+                    }
+                });
+
+                observer.observe(questionsParent, { childList: true, subtree: true });
+            }
+
+            // Fallback: observe the whole body if .questions-list is not yet in DOM — this catches cases where
+            // another script rewrites the tabs after DOMContentLoaded
+            if (!document.querySelector('.questions-list')) {
+                console.log('No .questions-list detected initially; adding body-level observer');
+                const bodyObserver = new MutationObserver((mutations, obs) => {
+                    const node = document.querySelector('.questions-list');
+                    if (node) {
+                        console.log('Body observer found .questions-list; running renderQuestions');
+                        try {
+                            renderQuestions(initialQuestions);
+                        } catch (e) { console.error('Body observer render failed', e); }
+                        obs.disconnect();
+                    }
+                });
+
+                bodyObserver.observe(document.body, { childList: true, subtree: true });
+            }
+        } catch (e) {
+            console.error('Error rendering initial questions:', e);
+        }
 
         $(document).on('click', '.cancel-answer', function() {
             $(this).closest('.answer-form-container').slideUp();

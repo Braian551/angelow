@@ -40,7 +40,7 @@ $canReview = canUserReviewProduct($conn, $_SESSION['user_id'] ?? null, $product[
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
   
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/notificacion.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/carritocheck.css">
+    <!-- carritocheck.css not found; removed to avoid 404 -->
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/producto/css/product-view.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/producto/css/product-gallery.css">

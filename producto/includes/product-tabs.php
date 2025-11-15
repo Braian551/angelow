@@ -192,7 +192,6 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                             Ver todas las opiniones (<?= $reviewsData['stats']['total_reviews'] ?>)
                         </a>
                     <?php endif; ?>
-                <?php endif; ?>
             </div>
         </div>
         
@@ -229,26 +228,83 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
             </div>
             
             <!-- Lista de preguntas -->
-            <div class="questions-list">
+            <div class="questions-list" data-qa-questions-count="<?= count($questionsData) ?>">
                 <?php if (empty($questionsData)): ?>
                     <div class="no-questions">
                         <i class="fas fa-question-circle"></i>
                         <p>No hay preguntas sobre este producto. Sé el primero en preguntar.</p>
                     </div>
-                <?php else: ?>
-                    <?php foreach ($questionsData as $question): ?>
-                        <div class="question-item">
-                            <!-- Contenido de la pregunta existente -->
-                        </div>
-                    <?php endforeach; ?>
+                    <?php else: ?>
+                        <?php foreach ($questionsData as $question): ?>
+                            <div class="question-item">
+                                <div class="question-meta">
+                                    <div class="user-avatar">
+                                        <img src="<?= BASE_URL ?>/<?= htmlspecialchars($question['user_image'] ?? 'images/default-avatar.png') ?>" alt="<?= htmlspecialchars($question['user_name'] ?? 'Usuario') ?>">
+                                    </div>
+                                    <div class="user-info">
+                                        <strong><?= htmlspecialchars($question['user_name'] ?? 'Usuario') ?></strong>
+                                        <span class="time"><?= date('d/m/Y H:i', strtotime($question['created_at'])) ?></span>
+                                    </div>
+                                </div>
+                                <div class="question-text">
+                                    <p><?= nl2br(htmlspecialchars($question['question'])) ?></p>
+                                </div>
+
+                                <?php if (!empty($question['answers'])): ?>
+                                    <div class="answers-list">
+                                        <?php foreach ($question['answers'] as $answer): ?>
+                                            <div class="answer-item">
+                                                <div class="answer-meta">
+                                                    <strong><?= htmlspecialchars($answer['user_name'] ?? 'Usuario') ?></strong>
+                                                    <?php if (!empty($answer['is_seller'])): ?>
+                                                        <span class="badge seller">Vendedor</span>
+                                                    <?php endif; ?>
+                                                    <span class="time"><?= date('d/m/Y H:i', strtotime($answer['created_at'])) ?></span>
+                                                </div>
+                                                <p><?= nl2br(htmlspecialchars($answer['answer'])) ?></p>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+
+                                <div class="question-actions">
+                                    <?php if (isset($_SESSION['user_id'])): ?>
+                                        <button class="answer-btn btn small">Responder</button>
+                                        <div class="answer-form-container" style="display:none;">
+                                            <form method="POST" class="answer-form" action="<?= BASE_URL ?>/api/submit_answer.php">
+                                                <input type="hidden" name="question_id" value="<?= $question['id'] ?>">
+                                                <div class="form-group">
+                                                    <textarea name="answer" rows="3" class="form-control" required placeholder="Escribe tu respuesta"></textarea>
+                                                </div>
+                                                <div class="form-actions">
+                                                    <button type="button" class="cancel-answer btn small">Cancelar</button>
+                                                    <button type="submit" class="btn primary small">Enviar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     
-                    <?php if (count($questionsData) > 5): ?>
-                        <a href="<?= BASE_URL ?>/producto/preguntas/<?= $product['slug'] ?>" class="see-all-questions">
-                            Ver todas las preguntas (<?= count($questionsData) ?>)
-                        </a>
+                        <?php if (count($questionsData) > 5): ?>
+                            <a href="<?= BASE_URL ?>/producto/preguntas/<?= $product['slug'] ?>" class="see-all-questions">
+                                Ver todas las preguntas (<?= count($questionsData) ?>)
+                            </a>
+                        <?php endif; ?>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>
+            <script>
+                // Debugging: print questions data to console
+                try {
+                    const qCount = document.querySelector('.questions-list')?.dataset?.qaQuestionsCount;
+                    const qNodes = document.querySelectorAll('.questions-list').length;
+                    console.log('questionsData count (server):', qCount, 'queryAll length:', qNodes);
+                    console.log('product tabs HTML for #questions:', document.querySelector('#questions')?.innerHTML?.slice(0, 400));
+                    console.log('questionsData (server raw):', <?= json_encode($questionsData ?: []) ?>);
+                } catch(e) { console.error(e); }
+            </script>
         </div>
     </div>
 </section>
@@ -431,9 +487,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         // Mostrar formulario correspondiente
                         if (tabId === 'reviews') {
-                            document.getElementById('review-form-container')?.style.display = 'block';
+                            const reviewForm = document.getElementById('review-form-container');
+                            if (reviewForm) reviewForm.style.display = 'block';
                         } else if (tabId === 'questions') {
-                            document.getElementById('question-form-container')?.style.display = 'block';
+                            const questionForm = document.getElementById('question-form-container');
+                            if (questionForm) questionForm.style.display = 'block';
                         }
                         
                         // Scroll al formulario

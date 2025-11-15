@@ -189,6 +189,14 @@
             }
         });
 
+        function safeSessionGet(key) {
+            try { return sessionStorage.getItem(key); } catch (e) { console.warn('sessionStorage.getItem blocked or unavailable', e); return null; }
+        }
+
+        function safeSessionSet(key, value) {
+            try { sessionStorage.setItem(key, value); } catch (e) { console.warn('sessionStorage.setItem blocked or unavailable', e); }
+        }
+
         function updateCartCount() {
             fetch(`<?= BASE_URL ?>/ajax/cart/get_cart_count.php`)
                 .then(response => response.json())
@@ -210,9 +218,9 @@
                             cartCountElements.forEach(el => el.remove());
                         }
 
-                        // Actualizar en sessionStorage para persistencia
-                        sessionStorage.setItem('lastCartCount', data.count);
-                        sessionStorage.setItem('lastCartUpdate', new Date().getTime());
+                        // Actualizar en sessionStorage para persistencia (protegido por try/catch)
+                        safeSessionSet('lastCartCount', data.count);
+                        safeSessionSet('lastCartUpdate', new Date().getTime());
                     }
                 })
                 .catch(error => console.error('Error al obtener carrito:', error));
@@ -220,8 +228,8 @@
 
         // Verificar si hay un carrito antiguo que necesite actualización
         function checkStaleCart() {
-            const lastUpdate = sessionStorage.getItem('lastCartUpdate');
-            const lastCount = sessionStorage.getItem('lastCartCount');
+            const lastUpdate = safeSessionGet('lastCartUpdate');
+            const lastCount = safeSessionGet('lastCartCount');
 
             if (lastUpdate && lastCount) {
                 const now = new Date().getTime();

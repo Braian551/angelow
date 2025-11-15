@@ -742,8 +742,12 @@ if ($action === 'edit' && $id) {
                     const $card = $(this);
                     const addressId = $card.data('id') || $card.find('.address-actions a').attr('href').match(/id=(\d+)/)[1];
 
-                    // Guardar en localStorage para futuras compras
-                    localStorage.setItem('selectedAddressId', addressId);
+                    // Guardar en localStorage para futuras compras (protegido por try/catch)
+                    try {
+                        localStorage.setItem('selectedAddressId', addressId);
+                    } catch (e) {
+                        console.warn('localStorage.setItem blocked or unavailable', e);
+                    }
 
                     // Feedback visual
                     $('.address-card').removeClass('selected-address');
@@ -792,7 +796,12 @@ if ($action === 'edit' && $id) {
             });
             
             // Resaltar la dirección seleccionada si existe
-            const selectedAddressId = localStorage.getItem('selectedAddressId');
+            let selectedAddressId = null;
+            try {
+                selectedAddressId = localStorage.getItem('selectedAddressId');
+            } catch (e) {
+                console.warn('localStorage.getItem blocked or unavailable', e);
+            }
             if (selectedAddressId) {
                 $(`.address-actions a[href*="id=${selectedAddressId}"]`).closest('.address-card').addClass('selected-address');
             }
