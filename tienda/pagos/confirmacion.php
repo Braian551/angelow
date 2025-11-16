@@ -135,7 +135,7 @@ try {
                 'class' => ''
             ],
             [
-                'icon' => 'fas fa-hand-holding-box',
+                'icon' => 'fas fa-box-open',
                 'title' => 'Pedido entregado',
                 'subtitle' => 'Pendiente de recogida',
                 'class' => ''
@@ -281,7 +281,7 @@ try {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/notificaciones/notification2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <?php if ($isStorePickup): ?>
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-o9N1j7kP5gyf3G2l1m0bV6wZ9F9s0gkMlG5wG4S0h2k=" crossorigin="" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css">
     <?php endif; ?>
 </head>
@@ -560,7 +560,7 @@ try {
     <?php include __DIR__ . '/../../layouts/footer.php'; ?>
 
     <?php if ($isStorePickup): ?>
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7kP5gyf3G2l1m0bV6wZ9F9s0gkMlG5wG4S0h2k=" crossorigin=""></script>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
         <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
     <?php endif; ?>
 
@@ -591,7 +591,7 @@ try {
             const customerLat = <?= $customerLat ? json_encode((float)$customerLat) : 'null' ?>;
             const customerLng = <?= $customerLng ? json_encode((float)$customerLng) : 'null' ?>;
 
-            if (mapElement && storeLat && storeLng && typeof L !== 'undefined') {
+                if (mapElement && storeLat && storeLng && typeof L !== 'undefined') {
                 const map = L.map('pickup-map').setView([storeLat, storeLng], customerLat && customerLng ? 13 : 15);
 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -619,6 +619,17 @@ try {
                             styles: [{ color: '#ff6f3d', weight: 5 }]
                         }
                     }).addTo(map);
+                } else {
+                    // Si L no está disponible (CDN bloqueado o no cargó), mostraremos una pista y un enlace a Google Maps
+                    const hint = document.querySelector('.map-hint');
+                    if (hint) {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'map-fallback';
+                        fallback.style.marginTop = '8px';
+                        fallback.innerHTML = '<p style="margin:0; color: #666;">No fue posible cargar el mapa interactivo. Puedes abrir la ruta en Google Maps:</p>' +
+                            (<?= json_encode($routeLink ? htmlspecialchars($routeLink) : null) ?> ? '<a href="' + <?= json_encode($routeLink ? htmlspecialchars($routeLink) : null) ?> + '" target="_blank" class="route-link"><i class="fas fa-location-arrow"></i> Abrir en Google Maps</a>' : '');
+                        hint.appendChild(fallback);
+                    }
                 }
             }
             <?php endif; ?>
