@@ -43,15 +43,9 @@ try {
             o.updated_at,
             o.shipping_address,
             COUNT(oi.id) as items_count,
-            SUM(oi.quantity * oi.price) as items_total,
-            od.delivery_status,
-            od.delivered_at,
-            od.driver_id,
-            d.name as driver_name
+            SUM(oi.quantity * oi.price) as items_total
         FROM orders o
         LEFT JOIN order_items oi ON oi.order_id = o.id
-        LEFT JOIN order_deliveries od ON od.order_id = o.id
-        LEFT JOIN users d ON d.id = od.driver_id
         $where
         GROUP BY o.id
         ORDER BY o.created_at DESC
@@ -91,7 +85,7 @@ try {
         <main class="user-main-content">
             <div class="dashboard-header">
                 <h1>Mis Pedidos</h1>
-                <p>Revisa el estado de tus compras, rastrea envíos y gestiona tus pedidos.</p>
+                <p>Revisa el estado de tus compras. El equipo de Angelow actualizará tus pedidos cuando sean enviados o entregados.</p>
             </div>
 
             <?php if (isset($_SESSION['error_message'])): ?>
@@ -134,7 +128,7 @@ try {
                     </div>
                     <div class="stat-info">
                         <h3><?= getOrderCountByStatus('shipped') ?></h3>
-                        <p>En Camino</p>
+                        <p>Enviados</p>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -198,12 +192,6 @@ try {
                                         <span class="status-badge status-<?= htmlspecialchars($order['status']) ?>">
                                             <?= getStatusText($order['status']) ?>
                                         </span>
-                                        <?php if ($order['delivery_status']): ?>
-                                            <span class="delivery-badge">
-                                                <i class="fas fa-truck"></i>
-                                                <?= getDeliveryStatusText($order['delivery_status']) ?>
-                                            </span>
-                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 
@@ -223,12 +211,6 @@ try {
                                                 <?= getPaymentStatusText($order['payment_status'] ?: 'pending') ?>
                                             </span>
                                         </div>
-                                        <?php if ($order['driver_name']): ?>
-                                        <div class="info-item">
-                                            <i class="fas fa-user"></i>
-                                            <span>Repartidor: <?= htmlspecialchars($order['driver_name']) ?></span>
-                                        </div>
-                                        <?php endif; ?>
                                     </div>
                                     
                                     <?php if ($order['shipping_address']): ?>
@@ -247,12 +229,6 @@ try {
                                     <?php if ($order['status'] === 'pending' || $order['status'] === 'processing'): ?>
                                         <button class="btn-cancel" data-order-id="<?= $order['id'] ?>">
                                             <i class="fas fa-times"></i> Cancelar
-                                        </button>
-                                    <?php endif; ?>
-                                    
-                                    <?php if ($order['status'] === 'shipped' || $order['delivery_status'] === 'in_transit'): ?>
-                                        <button class="btn-track" data-order-id="<?= $order['id'] ?>">
-                                            <i class="fas fa-truck"></i> Rastrear Envío
                                         </button>
                                     <?php endif; ?>
                                     
@@ -336,18 +312,6 @@ function getStatusText($status) {
         'cancelled' => 'Cancelado'
     ];
     return $statuses[$status] ?? ucfirst($status);
-}
-
-function getDeliveryStatusText($status) {
-    $statuses = [
-        'in_transit' => 'En Tránsito',
-        'delivered' => 'Entregado',
-        'pending' => 'Pendiente',
-        'picked_up' => 'Recogido',
-        'out_for_delivery' => 'En Reparto',
-        'failed_delivery' => 'Entrega Fallida'
-    ];
-    return $statuses[$status] ?? ucfirst(str_replace('_', ' ', $status));
 }
 
 function getPaymentStatusText($status) {

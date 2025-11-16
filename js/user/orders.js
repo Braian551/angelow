@@ -50,14 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        // Rastrear envío
-        document.querySelectorAll('.btn-track').forEach(button => {
-            button.addEventListener('click', function() {
-                const orderId = this.dataset.orderId;
-                trackOrder(orderId);
-            });
-        });
-
         // Volver a pedir
         document.querySelectorAll('.btn-reorder').forEach(button => {
             button.addEventListener('click', function() {
@@ -72,11 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Funciones de modal - REMOVIDAS: Ahora se usan páginas separadas
     // loadOrderDetails(orderId) { ... }
-
-    // Rastrear envío - redirigir a página de rastreo
-    function trackOrder(orderId) {
-        window.location.href = `track_order.php?id=${orderId}`;
-    }
 
     // startLiveTracking(orderId) { ... }
 
@@ -98,8 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusBadge.textContent = 'Cancelado';
                 statusBadge.className = 'status-badge status-cancelled';
                 
-                // Remover botones de acción
-                orderCard.querySelectorAll('.btn-cancel, .btn-track').forEach(btn => btn.remove());
+                // Remover botones de acción que ya no aplican
+                orderCard.querySelectorAll('.btn-cancel').forEach(btn => btn.remove());
                 
                 // Actualizar timeline
                 orderCard.querySelector('.order-timeline').innerHTML = renderOrderTimeline('cancelled');

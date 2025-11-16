@@ -48,15 +48,8 @@ try {
     $stmtItems->execute([':order_id' => $orderId]);
     $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
-    // Obtener información de delivery si existe
-    $stmtDelivery = $conn->prepare("
-        SELECT od.*, u.name as driver_name, u.phone as driver_phone
-        FROM order_deliveries od
-        LEFT JOIN users u ON u.id = od.driver_id
-        WHERE od.order_id = :order_id
-    ");
-    $stmtDelivery->execute([':order_id' => $orderId]);
-    $delivery = $stmtDelivery->fetch(PDO::FETCH_ASSOC);
+    // Ya no se manejan repartidores asociados desde el frontend
+    $delivery = null;
 
     // Determinar si es recogida en tienda
     $isStorePickup = isStorePickupMethod($order);
@@ -123,12 +116,6 @@ function calculateDiscountAmount($order, $subtotal) {
                             <i class="fas fa-check-circle"></i>
                             <?= getPaymentStatusText($order['payment_status'] ?: 'pending') ?>
                         </div>
-                        <?php if ($delivery): ?>
-                        <div class="delivery-badge">
-                            <i class="fas fa-<?= getDeliveryStatusIcon($delivery['delivery_status']) ?>"></i>
-                            <?= getDeliveryStatusText($delivery['delivery_status']) ?>
-                        </div>
-                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -261,42 +248,6 @@ function calculateDiscountAmount($order, $subtotal) {
                             </div>
                         </div>
 
-                        <!-- Información de delivery -->
-                        <?php if ($delivery): ?>
-                        <div class="order-info-panel">
-                            <div class="panel-header">
-                                <i class="fas fa-truck"></i>
-                                <h2>Información de Entrega</h2>
-                            </div>
-                            
-                            <?php if ($delivery['driver_name']): ?>
-                                <div class="driver-card">
-                                    <div class="driver-photo" style="background: #667eea; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                                        <?= substr($delivery['driver_name'], 0, 1) ?>
-                                    </div>
-                                    
-                                    <div class="driver-info">
-                                        <h4><?= htmlspecialchars($delivery['driver_name']) ?></h4>
-                                        <?php if ($delivery['driver_phone']): ?>
-                                            <p><i class="fas fa-phone"></i> <?= htmlspecialchars($delivery['driver_phone']) ?></p>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-
-                            <div class="delivery-timeline" style="margin-top: 20px;">
-                                <?php if ($delivery['assigned_at']): ?>
-                                    <p><strong>Asignado:</strong> <?= date('d/m/Y H:i', strtotime($delivery['assigned_at'])) ?></p>
-                                <?php endif; ?>
-                                <?php if ($delivery['started_at']): ?>
-                                    <p><strong>Iniciado:</strong> <?= date('d/m/Y H:i', strtotime($delivery['started_at'])) ?></p>
-                                <?php endif; ?>
-                                <?php if ($delivery['delivered_at']): ?>
-                                    <p><strong>Entregado:</strong> <?= date('d/m/Y H:i', strtotime($delivery['delivered_at'])) ?></p>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                        <?php endif; ?>
 
                         <!-- Botones de acción -->
                         <div class="order-actions">
@@ -317,12 +268,6 @@ function calculateDiscountAmount($order, $subtotal) {
                                 <button class="btn btn-danger" onclick="cancelOrder(<?= $order['id'] ?>)">
                                     <i class="fas fa-times"></i> Cancelar Pedido
                                 </button>
-                            <?php endif; ?>
-
-                            <?php if ($order['status'] === 'shipped' || ($delivery && in_array($delivery['delivery_status'], ['in_transit', 'out_for_delivery']))): ?>
-                                <a href="track_order.php?id=<?= $order['id'] ?>" class="btn btn-primary">
-                                    <i class="fas fa-map-marked-alt"></i> Rastrear Envío
-                                </a>
                             <?php endif; ?>
 
                             <?php if ($order['status'] === 'delivered'): ?>
@@ -522,36 +467,6 @@ function getStatusIcon($status) {
         'cancelled' => 'times-circle',
         'refunded' => 'undo',
         'on_hold' => 'pause-circle'
-    ];
-    return $icons[$status] ?? 'info-circle';
-}
-
-function getDeliveryStatusText($status) {
-    $statuses = [
-        'pending' => 'Pendiente',
-        'driver_assigned' => 'Conductor Asignado',
-        'driver_accepted' => 'Aceptado por Conductor',
-        'in_transit' => 'En Tránsito',
-        'out_for_delivery' => 'En Reparto',
-        'arrived' => 'Ha Llegado',
-        'delivered' => 'Entregado',
-        'failed_delivery' => 'Entrega Fallida',
-        'cancelled' => 'Cancelado'
-    ];
-    return $statuses[$status] ?? ucfirst(str_replace('_', ' ', $status));
-}
-
-function getDeliveryStatusIcon($status) {
-    $icons = [
-        'pending' => 'clock',
-        'driver_assigned' => 'user-check',
-        'driver_accepted' => 'check-circle',
-        'in_transit' => 'truck',
-        'out_for_delivery' => 'shipping-fast',
-        'arrived' => 'map-marker-alt',
-        'delivered' => 'check-circle',
-        'failed_delivery' => 'exclamation-triangle',
-        'cancelled' => 'times-circle'
     ];
     return $icons[$status] ?? 'info-circle';
 }
