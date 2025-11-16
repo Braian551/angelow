@@ -21,22 +21,23 @@ try {
     $userId = $_SESSION['user_id'];
     
     // Preparar y ejecutar la consulta
-    $stmt = $conn->prepare("
-        SELECT DISTINCT LOWER(TRIM(search_term)) as search_term 
-        FROM search_history 
-        WHERE user_id = :user_id
-        AND search_term IS NOT NULL
-        AND search_term != ''
-        ORDER BY created_at DESC
-        LIMIT 50
-    ");
+        $stmt = $conn->prepare("
+            SELECT LOWER(TRIM(search_term)) AS search_term, MAX(created_at) AS last_used
+            FROM search_history
+            WHERE user_id = :user_id
+            AND search_term IS NOT NULL
+            AND search_term != ''
+            GROUP BY LOWER(TRIM(search_term))
+            ORDER BY last_used DESC
+            LIMIT 50
+        ");
     $stmt->bindParam(':user_id', $userId);
     
     if (!$stmt->execute()) {
         throw new Exception('Error al ejecutar la consulta');
     }
     
-    $terms = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+        $terms = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'search_term');
     
     // Filtrar términos vacíos y asegurar que sean strings
     $response['terms'] = array_filter($terms, function($term) {

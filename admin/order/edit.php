@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
 require_once __DIR__ . '/../../alertas/alerta1.php';
+require_once __DIR__ . '/order_notification_service.php';
 
 // Verificar autenticación y permisos
 if (!isset($_SESSION['user_id'])) {
@@ -60,6 +61,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Estado de pago inválido");
         }
         
+        // Obtener estatus actual antes de actualizar
+        $stmtCurrentStatus = $conn->prepare("SELECT status FROM orders WHERE id = ?");
+        $stmtCurrentStatus->execute([$orderId]);
+        $statusRow = $stmtCurrentStatus->fetch(PDO::FETCH_ASSOC);
+        if (!$statusRow) {
+            throw new Exception("La orden no existe");
+        }
+        $previousStatus = $statusRow['status'];
+
         // Obtener nombre del usuario actual para el historial
         $stmtUser = $conn->prepare("SELECT name FROM users WHERE id = ?");
         $stmtUser->execute([$_SESSION['user_id']]);
@@ -168,7 +178,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->exec("SET @current_user_ip = NULL");
         
         if ($result) {
-            $_SESSION['alert'] = ['type' => 'success', 'message' => 'Orden actualizada correctamente'];
+            $shouldNotify = ($previousStatus !== 'delivered' && $_POST['status'] === 'delivered');
+            $notificationResult = null;
+            if ($shouldNotify) {
+                $notificationResult = notifyOrderDelivered($conn, $orderId);
+            }
+
+            if ($notificationResult && !$notificationResult['ok']) {
+                $_SESSION['alert'] = ['type' => 'warning', 'message' => 'Orden actualizada pero el comprobante no pudo enviarse: ' . $notificationResult['message']];
+            } elseif ($notificationResult && $notificationResult['ok']) {
+                $_SESSION['alert'] = ['type' => 'success', 'message' => 'Orden actualizada y comprobante enviado al cliente'];
+            } else {
+                $_SESSION['alert'] = ['type' => 'success', 'message' => 'Orden actualizada correctamente'];
+            }
             header("Location: " . BASE_URL . "/admin/order/detail.php?id=$orderId");
             exit();
         } else {
@@ -292,10 +314,17 @@ $paymentStatuses = [
 ];
 
 // Obtener ciudades de envío
+$cities = ['Medellín'];
 try {
-    $cities = $conn->query("SELECT city_name FROM delivery_cities WHERE is_active = 1 ORDER BY city_name")->fetchAll(PDO::FETCH_COLUMN);
+    $tableCheck = $conn->query("SHOW TABLES LIKE 'delivery_cities'");
+    if ($tableCheck && $tableCheck->rowCount() > 0) {
+        $result = $conn->query("SELECT city_name FROM delivery_cities WHERE is_active = 1 ORDER BY city_name");
+        $fetchedCities = $result ? $result->fetchAll(PDO::FETCH_COLUMN) : [];
+        if ($fetchedCities) {
+            $cities = $fetchedCities;
+        }
+    }
 } catch (PDOException $e) {
-    $cities = ['Medellín'];
     error_log("Error al obtener ciudades: " . $e->getMessage());
 }
 ?>

@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
+require_once __DIR__ . '/order_notification_service.php';
 
 header('Content-Type: application/json');
 
@@ -134,6 +135,7 @@ try {
     $affectedRows = 0;
     $skippedOrders = 0;
     $updatedOrders = [];
+    $ordersToNotify = [];
     
     // Actualizar cada orden individualmente para que los triggers funcionen correctamente
     foreach ($orderIds as $orderId) {
@@ -161,6 +163,9 @@ try {
         if ($stmt->rowCount() > 0) {
             $affectedRows++;
             $updatedOrders[] = $currentOrder['order_number'];
+            if ($newStatus === 'delivered') {
+                $ordersToNotify[] = (int) $orderId;
+            }
             
             // Registrar el cambio en el historial (si la tabla existe)
             try {
@@ -305,6 +310,22 @@ try {
     // Confirmar transacción
     $conn->commit();
     
+    // Enviar comprobantes si aplica
+    $notifications = [];
+    $notificationsSent = 0;
+    foreach ($ordersToNotify as $orderIdToNotify) {
+        $result = notifyOrderDelivered($conn, $orderIdToNotify);
+        if ($result['ok']) {
+            $notificationsSent++;
+        }
+        $notifications[] = [
+            'order_id' => $orderIdToNotify,
+            'ok' => $result['ok'],
+            'message' => $result['message']
+        ];
+    }
+    $notificationsFailed = count($ordersToNotify) - $notificationsSent;
+
     // Traducir estado para el mensaje
     $statusLabels = [
         'pending' => 'Pendiente',
@@ -322,13 +343,20 @@ try {
         if ($skippedOrders > 0) {
             $message .= " ($skippedOrders " . ($skippedOrders === 1 ? 'omitida' : 'omitidas') . " por tener el mismo estado)";
         }
+        if ($notificationsSent > 0) {
+            $message .= " · $notificationsSent comprobante(s) enviado(s)";
+        }
+        if ($notificationsFailed > 0) {
+            $message .= " · $notificationsFailed correo(s) con error";
+        }
         
         echo json_encode([
             'success' => true,
             'message' => $message,
             'updated' => $affectedRows,
             'skipped' => $skippedOrders,
-            'order_numbers' => $updatedOrders
+            'order_numbers' => $updatedOrders,
+            'notifications' => $notifications
         ]);
     } else {
         echo json_encode([

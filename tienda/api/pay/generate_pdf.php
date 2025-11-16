@@ -159,11 +159,12 @@ try {
             p.name as product_name,
             p.slug as product_slug,
             COALESCE(vi.image_path, pi.image_path) as primary_image,
-            pcv.name as variant_name
+            COALESCE(c.name, CONCAT('Variante ', pcv.id)) as variant_name
         FROM order_items oi
         LEFT JOIN products p ON oi.product_id = p.id
         LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_primary = 1
         LEFT JOIN product_color_variants pcv ON oi.color_variant_id = pcv.id
+        LEFT JOIN colors c ON pcv.color_id = c.id
         LEFT JOIN variant_images vi ON pcv.id = vi.color_variant_id AND vi.is_primary = 1
         WHERE oi.order_id = ?
     ";

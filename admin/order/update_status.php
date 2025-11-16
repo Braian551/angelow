@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
+require_once __DIR__ . '/order_notification_service.php';
 
 header('Content-Type: application/json');
 
@@ -94,6 +95,7 @@ try {
     $conn->beginTransaction();
     
     $affectedRows = 0;
+    $ordersToNotify = [];
     
     // Actualizar cada orden individualmente para que los triggers funcionen correctamente
     foreach ($orderIds as $orderId) {
@@ -109,6 +111,10 @@ try {
             
             if ($stmt->rowCount() > 0) {
                 $affectedRows++;
+
+                if ($newStatus === 'delivered') {
+                    $ordersToNotify[] = $orderId;
+                }
                 
                 // Si hay notas adicionales, registrarlas como un cambio separado
                 if ($notes && trim($notes) !== '') {
@@ -137,10 +143,34 @@ try {
     $conn->exec("SET @current_user_name = NULL");
     $conn->exec("SET @current_user_ip = NULL");
     
+    $notifications = [];
+    $notificationsSent = 0;
+    foreach ($ordersToNotify as $orderIdToNotify) {
+        $result = notifyOrderDelivered($conn, (int) $orderIdToNotify);
+        if ($result['ok']) {
+            $notificationsSent++;
+        }
+        $notifications[] = [
+            'order_id' => $orderIdToNotify,
+            'ok' => $result['ok'],
+            'message' => $result['message']
+        ];
+    }
+    $notificationsFailed = count($ordersToNotify) - $notificationsSent;
+    
     if ($affectedRows > 0) {
+        $message = "Estado de $affectedRows orden(es) actualizado correctamente";
+        if ($notificationsSent > 0) {
+            $message .= " · $notificationsSent comprobante(s) enviado(s)";
+        }
+        if ($notificationsFailed > 0) {
+            $message .= " · $notificationsFailed correo(s) con error";
+        }
+        
         echo json_encode([
             'success' => true,
-            'message' => "Estado de $affectedRows orden(es) actualizado correctamente"
+            'message' => $message,
+            'notifications' => $notifications
         ]);
     } else {
         echo json_encode([
