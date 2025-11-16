@@ -262,6 +262,17 @@ function formatCurrency($amount) {
     return '$' . number_format($amount, 0, ',', '.');
 }
 
+// Evitar duplicidad entre la dirección actual (FK) y la dirección snapshot (string)
+$showShippingSnapshot = true;
+if (!empty($order['shipping_address']) && !empty($order['current_address'])) {
+    $normalize = function($s) {
+        return preg_replace('/\s+/', ' ', mb_strtolower(trim(strip_tags($s))));
+    };
+    if ($normalize($order['shipping_address']) === $normalize($order['current_address'])) {
+        $showShippingSnapshot = false;
+    }
+}
+
 // Estados disponibles
 $statuses = [
     'pending' => 'Pendiente',
@@ -1074,22 +1085,32 @@ try {
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <small class="form-text">⚠️ Solo editar si no seleccionaste dirección arriba</small>
+                                        <small class="form-text">Solo editar si no seleccionaste una dirección guardada arriba</small>
                                 </div>
 
+                                <?php if ($showShippingSnapshot): ?>
                                 <div class="form-group full-width">
                                     <label for="shipping_address">
                                         <i class="fas fa-home"></i>
                                         Dirección Completa (Snapshot Histórico)
                                     </label>
                                     <textarea id="shipping_address" name="shipping_address" class="form-control" rows="3"><?= htmlspecialchars($order['shipping_address'] ?? '') ?></textarea>
-                                    <small class="form-text">
-                                        📜 Este campo guarda el snapshot histórico. 
+                                        <small class="form-text">
+                                        Este campo guarda el snapshot histórico.
                                         <?php if ($order['shipping_address_id']): ?>
                                             Se actualizará automáticamente si cambias la dirección arriba.
                                         <?php endif; ?>
                                     </small>
                                 </div>
+                                <?php else: ?>
+                                    <div class="form-group full-width">
+                                        <label for="shipping_address">
+                                            <i class="fas fa-home"></i>
+                                            Dirección Completa (Snapshot Histórico)
+                                        </label>
+                                        <p class="form-text" style="margin:0; padding:0.6rem 0;">La dirección actual se guardó como snapshot automáticamente.</p>
+                                    </div>
+                                <?php endif; ?>
 
                                 <div class="form-group full-width">
                                     <label for="delivery_notes">
