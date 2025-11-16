@@ -40,6 +40,7 @@ function getOrderPayloadForInvoice(PDO $conn, int $orderId): array
 
     $orderSql = "
         SELECT o.*, u.name AS user_name, u.email AS user_email, u.phone AS user_phone,
+               u.id AS user_id,
                pt.reference_number, pt.payment_proof, pt.created_at AS payment_date
                $shippingSelect
         FROM orders o
@@ -121,6 +122,17 @@ function notifyOrderDelivered(PDO $conn, int $orderId): array
 
         if (!$sent) {
             return ['ok' => false, 'message' => 'No se pudo enviar el correo'];
+        }
+
+        // Registrar notificación en la tabla `notifications` para que el usuario vea el aviso
+        try {
+            $stmt = $conn->prepare("INSERT INTO notifications (user_id, type_id, title, message, related_entity_type, related_entity_id, is_read, created_at) VALUES (?, 1, ?, ?, 'order', ?, 0, NOW())");
+            $title = 'Pedido entregado #' . ($order['order_number'] ?? $orderId);
+            $message = 'Tu pedido #' . ($order['order_number'] ?? $orderId) . ' ha sido marcado como entregado. Encuentra tu factura adjunta en el correo.';
+            $userId = $order['user_id'] ?? $order['user_id'];
+            $stmt->execute([$userId, $title, $message, $orderId]);
+        } catch (Throwable $e) {
+            error_log('[ORDER_NOTIFY] Error al crear notificación: ' . $e->getMessage());
         }
 
         return ['ok' => true, 'message' => 'Correo enviado correctamente'];
