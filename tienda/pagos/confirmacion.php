@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/helpers/shipping_helpers.php';
 
 // Verificar disponibilidad de una librería para generar PDF (Dompdf o TCPDF)
 $pdf_available = class_exists('\Dompdf\\Dompdf') || class_exists('Dompdf') || class_exists('TCPDF') || class_exists('\\TCPDF');
@@ -28,15 +29,29 @@ if (!isset($_SESSION['last_order'])) {
 }
 
 $order_number = $_SESSION['last_order'];
+$shippingMethodName = '';
+$shippingMethodDesc = '';
+$isStorePickup = false;
+$storeAddress = getStorePickupAddress();
+$storeCoords = getStorePickupCoordinates();
+$customerLat = null;
+$customerLng = null;
+$routeLink = null;
 
 // Obtener información completa de la orden
 try {
     $orderQuery = "
         SELECT o.*, u.name as user_name, u.email as user_email, u.phone as user_phone,
-               pt.reference_number, pt.payment_proof, pt.created_at as payment_date
+               pt.reference_number, pt.payment_proof, pt.created_at as payment_date,
+               sm.name AS shipping_method_name, sm.description AS shipping_method_description,
+               sm.delivery_time AS shipping_delivery_time,
+               ua.gps_latitude, ua.gps_longitude, ua.recipient_name AS address_recipient,
+               ua.recipient_phone AS address_phone, ua.alias AS address_alias
         FROM orders o
         JOIN users u ON o.user_id = u.id
         LEFT JOIN payment_transactions pt ON o.id = pt.order_id
+        LEFT JOIN shipping_methods sm ON o.shipping_method_id = sm.id
+        LEFT JOIN user_addresses ua ON o.shipping_address_id = ua.id
         WHERE o.order_number = ? AND o.user_id = ?
         ORDER BY o.created_at DESC 
         LIMIT 1
@@ -66,6 +81,86 @@ try {
     
     // Obtener dirección de envío desde los datos de la orden
     $shipping_address = $order['shipping_address'];
+    $shippingMethodName = $order['shipping_method_name'] ?? 'Envío a domicilio';
+    $shippingMethodDesc = $order['shipping_method_description'] ?? '';
+    $isStorePickup = isStorePickupMethod([
+        'name' => $shippingMethodName,
+        'description' => $shippingMethodDesc
+    ]);
+    $customerLat = $order['gps_latitude'] ?? null;
+    $customerLng = $order['gps_longitude'] ?? null;
+    $routeLink = $shipping_address ? buildStoreRouteLink($shipping_address) : null;
+    if ($isStorePickup) {
+        $shipping_address = $shipping_address ?: $storeAddress;
+        if (!$routeLink && $storeAddress) {
+            $routeLink = buildStoreRouteLink($storeAddress);
+        }
+    }
+    $trackingSteps = $isStorePickup
+        ? [
+            [
+                'icon' => 'fas fa-shopping-cart',
+                'title' => 'Pedido realizado',
+                'subtitle' => date('d/m H:i', strtotime($order['created_at'])),
+                'class' => 'completed'
+            ],
+            [
+                'icon' => 'fas fa-money-bill-wave',
+                'title' => 'Verificación de pago',
+                'subtitle' => 'En proceso',
+                'class' => 'active'
+            ],
+            [
+                'icon' => 'fas fa-box',
+                'title' => 'Preparando pedido',
+                'subtitle' => 'Próximamente',
+                'class' => ''
+            ],
+            [
+                'icon' => 'fas fa-store',
+                'title' => 'Listo para recoger',
+                'subtitle' => 'Te avisaremos por correo',
+                'class' => ''
+            ],
+            [
+                'icon' => 'fas fa-hand-holding-box',
+                'title' => 'Pedido entregado',
+                'subtitle' => 'Pendiente de recogida',
+                'class' => ''
+            ],
+        ]
+        : [
+            [
+                'icon' => 'fas fa-shopping-cart',
+                'title' => 'Pedido realizado',
+                'subtitle' => date('d/m H:i', strtotime($order['created_at'])),
+                'class' => 'completed'
+            ],
+            [
+                'icon' => 'fas fa-money-bill-wave',
+                'title' => 'Verificación de pago',
+                'subtitle' => 'En proceso',
+                'class' => 'active'
+            ],
+            [
+                'icon' => 'fas fa-box',
+                'title' => 'Preparando pedido',
+                'subtitle' => 'Próximamente',
+                'class' => ''
+            ],
+            [
+                'icon' => 'fas fa-truck',
+                'title' => 'En camino',
+                'subtitle' => 'Pendiente',
+                'class' => ''
+            ],
+            [
+                'icon' => 'fas fa-home',
+                'title' => 'Entregado',
+                'subtitle' => 'Pendiente',
+                'class' => ''
+            ],
+        ];
     
 } catch (Exception $e) {
     error_log("Error al obtener información de la orden: " . $e->getMessage());
@@ -173,6 +268,10 @@ try {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/tienda/confirmacion.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/notificaciones/notification2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <?php if ($isStorePickup): ?>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-o9N1j7kP5gyf3G2l1m0bV6wZ9F9s0gkMlG5wG4S0h2k=" crossorigin="" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css">
+    <?php endif; ?>
 </head>
 
 <body>
@@ -238,8 +337,10 @@ try {
                         <div class="summary-item">
                             <i class="fas fa-truck"></i>
                             <div>
-                                <span class="label">Método de envío</span>
-                                <span class="value">Transferencia bancaria</span>
+                                <span class="label">Método de entrega</span>
+                                <span class="value">
+                                    <?= htmlspecialchars($shippingMethodName ?: 'Envío a domicilio') ?>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -303,69 +404,105 @@ try {
                     </div>
 
                     <div class="shipping-info">
+                        <?php if ($isStorePickup): ?>
+                            <div class="info-group">
+                                <label>Tipo de entrega:</label>
+                                <p>Recogida en tienda</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Tienda principal:</label>
+                                <p><?= htmlspecialchars($storeAddress) ?></p>
+                            </div>
+                            <div class="info-group">
+                                <label>Contacto registrado:</label>
+                                <p>
+                                    <?= htmlspecialchars($order['address_recipient'] ?? $order['user_name']) ?>
+                                    <?php if (!empty($order['address_phone'])): ?>
+                                        <br><span class="muted">Tel: <?= htmlspecialchars($order['address_phone']) ?></span>
+                                    <?php endif; ?>
+                                </p>
+                            </div>
+                            <div class="info-group">
+                                <label>Indicaciones:</label>
+                                <p>
+                                    Te avisaremos por correo y WhatsApp cuando el pedido esté listo.
+                                    Presenta tu documento y el número de orden al recogerlo.
+                                </p>
+                            </div>
+                            <?php if (!empty($shippingMethodDesc)): ?>
+                                <div class="info-group">
+                                    <label>Detalles del método:</label>
+                                    <p><?= htmlspecialchars($shippingMethodDesc) ?></p>
+                                </div>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <div class="info-group">
+                                <label>Dirección de envío:</label>
+                                <p><?= htmlspecialchars($shipping_address) ?></p>
+                            </div>
+                            <div class="info-group">
+                                <label>Método de envío:</label>
+                                <p>
+                                    <?= htmlspecialchars($shippingMethodName ?: 'Envío a domicilio') ?>
+                                    <?php if (!empty($shippingMethodDesc)): ?>
+                                        <br><span class="muted"><?= htmlspecialchars($shippingMethodDesc) ?></span>
+                                    <?php endif; ?>
+                                </p>
+                            </div>
+                            <?php if (!empty($order['reference_number'])): ?>
+                                <div class="info-group">
+                                    <label>Referencia de pago:</label>
+                                    <p class="reference-number"><?= htmlspecialchars($order['reference_number']) ?></p>
+                                </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
+
+                        <?php if (!empty($order['reference_number']) && $isStorePickup): ?>
+                            <div class="info-group">
+                                <label>Referencia de pago:</label>
+                                <p class="reference-number"><?= htmlspecialchars($order['reference_number']) ?></p>
+                            </div>
+                        <?php endif; ?>
                         <div class="info-group">
-                            <label>Dirección de envío:</label>
-                            <p><?= htmlspecialchars($shipping_address) ?></p>
-                        </div>
-                        <div class="info-group">
-                            <label>Método de envío:</label>
+                            <label>Estado de pago:</label>
                             <p>Transferencia bancaria - Pendiente de verificación</p>
                         </div>
-                        <div class="info-group">
-                            <label>Referencia de pago:</label>
-                            <p class="reference-number"><?= htmlspecialchars($order['reference_number']) ?></p>
-                        </div>
                     </div>
+
+                    <?php if ($isStorePickup): ?>
+                        <div class="pickup-map-wrapper">
+                            <h3><i class="fas fa-map-marker-alt"></i> Cómo llegar a la tienda</h3>
+                            <div id="pickup-map" class="pickup-map"></div>
+                            <div class="map-hint">
+                                <?php if ($customerLat && $customerLng): ?>
+                                    <p>Mostramos la ruta desde tu dirección guardada hasta la tienda.</p>
+                                <?php else: ?>
+                                    <p>Para trazar la ruta exacta agrega una dirección con GPS en tu perfil.</p>
+                                <?php endif; ?>
+                                <?php if ($routeLink): ?>
+                                    <a href="<?= htmlspecialchars($routeLink) ?>" target="_blank" class="route-link">
+                                        <i class="fas fa-location-arrow"></i> Abrir en Google Maps
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
                     <!-- Información de seguimiento -->
                     <div class="tracking-info">
                         <h3><i class="fas fa-map-marker-alt"></i> Progreso del Pedido</h3>
                         <div class="tracking-steps">
-                            <div class="tracking-step completed">
-                                <div class="step-icon">
-                                    <i class="fas fa-shopping-cart"></i>
+                            <?php foreach ($trackingSteps as $step): ?>
+                                <div class="tracking-step <?= htmlspecialchars($step['class'] ?? '') ?>">
+                                    <div class="step-icon">
+                                        <i class="<?= htmlspecialchars($step['icon']) ?>"></i>
+                                    </div>
+                                    <div class="step-content">
+                                        <span class="step-title"><?= htmlspecialchars($step['title']) ?></span>
+                                        <span class="step-date"><?= htmlspecialchars($step['subtitle']) ?></span>
+                                    </div>
                                 </div>
-                                <div class="step-content">
-                                    <span class="step-title">Pedido realizado</span>
-                                    <span class="step-date"><?= date('d/m H:i', strtotime($order['created_at'])) ?></span>
-                                </div>
-                            </div>
-                            <div class="tracking-step active">
-                                <div class="step-icon">
-                                    <i class="fas fa-money-bill-wave"></i>
-                                </div>
-                                <div class="step-content">
-                                    <span class="step-title">Verificación de pago</span>
-                                    <span class="step-date">En proceso</span>
-                                </div>
-                            </div>
-                            <div class="tracking-step">
-                                <div class="step-icon">
-                                    <i class="fas fa-box"></i>
-                                </div>
-                                <div class="step-content">
-                                    <span class="step-title">Preparando pedido</span>
-                                    <span class="step-date">Próximamente</span>
-                                </div>
-                            </div>
-                            <div class="tracking-step">
-                                <div class="step-icon">
-                                    <i class="fas fa-truck"></i>
-                                </div>
-                                <div class="step-content">
-                                    <span class="step-title">En camino</span>
-                                    <span class="step-date">Próximamente</span>
-                                </div>
-                            </div>
-                            <div class="tracking-step">
-                                <div class="step-icon">
-                                    <i class="fas fa-home"></i>
-                                </div>
-                                <div class="step-content">
-                                    <span class="step-title">Entregado</span>
-                                    <span class="step-date">Próximamente</span>
-                                </div>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </section>
@@ -410,6 +547,11 @@ try {
 
     <?php include __DIR__ . '/../../layouts/footer.php'; ?>
 
+    <?php if ($isStorePickup): ?>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7kP5gyf3G2l1m0bV6wZ9F9s0gkMlG5wG4S0h2k=" crossorigin=""></script>
+        <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <?php endif; ?>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Animación para los pasos de seguimiento
@@ -429,6 +571,45 @@ try {
                     successCard.classList.add('animate-in');
                 }
             }, 500);
+
+            <?php if ($isStorePickup): ?>
+            const mapElement = document.getElementById('pickup-map');
+            const storeLat = <?= isset($storeCoords['lat']) ? json_encode((float)$storeCoords['lat']) : 'null' ?>;
+            const storeLng = <?= isset($storeCoords['lng']) ? json_encode((float)$storeCoords['lng']) : 'null' ?>;
+            const customerLat = <?= $customerLat ? json_encode((float)$customerLat) : 'null' ?>;
+            const customerLng = <?= $customerLng ? json_encode((float)$customerLng) : 'null' ?>;
+
+            if (mapElement && storeLat && storeLng && typeof L !== 'undefined') {
+                const map = L.map('pickup-map').setView([storeLat, storeLng], customerLat && customerLng ? 13 : 15);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap'
+                }).addTo(map);
+
+                L.marker([storeLat, storeLng]).addTo(map)
+                    .bindPopup('Tienda principal')
+                    .openPopup();
+
+                if (customerLat && customerLng && typeof L.Routing !== 'undefined') {
+                    L.marker([customerLat, customerLng]).addTo(map)
+                        .bindPopup('Tu dirección guardada');
+
+                    L.Routing.control({
+                        waypoints: [
+                            L.latLng(customerLat, customerLng),
+                            L.latLng(storeLat, storeLng)
+                        ],
+                        draggableWaypoints: false,
+                        addWaypoints: false,
+                        show: false,
+                        lineOptions: {
+                            styles: [{ color: '#ff6f3d', weight: 5 }]
+                        }
+                    }).addTo(map);
+                }
+            }
+            <?php endif; ?>
         });
     </script>
 </body>

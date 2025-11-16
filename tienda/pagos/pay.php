@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
+require_once __DIR__ . '/helpers/shipping_helpers.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -77,6 +78,18 @@ try {
     header("Location: " . BASE_URL . "/tienda/pagos/envio.php?error=shipping");
     exit();
 }
+
+$isStorePickup = isStorePickupMethod($selectedShipping);
+$addressParts = array_filter([
+    $selectedAddress['address'] ?? '',
+    $selectedAddress['neighborhood'] ?? ''
+]);
+$customerFullAddress = implode(', ', $addressParts);
+if (!empty($selectedAddress['complement'])) {
+    $customerFullAddress .= ' - ' . $selectedAddress['complement'];
+}
+$customerFullAddress = trim($customerFullAddress);
+$pickupRouteLink = $isStorePickup ? buildStoreRouteLink($customerFullAddress) : null;
 
 // Obtener items del carrito para mostrar resumen
 try {
@@ -201,14 +214,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 INSERT INTO orders (
                     order_number, user_id, status, subtotal, shipping_cost, 
                     total, payment_method, payment_status,
-                    shipping_address_id, shipping_address, shipping_city
-                ) VALUES (?, ?, 'pending', ?, ?, ?, 'transfer', 'pending', ?, ?, ?)
+                    shipping_address_id, shipping_address, shipping_city, shipping_method_id
+                ) VALUES (?, ?, 'pending', ?, ?, ?, 'transfer', 'pending', ?, ?, ?, ?)
             ";
             
-            $shipping_address = $selectedAddress['address'] . ', ' . $selectedAddress['neighborhood'];
-            if ($selectedAddress['complement']) {
-                $shipping_address .= ' - ' . $selectedAddress['complement'];
-            }
+            $shipping_address = $customerFullAddress;
+            $pickupRouteLink = $isStorePickup ? buildStoreRouteLink($shipping_address) : null;
             
             $stmt = $conn->prepare($orderQuery);
             $stmt->execute([
@@ -219,7 +230,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $checkout_data['total'],
                 $selectedAddress['id'], // Guardar el ID de la dirección seleccionada
                 $shipping_address,
-                'Medellín' // Asumiendo que todas las direcciones son en Medellín
+                'Medellín', // Asumiendo que todas las direcciones son en Medellín
+                $checkout_data['shipping_method_id']
             ]);
             
             $order_id = $conn->lastInsertId();
@@ -503,7 +515,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="order-summary-details">
                             <!-- Dirección de Envío -->
                             <div class="summary-block">
-                                <h4><i class="fas fa-map-marker-alt"></i> Dirección de Envío</h4>
+                                <h4><i class="fas fa-map-marker-alt"></i> <?= $isStorePickup ? 'Punto de partida' : 'Dirección de Envío' ?></h4>
                                 <div class="address-summary">
                                     <p><strong><?= htmlspecialchars($selectedAddress['recipient_name']) ?></strong> (<?= htmlspecialchars($selectedAddress['recipient_phone']) ?>)</p>
                                     <p><?= htmlspecialchars($selectedAddress['address']) ?></p>
@@ -515,6 +527,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <p class="delivery-notes">
                                             <i class="fas fa-info-circle"></i>
                                             <?= htmlspecialchars($selectedAddress['delivery_instructions']) ?>
+                                        </p>
+                                    <?php elseif ($isStorePickup): ?>
+                                        <p class="delivery-notes pickup-note">
+                                            <i class="fas fa-store"></i>
+                                            Usaremos esta dirección para validar tu identidad y calcular la ruta hacia nuestra tienda.
                                         </p>
                                     <?php endif; ?>
                                 </div>
@@ -530,8 +547,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <i class="fas fa-clock"></i>
                                         <?= htmlspecialchars($selectedShipping['delivery_time']) ?>
                                     </p>
+                                    <?php if ($isStorePickup): ?>
+                                        <p class="pickup-note">
+                                            <i class="fas fa-store"></i>
+                                            Recibirás un correo cuando tu pedido esté listo para recoger en la tienda física.
+                                        </p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
+
+                            <?php if ($isStorePickup): ?>
+                            <div class="summary-block pickup-destination">
+                                <h4><i class="fas fa-map-signs"></i> Punto de Recogida</h4>
+                                <p><strong>Angelow Ropa Infantil</strong></p>
+                                <p><?= htmlspecialchars(getStorePickupAddress()) ?></p>
+                                <p class="shipping-time"><i class="fas fa-clock"></i> Horario: Lunes a Viernes 9:00 AM - 6:00 PM</p>
+                                <?php if ($pickupRouteLink): ?>
+                                    <a class="btn btn-outline btn-sm" href="<?= htmlspecialchars($pickupRouteLink) ?>" target="_blank" rel="noopener">
+                                        <i class="fas fa-route"></i> Ver ruta sugerida
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                            <?php endif; ?>
 
                             <!-- Productos -->
                             <div class="summary-block">
