@@ -164,7 +164,17 @@ function sendInvoiceEmail(array $order, array $orderItems, ?string $pdfContent =
             </div>
             <div class="card">
                 <h3>Detalle de productos</h3>
-                <table class="items-table">' . $itemsHtml . '</table>
+                <table class="items-table">
+                    <thead>
+                        <tr style="background:#f8fafc;">
+                            <th style="text-align:left;padding:12px;border-bottom:1px solid #e2e8f0;">Imagen</th>
+                            <th style="text-align:left;padding:12px;border-bottom:1px solid #e2e8f0;">Producto</th>
+                            <th style="text-align:center;padding:12px;border-bottom:1px solid #e2e8f0;">Cant.</th>
+                            <th style="text-align:right;padding:12px;border-bottom:1px solid #e2e8f0;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>' . $itemsHtml . '</tbody>
+                </table>
                 <div class="totals">
                     <div class="totals-row"><span>Subtotal:</span><span>$' . number_format($subtotal, 0, ',', '.') . '</span></div>
                     ' . ($discount > 0 ? '<div class="totals-row"><span>Descuento:</span><span>-$' . number_format($discount, 0, ',', '.') . '</span></div>' : '') . '
