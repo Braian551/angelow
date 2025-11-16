@@ -109,6 +109,15 @@ try {
 
 } catch (PDOException $e) {
     error_log("Error al aplicar descuento: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Error al aplicar el código de descuento']);
+
+    // Detectar caso común: tabla sin AUTO_INCREMENT en id (MySQL error 1364)
+    $msg = 'Error al aplicar el código de descuento';
+    if (strpos($e->getMessage(), "Field 'id' doesn't have a default value") !== false || strpos($e->getMessage(), 'SQLSTATE[HY000]: General error: 1364') !== false) {
+        // Mensaje más amigable si la base de datos no tiene AUTO_INCREMENT
+        $msg = 'Error interno en la base de datos: id falta configuración. Ejecuta database/fixes/fix_user_applied_discounts.php en el servidor para corregirlo.';
+        error_log('Sugerencia de migración: database/fixes/fix_user_applied_discounts.php');
+    }
+
+    echo json_encode(['success' => false, 'message' => $msg]);
 }
 ?>
