@@ -226,14 +226,15 @@ function generateInvoicePdfContent(array $order, array $orderItems)
             </table>
 
             <div class="totals-card">
-                <div class="totals-row"><span>Subtotal</span><span>$' . number_format($order['subtotal'] ?? array_sum(array_column($orderItems, 'total')), 0, ',', '.') . '</span></div>';
+                 <div class="totals-row"><span>Subtotal:</span><span>$' . number_format($order['subtotal'] ?? array_sum(array_column($orderItems, 'total')), 0, ',', '.') . '</span></div>';
 
     if (!empty($order['discount_amount']) && $order['discount_amount'] > 0) {
-        $html .= '<div class="totals-row"><span>Descuento aplicado</span><span>-$' . number_format($order['discount_amount'], 0, ',', '.') . '</span></div>';
+                $html .= '<div class="totals-row"><span>Descuento aplicado:</span><span>-$' . number_format($order['discount_amount'], 0, ',', '.') . '</span></div>';
     }
 
     $html .= '<div class="totals-row"><span>Costo de envío</span><span>$' . number_format($order['shipping_cost'] ?? 0, 0, ',', '.') . '</span></div>
-                <div class="totals-row grand-total"><span>Total factura</span><span>$' . number_format($order['total'], 0, ',', '.') . '</span></div>
+                <div class="totals-row"><span>Costo de envío:</span><span>$' . number_format($order['shipping_cost'] ?? 0, 0, ',', '.') . '</span></div>
+                <div class="totals-row grand-total"><span>Total factura:</span><span>$' . number_format($order['total'], 0, ',', '.') . '</span></div>
             </div>
 
             <div class="notes">

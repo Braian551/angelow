@@ -166,10 +166,10 @@ function sendInvoiceEmail(array $order, array $orderItems, ?string $pdfContent =
                 <h3>Detalle de productos</h3>
                 <table class="items-table">' . $itemsHtml . '</table>
                 <div class="totals">
-                    <div class="totals-row"><span>Subtotal</span><span>$' . number_format($subtotal, 0, ',', '.') . '</span></div>
-                    ' . ($discount > 0 ? '<div class="totals-row"><span>Descuento</span><span>-$' . number_format($discount, 0, ',', '.') . '</span></div>' : '') . '
-                    <div class="totals-row"><span>Envío</span><span>$' . number_format($shipping, 0, ',', '.') . '</span></div>
-                    <div class="totals-row" style="font-size:16px; font-weight:700;"><span>Total pagado</span><span>$' . number_format($total, 0, ',', '.') . '</span></div>
+                    <div class="totals-row"><span>Subtotal:</span><span>$' . number_format($subtotal, 0, ',', '.') . '</span></div>
+                    ' . ($discount > 0 ? '<div class="totals-row"><span>Descuento:</span><span>-$' . number_format($discount, 0, ',', '.') . '</span></div>' : '') . '
+                    <div class="totals-row"><span>Envío:</span><span>$' . number_format($shipping, 0, ',', '.') . '</span></div>
+                    <div class="totals-row" style="font-size:16px; font-weight:700;"><span>Total pagado:</span><span>$' . number_format($total, 0, ',', '.') . '</span></div>
                 </div>
             </div>
             <p style="color:#475569; font-size:14px;">Conserva este correo como soporte de tu compra. Si necesitas actualizar tus datos de facturación o tienes inquietudes, escríbenos a <strong>facturacion@angelow.com</strong>.</p>
