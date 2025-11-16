@@ -536,10 +536,10 @@ try {
                         <i class="fas fa-download"></i> Descargar Comprobante (PDF)
                     </button>
                 </form>
-                <a href="<?= BASE_URL ?>/tienda" class="btn btn-outline">
+                <a href="<?= BASE_URL ?>/index.php" class="btn btn-outline">
                     <i class="fas fa-shopping-bag"></i> Seguir Comprando
                 </a>
-                <a href="<?= BASE_URL ?>/users/profile.php" class="btn btn-outline">
+                <a href="<?= BASE_URL ?>/users/orders.php" class="btn btn-outline">
                     <i class="fas fa-user"></i> Ver Mis Pedidos
                 </a>
             </div>
