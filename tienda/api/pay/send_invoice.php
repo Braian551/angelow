@@ -5,12 +5,17 @@ require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once __DIR__ . '/../../pagos/helpers/shipping_helpers.php';
+require_once __DIR__ . '/invoice_pdf_helpers.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-function invoiceBuildPublicImageUrl(?string $path): string
+function invoiceBuildEmailImageSrc(?string $path): string
 {
+    if (function_exists('invoiceImageToBase64')) {
+        return invoiceImageToBase64($path);
+    }
+
     if (empty($path)) {
         return BASE_URL . '/images/default-product.jpg';
     }
@@ -58,7 +63,7 @@ function sendInvoiceEmail(array $order, array $orderItems, ?string $pdfContent =
 
         $itemsHtml = '';
         foreach ($orderItems as $item) {
-            $imageUrl = invoiceBuildPublicImageUrl($item['primary_image'] ?? null);
+            $imageUrl = invoiceBuildEmailImageSrc($item['primary_image'] ?? null);
             $itemsHtml .= '<tr style="border-bottom:1px solid #e2e8f0;">
                 <td style="padding:12px 8px; width:64px;"><img src="' . htmlspecialchars($imageUrl) . '" style="width:48px; height:48px; border-radius:8px; object-fit:cover;" alt="Producto"></td>
                 <td style="padding:12px 8px;">

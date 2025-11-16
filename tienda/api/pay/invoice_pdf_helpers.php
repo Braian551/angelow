@@ -9,6 +9,29 @@ require_once __DIR__ . '/../../pagos/helpers/shipping_helpers.php';
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
+function invoiceTranslatePaymentStatus(?string $status): string
+{
+    $map = [
+        'pending' => 'Pendiente',
+        'paid' => 'Pagado',
+        'failed' => 'Fallido',
+        'refunded' => 'Reembolsado',
+        'cancelled' => 'Cancelado',
+        'canceled' => 'Cancelado',
+    ];
+
+    $key = strtolower(trim((string) $status));
+    if ($key === '') {
+        return 'Pendiente';
+    }
+
+    if (isset($map[$key])) {
+        return $map[$key];
+    }
+
+    return ucfirst($key);
+}
+
 /**
  * Helpers internos para resolver rutas de imagen siguiendo la lógica del comprobante original.
  */
@@ -85,6 +108,8 @@ function generateInvoicePdfContent(array $order, array $orderItems)
     $invoiceNumber = 'FAC-' . ($order['order_number'] ?? $order['id']);
     $issueDate = date('d/m/Y H:i');
 
+    $paymentStatusLabel = invoiceTranslatePaymentStatus($order['payment_status'] ?? 'pending');
+
     $html = '
     <!DOCTYPE html>
     <html>
@@ -149,7 +174,7 @@ function generateInvoicePdfContent(array $order, array $orderItems)
                         <h3 class="section-title">Datos de la orden</h3>
                         <div class="info-item"><span class="info-label">Orden:</span><span class="info-value">' . htmlspecialchars($order['order_number']) . '</span></div>
                         <div class="info-item"><span class="info-label">Fecha orden:</span><span class="info-value">' . date('d/m/Y H:i', strtotime($order['created_at'])) . '</span></div>
-                        <div class="info-item"><span class="info-label">Estado pago:</span><span class="info-value"><span class="badge">' . strtoupper(htmlspecialchars($order['payment_status'])) . '</span></span></div>
+                        <div class="info-item"><span class="info-label">Estado pago:</span><span class="info-value"><span class="badge">' . htmlspecialchars($paymentStatusLabel) . '</span></span></div>
                         <div class="info-item"><span class="info-label">Método pago:</span><span class="info-value">Transferencia bancaria</span></div>
                     </div>
                 </div>
