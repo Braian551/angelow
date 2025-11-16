@@ -10,6 +10,15 @@
         let isInWishlist = false;
         const currentUserId = <?= json_encode($_SESSION['user_id'] ?? null) ?>;
         const currentUserRole = <?= json_encode($_SESSION['user_role'] ?? null) ?>;
+        // Initial set of questions from server. Use let so we can update after delete.
+        let initialQuestions = <?= json_encode($questionsData ?: []) ?>;
+
+        // Helper: remove a question from front-end state after delete
+        function removeQuestionFromInitial(qId) {
+            try {
+                initialQuestions = initialQuestions.filter(q => q.id != qId);
+            } catch (err) { console.warn('Could not remove from initialQuestions', err); }
+        }
 
 
 
@@ -417,17 +426,18 @@
             $('#rating-value').val(rating);
         });
 
-        // Formulario de pregunta
-        $('#ask-question-btn').click(function() {
+        // Formulario de pregunta (delegated so it works with injected buttons)
+        $(document).on('click', '#ask-question-btn', function() {
             $('#question-form-container').slideDown();
         });
 
-        $('#cancel-question').click(function() {
+        $(document).on('click', '#cancel-question', function() {
             $('#question-form-container').slideUp();
         });
 
         // Enviar pregunta via AJAX (evita recarga completa)
-        $('#question-form').submit(function(e) {
+        // Use delegated submit in case the form is injected dynamically
+        $(document).on('submit', '#question-form', function(e) {
             e.preventDefault();
 
             const form = $(this);
@@ -529,6 +539,8 @@
                     body: JSON.stringify({ question_id: qId, question: newText })
                 }).then(r => r.json()).then(data => {
                     if (data.success) {
+                        // Update internal questions array so future rerenders don't bring it back
+                        try { removeQuestionFromInitial(qId); } catch (err) { console.warn('removeQuestionFromInitial failed', err); }
                         qItem.find('.question-text p').text(newText);
                         editor.remove();
                         // Usar las alertas de usuario para notificar éxito
@@ -572,9 +584,43 @@
                                 if (n !== null && n >= 0) tabBtn.textContent = tabBtn.textContent.replace(/\(.*\)/, '(' + n + ')');
                             }
                         } catch (e) { console.warn('Could not update questions count', e); }
+
+                        // Re-render questions to show placeholder if none remain
+                        try { renderQuestions(initialQuestions); } catch (err) { console.warn('Render after delete failed', err); }
                     } else {
                         showNotification(data.message || 'Error al eliminar pregunta', 'error');
                     }
+
+                    // If there are no more questions after delete, ensure ask button and form are present
+                    try {
+                        const questionsList = document.querySelector('.questions-list');
+                        const remaining = questionsList ? questionsList.querySelectorAll('.question-item').length : 0;
+                        // Update the dataset counter
+                        if (questionsList) questionsList.dataset.qaQuestionsCount = remaining;
+
+                        // Recreate ask-button if missing
+                        if (!document.getElementById('ask-question-btn')) {
+                            const header = document.querySelector('#questions .questions-header');
+                            if (header) {
+                                const btn = document.createElement('button');
+                                btn.id = 'ask-question-btn';
+                                btn.className = 'tab-action-btn question-btn';
+                                btn.innerHTML = '<i class="fas fa-question-circle"></i> Hacer una pregunta';
+                                header.appendChild(btn);
+
+                                // Rebind click to slide down form
+                                btn.addEventListener('click', function() {
+                                    const qForm = document.getElementById('question-form-container');
+                                    if (qForm) qForm.style.display = 'block';
+                                });
+                            }
+                        }
+                        // If question form hidden, ensure it's available
+                        const qForm = document.getElementById('question-form-container');
+                        if (qForm && qForm.style.display === 'none') {
+                            // Optionally leave hidden; user can click the Ask button to open.
+                        }
+                    } catch (err) { console.warn('Could not ensure ask button exists', err); }
                 } catch (e) {
                     console.error(e);
                     showUserError('Error de conexión');
@@ -707,19 +753,41 @@
 
         // On load, ensure questions are rendered consistently with the server data
         try {
-            const initialQuestions = <?= json_encode($questionsData ?: []) ?>;
+            // initialQuestions and removeQuestionFromInitial are declared above
             // Delay slightly to avoid race with layout scripts and ensure the .questions-list is in DOM
             setTimeout(() => {
                 console.log('renderQuestions delayed call, initial questions', initialQuestions.length);
                 // If .questions-list is missing but server returned questions, create a fallback container
-                if (!document.querySelector('.questions-list') && initialQuestions.length) {
+                // If .questions-list is missing, inject an empty container and header (ask button) so users can add questions
+                if (!document.querySelector('.questions-list')) {
                     console.warn('No .questions-list found - injecting fallback #questions/.questions-list');
                     const tabContent = document.querySelector('.tabs-content');
                     if (tabContent) {
                         tabContent.insertAdjacentHTML('beforeend', `
                             <div id="questions" class="tab-pane">
-                                <div class="questions-header"><h3>Preguntas y respuestas</h3></div>
+                                <div class="questions-header">
+                                    <h3>Preguntas y respuestas</h3>
+                                    <button id="ask-question-btn" class="tab-action-btn question-btn"><i class="fas fa-question-circle"></i> Hacer una pregunta</button>
+                                </div>
                                 <div class="questions-list" data-qa-questions-count="${initialQuestions.length}"></div>
+                                <div id="question-form-container" class="question-form-container" style="display:none;">
+                                    <form id="question-form" method="POST" action="<?= BASE_URL ?>/api/submit_question.php">
+                                        <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                        <div class="form-group">
+                                            <label for="question-text">Tu pregunta</label>
+                                            <textarea id="question-text" name="question" rows="3" required placeholder="Escribe tu pregunta sobre este producto (mín. 10 caracteres)"></textarea>
+                                            <small class="form-note">Las preguntas serán respondidas por el vendedor u otros compradores.</small>
+                                        </div>
+                                        <div class="form-actions">
+                                            <button type="button" id="cancel-question" class="tab-action-btn review-btn">
+                                                <i class="fas fa-times"></i> Cancelar
+                                            </button>
+                                            <button type="submit" class="tab-action-btn question-btn">
+                                                <i class="fas fa-paper-plane"></i> Enviar pregunta
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         `);
                         // If the Questions tab is already active, ensure the injected pane is visible
