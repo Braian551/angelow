@@ -43,7 +43,7 @@ try {
         SELECT 
             o.id,
             o.order_number,
-            o.total_amount,
+            o.total AS total,
             o.status,
             o.created_at,
             COUNT(oi.id) as items_count
@@ -299,7 +299,7 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                                         <span><?= $order['items_count'] ?> producto<?= $order['items_count'] != 1 ? 's' : '' ?></span>
                                     </div>
                                     <div class="order-total">
-                                        <strong>$<?= number_format($order['total_amount'], 0, ',', '.') ?></strong>
+                                        <strong>$<?= number_format($order['total'], 0, ',', '.') ?></strong>
                                     </div>
                                 </div>
                                 <div class="order-actions">
