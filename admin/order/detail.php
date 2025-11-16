@@ -652,7 +652,14 @@ function translateValue($value, $field = '') {
                                         <?php if ($tx['payment_proof']): ?>
                                             <div class="proof-image-container">
                                                 <h5>Comprobante de Pago:</h5>
-                                                <img src="<?= BASE_URL . '/' . $tx['payment_proof'] ?>" alt="Comprobante de pago" class="proof-image" onclick="openModal('<?= BASE_URL . '/' . $tx['payment_proof'] ?>')">
+                                                <?php 
+                                                    // Normalizar URL del comprobante (acepta rutas relativas o URL completas)
+                                                    $proofUrl = $tx['payment_proof'];
+                                                    if (!empty($proofUrl) && !preg_match('/^https?:\/\//', $proofUrl)) {
+                                                        $proofUrl = rtrim(BASE_URL, '/') . '/' . ltrim($proofUrl, '/');
+                                                    }
+                                                ?>
+                                                <img src="<?= htmlspecialchars($proofUrl) ?>" alt="Comprobante de pago" class="proof-image" onclick="openModal(<?= json_encode($proofUrl) ?>)">
                                                 <p class="text-muted">Haz clic en la imagen para ampliar</p>
                                             </div>
                                         <?php endif; ?>

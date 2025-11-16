@@ -170,7 +170,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         if (empty($errors)) {
-            $upload_dir = __DIR__ . '/../uploads/payment_proofs/';
+            // Guardar comprobantes en el folder global /uploads/payment_proofs
+            // anterior: __DIR__ . '/../uploads/...' (lo dejaba dentro de /tienda/uploads)
+            $upload_dir = __DIR__ . '/../../uploads/payment_proofs/';
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0755, true);
             }
