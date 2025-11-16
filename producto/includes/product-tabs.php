@@ -236,7 +236,7 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                     </div>
                     <?php else: ?>
                         <?php foreach ($questionsData as $question): ?>
-                            <div class="question-item">
+                            <div class="question-item" data-question-id="<?= $question['id'] ?>">
                                 <div class="question-meta">
                                     <div class="user-avatar">
                                         <img src="<?= BASE_URL ?>/<?= htmlspecialchars($question['user_image'] ?? 'images/default-avatar.png') ?>" alt="<?= htmlspecialchars($question['user_name'] ?? 'Usuario') ?>">
@@ -268,8 +268,14 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                                 <?php endif; ?>
 
                                 <div class="question-actions">
-                                    <?php if (isset($_SESSION['user_id'])): ?>
+                                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                                         <button class="answer-btn btn small">Responder</button>
+                                    <?php endif; ?>
+                                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $question['user_id']): ?>
+                                        <button class="edit-question btn small" data-question-id="<?= $question['id'] ?>">Editar</button>
+                                        <button class="delete-question btn small danger" data-question-id="<?= $question['id'] ?>">Eliminar</button>
+                                    <?php endif; ?>
+                                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                                         <div class="answer-form-container" style="display:none;">
                                             <form method="POST" class="answer-form" action="<?= BASE_URL ?>/api/submit_answer.php">
                                                 <input type="hidden" name="question_id" value="<?= $question['id'] ?>">
@@ -280,6 +286,7 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                                                     <button type="button" class="cancel-answer btn small">Cancelar</button>
                                                     <button type="submit" class="btn primary small">Enviar</button>
                                                 </div>
+                                            </form>
                                             </form>
                                         </div>
                                     <?php endif; ?>

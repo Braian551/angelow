@@ -8,6 +8,8 @@
         let variantsByColor = <?= json_encode($variantsData['variantsByColor']) ?>;
         let productId = <?= $product['id'] ?? 'null' ?>;
         let isInWishlist = false;
+        const currentUserId = <?= json_encode($_SESSION['user_id'] ?? null) ?>;
+        const currentUserRole = <?= json_encode($_SESSION['user_role'] ?? null) ?>;
 
 
 
@@ -488,6 +490,57 @@
             $(this).siblings('.answer-form-container').slideToggle();
         });
 
+        // Editar pregunta (sólo para autor)
+        $(document).on('click', '.edit-question', function() {
+            const qItem = $(this).closest('.question-item');
+            const qId = qItem.data('question-id');
+            const currentText = qItem.find('.question-text p').text().trim();
+            const newText = prompt('Editar pregunta', currentText);
+            if (!newText || newText.trim().length < 10) return alert('La pregunta debe tener al menos 10 caracteres');
+
+            fetch('<?= BASE_URL ?>/api/edit_question.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ question_id: qId, question: newText })
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    qItem.find('.question-text p').text(newText);
+                    showNotification('Pregunta actualizada', 'success');
+                } else {
+                    showNotification(data.message || 'Error al actualizar pregunta', 'error');
+                }
+            }).catch(e => { console.error(e); showNotification('Error de conexión', 'error'); });
+        });
+
+        // Eliminar pregunta (sólo para autor)
+        $(document).on('click', '.delete-question', function() {
+            const qItem = $(this).closest('.question-item');
+            const qId = qItem.data('question-id');
+            if (!confirm('¿Estás seguro de eliminar esta pregunta?')) return;
+
+            fetch('<?= BASE_URL ?>/api/delete_question.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ question_id: qId })
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    qItem.slideUp(300, function() { $(this).remove(); });
+                    showNotification('Pregunta eliminada', 'success');
+                    // Update questions tab count
+                    try {
+                        const tabBtn = document.querySelector('.tab-btn[data-tab="questions"]');
+                        if (tabBtn) {
+                            const m = tabBtn.textContent.match(/\((\d+)\)/);
+                            let n = m ? parseInt(m[1]) - 1 : null;
+                            if (n !== null && n >= 0) tabBtn.textContent = tabBtn.textContent.replace(/\(.*\)/, '(' + n + ')');
+                        }
+                    } catch (e) { console.warn('Could not update questions count', e); }
+                } else {
+                    showNotification(data.message || 'Error al eliminar pregunta', 'error');
+                }
+            }).catch(e => { console.error(e); showNotification('Error de conexión', 'error'); });
+        });
+
         function renderQuestions(questions) {
             console.log('renderQuestions called, questions length:', questions.length);
             let container = $('.questions-list');
@@ -518,7 +571,7 @@
                 // Prefer a known existing placeholder -> default-avatar.png
                 const userImage = q.user_image ? '<?= BASE_URL ?>/' + q.user_image : '<?= BASE_URL ?>/images/default-avatar.png';
 
-                const qItem = $('<div>').addClass('question-item');
+                const qItem = $('<div>').addClass('question-item').attr('data-question-id', q.id);
                 const qMeta = $('<div>').addClass('question-meta');
                 const avatar = $('<div>').addClass('user-avatar').append($('<img>').attr('src', userImage).attr('alt', userName));
                 const userInfo = $('<div>').addClass('user-info').append($('<strong>').text(userName)).append($('<span>').addClass('time').text(q.created_at ? new Date(q.created_at).toLocaleString() : ''));
@@ -544,7 +597,24 @@
 
                 if (<?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>) {
                     const actions = $('<div>').addClass('question-actions');
-                    actions.append($('<button>').addClass('answer-btn btn small').text('Responder'));
+                    // Only show the responder button to admins
+                    if (currentUserRole === 'admin') {
+                        actions.append($('<button>').addClass('answer-btn btn small').text('Responder'));
+                        // Append an answer form for inline admin replies
+                        const ansForm = $('<div>').addClass('answer-form-container').hide().append(
+                            $('<form>').addClass('answer-form').attr('method','POST').attr('action','<?= BASE_URL ?>/api/submit_answer.php').append(
+                                $('<input>').attr('type','hidden').attr('name','question_id').val(q.id),
+                                $('<div>').addClass('form-group').append($('<textarea>').attr('name','answer').attr('rows','3').addClass('form-control').attr('required', true).attr('placeholder','Escribe tu respuesta')),
+                                $('<div>').addClass('form-actions').append($('<button>').attr('type','button').addClass('cancel-answer btn small').text('Cancelar'), $('<button>').attr('type','submit').addClass('btn primary small').text('Enviar'))
+                            )
+                        );
+                        qItem.append(ansForm);
+                    }
+                    // Show edit/delete to the owner of the question
+                    if (currentUserId && currentUserId == q.user_id) {
+                        actions.append($('<button>').addClass('edit-question btn small').text('Editar'));
+                        actions.append($('<button>').addClass('delete-question btn small danger').text('Eliminar'));
+                    }
                     qItem.append(actions);
                 }
 
@@ -679,6 +749,43 @@
 
         $(document).on('click', '.cancel-answer', function() {
             $(this).closest('.answer-form-container').slideUp();
+        });
+
+        // Submit answer via AJAX for inline admin answer forms
+        $(document).on('submit', '.answer-form', function(e) {
+            e.preventDefault();
+            const form = $(this);
+            const qId = form.find('input[name="question_id"]').val();
+            const answerText = form.find('textarea[name="answer"]').val().trim();
+
+            if (!answerText) return showNotification('El texto de la respuesta no puede estar vacío.', 'error');
+
+            fetch(form.attr('action'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ question_id: qId, answer: answerText })
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    // Append answer to answers list
+                    const qItem = form.closest('.question-item');
+                    const answersList = qItem.find('.answers-list');
+                    if (!answersList.length) {
+                        qItem.append('<div class="answers-list"></div>');
+                    }
+                    const userName = data.data?.user_name || 'Administrador';
+                    const userImage = data.data?.user_image ? '<?= BASE_URL ?>/' + data.data.user_image : '<?= BASE_URL ?>/images/default-avatar.png';
+                    const ansDom = $('<div>').addClass('answer-item').append(
+                        $('<div>').addClass('answer-meta').append($('<div>').addClass('user-avatar').append($('<img>').attr('src', userImage).attr('alt', userName))).append($('<div>').addClass('user-info').append($('<strong>').text(userName)).append($('<span>').addClass('time').text(new Date().toLocaleString()))),
+                        $('<p>').text(answerText)
+                    );
+                    qItem.find('.answers-list').append(ansDom);
+                    form.closest('.answer-form-container').slideUp();
+                    showNotification('Respuesta enviada', 'success');
+                } else {
+                    showNotification(data.message || 'Error al enviar respuesta', 'error');
+                }
+            }).catch(err => { console.error(err); showNotification('Error de conexión', 'error'); });
+
         });
 
         // Mejorar interactividad de pestañas

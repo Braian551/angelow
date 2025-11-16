@@ -762,6 +762,20 @@
 }
 .question-actions .answer-btn:hover { color: var(--primary-dark); }
 
+.question-actions .edit-question {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-dark);
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+}
+
+.question-actions .delete-question {
+  background: none;
+  color: var(--danger-color, #e74c3c);
+  border: none;
+}
+
 /* Render replies as indented cards */
 .answers-list .answer-item { padding-left: 1rem; }
 
