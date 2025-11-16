@@ -700,6 +700,46 @@
   gap: 1.2rem;
 }
 
+/* Encabezado de sección de dirección: sin emojis, fuente neutra */
+.order-address-card .address-header h4 {
+  margin: 0 0 0.6rem 0;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.order-address-card .address-header {
+  margin-bottom: 0.6rem;
+}
+
+.address-selector-section {
+  display: block;
+}
+
+.address-selector-section .form-group.full-width label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.address-preview h4 {
+  margin: 0 0 0.6rem 0;
+  font-size: 1.3rem;
+  color: var(--text-dark);
+}
+
+.address-preview .address-details p {
+  margin: 0.2rem 0;
+  font-size: 1.35rem;
+  padding: 0.4rem 0;
+}
+
+.address-selector-section .form-text {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 1.25rem;
+}
+
 .order-address-card .card-body p {
   margin: 0;
   padding: 1.2rem 1.5rem;
@@ -785,7 +825,7 @@
 }
 
 .delivery-notes h4::before {
-  content: '📝';
+  content: '';
   font-size: 1.6rem;
 }
 
@@ -812,7 +852,7 @@
   color: var(--text-lighter);
   font-style: italic;
   text-align: center;
-  padding: 2rem;
+  padding: 0.4rem 0;
   background: rgba(248, 250, 252, 0.6);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -2397,4 +2437,41 @@
   .close-modal::before {
     font-size: 36px;
   }
+}
+
+/* Mejor estilo para sub-título en la sección de dirección (no usar emojis) */
+.order-address-card .address-header .address-subtitle {
+  color: var(--text-lighter);
+  font-style: normal;
+  font-size: 1.2rem;
+  margin-left: 0.6rem;
+  display: inline-block;
+}
+
+/* Ajustes: la lista de detalles de dirección debe ser compacta y consistente */
+.order-address-card .address-details p {
+  margin: 0.4rem 0;
+  padding: 0.6rem 0.8rem;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 1.35rem;
+  display: block;
+}
+
+.order-address-card .address-details p strong {
+  display: inline-block;
+  min-width: 140px;
+  color: var(--primary-color);
+}
+
+/* Dirección histórica: menos agresiva visualmente */
+.order-address-card .address-historical .address-header h4 {
+  font-weight: 600;
+  color: var(--text-medium);
+}
+
+/* Si la dirección no tiene datos GPS, ocultar el enlace de Google Maps y coordenadas */
+.order-address-card .address-details .coords-hidden {
+  display: none;
 }

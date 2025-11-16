@@ -429,8 +429,8 @@ function translateValue($value, $field = '') {
                                 <div class="address-section">
                                     <div class="address-header">
                                         <h4>
-                                            📍 <?= htmlspecialchars($order['address_alias'] ?? 'Dirección') ?>
-                                            <small class="text-muted">(Dirección Actual)</small>
+                                            <?= htmlspecialchars($order['address_alias'] ?? 'Dirección') ?>
+                                            <small class="address-subtitle">(Dirección actual)</small>
                                         </h4>
                                     </div>
                                     
@@ -498,13 +498,25 @@ function translateValue($value, $field = '') {
                                     <?php endif; ?>
                                 </div>
                                 
-                                <?php if ($order['shipping_address'] && $order['shipping_address'] !== $order['address_current']): ?>
+                                <?php
+                                    // Mostrar dirección histórica solo si difiere de la actual (normalización simple)
+                                    $showHistorical = false;
+                                    if (!empty($order['shipping_address']) && !empty($order['address_current'])) {
+                                        $normalize = function($s) {
+                                            return preg_replace('/\s+/', ' ', mb_strtolower(trim(strip_tags($s))));
+                                        };
+                                        $showHistorical = $normalize($order['shipping_address']) !== $normalize($order['address_current']);
+                                    } else {
+                                        $showHistorical = !empty($order['shipping_address']);
+                                    }
+                                ?>
+                                <?php if ($showHistorical): ?>
                                     <!-- Dirección histórica (snapshot) -->
                                     <div class="address-section address-historical">
                                         <div class="address-header">
                                             <h4>
-                                                📜 Dirección al momento del pedido 
-                                                <small class="text-muted">(Histórico)</small>
+                                                Dirección al momento del pedido
+                                                <small class="address-subtitle">(Histórico)</small>
                                             </h4>
                                         </div>
                                         <div class="address-details">

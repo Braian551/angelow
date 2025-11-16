@@ -1023,33 +1023,33 @@ try {
                                                         data-lng="<?= $addr['gps_longitude'] ?? '' ?>"
                                                         data-gps-used="<?= $addr['gps_used'] ?? 0 ?>">
                                                     <?= htmlspecialchars($addr['alias'] ?? 'Dirección ' . $addr['id']) ?>
-                                                    <?php if ($addr['is_default']): ?>
-                                                        ⭐ (Por defecto)
-                                                    <?php endif; ?>
-                                                    <?php if (!empty($addr['gps_used']) && $addr['gps_used'] == 1): ?>
-                                                        📍 GPS
-                                                    <?php elseif ($addr['gps_latitude'] && $addr['gps_longitude']): ?>
-                                                        � Con Coords
-                                                    <?php else: ?>
-                                                        ⚠️ Sin GPS
-                                                    <?php endif; ?>
+                                                            <?php if ($addr['is_default']): ?>
+                                                                (Por defecto)
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($addr['gps_used']) && $addr['gps_used'] == 1): ?>
+                                                                (GPS disponible)
+                                                            <?php elseif ($addr['gps_latitude'] && $addr['gps_longitude']): ?>
+                                                                (Coordenadas)
+                                                            <?php else: ?>
+                                                                (Sin GPS)
+                                                            <?php endif; ?>
                                                     - <?= htmlspecialchars(substr($addr['address'], 0, 50)) ?>...
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
                                         <small class="form-text">
-                                            💡 Selecciona una dirección guardada del usuario. 
+                                            Selecciona una dirección guardada del usuario.
                                             <?php if ($order['shipping_address_id']): ?>
                                                 <strong>Actualmente vinculada: <?= htmlspecialchars($order['current_address_alias'] ?? 'Dirección #' . $order['shipping_address_id']) ?></strong>
                                             <?php else: ?>
-                                                <strong style="color: var(--warning-color);">⚠️ Esta orden no tiene dirección vinculada (legacy)</strong>
+                                                <strong style="color: var(--warning-color);">Esta orden no tiene dirección vinculada (legacy)</strong>
                                             <?php endif; ?>
                                         </small>
                                     </div>
 
                                     <!-- Preview de dirección seleccionada -->
                                     <div id="address-preview" class="address-preview" style="display: <?= $order['shipping_address_id'] ? 'block' : 'none' ?>;">
-                                        <h4><i class="fas fa-eye"></i> Vista previa de dirección seleccionada:</h4>
+                                        <h4><i class="fas fa-eye"></i> Vista previa de la dirección seleccionada</h4>
                                         <div id="address-preview-content"></div>
                                     </div>
                                 </div>
@@ -1192,7 +1192,7 @@ try {
                 html += `<p><strong><i class="fas fa-door-closed"></i> Apto/Local:</strong> ${apt}</p>`;
             }
             
-            if (hasGPS) {
+                if (hasGPS) {
                 html += `<p><strong><i class="fas fa-map-pin"></i> GPS:</strong> 
                     <code>${parseFloat(lat).toFixed(8)}, ${parseFloat(lng).toFixed(8)}</code> 
                     <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="btn-link">
@@ -1200,8 +1200,8 @@ try {
                     </a>
                 </p>`;
                 html += '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Esta dirección tiene coordenadas GPS para navegación</div>';
-            } else {
-                html += '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> ⚠️ Esta dirección NO tiene GPS. Los deliveries pueden tener problemas de navegación.</div>';
+                } else {
+                html += '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> Esta dirección no tiene GPS; puede afectar la navegación.</div>';
             }
             
             html += '</div>';
