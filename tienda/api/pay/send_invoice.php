@@ -32,6 +32,43 @@ function invoiceBuildEmailImageSrc(?string $path): string
     return BASE_URL . '/' . $normalized;
 }
 
+/**
+ * Intenta embeber la imagen en el correo usando PHPMailer y devuelve la CID.
+ * Si no es posible, devuelve una URL pública o base64 (según invoiceImageToBase64).
+ */
+function invoiceEmbedImageForMail(PHPMailer $mail, ?string $path): string
+{
+    // Primero preferimos la ruta absoluta conocida (misma lógica del PDF)
+    if (function_exists('invoiceAbsoluteImagePath')) {
+        $absolute = invoiceAbsoluteImagePath($path);
+    } else {
+        // Fallback: construir la ruta física
+        $relative = ltrim($path ?? 'images/default-product.jpg', '/');
+        $absolute = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/' . $relative;
+    }
+
+    // Añadir imagen embebida si existe
+    if ($absolute && file_exists($absolute) && is_readable($absolute)) {
+        $embedId = 'product_' . md5($absolute . microtime(true));
+        try {
+            $mail->addEmbeddedImage($absolute, $embedId, basename($absolute));
+            return 'cid:' . $embedId;
+        } catch (Exception $e) {
+            error_log('[INVOICE_EMAIL] No fue posible embeber imagen en email: ' . $e->getMessage());
+            // Seguir con otro método
+        }
+    }
+
+    // Si no podemos embeber, preferimos base64 como el PDF o la URL pública
+    if (function_exists('invoiceImageToBase64')) {
+        $b64 = invoiceImageToBase64($path);
+        if (!empty($b64)) return $b64;
+    }
+
+    // Fallback final: URL pública
+    return invoiceBuildEmailImageSrc($path);
+}
+
 function sendInvoiceEmail(array $order, array $orderItems, ?string $pdfContent = null, ?string $pdfFilename = null): bool
 {
     if (empty($order['user_email'])) {
@@ -63,7 +100,8 @@ function sendInvoiceEmail(array $order, array $orderItems, ?string $pdfContent =
 
         $itemsHtml = '';
         foreach ($orderItems as $item) {
-            $imageUrl = invoiceBuildEmailImageSrc($item['primary_image'] ?? null);
+            // Intentamos embeber la imagen como CID (más fiable en clientes de correo)
+            $imageUrl = invoiceEmbedImageForMail($mail, $item['primary_image'] ?? null);
             $itemsHtml .= '<tr style="border-bottom:1px solid #e2e8f0;">
                 <td style="padding:12px 8px; width:64px;"><img src="' . htmlspecialchars($imageUrl) . '" style="width:48px; height:48px; border-radius:8px; object-fit:cover;" alt="Producto"></td>
                 <td style="padding:12px 8px;">
