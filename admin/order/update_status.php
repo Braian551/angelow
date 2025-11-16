@@ -85,7 +85,8 @@ try {
     $userIp = getRealUserIP();
     
     // Establecer variables de sesión MySQL para los triggers
-    $conn->exec("SET @current_user_id = {$currentUser['id']}");
+    // user id can be non-integer (alphanumeric), quote when setting user variable
+    $conn->exec("SET @current_user_id = " . $conn->quote($currentUser['id']));
     $conn->exec("SET @current_user_name = " . $conn->quote($currentUser['name']));
     $conn->exec("SET @current_user_ip = " . $conn->quote($userIp));
     

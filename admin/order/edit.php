@@ -67,7 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $currentUserName = $currentUser['name'] ?? 'Administrador';
         
         // Configurar variables de sesión MySQL para el trigger
-        $conn->exec("SET @current_user_id = '{$_SESSION['user_id']}'");
+        // Usar quote para evitar errores si el user_id no es numérico
+        $conn->exec("SET @current_user_id = " . $conn->quote($_SESSION['user_id']));
         $conn->exec("SET @current_user_name = '{$currentUserName}'");
         $conn->exec("SET @current_user_ip = '{$_SERVER['REMOTE_ADDR']}'");
         

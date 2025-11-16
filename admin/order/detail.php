@@ -347,6 +347,10 @@ function translateValue($value, $field = '') {
                                 <button onclick="changeOrderStatus(<?= $orderId ?>)" class="btn btn-info">
                                     <i class="fas fa-sync-alt"></i> Cambiar Estado
                                 </button>
+                                <button onclick="changePaymentStatus(<?= $orderId ?>)" class="btn btn-info">
+                                    <i class="fas fa-credit-card"></i> Cambiar Estado de Pago
+                                </button>
+                                
                             </div>
                         </div>
                         <div class="card-body">
@@ -873,6 +877,80 @@ function translateValue($value, $field = '') {
             });
         }
 
+        // Payment status modal and logic (reuses same styling as 'status-modal')
+        function changePaymentStatus(orderId) {
+            const modalHTML = `
+                <div class="modal" id="payment-status-modal" style="display: flex; align-items: center; justify-content: center; padding: 20px;">
+                    <div class="payment-modal-content" style="max-width: 520px; width: 100%; background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-radius: 20px; border: 1px solid rgba(0, 119, 182, 0.18); box-shadow: 0 8px 32px rgba(0, 119, 182, 0.15), 0 20px 60px rgba(0, 0, 0, 0.15); position: relative; animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                        <div class="card-header" style="padding: 2rem 4.5rem 2rem 2.5rem; background: rgba(255, 255, 255, 0.5); border-bottom: 1px solid rgba(0, 119, 182, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 20px 20px 0 0; position: relative;">
+                            <span class="close-modal" onclick="closePaymentModal()" style="cursor: pointer; font-size: 0; color: #64748b; position: absolute; top: 20px; right: 20px; width: 38px; height: 38px; border-radius: 50%; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.3s; z-index: 10; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(100, 116, 139, 0.2);"></span>
+                            <h3 style="margin: 0; font-size: 1.8rem; color: #334155; font-weight: 600; line-height: 1.2; display: flex; align-items: center; gap: 0.8rem; position: relative; z-index: 1;">
+                                <i class="fas fa-credit-card" style="color: #0077b6; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(0, 119, 182, 0.12); border-radius: 10px; padding: 8px; flex-shrink: 0;"></i>
+                                <span>Cambiar Estado de Pago</span>
+                            </h3>
+                        </div>
+                        <div class="card-body" style="padding: 2.5rem; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 0 0 20px 20px;">
+                            <div style="margin-bottom: 1.8rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem; font-weight: 600; color: #475569; margin-bottom: 0.8rem;">
+                                    <i class="fas fa-tag" style="color: #0077b6;"></i>
+                                    Nuevo Estado
+                                </label>
+                                <select id="new-payment-status" style="width: 100%; height: 50px; padding: 0 1.4rem; border: 2px solid rgba(0, 119, 182, 0.15); border-radius: 12px; font-size: 15px; color: #334155; background: rgba(255, 255, 255, 0.95); cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: all 0.3s; outline: none;">
+                                    <option value="pending">Pendiente</option>
+                                    <option value="paid">Pagado</option>
+                                    <option value="failed">Fallido</option>
+                                    <option value="refunded">Reembolsado</option>
+                                </select>
+                            </div>
+                            <div style="margin-bottom: 2rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem; font-weight: 600; color: #475569; margin-bottom: 0.8rem;">
+                                    <i class="fas fa-sticky-note" style="color: #0077b6;"></i>
+                                    Notas (Opcional)
+                                </label>
+                                <textarea id="payment-notes" rows="3" style="width: 100%; padding: 1.2rem; border: 2px solid rgba(0, 119, 182, 0.15); border-radius: 12px; font-size: 14.5px; color: #334155; background: rgba(255, 255, 255, 0.95); font-family: inherit; resize: vertical; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: all 0.3s; outline: none; line-height: 1.5;" placeholder="Agrega notas sobre el nuevo estado de pago..."></textarea>
+                            </div>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <button onclick="closePaymentModal()" style="flex: 1; min-width: 140px; padding: 1rem 1.8rem; border-radius: 12px; font-size: 1.4rem; font-weight: 600; border: 2px solid rgba(0, 119, 182, 0.15); background: rgba(248, 250, 252, 0.85); color: #64748b; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                                <button onclick="confirmPaymentChange(${orderId})" style="flex: 1; min-width: 140px; padding: 1rem 1.8rem; border-radius: 12px; font-size: 1.4rem; font-weight: 600; border: 2px solid rgba(0, 119, 182, 0.3); background: rgba(0, 119, 182, 0.9); color: white; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+                                    <i class="fas fa-check"></i> Confirmar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            document.getElementById('payment-status-modal').addEventListener('click', function(e){ if (e.target === this) closePaymentModal(); });
+        }
+
+        function closePaymentModal() { const modal = document.getElementById('payment-status-modal'); if (modal) modal.style.animation = 'fadeOut 0.3s ease-out'; setTimeout(() => modal && modal.remove(), 300); }
+
+        async function confirmPaymentChange(orderId) {
+            const newStatus = document.getElementById('new-payment-status').value;
+            const notes = document.getElementById('payment-notes').value;
+
+            if (!newStatus) { showAlert('Por favor selecciona un estado', 'warning'); return; }
+
+            try {
+                const res = await fetch('<?= BASE_URL ?>/admin/order/update_payment_status.php', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ order_ids: [orderId], new_payment_status: newStatus, notes: notes || null })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showAlert('Estado de pago actualizado correctamente', 'success');
+                    closePaymentModal();
+                    setTimeout(() => location.reload(), 1200);
+                } else {
+                    throw new Error(data.message || 'Error actualizando');
+                }
+            } catch (err) {
+                showAlert(err.message, 'error');
+            }
+        }
+
         // Funciones para el modal de imagen
         function openModal(imageSrc) {
             const modal = document.getElementById('imageModal');
@@ -1299,6 +1377,32 @@ function translateValue($value, $field = '') {
                 height: 48px !important;
                 font-size: 14px !important;
             }
+        }
+
+        /* Payment modal styles — mirror status modal for identical look */
+        #payment-status-modal { display: flex !important; align-items: center; justify-content: center; }
+
+        #payment-status-modal .payment-modal-content { position: relative; margin: 0; top: auto; transform: none; }
+
+        #payment-status-modal .close-modal { position: absolute !important; top: 20px !important; right: 20px !important; width: 38px !important; height: 38px !important; background: rgba(248, 250, 252, 0.8) !important; border: 2px solid rgba(100, 116, 139, 0.2) !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+
+        #payment-status-modal .close-modal::before { content: '\00D7' !important; font-size: 32px !important; color: #64748b !important; display: flex !important; align-items: center !important; justify-content: center !important; width: 100% !important; height: 100% !important; line-height: 0 !important; margin: 0 !important; position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; }
+
+        #payment-status-modal .close-modal:hover { background: rgba(220, 38, 38, 0.2) !important; border-color: rgba(239, 68, 68, 0.5) !important; transform: rotate(90deg) scale(1.05) !important; }
+
+        #payment-status-modal .close-modal:hover::before { color: #ef4444 !important; transform: translate(-50%, -50%) !important; }
+
+        #payment-status-modal .card-header::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 119, 182, 0.02); pointer-events: none; }
+
+        @media (max-width: 600px) {
+            #payment-status-modal .payment-modal-content { max-width: 90% !important; }
+            #payment-status-modal .card-header { padding: 1.8rem 4rem 1.8rem 2rem !important; }
+            #payment-status-modal h3 { font-size: 1.6rem !important; }
+            #payment-status-modal h3 i { width: 32px !important; height: 32px !important; }
+            #payment-status-modal .close-modal { width: 34px !important; height: 34px !important; top: 16px !important; right: 16px !important; }
+            #payment-status-modal .card-body { padding: 2rem !important; }
+            #payment-status-modal button { font-size: 1.3rem !important; padding: 0.85rem 1.4rem !important; }
+            #payment-status-modal select { height: 48px !important; font-size: 14px !important; }
         }
         
         @media (max-width: 400px) {
