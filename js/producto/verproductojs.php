@@ -751,67 +751,97 @@
                 }
         }
 
+        function getQuestionsListElement() {
+            return document.querySelector('#questions .questions-list') || document.querySelector('.questions-list');
+        }
+
+        function injectQuestionsFallback() {
+            const existing = getQuestionsListElement();
+            if (existing) return existing;
+
+            const tabContent = document.querySelector('.tabs-content');
+            if (!tabContent) {
+                console.error('Questions fallback: .tabs-content not found');
+                return null;
+            }
+
+            tabContent.insertAdjacentHTML('beforeend', `
+                <div id="questions" class="tab-pane">
+                    <div class="questions-header">
+                        <h3>Preguntas y respuestas</h3>
+                        <button id="ask-question-btn" class="tab-action-btn question-btn">
+                            <i class="fas fa-question-circle"></i> Hacer una pregunta
+                        </button>
+                    </div>
+                    <div class="questions-list" data-qa-questions-count="${initialQuestions.length}"></div>
+                    <div id="question-form-container" class="question-form-container" style="display:none;">
+                        <form id="question-form" method="POST" action="<?= BASE_URL ?>/api/submit_question.php">
+                            <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                            <div class="form-group">
+                                <label for="question-text">Tu pregunta</label>
+                                <textarea id="question-text" name="question" rows="3" required placeholder="Escribe tu pregunta sobre este producto (mín. 10 caracteres)"></textarea>
+                                <small class="form-note">Las preguntas serán respondidas por el vendedor u otros compradores.</small>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" id="cancel-question" class="tab-action-btn review-btn">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                                <button type="submit" class="tab-action-btn question-btn">
+                                    <i class="fas fa-paper-plane"></i> Enviar pregunta
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `);
+
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab && activeTab.dataset && activeTab.dataset.tab === 'questions') {
+                const injected = document.getElementById('questions');
+                if (injected) {
+                    injected.classList.add('active');
+                    injected.style.display = 'block';
+                }
+            }
+
+            return getQuestionsListElement();
+        }
+
+        function logQuestionsMarkupSnapshot() {
+            try {
+                const listing = document.querySelector('#questions .questions-list');
+                console.log('post-render .questions-list innerHTML length:', listing ? listing.innerHTML.length : 'no-listing');
+            } catch (err) {
+                console.error('post-render debugging failed', err);
+            }
+        }
+
+        function bootstrapQuestionsSection(attempt = 0) {
+            const container = getQuestionsListElement();
+            if (container) {
+                renderQuestions(initialQuestions);
+                logQuestionsMarkupSnapshot();
+                return;
+            }
+
+            if (attempt < 8) {
+                setTimeout(() => bootstrapQuestionsSection(attempt + 1), 100);
+                return;
+            }
+
+            const fallback = injectQuestionsFallback();
+            if (fallback) {
+                renderQuestions(initialQuestions);
+                logQuestionsMarkupSnapshot();
+            } else {
+                console.error('Unable to prepare questions section; .questions-list is still missing.');
+            }
+        }
+
         // On load, ensure questions are rendered consistently with the server data
         try {
             // initialQuestions and removeQuestionFromInitial are declared above
-            // Delay slightly to avoid race with layout scripts and ensure the .questions-list is in DOM
-            setTimeout(() => {
-                console.log('renderQuestions delayed call, initial questions', initialQuestions.length);
-                // If .questions-list is missing but server returned questions, create a fallback container
-                // If .questions-list is missing, inject an empty container and header (ask button) so users can add questions
-                if (!document.querySelector('.questions-list')) {
-                    console.warn('No .questions-list found - injecting fallback #questions/.questions-list');
-                    const tabContent = document.querySelector('.tabs-content');
-                    if (tabContent) {
-                        tabContent.insertAdjacentHTML('beforeend', `
-                            <div id="questions" class="tab-pane">
-                                <div class="questions-header">
-                                    <h3>Preguntas y respuestas</h3>
-                                    <button id="ask-question-btn" class="tab-action-btn question-btn"><i class="fas fa-question-circle"></i> Hacer una pregunta</button>
-                                </div>
-                                <div class="questions-list" data-qa-questions-count="${initialQuestions.length}"></div>
-                                <div id="question-form-container" class="question-form-container" style="display:none;">
-                                    <form id="question-form" method="POST" action="<?= BASE_URL ?>/api/submit_question.php">
-                                        <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                                        <div class="form-group">
-                                            <label for="question-text">Tu pregunta</label>
-                                            <textarea id="question-text" name="question" rows="3" required placeholder="Escribe tu pregunta sobre este producto (mín. 10 caracteres)"></textarea>
-                                            <small class="form-note">Las preguntas serán respondidas por el vendedor u otros compradores.</small>
-                                        </div>
-                                        <div class="form-actions">
-                                            <button type="button" id="cancel-question" class="tab-action-btn review-btn">
-                                                <i class="fas fa-times"></i> Cancelar
-                                            </button>
-                                            <button type="submit" class="tab-action-btn question-btn">
-                                                <i class="fas fa-paper-plane"></i> Enviar pregunta
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        `);
-                        // If the Questions tab is already active, ensure the injected pane is visible
-                        try {
-                            const activeTab = document.querySelector('.tab-btn.active');
-                            if (activeTab && activeTab.dataset && activeTab.dataset.tab === 'questions') {
-                                const injected = document.getElementById('questions');
-                                if (injected) {
-                                    injected.classList.add('active');
-                                    injected.style.display = 'block';
-                                }
-                            }
-                        } catch (err) { console.warn('Error checking active tab after injection', err); }
-                    } else {
-                        console.warn('No .tabs-content found to insert fallback questions');
-                    }
-                }
-                renderQuestions(initialQuestions);
-                // After rendering, log the computed HTML for debugging
-                try {
-                    const listing = document.querySelector('#questions .questions-list');
-                    console.log('post-render .questions-list innerHTML length:', listing ? listing.innerHTML.length : 'no-listing');
-                } catch (err) { console.error('post-render debugging failed', err); }
-            }, 50);
+            bootstrapQuestionsSection();
             
             // Ensure questions are re-rendered when the Questions tab is activated
             $(document).on('click', '.tab-btn[data-tab="questions"]', function() {
