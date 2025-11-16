@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* ===== VARIABLES Y ESTILOS BASE ===== */
 :root {
   --dashboard-primary: #0077b6;
@@ -251,7 +252,7 @@ Don't show
 }
 
 .summary-content a::after {
-  content: '→';
+  content: '\2192';
   margin-left: 5px;
   transition: var(--dashboard-transition);
 }

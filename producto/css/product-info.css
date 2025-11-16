@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* ===== MODERN PRODUCT INFO - 2024 STYLE ===== */
 .product-info {
   padding: 2rem 0;
@@ -58,7 +59,7 @@
 }
 
 .product-collection a::after {
-  content: '→';
+  content: '\2192';
   transition: transform 0.3s ease;
 }
 
@@ -356,7 +357,7 @@
 }
 
 .size-guide-link::after {
-  content: '→';
+  content: '\2192';
   transition: transform 0.3s ease;
 }
 
@@ -591,7 +592,7 @@
 }
 
 .btn-link::after {
-  content: '→';
+  content: '\2192';
   transition: transform 0.3s ease;
 }
 
@@ -656,7 +657,7 @@
 }
 
 .info-link::after {
-  content: '→';
+  content: '\2192';
   transition: transform 0.3s ease;
 }
 
