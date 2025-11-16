@@ -34,6 +34,8 @@ $canReview = canUserReviewProduct($conn, $_SESSION['user_id'] ?? null, $product[
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($product['name']) ?> - Angelow Ropa Infantil</title>
+    <!-- Debug control: set to '1' to enable verbose logs for debugging, keep '0' in production -->
+    <meta name="debug" content="0">
     <meta name="description" content="<?= htmlspecialchars($product['description'] ? substr($product['description'], 0, 160) : 'Descubre este producto en Angelow Ropa Infantil') ?>">
     <link rel="icon" href="<?= BASE_URL ?>/images/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

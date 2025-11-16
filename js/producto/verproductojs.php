@@ -13,8 +13,8 @@
         // Initial set of questions from server. Use let so we can update after delete.
         let initialQuestions = <?= json_encode($questionsData ?: []) ?>;
 
-        // Debug flag to control console output for this page
-        const PRODUCT_PAGE_DEBUG = false;
+        // Read product page debug flag from the <meta name="debug"> tag (set to 1 to enable)
+        const PRODUCT_PAGE_DEBUG = document.querySelector('meta[name="debug"]')?.content === '1';
 
         // Helper: remove a question from front-end state after delete
         function removeQuestionFromInitial(qId) {

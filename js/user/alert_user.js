@@ -2,6 +2,14 @@
 // SISTEMA DE ALERTAS PARA USUARIOS - WISHLIST
 // ============================================
 
+// Global debug flag read from meta tag in head (<meta name="debug" content="1">)
+const ALERT_DEBUG = (function(){
+    try {
+        const m = document.querySelector('meta[name="debug"]');
+        return m && m.content === '1';
+    } catch (e) { return false; }
+})();
+
 class UserAlertSystem {
     constructor() {
         this.overlay = document.getElementById('userAlertOverlay');
@@ -314,7 +322,6 @@ class WishlistManager {
         this.alertSystem = new UserAlertSystem();
         this.notificationSystem = new NotificationSystem();
         
-        const ALERT_DEBUG = false;
         if (ALERT_DEBUG) console.log('🎯 WishlistManager: Inicializando...');
         if (ALERT_DEBUG) console.log('📍 Base URL:', this.baseUrl);
         

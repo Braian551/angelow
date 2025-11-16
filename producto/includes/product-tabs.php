@@ -303,8 +303,8 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                 <?php endif; ?>
             </div>
             <script>
-                // Debugging: print questions data to console (disabled by default)
-                const PRODUCT_PAGE_DEBUG = false;
+                // Debugging: use global debug flag from head meta
+                const PRODUCT_PAGE_DEBUG = document.querySelector('meta[name="debug"]')?.content === '1';
                 try {
                     const qCount = document.querySelector('.questions-list')?.dataset?.qaQuestionsCount;
                     const qNodes = document.querySelectorAll('.questions-list').length;
