@@ -628,6 +628,94 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('✅ Sistema de Wishlist inicializado');
 });
 
+// -----------------------------------------------------------------------------
+// Global lightweight wrapper helpers for the alert system
+// These make the API easy to call from other scripts (showUserConfirm, etc.)
+// They use the existing wishlistManager.alertSystem instance when available.
+// -----------------------------------------------------------------------------
+function _getUserAlertInstance() {
+    if (window.wishlistManager && window.wishlistManager.alertSystem) {
+        return window.wishlistManager.alertSystem;
+    }
+
+    // Fallback: if no wishlist manager is available, create a global one
+    if (!window.UserAlert) {
+        window.UserAlert = new UserAlertSystem();
+    }
+    return window.UserAlert;
+}
+
+window.showUserConfirm = function(message, onConfirm, options = {}) {
+    const alertInst = _getUserAlertInstance();
+    const title = options.title || '';
+    const confirmText = options.confirmText || 'Sí';
+    const cancelText = options.cancelText || 'Cancelar';
+
+    alertInst.show({
+        type: 'question',
+        title: title,
+        message: message,
+        actions: [
+            {
+                text: cancelText,
+                type: 'secondary',
+                icon: 'fas fa-times'
+            },
+            {
+                text: confirmText,
+                type: 'primary',
+                icon: 'fas fa-check',
+                callback: onConfirm
+            }
+        ]
+    });
+};
+
+window.showUserSuccess = function(message, options = {}) {
+    const alertInst = _getUserAlertInstance();
+    alertInst.show({
+        type: 'success',
+        title: options.title || 'Éxito',
+        message: message,
+        actions: [
+            { text: options.confirmText || 'Aceptar', type: 'primary' }
+        ],
+        autoClose: options.autoClose || null,
+        onClose: options.onClose || null
+    });
+};
+
+window.showUserError = function(message, options = {}) {
+    const alertInst = _getUserAlertInstance();
+    alertInst.show({
+        type: 'error',
+        title: options.title || 'Error',
+        message: message,
+        actions: [ { text: options.confirmText || 'Aceptar', type: 'primary' } ]
+    });
+};
+
+window.showUserWarning = function(message, options = {}) {
+    const alertInst = _getUserAlertInstance();
+    alertInst.show({
+        type: 'warning',
+        title: options.title || 'Advertencia',
+        message: message,
+        actions: [ { text: options.confirmText || 'Aceptar', type: 'primary' } ]
+    });
+};
+
+window.showUserInfo = function(message, options = {}) {
+    const alertInst = _getUserAlertInstance();
+    alertInst.show({
+        type: 'info',
+        title: options.title || 'Información',
+        message: message,
+        actions: [ { text: options.confirmText || 'Aceptar', type: 'primary' } ],
+        autoClose: options.autoClose || null
+    });
+};
+
 // Añadir animación de fadeOut para productos eliminados
 const style = document.createElement('style');
 style.textContent = `

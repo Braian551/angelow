@@ -46,6 +46,7 @@ $canReview = canUserReviewProduct($conn, $_SESSION['user_id'] ?? null, $product[
     <link rel="stylesheet" href="<?= BASE_URL ?>/producto/css/product-gallery.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/producto/css/product-info.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/producto/css/product-tabs.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/user/alert_user.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/producto/css/related-products.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/producto/css/product-modal.css">
 </head>
@@ -85,6 +86,9 @@ $canReview = canUserReviewProduct($conn, $_SESSION['user_id'] ?? null, $product[
     <?php includeFromRoot('layouts/footer.php'); ?>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- User alert system (required for product question edit/delete confirmations) -->
+    <?php includeFromRoot('users/alertas/alert_user.php'); ?>
+    <script src="<?= BASE_URL ?>/js/user/alert_user.js"></script>
      <?php require_once __DIR__ . '/../js/producto/verproductojs.php'; ?>
 
 

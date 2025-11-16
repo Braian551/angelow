@@ -490,55 +490,96 @@
             $(this).siblings('.answer-form-container').slideToggle();
         });
 
-        // Editar pregunta (sólo para autor)
+        // Editar pregunta (sólo para autor) - muestra editor inline y usa alertas del usuario para feedback
         $(document).on('click', '.edit-question', function() {
             const qItem = $(this).closest('.question-item');
             const qId = qItem.data('question-id');
             const currentText = qItem.find('.question-text p').text().trim();
-            const newText = prompt('Editar pregunta', currentText);
-            if (!newText || newText.trim().length < 10) return alert('La pregunta debe tener al menos 10 caracteres');
 
-            fetch('<?= BASE_URL ?>/api/edit_question.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ question_id: qId, question: newText })
-            }).then(r => r.json()).then(data => {
-                if (data.success) {
-                    qItem.find('.question-text p').text(newText);
-                    showNotification('Pregunta actualizada', 'success');
-                } else {
-                    showNotification(data.message || 'Error al actualizar pregunta', 'error');
-                }
-            }).catch(e => { console.error(e); showNotification('Error de conexión', 'error'); });
+            // Si ya existe un editor, no añadir otro
+            if (qItem.find('.edit-question-form').length) return;
+
+            const editor = $(
+                `<div class="edit-question-form">
+                    <textarea class="edit-question-textarea">${$('<div/>').text(currentText).html()}</textarea>
+                    <div class="edit-question-actions">
+                        <button class="btn small secondary cancel-edit">Cancelar</button>
+                        <button class="btn small primary save-edit">Guardar</button>
+                    </div>
+                </div>`
+            );
+
+            qItem.append(editor);
+
+            // Cancel edit
+            editor.on('click', '.cancel-edit', function(e) {
+                e.preventDefault();
+                editor.remove();
+            });
+
+            // Save edit
+            editor.on('click', '.save-edit', function(e) {
+                e.preventDefault();
+                const newText = editor.find('.edit-question-textarea').val().trim();
+                if (!newText || newText.length < 10) return showUserWarning('La pregunta debe tener al menos 10 caracteres');
+
+                fetch('<?= BASE_URL ?>/api/edit_question.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ question_id: qId, question: newText })
+                }).then(r => r.json()).then(data => {
+                    if (data.success) {
+                        qItem.find('.question-text p').text(newText);
+                        editor.remove();
+                        // Usar las alertas de usuario para notificar éxito
+                        showUserSuccess('Pregunta actualizada correctamente', { confirmText: 'OK' });
+                    } else {
+                        showUserError(data.message || 'Error al actualizar pregunta');
+                    }
+                }).catch(e => { console.error(e); showUserError('Error de conexión'); });
+            });
         });
 
         // Eliminar pregunta (sólo para autor)
         $(document).on('click', '.delete-question', function() {
             const qItem = $(this).closest('.question-item');
             const qId = qItem.data('question-id');
-            if (!confirm('¿Estás seguro de eliminar esta pregunta?')) return;
 
-            fetch('<?= BASE_URL ?>/api/delete_question.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ question_id: qId })
-            }).then(r => r.json()).then(data => {
-                if (data.success) {
-                    qItem.slideUp(300, function() { $(this).remove(); });
-                    showNotification('Pregunta eliminada', 'success');
-                    // Update questions tab count
-                    try {
-                        const tabBtn = document.querySelector('.tab-btn[data-tab="questions"]');
-                        if (tabBtn) {
-                            const m = tabBtn.textContent.match(/\((\d+)\)/);
-                            let n = m ? parseInt(m[1]) - 1 : null;
-                            if (n !== null && n >= 0) tabBtn.textContent = tabBtn.textContent.replace(/\(.*\)/, '(' + n + ')');
+            // Reemplazar confirm() por la alerta del usuario
+            showUserConfirm('¿Estás seguro de eliminar esta pregunta?', async function() {
+                try {
+                    const resp = await fetch('<?= BASE_URL ?>/api/delete_question.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({ question_id: qId })
+                    });
+                    const data = await resp.json();
+                    if (data.success) {
+                        qItem.slideUp(300, function() { $(this).remove(); });
+                        // Mostrar éxito usando el sistema de alertas de usuario
+                        if (typeof showUserSuccess === 'function') {
+                            showUserSuccess('Pregunta eliminada correctamente');
+                        } else {
+                            window.wishlistManager?.notificationSystem.show('Pregunta eliminada', 'success');
                         }
-                    } catch (e) { console.warn('Could not update questions count', e); }
-                } else {
-                    showNotification(data.message || 'Error al eliminar pregunta', 'error');
+
+                        // Update questions tab count
+                        try {
+                            const tabBtn = document.querySelector('.tab-btn[data-tab="questions"]');
+                            if (tabBtn) {
+                                const m = tabBtn.textContent.match(/\((\d+)\)/);
+                                let n = m ? parseInt(m[1]) - 1 : null;
+                                if (n !== null && n >= 0) tabBtn.textContent = tabBtn.textContent.replace(/\(.*\)/, '(' + n + ')');
+                            }
+                        } catch (e) { console.warn('Could not update questions count', e); }
+                    } else {
+                        showNotification(data.message || 'Error al eliminar pregunta', 'error');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    showUserError('Error de conexión');
                 }
-            }).catch(e => { console.error(e); showNotification('Error de conexión', 'error'); });
+            });
         });
 
         function renderQuestions(questions) {

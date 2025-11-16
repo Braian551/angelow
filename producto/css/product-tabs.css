@@ -1277,3 +1277,43 @@
   font-size: 1.2rem;
   font-weight: 600;
 }
+
+/* Inline editor for questions */
+.edit-question-form {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.edit-question-form .edit-question-textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-light);
+  font-size: 1.4rem;
+}
+
+.edit-question-form .edit-question-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.edit-question-form .save-edit {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+}
+
+.edit-question-form .cancel-edit {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-dark);
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+}
