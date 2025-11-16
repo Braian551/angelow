@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
+require_once __DIR__ . '/../../pagos/helpers/shipping_helpers.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -101,6 +102,10 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
         // Calcular subtotales
         $subtotal = $order['subtotal'] ?? array_sum(array_column($orderItems, 'total'));
         $shippingCost = $order['shipping_cost'] ?? 0;
+        // Verificar si es recogida en tienda
+        $isStorePickup = isStorePickupMethod($order);
+        $storeAddress = $isStorePickup ? getStorePickupAddress() : null;
+        $routeLink = $isStorePickup ? buildStoreRouteLink($order['shipping_address'] ?? '') : null;
         $discountAmount = $order['discount_amount'] ?? 0;
 
         $body = '<!DOCTYPE html>
@@ -265,43 +270,71 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
                 </p>
             </div>
 
-            <!-- Información de Envío -->
+            <!-- Información de Envío / Recogida -->
             <div class="section-title">Información de Envío</div>
             <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin: 15px 0;">
-                <p><strong>Dirección de envío:</strong><br>' . nl2br(htmlspecialchars($order['shipping_address'] ?? '')) . '</p>';
+                <p><strong>' . ($isStorePickup ? 'Punto de Recogida' : 'Dirección de envío') . ':</strong><br>' . nl2br(htmlspecialchars($isStorePickup ? $storeAddress : ($order['shipping_address'] ?? ''))) . '</p>';
                 
-                if (!empty($order['shipping_city'])) {
+                if (!$isStorePickup && !empty($order['shipping_city'])) {
                     $body .= '<p><strong>Ciudad:</strong> ' . htmlspecialchars($order['shipping_city']) . '</p>';
                 }
                 
                 if (!empty($order['delivery_notes'])) {
                     $body .= '<p><strong>Instrucciones de entrega:</strong><br>' . nl2br(htmlspecialchars($order['delivery_notes'])) . '</p>';
                 }
+
+                if ($isStorePickup) {
+                    $body .= '<p><strong>Indicaciones:</strong><br>Presenta tu documento y el número de orden para recoger tu pedido en tienda. Horario de recogida: Lunes a Viernes 9:00 AM - 6:00 PM.</p>';
+                    if ($routeLink) {
+                        $body .= '<p><a href="' . htmlspecialchars($routeLink) . '" style="color: #2968c8; text-decoration:none; font-weight:600;">Ver ruta sugerida en Google Maps</a></p>';
+                    }
+                }
                 
                 $body .= '</div>
 
-            <!-- Próximos Pasos -->
+                        <!-- Próximos Pasos -->
             <div class="section-title">Próximos Pasos</div>
-            <div class="step-container">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-title">Preparación</div>
-                    <div class="step-divider"></div>
-                    <div class="step-description">Estamos preparando tu pedido con cuidado y revisando cada detalle para garantizar la mejor calidad.</div>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-title">Envío</div>
-                    <div class="step-divider"></div>
-                    <div class="step-description">Tu pedido será empacado y enviado pronto. Recibirás una notificación cuando salga de nuestro almacén.</div>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-title">Entrega</div>
-                    <div class="step-divider"></div>
-                    <div class="step-description">Recibirás tu pedido en la dirección indicada. Estaremos en contacto para coordinar la entrega.</div>
-                </div>
-            </div>
+                        <div class="step-container">' . (
+                                $isStorePickup
+                                ? '<div class="step">' .
+                                        '<div class="step-number">1</div>' .
+                                        '<div class="step-title">Preparación</div>' .
+                                        '<div class="step-divider"></div>' .
+                                        '<div class="step-description">Estamos preparando tu pedido con cuidado y lo tendremos listo en la tienda.</div>' .
+                                    '</div>' .
+                                    '<div class="step">' .
+                                        '<div class="step-number">2</div>' .
+                                        '<div class="step-title">Listo para recoger</div>' .
+                                        '<div class="step-divider"></div>' .
+                                        '<div class="step-description">Recibirás un correo cuando el pedido esté disponible para recogida en tienda.</div>' .
+                                    '</div>' .
+                                    '<div class="step">' .
+                                        '<div class="step-number">3</div>' .
+                                        '<div class="step-title">Recogida</div>' .
+                                        '<div class="step-divider"></div>' .
+                                        '<div class="step-description">Presenta tu documento y el número de orden en la tienda para recoger tu pedido.</div>' .
+                                    '</div>'
+                                : '<div class="step">' .
+                                        '<div class="step-number">1</div>' .
+                                        '<div class="step-title">Preparación</div>' .
+                                        '<div class="step-divider"></div>' .
+                                        '<div class="step-description">Estamos preparando tu pedido con cuidado y revisando cada detalle para garantizar la mejor calidad.</div>' .
+                                    '</div>' .
+                                    '<div class="step">' .
+                                        '<div class="step-number">2</div>' .
+                                        '<div class="step-title">Envío</div>' .
+                                        '<div class="step-divider"></div>' .
+                                        '<div class="step-description">Tu pedido será empacado y enviado pronto. Recibirás una notificación cuando salga de nuestro almacén.</div>' .
+                                    '</div>' .
+                                    '<div class="step">' .
+                                        '<div class="step-number">3</div>' .
+                                        '<div class="step-title">Entrega</div>' .
+                                        '<div class="step-divider"></div>' .
+                                        '<div class="step-description">Recibirás tu pedido en la dirección indicada. Estaremos en contacto para coordinar la entrega.</div>' .
+                                    '</div>'
+                        ) . '</div>';
+
+            $body .= '
 
             <!-- Asistencia -->
             <div style="background: #f8fafc; padding: 25px; border-radius: 10px; margin: 40px 0 20px 0; text-align: center; border: 1px solid #e8f0fe;">

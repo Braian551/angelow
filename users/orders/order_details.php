@@ -2,6 +2,7 @@
 // Este archivo se usa como include o via AJAX
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
+require_once __DIR__ . '/../../tienda/pagos/helpers/shipping_helpers.php';
 
 // Iniciar sesión si no está iniciada
 if (session_status() === PHP_SESSION_NONE) {
@@ -47,7 +48,8 @@ try {
     <div class="order-summary">
         <p><strong>Fecha:</strong> <?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></p>
         <p><strong>Estado:</strong> <span class="status-badge status-<?= $order['status'] ?>"><?= ucfirst($order['status']) ?></span></p>
-        <p><strong>Dirección de envío:</strong> <?= htmlspecialchars($order['shipping_address']) ?></p>
+        <?php $isStorePickup = isStorePickupMethod($order); ?>
+        <p><strong><?= $isStorePickup ? 'Punto de Recogida' : 'Dirección de envío' ?>:</strong> <?= htmlspecialchars($isStorePickup ? getStorePickupAddress() : $order['shipping_address']) ?></p>
         <p><strong>Total:</strong> $<?= number_format($order['total'], 0) ?></p>
     </div>
     <h3>Productos</h3>

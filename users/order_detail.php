@@ -4,6 +4,7 @@ require_once __DIR__ . '/../conexion.php';
 require_once __DIR__ . '/../layouts/header2.php';
 require_once __DIR__ . '/../layouts/functions.php';
 require_once __DIR__ . '/../auth/role_redirect.php';
+require_once __DIR__ . '/../tienda/pagos/helpers/shipping_helpers.php';
 
 // Verificar rol de usuario
 requireRole(['user', 'customer']);
@@ -56,6 +57,10 @@ try {
     ");
     $stmtDelivery->execute([':order_id' => $orderId]);
     $delivery = $stmtDelivery->fetch(PDO::FETCH_ASSOC);
+
+    // Determinar si es recogida en tienda
+    $isStorePickup = isStorePickupMethod($order);
+    $storePickupAddress = $isStorePickup ? getStorePickupAddress() : null;
 
     // Inicializar variables para evitar errores
     $history = [];
@@ -240,12 +245,12 @@ function calculateDiscountAmount($order, $subtotal) {
                         <div class="shipping-info">
                             <div class="panel-header">
                                 <i class="fas fa-map-marker-alt"></i>
-                                <h2>Dirección de Envío</h2>
+                                <h2><?= $isStorePickup ? 'Punto de Recogida' : 'Dirección de Envío' ?></h2>
                             </div>
                             <div class="delivery-address">
                                 <i class="fas fa-map-marker-alt"></i>
                                 <span>
-                                    <strong>Dirección:</strong> <?= htmlspecialchars($order['shipping_address']) ?><br>
+                                    <strong>Dirección:</strong> <?= htmlspecialchars($isStorePickup ? $storePickupAddress : $order['shipping_address']) ?><br>
                                     <?php if ($order['neighborhood']): ?>
                                         <strong>Barrio:</strong> <?= htmlspecialchars($order['neighborhood']) ?><br>
                                     <?php endif; ?>

@@ -4,6 +4,7 @@
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
+require_once __DIR__ . '/../../pagos/helpers/shipping_helpers.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -22,6 +23,11 @@ function generateOrderPdfContent($order, $orderItems) {
     $options->set('isPhpEnabled', true);
     
     $dompdf = new Dompdf($options);
+
+    // Verificar si es recogida en tienda
+    $isStorePickup = isStorePickupMethod($order);
+    $storeAddress = $isStorePickup ? getStorePickupAddress() : null;
+    $routeLink = $isStorePickup ? buildStoreRouteLink($order['shipping_address'] ?? '') : null;
 
     // HTML para el contenido del PDF (mismo que el archivo principal)
     $html = '
@@ -264,10 +270,11 @@ function generateOrderPdfContent($order, $orderItems) {
 
                 <div class="info-grid">
                     <div class="info-section">
-                        <h3 class="section-title">Dirección de Envío</h3>
+                        <h3 class="section-title">' . ($isStorePickup ? 'Punto de Recogida' : 'Dirección de Envío') . '</h3>
                         <div class="info-item">
-                            <span class="info-value">' . nl2br(htmlspecialchars($order['shipping_address'])) . '</span>
+                            <span class="info-value">' . nl2br(htmlspecialchars($isStorePickup ? $storeAddress : ($order['shipping_address'] ?? ''))) . '</span>
                         </div>
+                        ' . ($isStorePickup && $routeLink ? '<div class="info-item"><span class="info-label">Ruta sugerida:</span> <a href="' . htmlspecialchars($routeLink) . '">' . htmlspecialchars($routeLink) . '</a></div>' : '') . '
                     </div>
 
                     <div class="info-section">
