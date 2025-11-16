@@ -254,8 +254,11 @@ $paymentMethods = [
         </main>
     </div>
 
-
-    <?php include __DIR__ . '/modals/modal-status-change.php'; ?>
+            <script>
+                window.orderStatuses = <?= json_encode($statuses) ?>;
+                window.paymentStatuses = <?= json_encode($paymentStatuses) ?>;
+            </script>
+    <?php include __DIR__ . '/modals/modal-change-field.php'; ?>
     <?php include __DIR__ . '/modals/modal-delete-order.php'; ?>
     <?php include __DIR__ . '/modals/modal-bulk-actions.php'; ?>
     <?php require_once __DIR__ . '/../js/orderadmin.php'; ?>

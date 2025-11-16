@@ -550,7 +550,22 @@ exportBtn.addEventListener('click', function() {
                     new_status: newStatus
                 })
             })
-            .then(response => response.json())
+            .then(async function(response) {
+                const contentType = response.headers.get('content-type') || '';
+                if (!response.ok) {
+                    if (contentType.includes('application/json')) {
+                        const errData = await response.json();
+                        throw new Error(errData.message || errData.error || 'Error al actualizar estado');
+                    }
+                    const text = await response.text();
+                    throw new Error(text || 'Error al actualizar estado');
+                }
+                if (!contentType.includes('application/json')) {
+                    const text = await response.text();
+                    throw new Error('Respuesta inesperada del servidor: ' + (text || ''));
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     showAlert(`Estado de ${orderIds.length} órdenes actualizado correctamente`, 'success');
@@ -581,7 +596,22 @@ exportBtn.addEventListener('click', function() {
                     order_ids: orderIds
                 })
             })
-            .then(response => response.json())
+            .then(async function(response) {
+                const contentType = response.headers.get('content-type') || '';
+                if (!response.ok) {
+                    if (contentType.includes('application/json')) {
+                        const errData = await response.json();
+                        throw new Error(errData.message || errData.error || 'Error al eliminar órdenes');
+                    }
+                    const text = await response.text();
+                    throw new Error(text || 'Error al eliminar órdenes');
+                }
+                if (!contentType.includes('application/json')) {
+                    const text = await response.text();
+                    throw new Error('Respuesta inesperada del servidor: ' + (text || ''));
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     showAlert(`${orderIds.length} órdenes eliminadas correctamente`, 'success');

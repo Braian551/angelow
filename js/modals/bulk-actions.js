@@ -97,7 +97,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función para actualizar estado de múltiples órdenes
     function updateOrdersStatusBulk(orderIds, newStatus) {
-        const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
+        const meta = document.querySelector('meta[name="base-url"]');
+        const baseUrl = meta ? meta.content : '';
         
         // Mostrar indicador de carga
         showAlert(`Actualizando estado de ${orderIds.length} ${orderIds.length === 1 ? 'orden' : 'órdenes'}...`, 'info');
@@ -112,7 +113,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 new_status: newStatus
             })
         })
-        .then(response => response.json())
+        .then(async function(response) {
+            const contentType = response.headers.get('content-type') || '';
+            if (!response.ok) {
+                if (contentType.includes('application/json')) {
+                    const errData = await response.json();
+                    throw new Error(errData.message || errData.error || 'Error al actualizar estado de las órdenes');
+                }
+                const txt = await response.text();
+                throw new Error(txt || 'Error al actualizar estado de las órdenes');
+            }
+            if (!contentType.includes('application/json')) {
+                const txt = await response.text();
+                throw new Error('Respuesta inesperada: ' + (txt || ''));
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 showAlert(data.message, 'success');
@@ -146,7 +162,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función para eliminar múltiples órdenes
     function deleteOrdersBulk(orderIds) {
-        const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
+        const meta = document.querySelector('meta[name="base-url"]');
+        const baseUrl = meta ? meta.content : '';
         
         // Mostrar indicador de carga
         showAlert(`Eliminando ${orderIds.length} ${orderIds.length === 1 ? 'orden' : 'órdenes'}...`, 'info');
@@ -160,7 +177,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 order_ids: orderIds
             })
         })
-        .then(response => response.json())
+        .then(async function(response) {
+            const contentType = response.headers.get('content-type') || '';
+            if (!response.ok) {
+                if (contentType.includes('application/json')) {
+                    const errData = await response.json();
+                    throw new Error(errData.message || errData.error || 'Error al eliminar las órdenes');
+                }
+                const txt = await response.text();
+                throw new Error(txt || 'Error al eliminar las órdenes');
+            }
+            if (!contentType.includes('application/json')) {
+                const txt = await response.text();
+                throw new Error('Respuesta inesperada: ' + (txt || ''));
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 showAlert(data.message, 'success');
