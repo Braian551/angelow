@@ -303,13 +303,14 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                 <?php endif; ?>
             </div>
             <script>
-                // Debugging: print questions data to console
+                // Debugging: print questions data to console (disabled by default)
+                const PRODUCT_PAGE_DEBUG = false;
                 try {
                     const qCount = document.querySelector('.questions-list')?.dataset?.qaQuestionsCount;
                     const qNodes = document.querySelectorAll('.questions-list').length;
-                    console.log('questionsData count (server):', qCount, 'queryAll length:', qNodes);
-                    console.log('product tabs HTML for #questions:', document.querySelector('#questions')?.innerHTML?.slice(0, 400));
-                    console.log('questionsData (server raw):', <?= json_encode($questionsData ?: []) ?>);
+                    if (PRODUCT_PAGE_DEBUG) console.log('questionsData count (server):', qCount, 'queryAll length:', qNodes);
+                    if (PRODUCT_PAGE_DEBUG) console.log('product tabs HTML for #questions:', document.querySelector('#questions')?.innerHTML?.slice(0, 400));
+                    if (PRODUCT_PAGE_DEBUG) console.log('questionsData (server raw):', <?= json_encode($questionsData ?: []) ?>);
                 } catch(e) { console.error(e); }
             </script>
         </div>

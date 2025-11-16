@@ -314,37 +314,38 @@ class WishlistManager {
         this.alertSystem = new UserAlertSystem();
         this.notificationSystem = new NotificationSystem();
         
-        console.log('🎯 WishlistManager: Inicializando...');
-        console.log('📍 Base URL:', this.baseUrl);
+        const ALERT_DEBUG = false;
+        if (ALERT_DEBUG) console.log('🎯 WishlistManager: Inicializando...');
+        if (ALERT_DEBUG) console.log('📍 Base URL:', this.baseUrl);
         
         this.init();
     }
 
     init() {
-        console.log('🔧 WishlistManager: Configurando event listeners...');
+        if (ALERT_DEBUG) console.log('🔧 WishlistManager: Configurando event listeners...');
         
         // Event listeners para botones de wishlist
         const wishlistButtons = document.querySelectorAll('.wishlist-btn');
-        console.log(`❤️ Botones de wishlist encontrados: ${wishlistButtons.length}`);
+        if (ALERT_DEBUG) console.log(`❤️ Botones de wishlist encontrados: ${wishlistButtons.length}`);
         
         wishlistButtons.forEach((btn, index) => {
             const productId = btn.dataset.productId;
-            console.log(`  [${index + 1}] Botón para producto ID: ${productId}`);
+            if (ALERT_DEBUG) console.log(`  [${index + 1}] Botón para producto ID: ${productId}`);
             
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                console.log('🖱️ Click en wishlist button, producto:', productId);
+                if (ALERT_DEBUG) console.log('🖱️ Click en wishlist button, producto:', productId);
                 
                 const isActive = btn.classList.contains('active');
-                console.log('  Estado actual:', isActive ? 'ACTIVO (en wishlist)' : 'INACTIVO (no en wishlist)');
+                if (ALERT_DEBUG) console.log('  Estado actual:', isActive ? 'ACTIVO (en wishlist)' : 'INACTIVO (no en wishlist)');
                 
                 if (isActive) {
-                    console.log('  ➡️ Acción: ELIMINAR de wishlist');
+                    if (ALERT_DEBUG) console.log('  ➡️ Acción: ELIMINAR de wishlist');
                     this.removeFromWishlist(productId, btn);
                 } else {
-                    console.log('  ➡️ Acción: AGREGAR a wishlist');
+                    if (ALERT_DEBUG) console.log('  ➡️ Acción: AGREGAR a wishlist');
                     this.addToWishlist(productId, btn);
                 }
             });
@@ -353,9 +354,9 @@ class WishlistManager {
         // Event listener para limpiar toda la lista
         const clearAllBtn = document.getElementById('clearAllWishlist');
         if (clearAllBtn) {
-            console.log('🗑️ Botón "Limpiar todo" encontrado');
+            if (ALERT_DEBUG) console.log('🗑️ Botón "Limpiar todo" encontrado');
             clearAllBtn.addEventListener('click', () => {
-                console.log('🖱️ Click en "Limpiar todo"');
+                    if (ALERT_DEBUG) console.log('🖱️ Click en "Limpiar todo"');
                 this.clearAllWishlist();
             });
         }
@@ -363,19 +364,19 @@ class WishlistManager {
         // Cargar imágenes con lazy loading
         this.setupLazyLoading();
         
-        console.log('✅ WishlistManager: Inicialización completa');
+        if (ALERT_DEBUG) console.log('✅ WishlistManager: Inicialización completa');
     }
 
     async addToWishlist(productId, button) {
-        console.log('📤 addToWishlist: Iniciando...', { productId });
+        if (ALERT_DEBUG) console.log('📤 addToWishlist: Iniciando...', { productId });
         
         try {
             // Optimistic UI update
             button.classList.add('active');
-            console.log('  ✓ UI actualizada (optimistic)');
+            if (ALERT_DEBUG) console.log('  ✓ UI actualizada (optimistic)');
             
             const url = `${this.baseUrl}/ajax/wishlist/add.php`;
-            console.log('  📡 Enviando petición a:', url);
+            if (ALERT_DEBUG) console.log('  📡 Enviando petición a:', url);
             
             const response = await fetch(url, {
                 method: 'POST',
@@ -385,12 +386,12 @@ class WishlistManager {
                 body: JSON.stringify({ product_id: productId })
             });
 
-            console.log('  📥 Respuesta recibida:', response.status);
+            if (ALERT_DEBUG) console.log('  📥 Respuesta recibida:', response.status);
             const data = await response.json();
-            console.log('  📋 Datos:', data);
+            if (ALERT_DEBUG) console.log('  📋 Datos:', data);
 
             if (data.success) {
-                console.log('  ✅ Éxito! Mostrando notificación toast...');
+                if (ALERT_DEBUG) console.log('  ✅ Éxito! Mostrando notificación toast...');
                 this.notificationSystem.show(
                     '¡Producto agregado a tu lista de deseos!',
                     'success',
@@ -403,12 +404,12 @@ class WishlistManager {
                     }
                 );
             } else {
-                console.log('  ❌ Error:', data.error);
+                if (ALERT_DEBUG) console.log('  ❌ Error:', data.error);
                 // Revertir si falla
                 button.classList.remove('active');
                 
                 if (data.error === 'not_logged_in') {
-                    console.log('  🔐 Usuario no logueado, mostrando alerta de login...');
+                    if (ALERT_DEBUG) console.log('  🔐 Usuario no logueado, mostrando alerta de login...');
                     this.showLoginAlert();
                 } else {
                     this.notificationSystem.show(
@@ -486,7 +487,7 @@ class WishlistManager {
                     type: 'secondary',
                     icon: 'fas fa-times',
                     callback: () => {
-                        console.log('Operación cancelada');
+                        if (ALERT_DEBUG) console.log('Operación cancelada');
                     }
                 },
                 {
@@ -626,7 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar el sistema de wishlist
     window.wishlistManager = new WishlistManager();
     
-    console.log('✅ Sistema de Wishlist inicializado');
+    if (ALERT_DEBUG) console.log('✅ Sistema de Wishlist inicializado');
 });
 
 // -----------------------------------------------------------------------------

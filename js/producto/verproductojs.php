@@ -13,11 +13,14 @@
         // Initial set of questions from server. Use let so we can update after delete.
         let initialQuestions = <?= json_encode($questionsData ?: []) ?>;
 
+        // Debug flag to control console output for this page
+        const PRODUCT_PAGE_DEBUG = false;
+
         // Helper: remove a question from front-end state after delete
         function removeQuestionFromInitial(qId) {
             try {
                 initialQuestions = initialQuestions.filter(q => q.id != qId);
-            } catch (err) { console.warn('Could not remove from initialQuestions', err); }
+            } catch (err) { if (PRODUCT_PAGE_DEBUG) console.warn('Could not remove from initialQuestions', err); }
         }
 
 
@@ -540,7 +543,7 @@
                 }).then(r => r.json()).then(data => {
                     if (data.success) {
                         // Update internal questions array so future rerenders don't bring it back
-                        try { removeQuestionFromInitial(qId); } catch (err) { console.warn('removeQuestionFromInitial failed', err); }
+                        try { removeQuestionFromInitial(qId); } catch (err) { if (PRODUCT_PAGE_DEBUG) console.warn('removeQuestionFromInitial failed', err); }
                         qItem.find('.question-text p').text(newText);
                         editor.remove();
                         // Usar las alertas de usuario para notificar éxito
@@ -583,10 +586,10 @@
                                 let n = m ? parseInt(m[1]) - 1 : null;
                                 if (n !== null && n >= 0) tabBtn.textContent = tabBtn.textContent.replace(/\(.*\)/, '(' + n + ')');
                             }
-                        } catch (e) { console.warn('Could not update questions count', e); }
+                        } catch (e) { if (PRODUCT_PAGE_DEBUG) console.warn('Could not update questions count', e); }
 
                         // Re-render questions to show placeholder if none remain
-                        try { renderQuestions(initialQuestions); } catch (err) { console.warn('Render after delete failed', err); }
+                        try { renderQuestions(initialQuestions); } catch (err) { if (PRODUCT_PAGE_DEBUG) console.warn('Render after delete failed', err); }
                     } else {
                         showNotification(data.message || 'Error al eliminar pregunta', 'error');
                     }
@@ -620,7 +623,7 @@
                         if (qForm && qForm.style.display === 'none') {
                             // Optionally leave hidden; user can click the Ask button to open.
                         }
-                    } catch (err) { console.warn('Could not ensure ask button exists', err); }
+                    } catch (err) { if (PRODUCT_PAGE_DEBUG) console.warn('Could not ensure ask button exists', err); }
                 } catch (e) {
                     console.error(e);
                     showUserError('Error de conexión');
@@ -629,29 +632,29 @@
         });
 
         function renderQuestions(questions) {
-            console.log('renderQuestions called, questions length:', questions.length);
+            if (PRODUCT_PAGE_DEBUG) console.log('renderQuestions called, questions length:', questions.length);
             let container = $('.questions-list');
             
             // If the regular selector didn't find the container, try a scoped selector or a direct DOM query.
             if (!container.length) {
                 const fallback = document.querySelector('#questions .questions-list') || document.querySelector('.questions-list');
-                console.log('renderQuestions: fallback queryAll length:', document.querySelectorAll('.questions-list').length);
+                if (PRODUCT_PAGE_DEBUG) console.log('renderQuestions: fallback queryAll length:', document.querySelectorAll('.questions-list').length);
                 if (fallback) {
                     container = $(fallback);
                 } else {
-                    console.warn('renderQuestions: could not find .questions-list in DOM');
+                    if (PRODUCT_PAGE_DEBUG) console.warn('renderQuestions: could not find .questions-list in DOM');
                     return; // nothing to render into
                 }
             }
             container.empty();
 
             if (!questions || questions.length === 0) {
-                console.log('renderQuestions: no questions, showing placeholder');
+                if (PRODUCT_PAGE_DEBUG) console.log('renderQuestions: no questions, showing placeholder');
                 container.html('<div class="no-questions"><i class="fas fa-question-circle"></i><p>No hay preguntas sobre este producto. Sé el primero en preguntar.</p></div>');
                 return;
             }
 
-            console.log('renderQuestions debug:', typeof questions, Array.isArray(questions), questions);
+            if (PRODUCT_PAGE_DEBUG) console.log('renderQuestions debug:', typeof questions, Array.isArray(questions), questions);
             try {
             questions.forEach(q => {
                 const userName = q.user_name || 'Usuario';
@@ -714,7 +717,7 @@
                     // If jQuery append didn't create DOM nodes (some libs may prevent jQuery insertion),
                     // use raw HTML fallback
                     if (container.find('.question-item').length === 0) {
-                        console.warn('renderQuestions: appended items not visible; using HTML fallback');
+                        if (PRODUCT_PAGE_DEBUG) console.warn('renderQuestions: appended items not visible; using HTML fallback');
                         const fallbackHtml = questions.map(q2 => {
                             const uName = q2.user_name || 'Usuario';
                             const uImg = q2.user_image ? '<?= BASE_URL ?>/' + q2.user_image : '<?= BASE_URL ?>/images/default-avatar.png';
@@ -723,25 +726,25 @@
                         }).join('');
                         container.html(fallbackHtml);
                     }
-                    console.log('renderQuestions debug append: container jQuery length:', container.length, 'native elem:', container.get(0), 'qItem native:', qItem.get(0));
-                    console.log('renderQuestions debug check find:', container.find('.question-item').length);
+                    if (PRODUCT_PAGE_DEBUG) console.log('renderQuestions debug append: container jQuery length:', container.length, 'native elem:', container.get(0), 'qItem native:', qItem.get(0));
+                    if (PRODUCT_PAGE_DEBUG) console.log('renderQuestions debug check find:', container.find('.question-item').length);
                 } catch (e) {
-                    console.warn('jQuery append failed, trying native append', e);
+                    if (PRODUCT_PAGE_DEBUG) console.warn('jQuery append failed, trying native append', e);
                     try {
                         document.querySelector('.questions-list').appendChild(qItem.get(0));
                     } catch (err) {
                         console.error('native append also failed', err);
                     }
                 }
-            console.log('renderQuestions: appended qItem for id=', q.id, 'container children now=', container.children().length);
+            if (PRODUCT_PAGE_DEBUG) console.log('renderQuestions: appended qItem for id=', q.id, 'container children now=', container.children().length);
             });
             } catch(e) {
                 console.error('renderQuestions loop error:', e);
             }
-            console.log('renderQuestions: finished, DOM count=', container.find('.question-item').length);
+            if (PRODUCT_PAGE_DEBUG) console.log('renderQuestions: finished, DOM count=', container.find('.question-item').length);
             // For debugging: log the container children
-            console.log('renderQuestions: container children:', container.children().toArray().map(e => e.outerHTML ? e.outerHTML.slice(0,150) : e.innerText));
-            console.log('renderQuestions: container element:', document.querySelector('.questions-list'));
+            if (PRODUCT_PAGE_DEBUG) console.log('renderQuestions: container children:', container.children().toArray().map(e => e.outerHTML ? e.outerHTML.slice(0,150) : e.innerText));
+            if (PRODUCT_PAGE_DEBUG) console.log('renderQuestions: container element:', document.querySelector('.questions-list'));
 
                 // Update tab counter
                 const tabBtn = document.querySelector('.tab-btn[data-tab="questions"]');
@@ -810,7 +813,7 @@
         function logQuestionsMarkupSnapshot() {
             try {
                 const listing = document.querySelector('#questions .questions-list');
-                console.log('post-render .questions-list innerHTML length:', listing ? listing.innerHTML.length : 'no-listing');
+                    if (PRODUCT_PAGE_DEBUG) console.log('post-render .questions-list innerHTML length:', listing ? listing.innerHTML.length : 'no-listing');
             } catch (err) {
                 console.error('post-render debugging failed', err);
             }
@@ -845,7 +848,7 @@
             
             // Ensure questions are re-rendered when the Questions tab is activated
             $(document).on('click', '.tab-btn[data-tab="questions"]', function() {
-                console.log('Questions tab clicked, rendering questions if missing');
+                if (PRODUCT_PAGE_DEBUG) console.log('Questions tab clicked, rendering questions if missing');
                 try { renderQuestions(initialQuestions); } catch (e) { console.error('render on tab click failed', e); }
             });
 
@@ -855,7 +858,7 @@
                 const observer = new MutationObserver((mutations, obs) => {
                     const qlist = questionsParent.querySelector('.questions-list');
                     if (qlist && qlist.children.length === 0 && initialQuestions.length > 0) {
-                        console.log('MutationObserver detected empty .questions-list; re-rendering questions');
+                        if (PRODUCT_PAGE_DEBUG) console.log('MutationObserver detected empty .questions-list; re-rendering questions');
                         try { renderQuestions(initialQuestions); } catch (e) { console.error('Observer render failed', e); }
                         // stop observing after a successful re-render to avoid loops
                         obs.disconnect();
@@ -868,11 +871,11 @@
             // Fallback: observe the whole body if .questions-list is not yet in DOM — this catches cases where
             // another script rewrites the tabs after DOMContentLoaded
             if (!document.querySelector('.questions-list')) {
-                console.log('No .questions-list detected initially; adding body-level observer');
+                if (PRODUCT_PAGE_DEBUG) console.log('No .questions-list detected initially; adding body-level observer');
                 const bodyObserver = new MutationObserver((mutations, obs) => {
                     const node = document.querySelector('.questions-list');
                     if (node) {
-                        console.log('Body observer found .questions-list; running renderQuestions');
+                        if (PRODUCT_PAGE_DEBUG) console.log('Body observer found .questions-list; running renderQuestions');
                         try {
                             renderQuestions(initialQuestions);
                         } catch (e) { console.error('Body observer render failed', e); }
