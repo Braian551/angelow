@@ -1,3 +1,12 @@
+// Fallback queue so the global helpers can be called even before DOMContentLoaded
+window.__openChangeFieldQueue = window.__openChangeFieldQueue || [];
+window.openStatusChangeModal = window.openStatusChangeModal || function(orderId, currentValue) {
+    window.__openChangeFieldQueue.push({ orderId, type: 'status', currentValue });
+};
+window.openPaymentStatusModal = window.openPaymentStatusModal || function(orderId, currentValue) {
+    window.__openChangeFieldQueue.push({ orderId, type: 'payment', currentValue });
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     const changeFieldModal = document.getElementById('change-field-modal');
     if (!changeFieldModal) {
@@ -13,15 +22,35 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentOrderIdForChange = null;
     let currentChangeType = null; // 'status' | 'payment'
 
-    window.openStatusChangeModal = function(orderId) {
+    window.openStatusChangeModal = function(orderId, currentValue = null) {
         openChangeFieldModal(orderId, {
             type: 'status',
             title: 'Cambiar estado',
             options: window.orderStatuses || window.statuses || {}
-        });
+        }, currentValue);
+    };
+
+    window.openPaymentStatusModal = function(orderId, currentValue = null) {
+        openChangeFieldModal(orderId, {
+            type: 'payment',
+            title: 'Cambiar Estado de Pago',
+            options: window.paymentStatuses || {}
+        }, currentValue);
     };
 
     window.openChangeFieldModal = openChangeFieldModal;
+
+    // process pending calls made before DOMContentLoaded
+    if (Array.isArray(window.__openChangeFieldQueue) && window.__openChangeFieldQueue.length) {
+        window.__openChangeFieldQueue.forEach(item => {
+            if (item.type === 'status') {
+                openChangeFieldModal(item.orderId, { type: 'status', title: 'Cambiar estado', options: window.orderStatuses || window.statuses || {} }, item.currentValue);
+            } else {
+                openChangeFieldModal(item.orderId, { type: 'payment', title: 'Cambiar Estado de Pago', options: window.paymentStatuses || {} }, item.currentValue);
+            }
+        });
+        window.__openChangeFieldQueue.length = 0;
+    }
 
     function closeChangeFieldModal() {
         changeFieldModal.classList.remove('active');
@@ -94,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function openChangeFieldModal(orderId, { type = 'status', title = 'Cambiar', options = {} } = {}) {
+    function openChangeFieldModal(orderId, { type = 'status', title = 'Cambiar', options = {} } = {}, currentValue = null) {
         currentOrderIdForChange = orderId;
         currentChangeType = type;
         notesField.value = '';
@@ -110,6 +139,23 @@ document.addEventListener('DOMContentLoaded', function() {
             option.textContent = label;
             selectField.appendChild(option);
         });
+
+        // Si se pasó un currentValue, intentar seleccionarlo
+        if (currentValue) {
+            // Normalizar tipos y buscar coincidencia
+            const desired = String(currentValue);
+            const exists = Array.from(selectField.options).some(o => o.value === desired);
+            if (exists) {
+                selectField.value = desired;
+            } else {
+                // Si no existe la opción, agregarla como primer elemento y seleccionarla
+                const opt = document.createElement('option');
+                opt.value = desired;
+                opt.textContent = desired;
+                selectField.insertBefore(opt, selectField.firstChild);
+                selectField.value = desired;
+            }
+        }
 
         changeFieldModal.classList.add('active');
         document.body.style.overflow = 'hidden';

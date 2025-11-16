@@ -387,7 +387,7 @@ exportBtn.addEventListener('click', function() {
                             <button class="action-btn edit" title="Editar" onclick="editOrder(${order.id})">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="action-btn status" title="Cambiar estado" onclick="openStatusChangeModal(${order.id})">
+                            <button class="action-btn status" title="Cambiar estado" onclick='openStatusChangeModal(${order.id}, ${JSON.stringify(order.status)})'>
                                 <i class="fas fa-exchange-alt"></i>
                             </button>
                             <button class="action-btn delete" title="Eliminar" onclick="openDeleteOrderModal(${order.id})">

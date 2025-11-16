@@ -306,6 +306,9 @@ function translateValue($value, $field = '') {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/orders/detail.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/style-admin.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/orders/orders.css">
+    <meta name="base-url" content="<?= BASE_URL ?>">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/orders/detail-address-gps.css">
   
 </head>
@@ -344,10 +347,10 @@ function translateValue($value, $field = '') {
                                 <a href="<?= BASE_URL ?>/admin/order/edit.php?id=<?= $orderId ?>" class="btn btn-primary">
                                     <i class="fas fa-edit"></i> Editar
                                 </a>
-                                <button onclick="changeOrderStatus(<?= $orderId ?>)" class="btn btn-info">
+                                <button onclick='openStatusChangeModal(<?= $orderId ?>, <?= json_encode($order['status']) ?>)' class="btn btn-info">
                                     <i class="fas fa-sync-alt"></i> Cambiar Estado
                                 </button>
-                                <button onclick="changePaymentStatus(<?= $orderId ?>)" class="btn btn-info">
+                                <button onclick='openPaymentStatusModal(<?= $orderId ?>, <?= json_encode($order['payment_status']) ?>)' class="btn btn-info">
                                     <i class="fas fa-credit-card"></i> Cambiar Estado de Pago
                                 </button>
                                 
@@ -675,7 +678,7 @@ function translateValue($value, $field = '') {
                                                         $proofUrl = rtrim(BASE_URL, '/') . '/' . ltrim($proofUrl, '/');
                                                     }
                                                 ?>
-                                                <img src="<?= htmlspecialchars($proofUrl) ?>" alt="Comprobante de pago" class="proof-image" onclick="openModal(<?= json_encode($proofUrl) ?>)">
+                                                <img src="<?= htmlspecialchars($proofUrl) ?>" alt="Comprobante de pago" class="proof-image" onclick='openModal(<?= json_encode($proofUrl) ?>)'>
                                                 <p class="text-muted">Haz clic en la imagen para ampliar</p>
                                             </div>
                                         <?php endif; ?>
@@ -795,73 +798,7 @@ function translateValue($value, $field = '') {
     <script src="<?= BASE_URL ?>/js/alerta.js"></script>
     <script src="<?= BASE_URL ?>/js/modals/status-change.js"></script>
     <script>
-        // Función para cambiar el estado de la orden con modal moderno
-        function changeOrderStatus(orderId) {
-            // Crear el modal dinámicamente
-            const modalHTML = `
-                <div class="modal" id="status-modal" style="display: flex; align-items: center; justify-content: center; padding: 20px;">
-                    <div class="status-modal-content" style="max-width: 520px; width: 100%; background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-radius: 20px; border: 1px solid rgba(0, 119, 182, 0.18); box-shadow: 0 8px 32px rgba(0, 119, 182, 0.15), 0 20px 60px rgba(0, 0, 0, 0.15); position: relative; animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
-                        <div class="card-header" style="padding: 2rem 4.5rem 2rem 2.5rem; background: rgba(255, 255, 255, 0.5); border-bottom: 1px solid rgba(0, 119, 182, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 20px 20px 0 0; position: relative;">
-                            <span class="close-modal" onclick="closeStatusModal()" style="cursor: pointer; font-size: 0; color: #64748b; position: absolute; top: 20px; right: 20px; width: 38px; height: 38px; border-radius: 50%; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.3s; z-index: 10; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(100, 116, 139, 0.2);"></span>
-                            <h3 style="margin: 0; font-size: 1.8rem; color: #334155; font-weight: 600; line-height: 1.2; display: flex; align-items: center; gap: 0.8rem; position: relative; z-index: 1;">
-                                <i class="fas fa-sync-alt" style="color: #0077b6; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(0, 119, 182, 0.12); border-radius: 10px; padding: 8px; flex-shrink: 0;"></i>
-                                <span>Cambiar Estado</span>
-                            </h3>
-                        </div>
-                        <div class="card-body" style="padding: 2.5rem; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 0 0 20px 20px;">
-                            <div style="margin-bottom: 1.8rem;">
-                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem; font-weight: 600; color: #475569; margin-bottom: 0.8rem;">
-                                    <i class="fas fa-tag" style="color: #0077b6;"></i>
-                                    Nuevo Estado
-                                </label>
-                                <select id="new-status" style="width: 100%; height: 50px; padding: 0 1.4rem; border: 2px solid rgba(0, 119, 182, 0.15); border-radius: 12px; font-size: 15px; color: #334155; background: rgba(255, 255, 255, 0.95); cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: all 0.3s; outline: none;">
-                                    <option value="pending">Pendiente</option>
-                                    <option value="processing">En proceso</option>
-                                    <option value="shipped">Enviado</option>
-                                    <option value="delivered">Entregado</option>
-                                    <option value="cancelled">Cancelado</option>
-                                    <option value="refunded">Reembolsado</option>
-                                </select>
-                            </div>
-                            <div style="margin-bottom: 2rem;">
-                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem; font-weight: 600; color: #475569; margin-bottom: 0.8rem;">
-                                    <i class="fas fa-sticky-note" style="color: #0077b6;"></i>
-                                    Notas (Opcional)
-                                </label>
-                                <textarea id="status-notes" rows="3" style="width: 100%; padding: 1.2rem; border: 2px solid rgba(0, 119, 182, 0.15); border-radius: 12px; font-size: 14.5px; color: #334155; background: rgba(255, 255, 255, 0.95); font-family: inherit; resize: vertical; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: all 0.3s; outline: none; line-height: 1.5;" placeholder="Agrega notas sobre el cambio de estado..."></textarea>
-                            </div>
-                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                                <button onclick="closeStatusModal()" style="flex: 1; min-width: 140px; padding: 1rem 1.8rem; border-radius: 12px; font-size: 1.4rem; font-weight: 600; border: 2px solid rgba(0, 119, 182, 0.15); background: rgba(248, 250, 252, 0.85); color: #64748b; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
-                                    <i class="fas fa-times"></i> Cancelar
-                                </button>
-                                <button onclick="confirmStatusChange(${orderId})" style="flex: 1; min-width: 140px; padding: 1rem 1.8rem; border-radius: 12px; font-size: 1.4rem; font-weight: 600; border: 2px solid rgba(0, 119, 182, 0.3); background: rgba(0, 119, 182, 0.9); color: white; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
-                                    <i class="fas fa-check"></i> Confirmar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            
-            // Cerrar al hacer clic fuera
-            const modal = document.getElementById('status-modal');
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    closeStatusModal();
-                }
-            });
-        }
-        
-        function closeStatusModal() {
-            const modal = document.getElementById('status-modal');
-            if (modal) {
-                modal.style.animation = 'fadeOut 0.3s ease-out';
-                setTimeout(() => modal.remove(), 300);
-            }
-        }
-        
+        // Use shared modal for changing order status
         function confirmStatusChange(orderId) {
             const newStatus = document.getElementById('new-status').value;
             const notes = document.getElementById('status-notes').value;
@@ -907,12 +844,6 @@ function translateValue($value, $field = '') {
             .catch(error => {
                 showAlert(error.message, 'error');
             });
-        }
-
-        // Abrir modal genérico para cambiar el estado de pago (usa el modal 'change-field-modal')
-        function changePaymentStatus(orderId) {
-            // las opciones para paymentStatuses están disponibles en window.paymentStatuses
-            openChangeFieldModal(orderId, { type: 'payment', title: 'Cambiar Estado de Pago', options: window.paymentStatuses || {} });
         }
 
         // Funciones para el modal de imagen
@@ -1276,23 +1207,23 @@ function translateValue($value, $field = '') {
         }
         
         /* Hover effects para botones en el modal */
-        .modal button:hover {
+        #imageModal button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 119, 182, 0.15);
         }
         
-        .modal button:active {
+        #imageModal button:active {
             transform: translateY(0);
         }
         
-        .modal select:hover,
-        .modal textarea:hover {
+        #imageModal select:hover,
+        #imageModal textarea:hover {
             border-color: rgba(0, 119, 182, 0.3);
             background: rgba(255, 255, 255, 1);
         }
         
-        .modal select:focus,
-        .modal textarea:focus {
+        #imageModal select:focus,
+        #imageModal textarea:focus {
             border-color: rgba(0, 119, 182, 0.5);
             box-shadow: 0 0 0 4px rgba(0, 119, 182, 0.1);
             background: rgba(255, 255, 255, 1);
@@ -1378,7 +1309,7 @@ function translateValue($value, $field = '') {
         }
         
         /* Mejora de sombras y glassmorphism */
-        .modal {
+        #imageModal {
             background-color: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(8px);
         }

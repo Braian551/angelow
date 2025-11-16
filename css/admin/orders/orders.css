@@ -1677,7 +1677,7 @@ button:focus {
 
 .payment-badge.pending {
   background-color: var(--warning-light);
-  color: var(--warning-color);
+  color: #5e573f;
 }
 
 .payment-badge.failed {

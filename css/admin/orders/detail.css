@@ -1142,7 +1142,7 @@
 }
 
 /* ===== MODAL PARA IMAGEN ===== */
-.modal {
+#imageModal {
   display: none;
   position: fixed;
   z-index: 10000;
@@ -1157,7 +1157,7 @@
   animation: fadeIn 0.3s ease-out;
 }
 
-.modal-content {
+#imageModal .modal-content {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1168,34 +1168,34 @@
   text-align: center;
 }
 
-.modal-content::-webkit-scrollbar {
+#imageModal .modal-content::-webkit-scrollbar {
   width: 16px;
   height: 16px;
 }
 
-.modal-content::-webkit-scrollbar-track {
+#imageModal .modal-content::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.5);
   border-radius: 8px;
   margin: 8px;
 }
 
-.modal-content::-webkit-scrollbar-thumb {
+#imageModal .modal-content::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.6);
   border-radius: 8px;
   border: 3px solid rgba(0, 0, 0, 0.5);
   transition: var(--transition);
 }
 
-.modal-content::-webkit-scrollbar-thumb:hover {
+#imageModal .modal-content::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.8);
   border-color: rgba(0, 0, 0, 0.6);
 }
 
-.modal-content::-webkit-scrollbar-corner {
+#imageModal .modal-content::-webkit-scrollbar-corner {
   background: rgba(0, 0, 0, 0.5);
 }
 
-.modal-image {
+#imageModal .modal-image {
   max-width: 90vw;
   max-height: 90vh;
   width: auto;
@@ -1219,7 +1219,7 @@
   flex-shrink: 0;
 }
 
-.modal-image.zoomed {
+#imageModal .modal-image.zoomed {
   cursor: grab;
   max-width: none;
   max-height: none;
@@ -1231,11 +1231,11 @@
   z-index: 10001;
 }
 
-.modal-image.zoomed:active {
+#imageModal .modal-image.zoomed:active {
   cursor: grabbing;
 }
 
-.close-modal {
+#imageModal .close-modal {
   position: fixed;
   top: 30px;
   right: 40px;
@@ -1259,7 +1259,7 @@
   padding: 0;
 }
 
-.close-modal::before {
+#imageModal .close-modal::before {
   content: '×';
   font-size: 42px;
   display: flex;
@@ -1276,16 +1276,16 @@
   transform: translate(-50%, -50%);
 }
 
-.close-modal:hover,
-.close-modal:focus {
+#imageModal .close-modal:hover,
+#imageModal .close-modal:focus {
   background: rgba(220, 38, 38, 0.8);
   transform: rotate(90deg) scale(1.1);
   border-color: rgba(239, 68, 68, 0.8);
   box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
 }
 
-.close-modal:hover::before,
-.close-modal:focus::before {
+#imageModal .close-modal:hover::before,
+#imageModal .close-modal:focus::before {
   color: #ffffff;
 }
 
@@ -1429,23 +1429,23 @@
     grid-template-columns: 1fr;
   }
 
-  .close-modal {
+  #imageModal .close-modal {
     top: 15px;
     right: 15px;
     width: 45px;
     height: 45px;
   }
 
-  .close-modal::before {
+  #imageModal .close-modal::before {
     font-size: 36px;
   }
 
-  .modal-content {
+  #imageModal .modal-content {
     width: 95%;
     padding: 10px;
   }
 
-  .modal-image {
+  #imageModal .modal-image {
     max-height: 85vh;
   }
 }
@@ -1473,22 +1473,22 @@
     padding-left: 2rem;
   }
 
-  .close-modal {
+  #imageModal .close-modal {
     top: 10px;
     right: 10px;
     width: 40px;
     height: 40px;
   }
 
-  .close-modal::before {
+  #imageModal .close-modal::before {
     font-size: 32px;
   }
 
-  .modal-content {
+  #imageModal .modal-content {
     width: 98%;
   }
 
-  .modal-image {
+  #imageModal .modal-image {
     max-height: 80vh;
     border-radius: var(--radius-md);
   }
@@ -1496,16 +1496,16 @@
 
 /* ===== RESPONSIVE LANDSCAPE PHONES ===== */
 @media (max-width: 896px) and (orientation: landscape) {
-  .modal-image {
+  #imageModal .modal-image {
     max-width: 90vw;
     max-height: 88vh;
   }
 
-  .modal-image.zoomed {
+  #imageModal .modal-image.zoomed {
     transform: translate(-50%, -50%) scale(1.6);
   }
 
-  .close-modal {
+  #imageModal .close-modal {
     top: 10px;
     right: 10px;
     width: 45px;
@@ -1515,12 +1515,12 @@
 
 /* ===== RESPONSIVE LARGE SCREENS ===== */
 @media (min-width: 1920px) {
-  .modal-image {
+  #imageModal .modal-image {
     max-width: 85vw;
     max-height: 85vh;
   }
 
-  .modal-image.zoomed {
+  #imageModal .modal-image.zoomed {
     transform: translate(-50%, -50%) scale(2);
   }
 }
@@ -2397,44 +2397,44 @@
 
 /* Estilos responsive para el zoom */
 @media (max-width: 768px) {
-  .modal-image {
+  #imageModal .modal-image {
     max-width: 90vw;
     max-height: 85vh;
   }
 
-  .modal-image.zoomed {
+  #imageModal .modal-image.zoomed {
     transform: translate(-50%, -50%) scale(1.6);
   }
 
-  .modal-content::-webkit-scrollbar {
+  #imageModal .modal-content::-webkit-scrollbar {
     width: 12px;
     height: 12px;
   }
 }
 
 @media (max-width: 576px) {
-  .modal-image {
+  #imageModal .modal-image {
     max-width: 92vw;
     max-height: 80vh;
   }
 
-  .modal-image.zoomed {
+  #imageModal .modal-image.zoomed {
     transform: translate(-50%, -50%) scale(1.5);
   }
 
-  .modal-content::-webkit-scrollbar {
+  #imageModal .modal-content::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
 
-  .close-modal {
+  #imageModal .close-modal {
     width: 45px;
     height: 45px;
     top: 15px;
     right: 15px;
   }
 
-  .close-modal::before {
+  #imageModal .close-modal::before {
     font-size: 36px;
   }
 }
