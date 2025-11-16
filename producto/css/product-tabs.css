@@ -719,6 +719,57 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Card style for each question to improve visual separation */
+.questions-list .question-item {
+  background: transparent;
+  padding: 1.6rem 1.6rem;
+  margin-bottom: 1.2rem;
+  border-radius: 8px;
+  transition: var(--transition);
+}
+.questions-list .question-item:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+}
+
+.question-meta {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-info strong {
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+
+.user-info .time {
+  color: var(--text-light);
+  font-size: 1.2rem;
+}
+
+.question-text p { margin: 0.8rem 0; }
+
+.question-actions .answer-btn {
+  background: none;
+  color: var(--primary-color);
+  font-weight: 600;
+  text-decoration: none;
+}
+.question-actions .answer-btn:hover { color: var(--primary-dark); }
+
+/* Render replies as indented cards */
+.answers-list .answer-item { padding-left: 1rem; }
+
+@media (max-width: 768px) {
+  .questions-list { padding: 1.2rem; }
+  .user-avatar { width: 48px; height: 48px; flex: 0 0 48px; }
+}
+
 /* Avatar + user info */
 .user-avatar {
   width: 56px;
