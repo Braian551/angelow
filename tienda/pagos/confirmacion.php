@@ -437,7 +437,7 @@ try {
                             <div class="info-group">
                                 <label>Indicaciones:</label>
                                 <p>
-                                    Te avisaremos por correo y WhatsApp cuando el pedido esté listo.
+                                    Te avisaremos por correo o notificaciones de la plataforma cuando el pedido esté listo.
                                     Presenta tu documento y el número de orden al recogerlo.
                                 </p>
                             </div>
