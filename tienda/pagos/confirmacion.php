@@ -409,7 +409,7 @@ try {
                     </div>
                 </section>
 
-                <!-- Información de envío y pago -->
+                <!-- Información de envío -->
                 <section class="confirmation-section">
                     <div class="section-header">
                         <h2><i class="fas fa-shipping-fast"></i> Información de Envío</h2>
@@ -480,10 +480,15 @@ try {
                             <p>Transferencia bancaria - Pendiente de verificación</p>
                         </div>
                     </div>
+                </section>
 
-                    <?php if ($isStorePickup): ?>
+                <?php if ($isStorePickup): ?>
+                    <!-- Mapa de recogida: separado en su propia sección para no alargar el bloque de envío -->
+                    <section class="confirmation-section pickup-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-map-marker-alt"></i> Cómo llegar a la tienda</h2>
+                        </div>
                         <div class="pickup-map-wrapper">
-                            <h3><i class="fas fa-map-marker-alt"></i> Cómo llegar a la tienda</h3>
                             <div id="pickup-map" class="pickup-map"></div>
                             <div class="map-hint">
                                 <?php if ($customerLat && $customerLng): ?>
@@ -498,11 +503,15 @@ try {
                                 <?php endif; ?>
                             </div>
                         </div>
-                    <?php endif; ?>
+                    </section>
+                <?php endif; ?>
 
-                    <!-- Información de seguimiento -->
+                <!-- Información de seguimiento -->
+                <section class="confirmation-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-map-marker-alt"></i> Progreso del Pedido</h2>
+                    </div>
                     <div class="tracking-info">
-                        <h3><i class="fas fa-map-marker-alt"></i> Progreso del Pedido</h3>
                         <div class="tracking-steps">
                             <?php foreach ($trackingSteps as $step): ?>
                                 <div class="tracking-step <?= htmlspecialchars($step['class'] ?? '') ?>">

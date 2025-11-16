@@ -174,7 +174,6 @@
     box-shadow: var(--confirm-shadow-sm);
     border: 1px solid var(--confirm-border);
     padding: 2.5rem;
-    height: max-content;
     transition: var(--confirm-transition);
 }
 
@@ -350,9 +349,8 @@
 
 /* Seguimiento del pedido */
 .tracking-info {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--confirm-border);
+    margin-top: 0.5rem;
+    padding-top: 0;
 }
 
 .tracking-info h3 {
@@ -698,5 +696,20 @@
         align-items: flex-start;
         gap: 0.5rem;
         font-size: 1.05rem;
+    }
+}
+
+/* Sección dedicada al mapa de recogida: compacta y separada */
+.pickup-section {
+    padding: 1rem 1.5rem;
+}
+
+.pickup-section .pickup-map {
+    height: 320px;
+}
+
+@media (max-width: 480px) {
+    .pickup-section .pickup-map {
+        height: 200px;
     }
 }
