@@ -190,14 +190,14 @@
 /* Botón primario */
 .user-alert-btn.primary,
 .user-alert-btn-primary {
-    background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
     color: #fff;
-    box-shadow: 0 4px 15px rgba(0, 119, 182, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 119, 182, 0.12);
 }
 
 .user-alert-btn.primary:hover,
 .user-alert-btn-primary:hover {
-    background: linear-gradient(135deg, #006199 0%, #0099bb 100%);
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-color) 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 119, 182, 0.5);
 }
@@ -223,9 +223,9 @@
 
 /* Botón de peligro/danger */
 .user-alert-btn.danger {
-    background: linear-gradient(135deg, #e63946, #d62828);
+    background: linear-gradient(135deg, var(--error-color), #d62828);
     color: white;
-    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
+    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.15);
 }
 
 .user-alert-btn.danger:hover {
@@ -239,9 +239,9 @@
 
 /* Botón de éxito */
 .user-alert-btn.success {
-    background: linear-gradient(135deg, #06d6a0, #05a677);
+    background: linear-gradient(135deg, var(--success-color), #05a677);
     color: white;
-    box-shadow: 0 4px 15px rgba(6, 214, 160, 0.3);
+    box-shadow: 0 4px 15px rgba(6, 214, 160, 0.12);
 }
 
 .user-alert-btn.success:hover {
@@ -251,7 +251,7 @@
 
 /* Botón de advertencia */
 .user-alert-btn.warning {
-    background: linear-gradient(135deg, #ff9900, #ff8800);
+    background: linear-gradient(135deg, var(--warning-color), #ff8800);
     color: white;
     box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
 }
@@ -265,8 +265,8 @@
 
 /* Success - Verde */
 .user-alert-container.success .user-alert-icon-wrapper {
-    background: #4bb543;
-    box-shadow: 0 8px 25px rgba(75, 181, 67, 0.4);
+    background: var(--success-color);
+    box-shadow: 0 8px 25px rgba(75, 181, 67, 0.12);
 }
 
 .user-alert-container.success .user-alert-title {
@@ -275,8 +275,8 @@
 
 /* Error - Rojo */
 .user-alert-container.error .user-alert-icon-wrapper {
-    background: #ff3333;
-    box-shadow: 0 8px 25px rgba(255, 51, 51, 0.4);
+    background: var(--error-color);
+    box-shadow: 0 8px 25px rgba(255, 51, 51, 0.12);
 }
 
 .user-alert-container.error .user-alert-title {
@@ -285,8 +285,8 @@
 
 /* Warning - Amarillo */
 .user-alert-container.warning .user-alert-icon-wrapper {
-    background: #ff9900;
-    box-shadow: 0 8px 25px rgba(255, 153, 0, 0.4);
+    background: var(--warning-color);
+    box-shadow: 0 8px 25px rgba(255, 153, 0, 0.12);
 }
 
 .user-alert-container.warning .user-alert-title {
@@ -295,22 +295,42 @@
 
 /* Info - Azul principal */
 .user-alert-container.info .user-alert-icon-wrapper {
-    background: #0077b6;
-    box-shadow: 0 8px 25px rgba(0, 119, 182, 0.4);
+    background: var(--primary-color);
+    box-shadow: 0 8px 25px rgba(0, 119, 182, 0.12);
 }
 
 .user-alert-container.info .user-alert-title {
-    color: #0077b6;
+    color: var(--primary-color);
 }
 
 /* Question - Morado */
 .user-alert-container.question .user-alert-icon-wrapper {
-    background: #9333ea;
-    box-shadow: 0 8px 25px rgba(147, 51, 234, 0.4);
+    /* Use a solid background for confirmation (no gradient) */
+    background: var(--secondary-color);
+    box-shadow: 0 8px 25px rgba(72, 202, 228, 0.12);
+}
+
+.user-alert-container.question .user-alert-icon-wrapper::before {
+    /* Ensure diffuser uses same solid color and not a gradient */
+    background: var(--secondary-color);
+}
+
+/* When the alert is a 'question' (confirm) use solid button colors to match the icon */
+.user-alert-container.question .user-alert-btn.primary,
+.user-alert-container.question .user-alert-btn-primary {
+    background: var(--secondary-color);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(72, 202, 228, 0.12);
+}
+
+.user-alert-container.question .user-alert-btn.primary:hover,
+.user-alert-container.question .user-alert-btn-primary:hover {
+    filter: brightness(0.94);
+    transform: translateY(-2px);
 }
 
 .user-alert-container.question .user-alert-title {
-    color: #9333ea;
+    color: var(--secondary-color);
 }
 
 /* Botón de cancelar para confirmaciones */

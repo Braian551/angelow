@@ -59,13 +59,13 @@ class UserAlertSystem {
             success: { 
                 icon: 'fas fa-check-circle', 
                 color: '#ffffff', 
-                bgColor: '#4bb543',
+                bgColor: null,
                 animation: 'bounce-in-success'
             },
             error: { 
                 icon: 'fas fa-times-circle', 
                 color: '#ffffff', 
-                bgColor: '#ff3333',
+                bgColor: null,
                 animation: 'shake-error'
             },
             warning: { 
@@ -77,13 +77,13 @@ class UserAlertSystem {
             info: { 
                 icon: 'fas fa-info-circle', 
                 color: '#ffffff', 
-                bgColor: '#0077b6',
+                bgColor: null,
                 animation: 'bounce-in-info'
             },
             question: { 
                 icon: 'fas fa-question-circle', 
                 color: '#ffffff', 
-                bgColor: '#9333ea',
+                bgColor: null,
                 animation: 'bounce-in-question'
             }
         };
@@ -98,11 +98,12 @@ class UserAlertSystem {
         this.iconElement.style.color = config.color;
         this.iconElement.style.animation = `${config.animation} 0.6s ease-out`;
         
-        // Aplicar color de fondo al wrapper del icono
+        // Aplicar color de fondo al wrapper del icono (preferimos usar clases CSS y variables del proyecto)
         const iconWrapper = this.overlay.querySelector('.user-alert-icon-wrapper');
         if (iconWrapper) {
-            iconWrapper.style.background = config.bgColor;
-            iconWrapper.style.boxShadow = `0 8px 25px rgba(${this.hexToRgb(config.bgColor)}, 0.4)`;
+            // Ensure the container already has the correct type class which sets the background via CSS using project variables
+            iconWrapper.style.background = '';
+            iconWrapper.style.boxShadow = '';
         }
 
         // Aplicar contenido
