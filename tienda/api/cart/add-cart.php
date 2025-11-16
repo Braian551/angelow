@@ -81,12 +81,28 @@ try {
     
     if (!$cart) {
         // Crear nuevo carrito
-        $stmt = $conn->prepare("INSERT INTO carts (user_id, session_id) VALUES (:user_id, :session_id)");
-        $stmt->execute([
-            ':user_id' => $user_id,
-            ':session_id' => $user_id ? null : $session_id
-        ]);
-        $cart_id = $conn->lastInsertId();
+        try {
+            $stmt = $conn->prepare("INSERT INTO carts (user_id, session_id) VALUES (:user_id, :session_id)");
+            $stmt->execute([
+                ':user_id' => $user_id,
+                ':session_id' => $user_id ? null : $session_id
+            ]);
+            $cart_id = $conn->lastInsertId();
+        } catch (PDOException $e) {
+            // Fallback si la tabla no tiene AUTO_INCREMENT (SQLSTATE 1364)
+            if (strpos($e->getMessage(), '1364') !== false || stripos($e->getMessage(), "doesn't have a default value") !== false) {
+                error_log("add-cart.php: detected missing AUTO_INCREMENT for carts.id, falling back to manual id generation");
+
+                $nextStmt = $conn->query('SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM carts');
+                $nextId = intval($nextStmt->fetchColumn());
+
+                $ins = $conn->prepare('INSERT INTO carts (id, user_id, session_id, created_at) VALUES (?, ?, ?, NOW())');
+                $ins->execute([$nextId, $user_id, $user_id ? null : $session_id]);
+                $cart_id = $nextId;
+            } else {
+                throw $e;
+            }
+        }
     } else {
         $cart_id = $cart['id'];
     }
@@ -130,13 +146,28 @@ try {
                                 (cart_id, product_id, color_variant_id, size_variant_id, quantity) 
                                 VALUES 
                                 (:cart_id, :product_id, :color_variant_id, :size_variant_id, :quantity)");
-        $stmt->execute([
-            ':cart_id' => $cart_id,
-            ':product_id' => $product_id,
-            ':color_variant_id' => $color_variant_id ?: null,
-            ':size_variant_id' => $size_variant_id,
-            ':quantity' => $quantity
-        ]);
+        try {
+            $stmt->execute([
+                ':cart_id' => $cart_id,
+                ':product_id' => $product_id,
+                ':color_variant_id' => $color_variant_id ?: null,
+                ':size_variant_id' => $size_variant_id,
+                ':quantity' => $quantity
+            ]);
+        } catch (PDOException $e) {
+            // Fallback temporal en caso de que cart_items.id no tenga AUTO_INCREMENT
+            if (strpos($e->getMessage(), '1364') !== false || stripos($e->getMessage(), "doesn't have a default value") !== false) {
+                error_log("add-cart.php: detected missing AUTO_INCREMENT for cart_items.id, falling back to manual id generation");
+
+                $nextStmt = $conn->query('SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM cart_items');
+                $nextId = intval($nextStmt->fetchColumn());
+
+                $ins = $conn->prepare('INSERT INTO cart_items (id, cart_id, product_id, color_variant_id, size_variant_id, quantity, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())');
+                $ins->execute([$nextId, $cart_id, $product_id, $color_variant_id ?: null, $size_variant_id, $quantity]);
+            } else {
+                throw $e;
+            }
+        }
     }
     
     $response = [
