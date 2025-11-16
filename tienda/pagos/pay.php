@@ -209,30 +209,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Generar número de orden
             $order_number = 'ORD' . date('Ymd') . strtoupper(substr(uniqid(), -6));
             
-            // Crear la orden
-            $orderQuery = "
-                INSERT INTO orders (
-                    order_number, user_id, status, subtotal, shipping_cost, 
-                    total, payment_method, payment_status,
-                    shipping_address_id, shipping_address, shipping_city, shipping_method_id
-                ) VALUES (?, ?, 'pending', ?, ?, ?, 'transfer', 'pending', ?, ?, ?, ?)
-            ";
+            // Crear la orden - algunas instalaciones pueden no tener la columna shipping_method_id
+            $hasShippingMethodColumn = false;
+            try {
+                $colStmt = $conn->prepare("SHOW COLUMNS FROM `orders` LIKE 'shipping_method_id'");
+                $colStmt->execute();
+                $hasShippingMethodColumn = (bool)$colStmt->fetch();
+            } catch (Exception $e) {
+                // No fatal: seguirá sin la columna
+                $hasShippingMethodColumn = false;
+            }
+
+            if ($hasShippingMethodColumn) {
+                $orderQuery = "
+                    INSERT INTO orders (
+                        order_number, user_id, status, subtotal, shipping_cost, 
+                        total, payment_method, payment_status,
+                        shipping_address_id, shipping_address, shipping_city, shipping_method_id
+                    ) VALUES (?, ?, 'pending', ?, ?, ?, 'transfer', 'pending', ?, ?, ?, ?)
+                ";
+            } else {
+                $orderQuery = "
+                    INSERT INTO orders (
+                        order_number, user_id, status, subtotal, shipping_cost, 
+                        total, payment_method, payment_status,
+                        shipping_address_id, shipping_address, shipping_city
+                    ) VALUES (?, ?, 'pending', ?, ?, ?, 'transfer', 'pending', ?, ?, ?)
+                ";
+            }
             
             $shipping_address = $customerFullAddress;
             $pickupRouteLink = $isStorePickup ? buildStoreRouteLink($shipping_address) : null;
             
             $stmt = $conn->prepare($orderQuery);
-            $stmt->execute([
-                $order_number,
-                $user_id,
-                $checkout_data['subtotal'],
-                $checkout_data['shipping_cost'],
-                $checkout_data['total'],
-                $selectedAddress['id'], // Guardar el ID de la dirección seleccionada
-                $shipping_address,
-                'Medellín', // Asumiendo que todas las direcciones son en Medellín
-                $checkout_data['shipping_method_id']
-            ]);
+            if ($hasShippingMethodColumn) {
+                $stmt->execute([
+                    $order_number,
+                    $user_id,
+                    $checkout_data['subtotal'],
+                    $checkout_data['shipping_cost'],
+                    $checkout_data['total'],
+                    $selectedAddress['id'], // Guardar el ID de la dirección seleccionada
+                    $shipping_address,
+                    'Medellín', // Asumiendo que todas las direcciones son en Medellín
+                    $checkout_data['shipping_method_id']
+                ]);
+            } else {
+                $stmt->execute([
+                    $order_number,
+                    $user_id,
+                    $checkout_data['subtotal'],
+                    $checkout_data['shipping_cost'],
+                    $checkout_data['total'],
+                    $selectedAddress['id'],
+                    $shipping_address,
+                    'Medellín'
+                ]);
+            }
             
             $order_id = $conn->lastInsertId();
             

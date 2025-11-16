@@ -38,19 +38,31 @@ $customerLat = null;
 $customerLng = null;
 $routeLink = null;
 
+// Verificar si la columna shipping_method_id existe (migraciones anteriores)
+$hasShippingMethodColumn = false;
+try {
+    $colStmt = $conn->prepare("SHOW COLUMNS FROM `orders` LIKE 'shipping_method_id'");
+    $colStmt->execute();
+    $hasShippingMethodColumn = (bool)$colStmt->fetch();
+} catch (Exception $e) {
+    $hasShippingMethodColumn = false;
+}
+
 // Obtener información completa de la orden
 try {
+    // Construir select y join condicional para shipping method
+    $shippingSelect = $hasShippingMethodColumn ? ", sm.name AS shipping_method_name, sm.description AS shipping_method_description, sm.delivery_time AS shipping_delivery_time" : '';
+    $shippingJoin = $hasShippingMethodColumn ? "LEFT JOIN shipping_methods sm ON o.shipping_method_id = sm.id" : '';
+
     $orderQuery = "
         SELECT o.*, u.name as user_name, u.email as user_email, u.phone as user_phone,
-               pt.reference_number, pt.payment_proof, pt.created_at as payment_date,
-               sm.name AS shipping_method_name, sm.description AS shipping_method_description,
-               sm.delivery_time AS shipping_delivery_time,
+               pt.reference_number, pt.payment_proof, pt.created_at as payment_date" . $shippingSelect . ",
                ua.gps_latitude, ua.gps_longitude, ua.recipient_name AS address_recipient,
                ua.recipient_phone AS address_phone, ua.alias AS address_alias
         FROM orders o
         JOIN users u ON o.user_id = u.id
         LEFT JOIN payment_transactions pt ON o.id = pt.order_id
-        LEFT JOIN shipping_methods sm ON o.shipping_method_id = sm.id
+        " . $shippingJoin . "
         LEFT JOIN user_addresses ua ON o.shipping_address_id = ua.id
         WHERE o.order_number = ? AND o.user_id = ?
         ORDER BY o.created_at DESC 

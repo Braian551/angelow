@@ -120,14 +120,26 @@ try {
     $user_id = $_SESSION['user_id'];
 
     // Obtener información completa de la orden
+    // Verificar si orders tiene columna shipping_method_id
+    $hasShippingMethodColumn = false;
+    try {
+        $colStmt = $conn->prepare("SHOW COLUMNS FROM `orders` LIKE 'shipping_method_id'");
+        $colStmt->execute();
+        $hasShippingMethodColumn = (bool)$colStmt->fetch();
+    } catch (Exception $e) {
+        $hasShippingMethodColumn = false;
+    }
+
+    $shippingSelect = $hasShippingMethodColumn ? ", sm.name as shipping_method_name, sm.description as shipping_description" : '';
+    $shippingJoin = $hasShippingMethodColumn ? "LEFT JOIN shipping_methods sm ON o.shipping_method_id = sm.id" : '';
+
     $orderQuery = "
         SELECT o.*, u.name as user_name, u.email as user_email, u.phone as user_phone,
-               pt.reference_number, pt.payment_proof, pt.created_at as payment_date,
-               sm.name as shipping_method_name, sm.description as shipping_description
+               pt.reference_number, pt.payment_proof, pt.created_at as payment_date" . $shippingSelect . "
         FROM orders o
         JOIN users u ON o.user_id = u.id
         LEFT JOIN payment_transactions pt ON o.id = pt.order_id
-        LEFT JOIN shipping_methods sm ON o.shipping_method_id = sm.id
+        " . $shippingJoin . "
         WHERE o.id = ? AND o.user_id = ?
     ";
     $stmt = $conn->prepare($orderQuery);
