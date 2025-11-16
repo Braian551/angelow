@@ -114,6 +114,13 @@ try {
 
                 if ($newStatus === 'delivered') {
                     $ordersToNotify[] = $orderId;
+                } else {
+                    // Crear notificación para otros estados (processing, shipped, cancelled, etc.)
+                    try {
+                        createOrderStatusNotification($conn, (int)$orderId, $newStatus);
+                    } catch (Throwable $e) {
+                        error_log('[ORDER_NOTIFY] Error al crear notificación de estado: ' . $e->getMessage());
+                    }
                 }
                 
                 // Si hay notas adicionales, registrarlas como un cambio separado

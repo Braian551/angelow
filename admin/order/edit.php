@@ -182,6 +182,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $notificationResult = null;
             if ($shouldNotify) {
                 $notificationResult = notifyOrderDelivered($conn, $orderId);
+            } else {
+                // Crear notificación para otros cambios de estado (processing, shipped, cancelled, etc.)
+                if ($previousStatus !== $_POST['status']) {
+                    try {
+                        createOrderStatusNotification($conn, $orderId, $_POST['status']);
+                    } catch (Throwable $e) {
+                        error_log('[ORDER_NOTIFY] Error al crear notificación de estado en edit: ' . $e->getMessage());
+                    }
+                }
             }
 
             if ($notificationResult && !$notificationResult['ok']) {

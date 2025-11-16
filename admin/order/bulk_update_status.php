@@ -165,6 +165,12 @@ try {
             $updatedOrders[] = $currentOrder['order_number'];
             if ($newStatus === 'delivered') {
                 $ordersToNotify[] = (int) $orderId;
+            } else {
+                try {
+                    createOrderStatusNotification($conn, (int)$orderId, $newStatus);
+                } catch (Throwable $e) {
+                    error_log('[ORDER_NOTIFY] Error al crear notificación de estado (bulk): ' . $e->getMessage());
+                }
             }
             
             // Registrar el cambio en el historial (si la tabla existe)

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
+require_once __DIR__ . '/order_notification_service.php';
 
 header('Content-Type: application/json');
 
@@ -81,6 +82,12 @@ try {
             if ($notes) {
                 $stmtNotes = $conn->prepare("INSERT INTO order_status_history (order_id, changed_by, changed_by_name, change_type, field_changed, description, ip_address, created_at) VALUES (?, ?, ?, 'notes', 'admin_notes', ?, ?, NOW())");
                 $stmtNotes->execute([$orderId, $currentUser['id'] ?? null, $currentUser['name'] ?? 'Sistema', $notes, $_SERVER['REMOTE_ADDR']]);
+            }
+            // Crear notificación para cambios de estado de pago
+            try {
+                createPaymentNotification($conn, (int)$orderId, $newStatus);
+            } catch (Throwable $e) {
+                error_log('[ORDER_NOTIFY] Error al crear notificación de pago: ' . $e->getMessage());
             }
         }
     }

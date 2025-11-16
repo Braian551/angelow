@@ -141,3 +141,81 @@ function notifyOrderDelivered(PDO $conn, int $orderId): array
         return ['ok' => false, 'message' => $e->getMessage()];
     }
 }
+
+/**
+ * Inserta una notificación genérica para un usuario.
+ */
+function createNotification(PDO $conn, $userId, int $typeId, string $title, string $message, string $relatedEntityType = 'order', ?int $relatedEntityId = null): bool
+{
+    try {
+        $stmt = $conn->prepare("INSERT INTO notifications (user_id, type_id, title, message, related_entity_type, related_entity_id, is_read, created_at) VALUES (?, ?, ?, ?, ?, ?, 0, NOW())");
+        $stmt->execute([$userId, $typeId, $title, $message, $relatedEntityType, $relatedEntityId]);
+        return true;
+    } catch (Throwable $e) {
+        error_log('[ORDER_NOTIFY] Error createNotification: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Notifica al usuario sobre el nuevo estado de la orden (excepto 'delivered' que se maneja por separado).
+ */
+function createOrderStatusNotification(PDO $conn, int $orderId, string $newStatus): bool
+{
+    try {
+        $stmt = $conn->prepare("SELECT user_id, order_number FROM orders WHERE id = ? LIMIT 1");
+        $stmt->execute([$orderId]);
+        $ord = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$ord) return false;
+
+        $userId = $ord['user_id'];
+        $orderNumber = $ord['order_number'];
+
+        $labels = [
+            'processing' => ['Pedido en proceso', "Tu pedido #$orderNumber está en proceso y pronto saldrá para entrega."],
+            'shipped' => ['Tu envío está en camino', "Tu pedido #$orderNumber ha salido para entrega. Pronto lo recibirás."],
+            'cancelled' => ['Pedido cancelado', "Tu pedido #$orderNumber ha sido cancelado. Si necesitas ayuda, contáctanos."],
+            'refunded' => ['Pago reembolsado', "El pago de tu pedido #$orderNumber ha sido reembolsado."],
+            'pending' => ['Pedido pendiente', "Tu pedido #$orderNumber está pendiente de confirmación."],
+        ];
+
+        if (!isset($labels[$newStatus])) return false;
+
+        [$title, $message] = $labels[$newStatus];
+
+        return createNotification($conn, $userId, 1, $title, $message, 'order', $orderId);
+    } catch (Throwable $e) {
+        error_log('[ORDER_NOTIFY] Error createOrderStatusNotification: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Crear notificaciones específicas para cambios en el estado de pago.
+ */
+function createPaymentNotification(PDO $conn, int $orderId, string $newPaymentStatus): bool
+{
+    try {
+        $stmt = $conn->prepare("SELECT user_id, order_number FROM orders WHERE id = ? LIMIT 1");
+        $stmt->execute([$orderId]);
+        $ord = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$ord) return false;
+
+        $userId = $ord['user_id'];
+        $orderNumber = $ord['order_number'];
+
+        $labels = [
+            'paid' => ['Pago aprobado', "Hemos recibido el pago de tu pedido #$orderNumber. Gracias."],
+            'failed' => ['Pago rechazado', "Tu pago para el pedido #$orderNumber no fue aprobado. Revisa la referencia o contáctanos."],
+            'refunded' => ['Pago reembolsado', "Se ha reembolsado el pago del pedido #$orderNumber."],
+        ];
+
+        if (!isset($labels[$newPaymentStatus])) return false;
+
+        [$title, $message] = $labels[$newPaymentStatus];
+        return createNotification($conn, $userId, 1, $title, $message, 'order', $orderId);
+    } catch (Throwable $e) {
+        error_log('[ORDER_NOTIFY] Error createPaymentNotification: ' . $e->getMessage());
+        return false;
+    }
+}
