@@ -302,12 +302,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Registrar traza completa y datos relevantes para diagnóstico
             error_log("Error al procesar pago: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString() . "\nPOST: " . print_r($_POST, true) . "\nFILES: " . print_r($_FILES, true) . "\nCheckout data: " . print_r($checkout_data, true));
 
-            // En modo DEBUG mostrar detalle en la interfaz para facilitar debugging local
-            if (defined('DEBUG_MODE') && DEBUG_MODE) {
-                $errors[] = "Error al procesar el pago: " . $e->getMessage();
-            } else {
-                $errors[] = "Error al procesar el pago. Por favor intenta nuevamente.";
-            }
+                // En modo DEBUG mostrar detalle en la interfaz para facilitar debugging local
+                $dbErrMsg = $e->getMessage();
+                if (strpos($dbErrMsg, "Field 'id' doesn't have a default value") !== false || strpos($dbErrMsg, 'SQLSTATE[HY000]: General error: 1364') !== false) {
+                    // Mensaje más útil cuando la tabla no tiene AUTO_INCREMENT
+                    $suggest = 'Error interno en la base de datos: id falta configuración. Ejecuta database/fixes/fix_missing_auto_increment.php en el servidor para corregirlo.';
+                    error_log('Sugerencia de migración: database/fixes/fix_missing_auto_increment.php');
+                    if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                        $errors[] = "Error al procesar el pago: $dbErrMsg";
+                    } else {
+                        $errors[] = $suggest;
+                    }
+                } else {
+                    if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                        $errors[] = "Error al procesar el pago: " . $dbErrMsg;
+                    } else {
+                        $errors[] = "Error al procesar el pago. Por favor intenta nuevamente.";
+                    }
+                }
         }
     }
 }
