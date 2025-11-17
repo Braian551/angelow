@@ -215,6 +215,7 @@ try {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboarduser2.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/productos.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/orders.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/notificacion.css">
 </head>
 
@@ -288,16 +289,18 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                             // Usar la función genérica para traducir estados consistentemente
                             $statusLabel = function_exists('getStatusText') ? getStatusText($order['status']) : ucfirst($order['status']);
                         ?>
-                            <div class="order-card">
+                            <div class="order-card glass-effect animate__animated animate__fadeInUp">
                                 <div class="order-header">
-                                    <div class="order-number">
-                                        <strong>Pedido #<?= htmlspecialchars($order['order_number']) ?></strong>
-                                        <span class="order-date"><?= date('d/m/Y', strtotime($order['created_at'])) ?></span>
+                                        <div class="order-title">
+                                            <h3>Pedido #<?= htmlspecialchars($order['order_number']) ?></h3>
+                                            <span class="order-date"><?= date('d/m/Y', strtotime($order['created_at'])) ?></span>
+                                        </div>
+                                        <div class="order-status">
+                                            <span class="status-badge status-<?= $statusClass ?>">
+                                                <?= $statusLabel ?>
+                                            </span>
+                                        </div>
                                     </div>
-                                    <span class="order-status status-<?= $statusClass ?>">
-                                        <?= $statusLabel ?>
-                                    </span>
-                                </div>
                                 <div class="order-details">
                                     <div class="order-info">
                                         <i class="fas fa-box"></i>
