@@ -193,6 +193,8 @@ try {
                     </div>
                 <?php else: ?>
                     <?php foreach ($products as $product):
+                        // Default category name in case it's missing
+                        $categoryName = 'Sin categoría';
                         // Resolver nombre de categoría antes de usarlo en la clase del producto
                         $categoryName = 'Sin categoría';
                         foreach ($categories as $cat) {
@@ -208,7 +210,7 @@ try {
                         // Determinar precio a mostrar
                         $displayPrice = $product['min_price'] ?? ($product['price'] ?? 0);
                     ?>
-                        <div class="product-card <?= strtolower((string)$categoryName) === 'ropa deportiva' ? 'no-hover' : '' ?>" data-product-id="<?= $product['id'] ?>">
+                        <div class="product-card <?= strtolower((string)($categoryName ?? 'Sin categoría')) === 'ropa deportiva' ? 'no-hover' : '' ?>" data-product-id="<?= $product['id'] ?>">
                             <!-- Badge para productos destacados -->
                             <?php if ($product['is_featured']): ?>
                                 <div class="product-badge">Destacado</div>
@@ -271,7 +273,7 @@ try {
                                 <!-- Precio -->
                                 <div class="product-price">
                                     <span class="current-price">$<?= number_format($displayPrice, 0, ',', '.') ?></span>
-                                    <?php if (!empty($product['compare_price']) && $product['compare_price'] > $displayPrice): ?>
+                                    <?php if (isset($product['compare_price']) && $product['compare_price'] > $displayPrice): ?>
                                         <span class="original-price">$<?= number_format($product['compare_price'], 0, ',', '.') ?></span>
                                     <?php endif; ?>
                                 </div>

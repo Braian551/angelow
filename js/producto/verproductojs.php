@@ -13,6 +13,7 @@ if (!empty($reviewsClientPayload['reviews'])) {
         $clientReview['images'] = !empty($clientReview['images']) ? (json_decode($clientReview['images'], true) ?: []) : [];
         $clientReview['display_date'] = !empty($clientReview['created_at']) ? date('d/m/Y H:i', strtotime($clientReview['created_at'])) : '';
         $clientReview['helpful_count'] = isset($clientReview['helpful_count']) ? (int)$clientReview['helpful_count'] : 0;
+        $clientReview['user_has_voted'] = isset($clientReview['user_has_voted']) ? (int)$clientReview['user_has_voted'] : 0;
     }
     unset($clientReview);
 }
@@ -97,6 +98,7 @@ if (!empty($reviewsClientPayload['reviews'])) {
             const comment = nl2brSafe(review.comment || '');
             const imagesHtml = buildReviewImages(review.images);
             const helpfulCount = review.helpful_count || 0;
+            const userHasVoted = review.user_has_voted ? parseInt(review.user_has_voted) === 1 : false;
             const displayDate = escapeHtml(review.display_date || '');
             const starsHtml = buildReviewStars(review.rating);
 
@@ -121,7 +123,7 @@ if (!empty($reviewsClientPayload['reviews'])) {
                         <p class="review-comment">${comment}</p>
                         ${imagesHtml}
                         <div class="review-actions">
-                            <button class="btn small helpful-btn" data-review-id="${safeId}">Útil (${helpfulCount})</button>
+                            <button class="btn small helpful-btn${userHasVoted ? ' active' : ''}" data-review-id="${safeId}" aria-pressed="${userHasVoted}">Útil (${helpfulCount})</button>
                         </div>
                     </div>
                 </div>
@@ -208,6 +210,67 @@ if (!empty($reviewsClientPayload['reviews'])) {
                     if (PRODUCT_PAGE_DEBUG) console.error('fetchLatestReviews error', err);
                 });
         }
+
+        // Manejar clic en "Útil"
+        $(document).on('click', '.helpful-btn', function(e) {
+            e.preventDefault();
+            if (!productId) return;
+
+            const btn = $(this);
+            const reviewId = btn.data('review-id');
+
+            if (!currentUserId) {
+                showNotification('Debes iniciar sesión para marcar una opinión como útil', 'error');
+                return;
+            }
+
+            // find the review in state if available
+            const rv = (reviewsState.reviews || []).find(r => String(r.id) === String(reviewId));
+            if (rv && String(rv.user_id) === String(currentUserId)) {
+                showNotification('No puedes marcar tu propia reseña como útil', 'info');
+                return;
+            }
+
+            btn.prop('disabled', true);
+
+            fetch('<?= BASE_URL ?>/api/toggle_review_helpful.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ review_id: reviewId })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) {
+                    showNotification(data.message || 'Error al marcar útil', 'error');
+                    return;
+                }
+
+                // update local state and UI
+                try {
+                    if (rv) {
+                        rv.helpful_count = data.data.helpful_count;
+                        rv.user_has_voted = data.data.user_has_voted;
+                    }
+
+                    // Update button state
+                    if (data.data.user_has_voted) {
+                        btn.addClass('active');
+                        btn.attr('aria-pressed', 'true');
+                    } else {
+                        btn.removeClass('active');
+                        btn.attr('aria-pressed', 'false');
+                    }
+                    btn.text('Útil (' + data.data.helpful_count + ')');
+                } catch (err) {
+                    if (PRODUCT_PAGE_DEBUG) console.error('Error updating helpful state', err);
+                }
+            })
+            .catch(err => {
+                console.error('toggle helpful error', err);
+                showNotification('Error de conexión', 'error');
+            })
+            .finally(() => btn.prop('disabled', false));
+        });
 
         renderReviewsSection(reviewsState);
 

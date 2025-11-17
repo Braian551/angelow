@@ -231,7 +231,9 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                                 <?php endif; ?>
 
                                 <div class="review-actions">
-                                    <button class="btn small helpful-btn" data-review-id="<?= $review['id'] ?>">Útil (<?= intval($review['helpful_count']) ?>)</button>
+                                    <?php $userHasVoted = !empty($review['user_has_voted']) ? (int)$review['user_has_voted'] : 0; ?>
+                                    <?php $isAuthor = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $review['user_id']; ?>
+                                    <button class="btn small helpful-btn <?= $userHasVoted ? 'active' : '' ?>" aria-pressed="<?= $userHasVoted ? 'true' : 'false' ?>" data-review-id="<?= $review['id'] ?>" <?= $isAuthor ? 'disabled title="No puedes marcar como útil tu propia reseña"' : '' ?>>Útil (<?= intval($review['helpful_count']) ?>)</button>
                                 </div>
                             </div>
                         </div>

@@ -682,6 +682,11 @@
   transform: translateY(-1px);
 }
 
+.review-card .helpful-btn.active {
+  background: var(--primary-dark);
+  color: #fff;
+}
+
 .no-reviews {
   text-align: center;
   padding: 4rem;

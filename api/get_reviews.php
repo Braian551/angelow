@@ -23,7 +23,7 @@ if ($productId <= 0) {
 }
 
 try {
-    $reviewsData = getProductReviews($conn, $productId);
+    $reviewsData = getProductReviews($conn, $productId, $_SESSION['user_id'] ?? null);
 
     if (!isset($reviewsData['reviews'], $reviewsData['stats'])) {
         $reviewsData = [
@@ -46,6 +46,7 @@ try {
         $review['images'] = !empty($review['images']) ? (json_decode($review['images'], true) ?: []) : [];
         $review['display_date'] = !empty($review['created_at']) ? date('d/m/Y H:i', strtotime($review['created_at'])) : '';
         $review['helpful_count'] = isset($review['helpful_count']) ? (int)$review['helpful_count'] : 0;
+        $review['user_has_voted'] = isset($review['user_has_voted']) ? (int)$review['user_has_voted'] : 0;
     }
     unset($review);
 

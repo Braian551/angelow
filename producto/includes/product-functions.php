@@ -163,18 +163,26 @@ function getAdditionalImages($conn, $productId) {
     }
 }
 
-function getProductReviews($conn, $productId) {
+function getProductReviews($conn, $productId, $currentUserId = null) {
     try {
-        $stmt = $conn->prepare("
-            SELECT pr.*, u.name as user_name, u.image as user_image,
-                   (SELECT COUNT(*) FROM review_votes rv WHERE rv.review_id = pr.id AND rv.is_helpful = 1) as helpful_count
-            FROM product_reviews pr
-            LEFT JOIN users u ON pr.user_id = u.id
-            WHERE pr.product_id = ? AND pr.is_approved = 1
-            ORDER BY pr.is_verified DESC, helpful_count DESC, pr.created_at DESC
-            LIMIT 10
-        ");
-        $stmt->execute([$productId]);
+         // Allow including whether the current user already marked a review as helpful
+         $userVoteSelect = $currentUserId !== null ? ", (SELECT rv.is_helpful FROM review_votes rv WHERE rv.review_id = pr.id AND rv.user_id = ? LIMIT 1) as user_has_voted" : ", 0 as user_has_voted";
+
+            $sql = "SELECT pr.*, u.name as user_name, u.image as user_image,"
+                . " (SELECT COUNT(*) FROM review_votes rv WHERE rv.review_id = pr.id AND rv.is_helpful = 1) as helpful_count"
+                . $userVoteSelect
+                . " FROM product_reviews pr"
+                . " LEFT JOIN users u ON pr.user_id = u.id"
+                . " WHERE pr.product_id = ? AND pr.is_approved = 1"
+                . " ORDER BY pr.is_verified DESC, helpful_count DESC, pr.created_at DESC"
+                . " LIMIT 10";
+
+        $stmt = $conn->prepare($sql);
+        if ($currentUserId !== null) {
+            $stmt->execute([$currentUserId, $productId]);
+        } else {
+            $stmt->execute([$productId]);
+        }
         $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         // Estadísticas de reseñas

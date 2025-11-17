@@ -19,7 +19,7 @@ if (!$product) {
 // Obtener datos relacionados con el producto
 $variantsData = getProductVariants($conn, $product['id']);
 $additionalImages = getAdditionalImages($conn, $product['id']);
-$reviewsData = getProductReviews($conn, $product['id']);
+$reviewsData = getProductReviews($conn, $product['id'], $_SESSION['user_id'] ?? null);
 $questionsData = getProductQuestions($conn, $product['id']);
 $relatedProducts = getRelatedProducts($conn, $product['id'], $product['category_id']);
 
