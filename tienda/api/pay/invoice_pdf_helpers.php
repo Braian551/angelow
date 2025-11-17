@@ -32,6 +32,29 @@ function invoiceTranslatePaymentStatus(?string $status): string
     return ucfirst($key);
 }
 
+function invoiceTranslatePaymentMethod(?string $method): string
+{
+    $map = [
+        'bank_transfer' => 'Transferencia Bancaria',
+        'transfer' => 'Transferencia',
+        'transferencia' => 'Transferencia Bancaria',
+        'transferencia_bancaria' => 'Transferencia Bancaria',
+        'efectivo' => 'Efectivo',
+        'cash' => 'Efectivo',
+        'credit_card' => 'Tarjeta de Crédito',
+        'debit_card' => 'Tarjeta de Débito',
+        'paypal' => 'PayPal',
+        'mercadopago' => 'Mercado Pago',
+        'mercado_pago' => 'Mercado Pago',
+        'other' => 'Otro'
+    ];
+
+    $key = strtolower(trim((string) ($method ?? '')));
+    if ($key === '') return 'Transferencia bancaria';
+
+    return $map[$key] ?? ucfirst(str_replace('_', ' ', $key));
+}
+
 /**
  * Helpers internos para resolver rutas de imagen siguiendo la lógica del comprobante original.
  */
@@ -175,7 +198,7 @@ function generateInvoicePdfContent(array $order, array $orderItems)
                         <div class="info-item"><span class="info-label">Orden:</span><span class="info-value">' . htmlspecialchars($order['order_number']) . '</span></div>
                         <div class="info-item"><span class="info-label">Fecha orden:</span><span class="info-value">' . date('d/m/Y H:i', strtotime($order['created_at'])) . '</span></div>
                         <div class="info-item"><span class="info-label">Estado pago:</span><span class="info-value"><span class="badge">' . htmlspecialchars($paymentStatusLabel) . '</span></span></div>
-                        <div class="info-item"><span class="info-label">Método pago:</span><span class="info-value">Transferencia bancaria</span></div>
+                        <div class="info-item"><span class="info-label">Método pago:</span><span class="info-value">' . htmlspecialchars(invoiceTranslatePaymentMethod($order['payment_method'] ?? null)) . '</span></div>
                     </div>
                 </div>
             </div>

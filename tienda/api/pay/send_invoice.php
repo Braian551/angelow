@@ -409,7 +409,7 @@ function sendRefundConfirmationEmail(array $order, array $orderItems, array $met
         }
 
         $refundAmount = $metadata['amount'] ?? $order['total'] ?? array_sum(array_column($orderItems, 'total'));
-        $paymentMethod = $metadata['payment_method'] ?? ($order['payment_method'] ?? 'Transferencia bancaria');
+        $paymentMethod = invoiceTranslatePaymentMethod($metadata['payment_method'] ?? ($order['payment_method'] ?? null));
         $reference = $metadata['reference'] ?? ($order['reference_number'] ?? 'N/A');
         $gateway = $metadata['gateway'] ?? 'Angelow';
         $orderNumber = $order['order_number'] ?? $order['id'] ?? 'N/A';
@@ -478,7 +478,7 @@ function sendRefundConfirmationEmail(array $order, array $orderItems, array $met
                     </div>
                     <div class="detail-box">
                         <div class="detail-label">Método</div>
-                        <div class="detail-value" style="font-size:16px;">' . htmlspecialchars(ucfirst($paymentMethod)) . '</div>
+                        <div class="detail-value" style="font-size:16px;">' . htmlspecialchars($paymentMethod) . '</div>
                     </div>
                     <div class="detail-box">
                         <div class="detail-label">Referencia</div>
