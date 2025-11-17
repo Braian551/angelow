@@ -35,8 +35,7 @@ try {
 
     $where = 'WHERE ' . implode(' AND ', $conditions);
 
-    $sql = "SELECT u.id, u.name, u.email, u.phone, u.image, u.created_at, u.last_access, u.is_blocked,
-            -- profile fields removed (admin_profiles table dropped)
+        $sql = "SELECT u.id, u.name, u.email, u.phone, u.image, u.created_at, u.last_access, u.is_blocked, u.role
             FROM users u
         $where
         ORDER BY COALESCE(u.last_access, u.created_at) DESC";
@@ -76,6 +75,7 @@ function formatAdminRow(array $row): array {
         'created_at' => $row['created_at'],
         'last_access' => $lastAccess,
         'is_blocked' => (bool) $row['is_blocked'],
+        'role' => $row['role'] ?? 'admin',
         // profile fields removed (admin_profiles table dropped)
     ];
 }

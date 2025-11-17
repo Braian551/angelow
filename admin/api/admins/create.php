@@ -54,8 +54,7 @@ try {
 
     $conn->commit();
 
-    $stmt = $conn->prepare("SELECT u.id, u.name, u.email, u.phone, u.image, u.created_at, u.last_access, u.is_blocked,
-            -- admin_profiles removed, profile fields are no longer returned
+    $stmt = $conn->prepare("SELECT u.id, u.name, u.email, u.phone, u.image, u.created_at, u.last_access, u.is_blocked, u.role
         FROM users u
         WHERE u.id = ? LIMIT 1");
     $stmt->execute([$userId]);
@@ -83,6 +82,7 @@ function formatAdminRow(array $row): array {
         'created_at' => $row['created_at'],
         'last_access' => $row['last_access'],
         'is_blocked' => (bool) $row['is_blocked'],
+        'role' => $row['role'] ?? 'admin',
         // admin_profiles removed: no profile fields returned
     ];
 }
