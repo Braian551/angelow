@@ -24,10 +24,18 @@ try {
             p.category_id,
             c.name as category_name,
             (SELECT image_path FROM product_images WHERE product_id = p.id ORDER BY is_primary DESC, `order` ASC LIMIT 1) as main_image,
+            COALESCE(pr.avg_rating, 0) as avg_rating,
+            COALESCE(pr.review_count, 0) as review_count,
             w.created_at as added_date
         FROM wishlist w
         INNER JOIN products p ON w.product_id = p.id
         LEFT JOIN categories c ON p.category_id = c.id
+        LEFT JOIN (
+            SELECT product_id, AVG(rating) as avg_rating, COUNT(*) as review_count
+            FROM product_reviews
+            WHERE is_approved = 1
+            GROUP BY product_id
+        ) pr ON p.id = pr.product_id
         WHERE w.user_id = :user_id AND p.is_active = 1
         ORDER BY w.created_at DESC
     ";
@@ -154,14 +162,29 @@ try {
 
                             <!-- Valoración -->
                             <div class="product-rating">
+                                <?php
+                                    // Intentar usar avg_rating y review_count si están disponibles (agregados en la consulta)
+                                    $avgRating = isset($product['avg_rating']) ? round($product['avg_rating'], 1) : 0;
+                                    $reviewCount = isset($product['review_count']) ? $product['review_count'] : 0;
+
+                                    $fullStars = floor($avgRating);
+                                    $hasHalfStar = ($avgRating - $fullStars) >= 0.5;
+                                    $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
+                                ?>
                                 <div class="stars">
-                                    <i class="far fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <i class="far fa-star"></i>
+                                    <?php
+                                    for ($i = 0; $i < $fullStars; $i++) {
+                                        echo '<i class="fas fa-star"></i>';
+                                    }
+                                    if ($hasHalfStar) {
+                                        echo '<i class="fas fa-star-half-alt"></i>';
+                                    }
+                                    for ($i = 0; $i < $emptyStars; $i++) {
+                                        echo '<i class="far fa-star"></i>';
+                                    }
+                                    ?>
                                 </div>
-                                <span class="rating-count">(0)</span>
+                                <span class="rating-count">(<?= $reviewCount ?>)</span>
                             </div>
 
                             <!-- Precio -->

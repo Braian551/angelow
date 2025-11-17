@@ -149,10 +149,13 @@ try {
             $query .= " AND p.id NOT IN ($placeholders)";
         }
 
-        $query .= " ORDER BY RAND() LIMIT ?";
+        $limitToAdd = 6 - count($recommendedProducts);
+
+        // Avoid binding LIMIT as a parameter (some MySQL versions don't accept it)
+        $query .= " ORDER BY RAND() LIMIT " . intval($limitToAdd);
 
         $stmt = $conn->prepare($query);
-        $params = array_merge([$userId], $existingIds, [6 - count($recommendedProducts)]);
+        $params = array_merge([$userId], $existingIds);
         $stmt->execute($params);
 
         $additionalProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -331,12 +334,43 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                 <div class="recommendations-grid" id="recommendations-grid">
                     <?php if (!empty($recommendedProducts)): ?>
                         <?php foreach ($recommendedProducts as $product):
-                            // Obtener información de valoración
-                            $avgRating = isset($product['avg_rating']) ? round($product['avg_rating'], 1) : 0;
-                            $reviewCount = isset($product['review_count']) ? $product['review_count'] : 0;
+                            // Obtener información de valoración (se reasigna después de fallback)
+                            $displayPrice = $product['price'];
                             $displayPrice = $product['price'];
                         ?>
-                            <div class="product-card" data-product-id="<?= $product['id'] ?>">
+                            <?php
+                                // Asegurar is_favorite y ratings aunque la consulta pueda no traerlos
+                                if (!isset($product['is_favorite'])) {
+                                    try {
+                                        $favStmt = $conn->prepare('SELECT 1 FROM wishlist WHERE user_id = ? AND product_id = ? LIMIT 1');
+                                        $favStmt->execute([$userId, $product['id']]);
+                                        $product['is_favorite'] = $favStmt->fetch() ? 1 : 0;
+                                    } catch (PDOException $e) {
+                                        $product['is_favorite'] = 0;
+                                    }
+                                }
+
+                                if (!isset($product['avg_rating']) || !isset($product['review_count'])) {
+                                    try {
+                                        $ratingStmt = $conn->prepare('SELECT AVG(rating) as avg_rating, COUNT(*) as review_count FROM product_reviews WHERE product_id = ? AND is_approved = 1');
+                                        $ratingStmt->execute([$product['id']]);
+                                        $ratingRow = $ratingStmt->fetch(PDO::FETCH_ASSOC);
+                                        $product['avg_rating'] = $ratingRow['avg_rating'] ?: 0;
+                                        $product['review_count'] = $ratingRow['review_count'] ?: 0;
+                                    } catch (PDOException $e) {
+                                        $product['avg_rating'] = 0;
+                                        $product['review_count'] = 0;
+                                    }
+                                }
+                                // Recalcular valores usados para mostrar estrellas
+                                $avgRating = isset($product['avg_rating']) ? round($product['avg_rating'], 1) : 0;
+                                $reviewCount = isset($product['review_count']) ? $product['review_count'] : 0;
+                            ?>
+
+                            <div class="product-card" data-product-id="<?= $product['id'] ?>"
+                                 data-avg-rating="<?= htmlspecialchars(round($product['avg_rating'],1)) ?>"
+                                 data-review-count="<?= htmlspecialchars($product['review_count'] ?? 0) ?>"
+                                 data-is-favorite="<?= htmlspecialchars($product['is_favorite'] ?? 0) ?>">
                                 <!-- Badge para productos destacados -->
                                 <?php if ($product['is_featured']): ?>
                                     <div class="product-badge">Destacado</div>

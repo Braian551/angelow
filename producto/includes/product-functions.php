@@ -282,13 +282,20 @@ function getProductQuestions($conn, $productId) {
 function getRelatedProducts($conn, $productId, $categoryId) {
     try {
         $stmt = $conn->prepare("
-            SELECT p.id, p.name, p.slug, p.price, p.compare_price, pi.image_path
-            FROM products p
-            LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_primary = 1
-            WHERE p.category_id = ? AND p.id != ? AND p.is_active = 1
-            ORDER BY p.is_featured DESC, RAND()
-            LIMIT 4
-        ");
+        SELECT p.id, p.name, p.slug, p.price, p.compare_price, pi.image_path,
+           COALESCE(pr.avg_rating, 0) as avg_rating, COALESCE(pr.review_count, 0) as review_count
+        FROM products p
+        LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_primary = 1
+        LEFT JOIN (
+        SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count
+        FROM product_reviews
+        WHERE is_approved = 1
+        GROUP BY product_id
+        ) pr ON p.id = pr.product_id
+        WHERE p.category_id = ? AND p.id != ? AND p.is_active = 1
+        ORDER BY p.is_featured DESC, RAND()
+        LIMIT 4
+    ");
         $stmt->execute([$categoryId, $productId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
