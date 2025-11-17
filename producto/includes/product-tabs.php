@@ -13,7 +13,9 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
             <i class="fas fa-list-ul"></i> Especificaciones
         </button>
         <button class="tab-btn" data-tab="reviews">
-            <i class="fas fa-star"></i> Opiniones (<?= $reviewsCount ?>)
+            <i class="fas fa-star"></i>
+            <span class="tab-label">Opiniones</span>
+            <span class="tab-count" data-reviews-tab-count>(<?= $reviewsCount ?>)</span>
         </button>
         <button class="tab-btn" data-tab="questions">
             <i class="fas fa-question-circle"></i> Preguntas (<?= $questionsCount ?>)
@@ -71,11 +73,27 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
         
         <!-- Reseñas -->
         <div id="reviews" class="tab-pane">
+            <div class="questions-header reviews-header">
+                <div class="reviews-header-copy">
+                    <h3>Opiniones y calificaciones</h3>
+                    <p>Las reseñas ayudan a otros compradores a decidirse por <?= htmlspecialchars($product['name']) ?>.</p>
+                </div>
+                <?php if ($canReview): ?>
+                    <button id="write-review-btn" class="tab-action-btn question-btn" data-review-action="open">
+                        <i class="fas fa-pen"></i> Escribir una opinión
+                    </button>
+                <?php else: ?>
+                    <button type="button" class="tab-action-btn review-btn locked-review-btn" data-review-action="locked" data-lock-reason="<?= isset($_SESSION['user_id']) ? 'purchase' : 'auth' ?>">
+                        <i class="fas fa-lock"></i> Escribir una opinión
+                    </button>
+                <?php endif; ?>
+            </div>
+
             <div class="reviews-summary">
                 <div class="summary-rating">
                     <div class="average-rating">
-                        <?= number_format($reviewsData['stats']['average_rating'] ?: 0, 1) ?>
-                        <div class="stars">
+                        <span class="average-rating-value" data-average-rating><?= number_format($reviewsData['stats']['average_rating'] ?: 0, 1) ?></span>
+                        <div class="stars" data-average-stars>
                             <?php 
                             $avgRating = $reviewsData['stats']['average_rating'] ?: 0;
                             for ($i = 1; $i <= 5; $i++):
@@ -85,7 +103,7 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                                 <i class="<?= $class ?>"></i>
                             <?php endfor; ?>
                         </div>
-                        <span><?= $reviewsData['stats']['total_reviews'] ?> opiniones</span>
+                        <span class="reviews-count" data-total-reviews-label="true"><?= $reviewsData['stats']['total_reviews'] ?> opiniones</span>
                     </div>
                 </div>
                 
@@ -93,37 +111,32 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                     <?php for ($i = 5; $i >= 1; $i--): 
                         $percent = $reviewsData['stats'][$i.'_star_percent'] ?? 0;
                     ?>
-                        <div class="rating-bar">
+                        <div class="rating-bar" data-rating-row="<?= $i ?>">
                             <span class="star-count"><?= $i ?> <i class="fas fa-star"></i></span>
                             <div class="bar-container">
-                                <div class="bar" style="width: <?= $percent ?>%"></div>
+                                <div class="bar" data-rating-bar="<?= $i ?>" style="width: <?= $percent ?>%"></div>
                             </div>
-                            <span class="percent"><?= $percent ?>%</span>
+                            <span class="percent" data-rating-percent="<?= $i ?>"><?= $percent ?>%</span>
                         </div>
                     <?php endfor; ?>
                 </div>
-                
-            
             </div>
-                <?php if ($canReview): ?>
-                    <button id="write-review-btn" class="tab-action-btn review-btn">
-                        <i class="fas fa-pen"></i> Escribir una opinión
-                    </button>
-                <?php elseif (isset($_SESSION['user_id'])): ?>
-                    <div class="review-note">
+
+            <?php if (!$canReview): ?>
+                <div class="review-note">
+                    <?php if (isset($_SESSION['user_id'])): ?>
                         <i class="fas fa-info-circle"></i> Solo los clientes que han comprado este producto pueden dejar una opinión.
-                    </div>
-                <?php else: ?>
-                    <div class="review-note">
+                    <?php else: ?>
                         <i class="fas fa-info-circle"></i> <a href="<?= BASE_URL ?>/login">Inicia sesión</a> para dejar una opinión (solo para clientes que han comprado este producto).
-                    </div>
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
             
             <!-- Formulario de reseña (oculto inicialmente) -->
             <?php if ($canReview): ?>
-            <div id="review-form-container" class="review-form-container" style="display: none;">
+            <div id="review-form-container" class="review-form-container question-form-container" style="display: none;">
                 <h3>Escribe tu opinión</h3>
-                <form id="review-form" method="POST" action="<?= BASE_URL ?>/api/submit_review.php">
+                <form id="review-form" method="POST" action="<?= BASE_URL ?>/api/submit_review.php" enctype="multipart/form-data">
                     <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                     
                     <div class="form-group">
@@ -173,17 +186,55 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
             <?php endif; ?>
             
             <!-- Lista de reseñas -->
-            <div class="reviews-list">
+            <div class="reviews-list questions-list" data-qa-reviews-count="<?= $reviewsCount ?>">
                 <?php if (empty($reviewsData['reviews'])): ?>
                     <div class="no-reviews">
                         <i class="fas fa-comment-alt"></i>
                         <p>Este producto aún no tiene opiniones. Sé el primero en opinar.</p>
-                        
                     </div>
                 <?php else: ?>
                     <?php foreach ($reviewsData['reviews'] as $review): ?>
-                        <div class="review-item">
-                            <!-- Contenido de la reseña existente -->
+                        <div class="review-item question-item" data-review-id="<?= $review['id'] ?>">
+                            <div class="review-meta">
+                                <div class="user-avatar">
+                                    <img src="<?= BASE_URL ?>/<?= htmlspecialchars($review['user_image'] ?? 'images/default-avatar.png') ?>" alt="<?= htmlspecialchars($review['user_name'] ?? 'Usuario') ?>">
+                                </div>
+                                <div class="user-info">
+                                    <strong><?= htmlspecialchars($review['user_name'] ?? 'Usuario') ?></strong>
+                                    <?php if (!empty($review['is_verified'])): ?>
+                                        <span class="badge verified">Compra verificada</span>
+                                    <?php endif; ?>
+                                    <span class="time"><?= date('d/m/Y H:i', strtotime($review['created_at'])) ?></span>
+                                </div>
+                                <div class="user-rating">
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <?php if ($i <= $review['rating']): ?>
+                                            <i class="fas fa-star"></i>
+                                        <?php else: ?>
+                                            <i class="far fa-star"></i>
+                                        <?php endif; ?>
+                                    <?php endfor; ?>
+                                </div>
+                            </div>
+
+                            <div class="review-body">
+                                <h4 class="review-title"><?= htmlspecialchars($review['title']) ?></h4>
+                                <p class="review-comment"><?= nl2br(htmlspecialchars($review['comment'])) ?></p>
+
+                                <?php if (!empty($review['images'])): 
+                                    $imgList = json_decode($review['images'], true) ?: [];
+                                ?>
+                                    <div class="review-images">
+                                        <?php foreach ($imgList as $img): ?>
+                                            <div class="review-image"><img src="<?= BASE_URL ?>/<?= htmlspecialchars($img) ?>" alt="Imagen reseña"></div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+
+                                <div class="review-actions">
+                                    <button class="btn small helpful-btn" data-review-id="<?= $review['id'] ?>">Útil (<?= intval($review['helpful_count']) ?>)</button>
+                                </div>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                     
@@ -192,6 +243,7 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                             Ver todas las opiniones (<?= $reviewsData['stats']['total_reviews'] ?>)
                         </a>
                     <?php endif; ?>
+                <?php endif; ?>
             </div>
         </div>
         
@@ -234,71 +286,69 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                         <i class="fas fa-question-circle"></i>
                         <p>No hay preguntas sobre este producto. Sé el primero en preguntar.</p>
                     </div>
-                    <?php else: ?>
-                        <?php foreach ($questionsData as $question): ?>
-                            <div class="question-item" data-question-id="<?= $question['id'] ?>">
-                                <div class="question-meta">
-                                    <div class="user-avatar">
-                                        <img src="<?= BASE_URL ?>/<?= htmlspecialchars($question['user_image'] ?? 'images/default-avatar.png') ?>" alt="<?= htmlspecialchars($question['user_name'] ?? 'Usuario') ?>">
-                                    </div>
-                                    <div class="user-info">
-                                        <strong><?= htmlspecialchars($question['user_name'] ?? 'Usuario') ?></strong>
-                                        <span class="time"><?= date('d/m/Y H:i', strtotime($question['created_at'])) ?></span>
-                                    </div>
+                <?php else: ?>
+                    <?php foreach ($questionsData as $question): ?>
+                        <div class="question-item" data-question-id="<?= $question['id'] ?>">
+                            <div class="question-meta">
+                                <div class="user-avatar">
+                                    <img src="<?= BASE_URL ?>/<?= htmlspecialchars($question['user_image'] ?? 'images/default-avatar.png') ?>" alt="<?= htmlspecialchars($question['user_name'] ?? 'Usuario') ?>">
                                 </div>
-                                <div class="question-text">
-                                    <p><?= nl2br(htmlspecialchars($question['question'])) ?></p>
-                                </div>
-
-                                <?php if (!empty($question['answers'])): ?>
-                                    <div class="answers-list">
-                                        <?php foreach ($question['answers'] as $answer): ?>
-                                            <div class="answer-item">
-                                                <div class="answer-meta">
-                                                    <strong><?= htmlspecialchars($answer['user_name'] ?? 'Usuario') ?></strong>
-                                                    <?php if (!empty($answer['is_seller'])): ?>
-                                                        <span class="badge seller">Vendedor</span>
-                                                    <?php endif; ?>
-                                                    <span class="time"><?= date('d/m/Y H:i', strtotime($answer['created_at'])) ?></span>
-                                                </div>
-                                                <p><?= nl2br(htmlspecialchars($answer['answer'])) ?></p>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php endif; ?>
-
-                                <div class="question-actions">
-                                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                                        <button class="answer-btn btn small">Responder</button>
-                                    <?php endif; ?>
-                                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $question['user_id']): ?>
-                                        <button class="edit-question btn small" data-question-id="<?= $question['id'] ?>">Editar</button>
-                                        <button class="delete-question btn small danger" data-question-id="<?= $question['id'] ?>">Eliminar</button>
-                                    <?php endif; ?>
-                                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                                        <div class="answer-form-container" style="display:none;">
-                                            <form method="POST" class="answer-form" action="<?= BASE_URL ?>/api/submit_answer.php">
-                                                <input type="hidden" name="question_id" value="<?= $question['id'] ?>">
-                                                <div class="form-group">
-                                                    <textarea name="answer" rows="3" class="form-control" required placeholder="Escribe tu respuesta"></textarea>
-                                                </div>
-                                                <div class="form-actions">
-                                                    <button type="button" class="cancel-answer btn small">Cancelar</button>
-                                                    <button type="submit" class="btn primary small">Enviar</button>
-                                                </div>
-                                            </form>
-                                            </form>
-                                        </div>
-                                    <?php endif; ?>
+                                <div class="user-info">
+                                    <strong><?= htmlspecialchars($question['user_name'] ?? 'Usuario') ?></strong>
+                                    <span class="time"><?= date('d/m/Y H:i', strtotime($question['created_at'])) ?></span>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
-                    
-                        <?php if (count($questionsData) > 5): ?>
-                            <a href="<?= BASE_URL ?>/producto/preguntas/<?= $product['slug'] ?>" class="see-all-questions">
-                                Ver todas las preguntas (<?= count($questionsData) ?>)
-                            </a>
-                        <?php endif; ?>
+                            <div class="question-text">
+                                <p><?= nl2br(htmlspecialchars($question['question'])) ?></p>
+                            </div>
+
+                            <?php if (!empty($question['answers'])): ?>
+                                <div class="answers-list">
+                                    <?php foreach ($question['answers'] as $answer): ?>
+                                        <div class="answer-item">
+                                            <div class="answer-meta">
+                                                <strong><?= htmlspecialchars($answer['user_name'] ?? 'Usuario') ?></strong>
+                                                <?php if (!empty($answer['is_seller'])): ?>
+                                                    <span class="badge seller">Vendedor</span>
+                                                <?php endif; ?>
+                                                <span class="time"><?= date('d/m/Y H:i', strtotime($answer['created_at'])) ?></span>
+                                            </div>
+                                            <p><?= nl2br(htmlspecialchars($answer['answer'])) ?></p>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="question-actions">
+                                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                                    <button class="answer-btn btn small">Responder</button>
+                                <?php endif; ?>
+                                <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $question['user_id']): ?>
+                                    <button class="edit-question btn small" data-question-id="<?= $question['id'] ?>">Editar</button>
+                                    <button class="delete-question btn small danger" data-question-id="<?= $question['id'] ?>">Eliminar</button>
+                                <?php endif; ?>
+                                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                                    <div class="answer-form-container" style="display:none;">
+                                        <form method="POST" class="answer-form" action="<?= BASE_URL ?>/api/submit_answer.php">
+                                            <input type="hidden" name="question_id" value="<?= $question['id'] ?>">
+                                            <div class="form-group">
+                                                <textarea name="answer" rows="3" class="form-control" required placeholder="Escribe tu respuesta"></textarea>
+                                            </div>
+                                            <div class="form-actions">
+                                                <button type="button" class="cancel-answer btn small">Cancelar</button>
+                                                <button type="submit" class="btn primary small">Enviar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+
+                    <?php if (count($questionsData) > 5): ?>
+                        <a href="<?= BASE_URL ?>/producto/preguntas/<?= $product['slug'] ?>" class="see-all-questions">
+                            Ver todas las preguntas (<?= count($questionsData) ?>)
+                        </a>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>
@@ -424,47 +474,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Mostrar/ocultar formularios
-    const writeReviewBtn = document.getElementById('write-review-btn');
-    const askQuestionBtn = document.getElementById('ask-question-btn');
-    
-    if (writeReviewBtn) {
-        writeReviewBtn.addEventListener('click', function() {
-            const formContainer = document.getElementById('review-form-container');
-            formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
-            
-            if (formContainer.style.display === 'block') {
-                formContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        });
-    }
-    
-    if (askQuestionBtn) {
-        askQuestionBtn.addEventListener('click', function() {
-            const formContainer = document.getElementById('question-form-container');
-            formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
-            
-            if (formContainer.style.display === 'block') {
-                formContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        });
-    }
-    
-    // Botones de cancelar
-    const cancelReview = document.getElementById('cancel-review');
-    const cancelQuestion = document.getElementById('cancel-question');
-    
-    if (cancelReview) {
-        cancelReview.addEventListener('click', function() {
-            document.getElementById('review-form-container').style.display = 'none';
-        });
-    }
-    
-    if (cancelQuestion) {
-        cancelQuestion.addEventListener('click', function() {
-            document.getElementById('question-form-container').style.display = 'none';
-        });
-    }
+    // Mostrar/ocultar formularios gestionado desde verproductojs.php para mantener las mismas animaciones
     
     // Botones flotantes para móvil
     function setupFloatingButtons() {
@@ -524,5 +534,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateActiveTabIndicator();
         setupFloatingButtons();
     });
+
 });
 </script>

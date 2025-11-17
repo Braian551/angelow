@@ -1,3 +1,22 @@
+<?php
+$reviewsClientPayload = $reviewsData ?? ['reviews' => [], 'stats' => []];
+if (!isset($reviewsClientPayload['reviews']) || !is_array($reviewsClientPayload['reviews'])) {
+    $reviewsClientPayload['reviews'] = [];
+}
+if (!isset($reviewsClientPayload['stats']) || !is_array($reviewsClientPayload['stats'])) {
+    $reviewsClientPayload['stats'] = [];
+}
+if (!empty($reviewsClientPayload['reviews'])) {
+    foreach ($reviewsClientPayload['reviews'] as &$clientReview) {
+        $clientReview['user_name'] = $clientReview['user_name'] ?? 'Usuario';
+        $clientReview['user_image'] = $clientReview['user_image'] ?? 'images/default-avatar.png';
+        $clientReview['images'] = !empty($clientReview['images']) ? (json_decode($clientReview['images'], true) ?: []) : [];
+        $clientReview['display_date'] = !empty($clientReview['created_at']) ? date('d/m/Y H:i', strtotime($clientReview['created_at'])) : '';
+        $clientReview['helpful_count'] = isset($clientReview['helpful_count']) ? (int)$clientReview['helpful_count'] : 0;
+    }
+    unset($clientReview);
+}
+?>
 <script>
     $(document).ready(function() {
         // Variables globales
@@ -10,8 +29,12 @@
         let isInWishlist = false;
         const currentUserId = <?= json_encode($_SESSION['user_id'] ?? null) ?>;
         const currentUserRole = <?= json_encode($_SESSION['user_role'] ?? null) ?>;
+        const productSlug = <?= json_encode($product['slug'] ?? '') ?>;
         // Initial set of questions from server. Use let so we can update after delete.
         let initialQuestions = <?= json_encode($questionsData ?: []) ?>;
+        let reviewsState = <?= json_encode($reviewsClientPayload, JSON_UNESCAPED_UNICODE) ?>;
+        const reviewsEndpoint = productId ? '<?= BASE_URL ?>/api/get_reviews.php?product_id=' + productId : null;
+        const seeAllReviewsUrl = <?= json_encode(BASE_URL . '/producto/opiniones/' . ($product['slug'] ?? '')) ?>;
 
         // Read product page debug flag from the <meta name="debug"> tag (set to 1 to enable)
         const PRODUCT_PAGE_DEBUG = document.querySelector('meta[name="debug"]')?.content === '1';
@@ -22,6 +45,163 @@
                 initialQuestions = initialQuestions.filter(q => q.id != qId);
             } catch (err) { if (PRODUCT_PAGE_DEBUG) console.warn('Could not remove from initialQuestions', err); }
         }
+
+        function escapeHtml(value) {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function nl2brSafe(value) {
+            return escapeHtml(value).replace(/\n/g, '<br>');
+        }
+
+        function buildReviewStars(rating) {
+            const stars = [];
+            const cleanRating = parseFloat(rating) || 0;
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.floor(cleanRating)) {
+                    stars.push('<i class="fas fa-star"></i>');
+                } else if (i - cleanRating <= 0.5 && cleanRating % 1 !== 0) {
+                    stars.push('<i class="fas fa-star-half-alt"></i>');
+                } else {
+                    stars.push('<i class="far fa-star"></i>');
+                }
+            }
+            return stars.join('');
+        }
+
+        function buildReviewImages(images) {
+            if (!Array.isArray(images) || !images.length) return '';
+            return `<div class="review-images">${images.map(img => {
+                const src = '<?= BASE_URL ?>/' + escapeHtml(img);
+                return `<div class="review-image"><img src="${src}" alt="Imagen reseña"></div>`;
+            }).join('')}</div>`;
+        }
+
+        function buildReviewCardHTML(review) {
+            const safeId = escapeHtml(review.id || '');
+            const safeName = escapeHtml(review.user_name || 'Usuario');
+            const avatarSrc = '<?= BASE_URL ?>/' + escapeHtml(review.user_image || 'images/default-avatar.png');
+            const badge = review.is_verified ? '<span class="badge verified">Compra verificada</span>' : '';
+            const title = escapeHtml(review.title || '');
+            const comment = nl2brSafe(review.comment || '');
+            const imagesHtml = buildReviewImages(review.images);
+            const helpfulCount = review.helpful_count || 0;
+            const displayDate = escapeHtml(review.display_date || '');
+            const starsHtml = buildReviewStars(review.rating);
+
+            return `
+                <div class="review-item question-item" data-review-id="${safeId}">
+                    <div class="review-meta">
+                        <div class="user-avatar">
+                            <img src="${avatarSrc}" alt="${safeName}">
+                        </div>
+                        <div class="user-info">
+                            <strong>${safeName}</strong>
+                            ${badge}
+                            <span class="time">${displayDate}</span>
+                        </div>
+                        <div class="user-rating">${starsHtml}</div>
+                    </div>
+                    <div class="review-body">
+                        <h4 class="review-title">${title}</h4>
+                        <p class="review-comment">${comment}</p>
+                        ${imagesHtml}
+                        <div class="review-actions">
+                            <button class="btn small helpful-btn" data-review-id="${safeId}">Útil (${helpfulCount})</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateReviewTabCount(total) {
+            const reviewsTab = document.querySelector('.tab-btn[data-tab="reviews"]');
+            if (!reviewsTab) return;
+            const badge = reviewsTab.querySelector('[data-reviews-tab-count]');
+            if (badge) {
+                badge.textContent = `(${total})`;
+            } else {
+                const baseText = reviewsTab.textContent.replace(/\(.*\)/, '').trim();
+                reviewsTab.textContent = `${baseText} (${total})`;
+            }
+        }
+
+        function renderReviewsSection(payload, rebuildList = false) {
+            if (!payload || typeof payload !== 'object') return;
+            const stats = payload.stats || {};
+            const total = parseInt(stats.total_reviews || 0, 10);
+            const avg = parseFloat(stats.average_rating || 0);
+
+            const avgNode = document.querySelector('[data-average-rating]');
+            if (avgNode) avgNode.textContent = avg.toFixed(1);
+
+            const totalLabel = document.querySelector('[data-total-reviews-label]');
+            if (totalLabel) totalLabel.textContent = `${total} opiniones`;
+
+            const percentKey = {
+                5: 'five_star_percent',
+                4: 'four_star_percent',
+                3: 'three_star_percent',
+                2: 'two_star_percent',
+                1: 'one_star_percent'
+            };
+
+            document.querySelectorAll('[data-rating-row]').forEach(row => {
+                const ratingVal = parseInt(row.dataset.ratingRow, 10);
+                const percent = stats[percentKey[ratingVal]] ?? 0;
+                const bar = row.querySelector('[data-rating-bar]');
+                if (bar) bar.style.width = `${percent}%`;
+                const percentLabel = row.querySelector('[data-rating-percent]');
+                if (percentLabel) percentLabel.textContent = `${percent}%`;
+            });
+
+            updateReviewTabCount(total);
+
+            const listEl = document.querySelector('.reviews-list');
+            if (!listEl) return;
+            listEl.dataset.qaReviewsCount = total;
+
+            if (!rebuildList) return;
+
+            if (!payload.reviews || !payload.reviews.length) {
+                listEl.innerHTML = `
+                    <div class="no-reviews">
+                        <i class="fas fa-comment-alt"></i>
+                        <p>Este producto aún no tiene opiniones. Sé el primero en opinar.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const cardsHtml = payload.reviews.map(buildReviewCardHTML).join('');
+            const seeAllLink = total > 10 && seeAllReviewsUrl ? `<a href="${seeAllReviewsUrl}" class="see-all-reviews">Ver todas las opiniones (${total})</a>` : '';
+            listEl.innerHTML = cardsHtml + seeAllLink;
+        }
+
+        function fetchLatestReviews() {
+            if (!reviewsEndpoint) return;
+            fetch(reviewsEndpoint, { headers: { 'Accept': 'application/json' } })
+                .then(resp => resp.json())
+                .then(data => {
+                    if (!data.success) {
+                        if (PRODUCT_PAGE_DEBUG) console.warn('fetchLatestReviews failed', data);
+                        return;
+                    }
+                    reviewsState = data.data || { reviews: [], stats: {} };
+                    renderReviewsSection(reviewsState, true);
+                })
+                .catch(err => {
+                    if (PRODUCT_PAGE_DEBUG) console.error('fetchLatestReviews error', err);
+                });
+        }
+
+        renderReviewsSection(reviewsState);
 
 
 
@@ -395,12 +575,70 @@
         });
 
         // Formulario de reseña
-        $('#write-review-btn').click(function() {
-            $('#review-form-container').slideDown();
+        $(document).on('click', '#write-review-btn', function() {
+            const container = $('#review-form-container');
+            if (!container.length) return;
+
+            if (container.is(':visible')) {
+                container.slideUp();
+            } else {
+                container.slideDown(() => {
+                    container[0]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
         });
 
-        $('#cancel-review').click(function() {
+        $(document).on('click', '#cancel-review', function() {
             $('#review-form-container').slideUp();
+        });
+
+        $(document).on('click', '.locked-review-btn', function() {
+            const reason = $(this).data('lock-reason');
+            if (reason === 'auth') {
+                showNotification('Inicia sesión para dejar una opinión sobre este producto.', 'error');
+            } else {
+                showNotification('Solo los clientes que han comprado este producto pueden calificarlo.', 'info');
+            }
+        });
+
+        $(document).on('submit', '#review-form', function(e) {
+            e.preventDefault();
+            const formElement = this;
+            const ratingVal = $('#rating-value').val();
+            if (!ratingVal || parseInt(ratingVal, 10) < 1) {
+                showNotification('Selecciona una calificación (1-5 estrellas) para enviar tu opinión.', 'error');
+                return;
+            }
+
+            const formData = new FormData(formElement);
+            formData.set('product_id', productId);
+            const submitBtn = $(formElement).find('button[type="submit"]');
+            submitBtn.prop('disabled', true);
+
+            fetch('<?= BASE_URL ?>/api/submit_review.php', {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                body: formData
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message || 'Opinión enviada correctamente', 'success');
+                    formElement.reset();
+                    $('#rating-value').val('');
+                    $('.rating-input .fa-star').removeClass('fas active hover').addClass('far');
+                    $('#review-form-container').slideUp();
+                    fetchLatestReviews();
+                } else {
+                    showNotification(data.message || 'Error al enviar la opinión', 'error');
+                }
+            })
+            .catch(() => {
+                showNotification('Error de conexión. Intenta de nuevo.', 'error');
+            })
+            .finally(() => {
+                submitBtn.prop('disabled', false);
+            });
         });
 
         // Rating con estrellas
