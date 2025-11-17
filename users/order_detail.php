@@ -38,7 +38,8 @@ try {
 
     // Obtener items de la orden
     $stmtItems = $conn->prepare(" 
-        SELECT oi.*, 
+         SELECT oi.*, 
+             p.slug as product_slug,
                COALESCE(vi.image_path, pi.image_path, 'uploads/productos/default-product.jpg') as product_image,
                pcv.id AS color_variant_id_join,
                c.name AS color_name,
@@ -47,6 +48,7 @@ try {
                s.name AS size_name
         FROM order_items oi
         LEFT JOIN product_images pi ON pi.product_id = oi.product_id AND pi.is_primary = 1
+        LEFT JOIN products p ON oi.product_id = p.id
         LEFT JOIN variant_images vi ON vi.color_variant_id = oi.color_variant_id AND vi.is_primary = 1
         LEFT JOIN product_color_variants pcv ON oi.color_variant_id = pcv.id
         LEFT JOIN colors c ON pcv.color_id = c.id
@@ -190,6 +192,13 @@ function calculateDiscountAmount($order, $subtotal) {
                                                     <?php endif; ?>
                                                 </div>
                                                 <p class="item-price-unit">$<?= number_format($item['price'], 0) ?> c/u</p>
+                                                <?php if (!empty($item['product_slug'])): ?>
+                                                    <div style="margin-top:6px;">
+                                                        <a class="btn btn-outline" href="<?= BASE_URL ?>/producto/verproducto.php?slug=<?= htmlspecialchars($item['product_slug']) ?>#reviews">
+                                                            <i class="fas fa-star"></i> Calificar producto
+                                                        </a>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
                                             <div class="item-total-price">
                                                 $<?= number_format($item['quantity'] * $item['price'], 0) ?>
@@ -302,6 +311,11 @@ function calculateDiscountAmount($order, $subtotal) {
                                 <button class="btn btn-primary" onclick="downloadInvoice(<?= $order['id'] ?>)">
                                     <i class="fas fa-download"></i> Descargar Factura
                                 </button>
+                                <?php if (!empty($items) && !empty($items[0]['product_slug'])): ?>
+                                    <button class="btn btn-primary" onclick="window.location.href='<?= BASE_URL ?>/producto/verproducto.php?slug=<?= htmlspecialchars($items[0]['product_slug']) ?>#reviews'">
+                                        <i class="fas fa-star"></i> Calificar Pedido
+                                    </button>
+                                <?php endif; ?>
                             <?php endif; ?>
 
                             <?php if (in_array($order['status'], ['pending', 'processing'])): ?>
@@ -310,11 +324,7 @@ function calculateDiscountAmount($order, $subtotal) {
                                 </button>
                             <?php endif; ?>
 
-                            <?php if ($order['status'] === 'delivered'): ?>
-                                <button class="btn btn-primary" onclick="rateOrder(<?= $order['id'] ?>)">
-                                    <i class="fas fa-star"></i> Calificar Pedido
-                                </button>
-                            <?php endif; ?>
+                            <?php /* Calificación dirigida desde la página del producto. Eliminado botón redundante. */ ?>
                         </div>
                     </div>
                 </div>
@@ -402,41 +412,7 @@ function calculateDiscountAmount($order, $subtotal) {
             window.open(`${BASE_URL}/users/orders/invoice.php?id=${orderId}`, '_blank');
         }
 
-        // Función para calificar pedido
-        function rateOrder(orderId) {
-            const rating = prompt('Califica tu pedido del 1 al 5 estrellas:');
-            if (rating === null) return;
-            
-            const ratingNum = parseInt(rating);
-            if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
-                alert('Por favor ingresa un número válido entre 1 y 5.');
-                return;
-            }
-
-            const comment = prompt('Comentario adicional (opcional):');
-            
-            showLoading('Enviando calificación...');
-            
-            fetch(`${BASE_URL}/users/ajax/ajax_rate_order.php`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `order_id=${orderId}&rating=${ratingNum}&comment=${encodeURIComponent(comment || '')}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideLoading();
-                if (data.success) {
-                    showNotification('¡Gracias por tu calificación!', 'success');
-                } else {
-                    showNotification('Error: ' + data.message, 'error');
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error:', error);
-                showNotification('Error al enviar la calificación', 'error');
-            });
-        }
+        // Nota: La calificación ahora se realiza desde la página del producto (verproducto.php)
 
         // Utilidades de UI
         function showLoading(message = 'Cargando...') {
