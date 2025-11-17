@@ -208,7 +208,11 @@ try {
                                         <div class="info-item">
                                             <i class="fas fa-credit-card"></i>
                                             <span class="payment-status payment-<?= $order['payment_status'] ?>">
-                                                <?= getPaymentStatusText($order['payment_status'] ?: 'pending') ?>
+                                                <?php if ($order['status'] === 'cancelled'): ?>
+                                                    <?= getRefundStatusText($order['payment_status'] ?? 'pending') ?>
+                                                <?php else: ?>
+                                                    <?= getPaymentStatusText($order['payment_status'] ?: 'pending') ?>
+                                                <?php endif; ?>
                                             </span>
                                         </div>
                                     </div>
@@ -221,13 +225,13 @@ try {
                                     <?php endif; ?>
                                 </div>
                                 
-                                <?php if ($order['status'] === 'cancelled'): ?>
+                                    <?php if ($order['status'] === 'cancelled'): ?>
                                 <div class="order-status-note" style="margin-top:12px; padding:12px; border-radius:12px; background:#fff3cd; color:#7c5700; display:flex; gap:10px; align-items:flex-start;">
                                     <i class="fas fa-money-bill-wave" style="margin-top:2px;"></i>
                                     <div>
                                         <strong>Reembolso en proceso.</strong>
                                         <div style="font-size:0.9rem; line-height:1.4;">
-                                            Te enviaremos el reembolso con el mismo método de pago. Estado actual: <?= getPaymentStatusText($order['payment_status'] ?? 'refunded') ?>.
+                                            Te enviaremos el reembolso con el mismo método de pago. Estado del reembolso: <?= getRefundStatusText($order['payment_status'] ?? 'pending') ?>.
                                         </div>
                                     </div>
                                 </div>
@@ -315,31 +319,17 @@ function getOrderCountByStatus($status) {
     }
 }
 
-function getStatusText($status) {
-    $statuses = [
-        'pending' => 'Pendiente',
-        'processing' => 'En Proceso',
-        'shipped' => 'Enviado',
-        'delivered' => 'Entregado',
-        'cancelled' => 'Cancelado'
-    ];
-    return $statuses[$status] ?? ucfirst($status);
-}
-
-function getPaymentStatusText($status) {
-    $statuses = [
-        'pending' => 'Pendiente',
-        'paid' => 'Pagado',
-        'failed' => 'Fallido',
-        'refunded' => 'Reembolso',
-        'cancelled' => 'Cancelado'
-    ];
-    return $statuses[$status] ?? ucfirst($status);
-}
+// Se usa `layouts/functions.php` para las traducciones de estados.
 
 function renderOrderTimeline($status) {
     if ($status === 'cancelled') {
         return '<div class="order-timeline-modern"><span class="status-badge status-cancelled"><i class="fas fa-ban"></i> Pedido cancelado</span></div>';
+    }
+
+    // Mostrar timeline especial en caso de reembolso
+    if ($status === 'refunded' || $status === 'partially_refunded') {
+        $label = $status === 'refunded' ? 'Pedido reembolsado' : 'Parcialmente reembolsado';
+        return '<div class="order-timeline-modern"><span class="status-badge status-refunded"><i class="fas fa-undo"></i> ' . $label . '</span></div>';
     }
 
     $steps = [

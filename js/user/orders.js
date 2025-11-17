@@ -94,7 +94,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.payment_status) {
                     const payEl = orderCard.querySelector('.payment-status');
                     if (payEl) {
-                        payEl.textContent = getPaymentStatusText(data.payment_status);
+                        // Si la orden quedó cancelada, mostrar estado del reembolso en lugar de 'Pendiente'
+                        payEl.textContent = getRefundStatusText(data.payment_status);
                         payEl.className = 'payment-status payment-' + data.payment_status;
                     }
                 }
@@ -102,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const paymentStatus = (data.payment_status || 'refunded').toLowerCase();
                 const paymentBadge = orderCard.querySelector('.payment-status');
                 if (paymentBadge) {
-                    paymentBadge.textContent = getPaymentStatusText(paymentStatus);
+                    paymentBadge.textContent = getRefundStatusText(paymentStatus);
                     paymentBadge.className = `payment-status payment-${paymentStatus}`;
                 }
 
@@ -116,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div>
                             <strong>Reembolso en proceso.</strong>
                             <div style="font-size:0.9rem; line-height:1.4;">
-                                Te enviaremos el reembolso con el mismo método de pago. Estado actual: ${paymentBadge ? paymentBadge.textContent : 'Reembolso'}.
+                                Te enviaremos el reembolso con el mismo método de pago. Estado del reembolso: ${paymentBadge ? paymentBadge.textContent : 'Reembolso'}.
                             </div>
                         </div>
                     `;
@@ -241,6 +242,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return '<div class="order-timeline-modern"><span class="status-badge status-cancelled"><i class="fas fa-ban"></i> Pedido cancelado</span></div>';
         }
 
+        if (status === 'refunded' || status === 'partially_refunded') {
+            const label = status === 'refunded' ? 'Pedido reembolsado' : 'Parcialmente reembolsado';
+            return `<div class="order-timeline-modern"><span class="status-badge status-refunded"><i class="fas fa-undo"></i> ${label}</span></div>`;
+        }
+
         // Implementación simplificada para JS
         const steps = ['pending', 'processing', 'shipped', 'delivered'];
         const currentIndex = steps.indexOf(status);
@@ -277,8 +283,24 @@ document.addEventListener('DOMContentLoaded', function() {
             'paid': 'Pagado',
             'failed': 'Fallido',
             'refunded': 'Reembolso',
+            'partially_refunded': 'Parcialmente reembolsado',
             'cancelled': 'Cancelado'
         };
         return statuses[status] || status;
+    }
+
+    // Traducción específica para estados de reembolso (cuando la orden fue cancelada)
+    function getRefundStatusText(status) {
+        const map = {
+            'pending': 'Reembolso pendiente',
+            'processing': 'Reembolso en proceso',
+            'refunded': 'Reembolsado',
+            'partially_refunded': 'Parcialmente reembolsado',
+            'failed': 'Reembolso fallido',
+            'cancelled': 'Cancelado'
+        };
+
+        if (!status) return map['pending'];
+        return map[status] || getPaymentStatusText(status);
     }
 });

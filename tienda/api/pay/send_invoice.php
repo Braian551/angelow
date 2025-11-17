@@ -409,7 +409,11 @@ function sendRefundConfirmationEmail(array $order, array $orderItems, array $met
         }
 
         $refundAmount = $metadata['amount'] ?? $order['total'] ?? array_sum(array_column($orderItems, 'total'));
-        $paymentMethod = invoiceTranslatePaymentMethod($metadata['payment_method'] ?? ($order['payment_method'] ?? null));
+        if (function_exists('translatePaymentMethod')) {
+            $paymentMethod = translatePaymentMethod($metadata['payment_method'] ?? ($order['payment_method'] ?? null));
+        } else {
+            $paymentMethod = invoiceTranslatePaymentMethod($metadata['payment_method'] ?? ($order['payment_method'] ?? null));
+        }
         $reference = $metadata['reference'] ?? ($order['reference_number'] ?? 'N/A');
         $gateway = $metadata['gateway'] ?? 'Angelow';
         $orderNumber = $order['order_number'] ?? $order['id'] ?? 'N/A';

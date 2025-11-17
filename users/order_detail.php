@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
-require_once __DIR__ . '/../layouts/header2.php';
+require_once __DIR__ . '/../layouts/headerproducts.php';
 require_once __DIR__ . '/../layouts/functions.php';
 require_once __DIR__ . '/../auth/role_redirect.php';
 require_once __DIR__ . '/../tienda/pagos/helpers/shipping_helpers.php';
@@ -37,12 +37,21 @@ try {
     }
 
     // Obtener items de la orden
-    $stmtItems = $conn->prepare("
+    $stmtItems = $conn->prepare(" 
         SELECT oi.*, 
-               COALESCE(vi.image_path, pi.image_path, 'uploads/productos/default-product.jpg') as product_image
+               COALESCE(vi.image_path, pi.image_path, 'uploads/productos/default-product.jpg') as product_image,
+               pcv.id AS color_variant_id_join,
+               c.name AS color_name,
+               c.hex_code AS color_hex,
+               psv.id AS size_variant_id_join,
+               s.name AS size_name
         FROM order_items oi
         LEFT JOIN product_images pi ON pi.product_id = oi.product_id AND pi.is_primary = 1
         LEFT JOIN variant_images vi ON vi.color_variant_id = oi.color_variant_id AND vi.is_primary = 1
+        LEFT JOIN product_color_variants pcv ON oi.color_variant_id = pcv.id
+        LEFT JOIN colors c ON pcv.color_id = c.id
+        LEFT JOIN product_size_variants psv ON oi.size_variant_id = psv.id
+        LEFT JOIN sizes s ON psv.size_id = s.id
         WHERE oi.order_id = :order_id
         ORDER BY oi.id ASC
     ");
@@ -113,9 +122,13 @@ function calculateDiscountAmount($order, $subtotal) {
                             <i class="fas fa-<?= getStatusIcon($order['status']) ?>"></i>
                             <?= getStatusText($order['status']) ?>
                         </div>
-                        <div class="status-badge status-<?= $order['payment_status'] === 'paid' ? 'delivered' : 'pending' ?>">
+                        <div class="status-badge status-<?= $order['payment_status'] === 'paid' ? 'delivered' : ($order['status'] === 'cancelled' ? 'cancelled' : 'pending') ?>">
                             <i class="fas fa-check-circle"></i>
-                            <?= getPaymentStatusText($order['payment_status'] ?: 'pending') ?>
+                            <?php if ($order['status'] === 'cancelled'): ?>
+                                <?= getRefundStatusText($order['payment_status'] ?? 'pending') ?>
+                            <?php else: ?>
+                                <?= getPaymentStatusText($order['payment_status'] ?: 'pending') ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -160,16 +173,25 @@ function calculateDiscountAmount($order, $subtotal) {
                                                 <h4><?= htmlspecialchars($item['product_name']) ?></h4>
                                                 <div class="item-meta">
                                                     <span><i class="fas fa-hashtag"></i> Cantidad: <?= $item['quantity'] ?></span>
-                                                    <?php if (isset($item['color_variant_id']) && $item['color_variant_id']): ?>
-                                                        <span><i class="fas fa-palette"></i> Variante Color: <?= $item['color_variant_id'] ?></span>
-                                                    <?php endif; ?>
-                                                    <?php if (isset($item['size_variant_id']) && $item['size_variant_id']): ?>
-                                                        <span><i class="fas fa-ruler"></i> Variante Talla: <?= $item['size_variant_id'] ?></span>
+
+                                                    <?php if (!empty($item['variant_name'])): // variant_name stored at checkout ?>
+                                                        <span class="variant-summary"><i class="fas fa-tags"></i> <?= htmlspecialchars($item['variant_name']) ?></span>
+                                                    <?php else: ?>
+                                                        <?php if (!empty($item['color_name'])): ?>
+                                                            <span class="variant-color"><i class="fas fa-palette"></i>
+                                                                <span class="color-swatch" style="background-color: <?= htmlspecialchars($item['color_hex'] ?: '#cccccc') ?>"></span>
+                                                                <?= htmlspecialchars($item['color_name']) ?>
+                                                            </span>
+                                                        <?php endif; ?>
+
+                                                        <?php if (!empty($item['size_name'])): ?>
+                                                            <span class="variant-size"><i class="fas fa-ruler"></i> <?= htmlspecialchars($item['size_name']) ?></span>
+                                                        <?php endif; ?>
                                                     <?php endif; ?>
                                                 </div>
-                                                <p class="item-price">$<?= number_format($item['price'], 0) ?> c/u</p>
+                                                <p class="item-price-unit">$<?= number_format($item['price'], 0) ?> c/u</p>
                                             </div>
-                                            <div class="item-price">
+                                            <div class="item-total-price">
                                                 $<?= number_format($item['quantity'] * $item['price'], 0) ?>
                                             </div>
                                         </div>
@@ -217,15 +239,29 @@ function calculateDiscountAmount($order, $subtotal) {
                             </div>
 
                             <!-- Información de pago -->
-                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
-                                <h3><i class="fas fa-credit-card"></i> Información de Pago</h3>
-                                <p><strong>Método:</strong> <?= htmlspecialchars($order['payment_method'] ?? 'No especificado') ?></p>
-                                <p><strong>Estado:</strong> 
-                                    <span class="status-badge status-<?= $order['payment_status'] === 'paid' ? 'delivered' : 'pending' ?>">
-                                        <i class="fas fa-<?= $order['payment_status'] === 'paid' ? 'check-circle' : 'clock' ?>"></i>
-                                        <?= getPaymentStatusText($order['payment_status'] ?: 'pending') ?>
-                                    </span>
-                                </p>
+                            <div class="order-payment-info">
+                                <div class="payment-header">
+                                    <h3><i class="fas fa-credit-card"></i> Información de Pago</h3>
+                                </div>
+                                <div class="payment-content">
+                                    <div class="payment-row">
+                                        <div class="payment-label">Método:</div>
+                                        <div class="payment-value"><span class="payment-method-text"><?= translatePaymentMethod($order['payment_method'] ?? null) ?></span></div>
+                                    </div>
+                                    <div class="payment-row">
+                                        <div class="payment-label">Estado:</div>
+                                        <div class="payment-value">
+                                            <span class="status-badge payment-badge status-<?= $order['payment_status'] === 'paid' ? 'delivered' : ($order['status'] === 'cancelled' ? 'cancelled' : 'pending') ?> payment-status payment-<?= $order['payment_status'] ?: 'pending' ?>">
+                                                <i class="fas fa-<?= $order['payment_status'] === 'paid' ? 'check-circle' : 'clock' ?>"></i>
+                                                <?php if ($order['status'] === 'cancelled'): ?>
+                                                    <?= getRefundStatusText($order['payment_status'] ?? 'pending') ?>
+                                                <?php else: ?>
+                                                    <?= getPaymentStatusText($order['payment_status'] ?: 'pending') ?>
+                                                <?php endif; ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -449,18 +485,6 @@ function calculateDiscountAmount($order, $subtotal) {
 
 <?php
 // Funciones auxiliares mejoradas
-function getStatusText($status) {
-    $statuses = [
-        'pending' => 'Pendiente',
-        'processing' => 'En Proceso',
-        'shipped' => 'Enviado',
-        'delivered' => 'Entregado',
-        'cancelled' => 'Cancelado',
-        'refunded' => 'Reembolsado',
-        'on_hold' => 'En Espera'
-    ];
-    return $statuses[$status] ?? ucfirst($status);
-}
 
 function getStatusIcon($status) {
     $icons = [
@@ -475,15 +499,6 @@ function getStatusIcon($status) {
     return $icons[$status] ?? 'info-circle';
 }
 
-function getPaymentStatusText($status) {
-    $statuses = [
-        'pending' => 'Pendiente',
-        'paid' => 'Pagado',
-        'failed' => 'Fallido',
-        'refunded' => 'Reembolso',
-        'cancelled' => 'Cancelado',
-        'partially_refunded' => 'Parcialmente Reembolsado'
-    ];
-    return $statuses[$status] ?? ucfirst($status);
-}
+
+// Preferimos usar funciones centralizadas en `layouts/functions.php` para traducciones
 ?>

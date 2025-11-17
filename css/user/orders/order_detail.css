@@ -271,19 +271,22 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    align-items: center; /* center cards for consistent look */
 }
 
 .order-item-card {
     display: grid;
-    grid-template-columns: 80px 1fr auto;
-    gap: 2rem;
-    padding: 2rem;
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: var(--border-radius-md);
-    border: 1px solid var(--glass-border-light);
+    grid-template-columns: 96px 1fr 140px;
+    gap: 1.6rem;
+    padding: 1.6rem;
+    background: var(--bg-white);
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.04);
     transition: var(--transition);
-    backdrop-filter: var(--blur-intensity-light);
-    -webkit-backdrop-filter: var(--blur-intensity-light);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+    align-items: center;
+    width: 100%;
+    max-width: 920px;
 }
 
 .order-item-card:hover {
@@ -294,8 +297,8 @@
 }
 
 .order-item-card img {
-    width: 80px;
-    height: 80px;
+    width: 96px;
+    height: 96px;
     object-fit: cover;
     border-radius: var(--border-radius);
     border: 2px solid var(--glass-border);
@@ -311,17 +314,51 @@
 
 .item-meta {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 0.6rem;
+    align-items: center;
 }
 
 .item-meta span {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.6rem;
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     color: var(--text-light);
+}
+
+/* Variant badges (reuse visual language from cart) */
+.variant-summary, .variant-color, .variant-size {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg-lighter);
+    padding: 0.2rem 0.8rem;
+    border-radius: 999px;
+    color: var(--text-light);
+    font-size: 1.25rem;
+    border: 1px solid rgba(0,0,0,0.04);
+}
+.variant-summary i, .variant-color i, .variant-size i { color: var(--primary-color); }
+
+/* Color swatch small */
+.color-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    display:inline-block;
+    vertical-align: middle;
+}
+
+/* Make sure badges don't wrap oddly in narrow layouts */
+.item-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
 }
 
 .item-meta i {
@@ -330,11 +367,18 @@
     text-align: center;
 }
 
-.item-price {
+.item-total-price {
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--primary-color);
     text-align: right;
+}
+
+.item-price-unit {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-top: 0.4rem;
 }
 
 .item-price.c-u {
@@ -395,6 +439,186 @@
     font-size: 2.2rem;
     color: var(--primary-color);
     font-weight: 700;
+}
+
+/* Estilos para la sección de información de pago (detalle de orden) */
+.order-payment-info {
+    margin-top: 2rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.order-payment-info .payment-header h3 {
+    font-size: 1.6rem;
+    color: var(--text-dark);
+    margin: 0 0 6px 0;
+    font-weight: 700;
+}
+
+.order-payment-info .payment-content {
+    padding: 0.6rem 0 0 0;
+}
+
+.order-payment-info .payment-method,
+.order-payment-info .payment-status-row {
+    font-size: 1.4rem;
+    color: var(--text-color);
+    margin: 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.order-payment-info .payment-method strong,
+.order-payment-info .payment-status-row strong {
+    min-width: 120px;
+    color: var(--text-dark);
+    font-weight: 700;
+}
+
+.order-payment-info .status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    text-transform: none;
+    letter-spacing: 0.2px;
+}
+
+.order-payment-info .status-badge i { margin-right: 0.6rem; }
+
+/* Más organización: filas de pago (label + value) para aspecto de detalles compactos */
+.order-payment-info .payment-row {
+    display: grid;
+    /* Give labels a fixed column so text aligns consistently */
+    grid-template-columns: 85px 1fr;
+    gap: 0.8rem;
+    align-items: center;
+    padding: 6px 0;
+    min-height: 46px; /* ensure both rows share the same height */
+}
+
+.order-payment-info .payment-label {
+    display: flex; /* align contents vertically to center */
+    align-items: center;
+    justify-content: flex-end;
+    font-weight: 700;
+    color: var(--text-dark);
+    font-size: 1.35rem;
+    text-align: right; /* explicitly right-align label text */
+    line-height: 1; /* stabilize vertical alignment */
+}
+
+/* Ensure right column content (method text & badges) are aligned center */
+.order-payment-info .payment-value,
+.order-payment-info .payment-value > * {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.order-payment-info .payment-method-text{
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+    color:var(--text-color);
+}
+
+.order-payment-info .payment-value {
+    font-size: 1.35rem;
+    color: var(--text-color);
+}
+
+/* Asegura que el valor esté alineado a la izquierda y elementos como badge no queden centrados */
+.order-payment-info .payment-value {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.6rem;
+    line-height: 1; /* stabilize vertical alignment for badges */
+}
+
+/* Increase pill font-size slightly to visually match the method text */
+.order-payment-info .payment-badge {
+    font-size: 1.25rem;
+}
+
+/* Ensure the status badge baseline matches the label */
+.order-payment-info .status-badge.payment-badge {
+    transform: translateY(-1px);
+}
+
+.order-payment-info .payment-label { justify-self: end; }
+
+/* Badge pequeño para el estado de pago (compacto como en la imagen) */
+.order-payment-info .payment-badge {
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap; /* evita espacios extra y wrapping */
+    text-transform: none; /* evitar uppercase */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    line-height: 1.1;
+}
+
+/* Ajustes específicos: icono dentro de badge pequeño */
+.order-payment-info .payment-badge i {
+    width: 18px;
+    height: 18px;
+    font-size: 14px;
+}
+
+/* Específicos para status dentro del order-detail (tama�o compacto + colores) */
+.order-payment-info .status-badge.payment-badge.status-delivered {
+    background: rgba(75,181,67,0.08);
+    color: var(--success-color);
+    border: 1px solid rgba(75,181,67,0.12);
+}
+.order-payment-info .status-badge.payment-badge.status-paid {
+    /* Pagado suele venir como 'paid' en payment_status - pill verde */
+    background: linear-gradient(90deg, rgba(120, 219, 118, 0.06), rgba(76, 187, 110, 0.07));
+    color: var(--success-color);
+    border: 1px solid rgba(75,181,67,0.12);
+}
+.order-payment-info .status-badge.payment-badge.status-pending {
+    background: rgba(255,152,0,0.06);
+    color: var(--warning-color);
+    border: 1px solid rgba(255,152,0,0.12);
+}
+.order-payment-info .status-badge.payment-badge.status-refunded,
+.order-payment-info .status-badge.payment-badge.status-partially_refunded {
+    background: rgba(111,66,193,0.06);
+    color: #6F42C1;
+    border: 1px solid rgba(111,66,193,0.12);
+}
+
+/* Make sure the status icon and badge align with label text baseline */
+.order-payment-info .payment-value .status-badge {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+/* Header + icon for Información de Pago to match panel look */
+.order-payment-info .payment-header {
+    display:flex;
+    align-items:center;
+    gap:0.8rem;
+    padding: 1.2rem 2.5rem 0.8rem;
+}
+.order-payment-info .payment-header i{
+    font-size:1.6rem;
+    color:var(--primary-color);
+    background: rgba(0,0,0,0.04);
+    padding:0.6rem;
+    border-radius:8px;
+}
+
+/* Adjust label size for clarity and right-align on larger screens */
+.order-payment-info .payment-label{
+    font-size:1.4rem;
+    justify-self:end;
 }
 
 /* Información de envío */
@@ -764,12 +988,12 @@
         gap: 1.5rem;
     }
     
-    .item-price {
+    .item-total-price {
         grid-column: 1 / -1;
         text-align: left;
         margin-top: 1rem;
         padding-top: 1rem;
-        border-top: 1px solid var(--glass-border-light);
+        border-top: 1px solid rgba(0,0,0,0.05);
     }
     
     .order-actions {
@@ -907,4 +1131,13 @@ a:focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 2px;
     border-radius: var(--border-radius);
+}
+
+@media (max-width: 480px) {
+    .order-payment-info .payment-row {
+        grid-template-columns: 1fr;
+    }
+    .order-payment-info .payment-label { justify-self: start; }
+
+    .order-payment-info .payment-header { padding-left: 1.5rem; padding-right: 1.5rem; }
 }

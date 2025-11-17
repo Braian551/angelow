@@ -75,5 +75,80 @@
     }
 
 
+/**
+ * Traducción genérica de estados de orden a español (para UI)
+ */
+if (!function_exists('getStatusText')) {
+    function getStatusText($status) {
+        $statuses = [
+            'pending' => 'Pendiente',
+            'processing' => 'En Proceso',
+            'shipped' => 'Enviado',
+            'delivered' => 'Entregado',
+            'cancelled' => 'Cancelado',
+            'refunded' => 'Reembolsado',
+            'partially_refunded' => 'Parcialmente Reembolsado'
+        ];
+        return $statuses[$status] ?? ucfirst($status);
+    }
+}
+
+// Traducción/normalización de métodos de pago a etiquetas en español
+if (!function_exists('translatePaymentMethod')) {
+    function translatePaymentMethod($method) {
+        $map = [
+            'bank_transfer' => 'Transferencia Bancaria',
+            'transfer' => 'Transferencia Bancaria',
+            'transferencia' => 'Transferencia Bancaria',
+            'transferencia_bancaria' => 'Transferencia Bancaria',
+            'efectivo' => 'Efectivo',
+            'cash' => 'Efectivo',
+            'credit_card' => 'Tarjeta de Crédito',
+            'debit_card' => 'Tarjeta de Débito',
+            'paypal' => 'PayPal',
+            'mercadopago' => 'Mercado Pago',
+            'mercado_pago' => 'Mercado Pago',
+            'oxxo' => 'OXXO',
+            'pse' => 'PSE',
+            'other' => 'Otro',
+            'deposit' => 'Depósito',
+            'stripe' => 'Stripe'
+        ];
+
+        $key = strtolower(trim((string) ($method ?? '')));
+        if ($key === '') return 'No especificado';
+        return $map[$key] ?? ucfirst(str_replace('_', ' ', $key));
+    }
+}
+
+if (!function_exists('getPaymentStatusText')) {
+    function getPaymentStatusText($status) {
+        $statuses = [
+            'pending' => 'Pendiente',
+            'paid' => 'Pagado',
+            'failed' => 'Fallido',
+            'refunded' => 'Reembolsado',
+            'partially_refunded' => 'Parcialmente Reembolsado',
+            'cancelled' => 'Cancelado'
+        ];
+        return $statuses[$status] ?? ucfirst($status);
+    }
+}
+
+if (!function_exists('getRefundStatusText')) {
+    function getRefundStatusText($status) {
+        $map = [
+            'pending' => 'Reembolso pendiente',
+            'processing' => 'Reembolso en proceso',
+            'refunded' => 'Reembolsado',
+            'partially_refunded' => 'Parcialmente Reembolsado',
+            'failed' => 'Reembolso fallido',
+            'cancelled' => 'Cancelado'
+        ];
+        if (empty($status)) return $map['pending'];
+        return $map[$status] ?? getPaymentStatusText($status);
+    }
+}
+
  
     ?>

@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once __DIR__ . '/../../pagos/helpers/shipping_helpers.php';
+require_once __DIR__ . '/../../../layouts/functions.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -48,6 +49,11 @@ function invoiceTranslatePaymentMethod(?string $method): string
         'mercado_pago' => 'Mercado Pago',
         'other' => 'Otro'
     ];
+
+    // Preferir la función centralizada
+    if (function_exists('translatePaymentMethod')) {
+        return translatePaymentMethod($method);
+    }
 
     $key = strtolower(trim((string) ($method ?? '')));
     if ($key === '') return 'Transferencia bancaria';
@@ -198,7 +204,7 @@ function generateInvoicePdfContent(array $order, array $orderItems)
                         <div class="info-item"><span class="info-label">Orden:</span><span class="info-value">' . htmlspecialchars($order['order_number']) . '</span></div>
                         <div class="info-item"><span class="info-label">Fecha orden:</span><span class="info-value">' . date('d/m/Y H:i', strtotime($order['created_at'])) . '</span></div>
                         <div class="info-item"><span class="info-label">Estado pago:</span><span class="info-value"><span class="badge">' . htmlspecialchars($paymentStatusLabel) . '</span></span></div>
-                        <div class="info-item"><span class="info-label">Método pago:</span><span class="info-value">' . htmlspecialchars(invoiceTranslatePaymentMethod($order['payment_method'] ?? null)) . '</span></div>
+                        <div class="info-item"><span class="info-label">Método pago:</span><span class="info-value">' . htmlspecialchars(translatePaymentMethod($order['payment_method'] ?? null)) . '</span></div>
                     </div>
                 </div>
             </div>

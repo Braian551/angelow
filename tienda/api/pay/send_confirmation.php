@@ -4,6 +4,7 @@ require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once __DIR__ . '/../../pagos/helpers/shipping_helpers.php';
+require_once __DIR__ . '/../../../layouts/functions.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -259,7 +260,7 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
             <!-- Información de Pago -->
             <div class="section-title">Información de Pago</div>
             <div class="payment-info">
-                <p><strong>Método de pago:</strong> ' . htmlspecialchars($order['payment_method'] ?? 'Transferencia') . '</p>';
+                <p><strong>Método de pago:</strong> ' . htmlspecialchars(translatePaymentMethod($order['payment_method'] ?? null)) . '</p>';
                 
                 if (!empty($order['reference_number'])) {
                     $body .= '<p><strong>Referencia de pago:</strong> <span style="background: #fff; padding: 4px 8px; border-radius: 4px; font-family: monospace;">' . htmlspecialchars($order['reference_number']) . '</span></p>';
