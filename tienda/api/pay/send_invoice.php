@@ -298,8 +298,8 @@ function sendOrderCancellationEmail(array $order, array $orderItems): bool
         .totals-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #475569; }
         .totals-row strong { color: #0f172a; }
         .footer { text-align: center; color: #94a3b8; padding: 24px; font-size: 13px; background: #f8fafc; }
-        .btn { display: inline-block; padding: 12px 20px; background: #1d4ed8; color: #fff; border-radius: 999px; text-decoration: none; font-weight: 600; margin-top: 20px; box-shadow: 0 10px 20px rgba(29,78,216,0.25); }
-        .highlight { display: inline-block; padding: 8px 14px; border-radius: 10px; background: rgba(30,64,175,0.08); color: #1e40af; font-weight: 600; }
+        .btn { display: inline-block; padding: 12px 20px; background: #0b6bbd; color: #fff; border-radius: 999px; text-decoration: none; font-weight: 600; margin-top: 20px; box-shadow: 0 10px 20px rgba(11,107,189,0.25); }
+        .highlight { display: inline-block; padding: 8px 14px; border-radius: 10px; background: rgba(11,107,189,0.08); color: #0b6bbd; font-weight: 600; }
     </style>
 </head>
 <body>
