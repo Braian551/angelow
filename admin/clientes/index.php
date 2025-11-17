@@ -63,7 +63,7 @@ requireRole('admin');
                     <div class="delta muted">Promedio global</div>
                 </article>
                 <article class="stat-card" data-metric="ticket">
-                    <h2>Ticket promedio</h2>
+                    <h2>Valor promedio por pedido (COP)</h2>
                     <strong>--</strong>
                     <div class="delta muted">Ultimos 60 dias</div>
                 </article>
@@ -74,7 +74,7 @@ requireRole('admin');
                     <header class="filter-bar">
                         <div>
                             <h2>Segmentos accionables</h2>
-                            <p class="text-muted">Prioriza outreach segun salud de clientes.</p>
+                            <p class="text-muted">Prioriza acciones de contacto según la salud del cliente (ej. recuperar inactivos, fidelizar clientes leales).</p>
                         </div>
                     </header>
                     <div class="segment-grid" id="client-segments"></div>
@@ -94,8 +94,8 @@ requireRole('admin');
                 <article class="surface-card">
                     <header class="filter-bar">
                         <div>
-                            <h2>Matriz de engagement</h2>
-                            <p class="text-muted">Cruce de frecuencia vs recencia.</p>
+                            <h2>Matriz de interacción</h2>
+                            <p class="text-muted">Cruce de frecuencia vs recencia (visitas/pedidos vs. tiempo desde último pedido).</p>
                         </div>
                     </header>
                     <div class="segment-grid" id="engagement-matrix"></div>
@@ -146,7 +146,7 @@ requireRole('admin');
                                     <th>Cliente</th>
                                     <th>Pedidos</th>
                                     <th>Ultimo pedido</th>
-                                    <th>Ticket</th>
+                                    <th>Valor promedio (COP)</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>

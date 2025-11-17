@@ -10,7 +10,7 @@ requireRole('admin');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['success' => false, 'message' => 'Metodo no permitido']);
+    echo json_encode(['success' => false, 'message' => 'Método no permitido']);
     exit;
 }
 
@@ -27,7 +27,7 @@ $action = $input['action'] ?? 'approve';
 
 if ($reviewId <= 0) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Resena invalida']);
+    echo json_encode(['success' => false, 'message' => 'Reseña inválida']);
     exit;
 }
 
@@ -37,7 +37,7 @@ try {
     $exists = $stmt->fetchColumn();
     if (!$exists) {
         http_response_code(404);
-        echo json_encode(['success' => false, 'message' => 'Resena no encontrada']);
+        echo json_encode(['success' => false, 'message' => 'Reseña no encontrada']);
         exit;
     }
 
@@ -58,7 +58,7 @@ try {
             exit;
         default:
             http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Accion no soportada']);
+            echo json_encode(['success' => false, 'message' => 'Acción no soportada']);
             exit;
     }
 
@@ -68,7 +68,7 @@ try {
 } catch (Throwable $e) {
     error_log('reviews.update_status error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'No se pudo actualizar la resena']);
+    echo json_encode(['success' => false, 'message' => 'No se pudo actualizar la reseña']);
 }
 
 function fetchReview(PDO $conn, int $reviewId): ?array {

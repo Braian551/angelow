@@ -123,7 +123,7 @@ if (isset($_SESSION['alert'])) {
 
                 <section class="metrics-grid" id="metrics-grid">
                     <article class="metric-card is-loading" data-metric-card="avg_ticket">
-                        <p class="metric-label">Ticket promedio (30 días)</p>
+                            <p class="metric-label">Valor promedio por pedido (30 días)</p>
                         <h3 class="metric-value" data-metric-value>--</h3>
                         <p class="metric-helper">Órdenes completadas</p>
                     </article>

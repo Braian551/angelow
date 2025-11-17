@@ -57,17 +57,17 @@ function getCustomerSegments(PDO $conn): array {
     $segments = [
         'vip' => [
             'label' => 'Clientes VIP',
-            'description' => 'Ticket acumulado mayor a 600000',
+            'description' => 'Gasto acumulado mayor a 600.000 COP',
             'query' => "SELECT COUNT(*) FROM (SELECT u.id FROM users u LEFT JOIN orders o ON o.user_id = u.id AND o.status != 'cancelled' WHERE u.role IN ('customer','user') GROUP BY u.id HAVING COALESCE(SUM(o.total),0) >= 600000) AS vip"
         ],
         'at_risk' => [
-            'label' => 'Inactivos 90+ dias',
-            'description' => 'Clientes con pedido pero sin compras en 90 dias',
+                    'label' => 'Inactivos 90+ días',
+                    'description' => 'Clientes con historial de compra, sin compras en los últimos 90 días',
             'query' => "SELECT COUNT(*) FROM (SELECT u.id, MAX(o.created_at) AS last_order FROM users u LEFT JOIN orders o ON o.user_id = u.id AND o.status != 'cancelled' WHERE u.role IN ('customer','user') GROUP BY u.id HAVING last_order IS NOT NULL AND last_order < DATE_SUB(NOW(), INTERVAL 90 DAY)) AS risk"
         ],
         'new' => [
             'label' => 'Nuevos 30d',
-            'description' => 'Clientes registrados en los ultimos 30 dias',
+            'description' => 'Clientes registrados en los últimos 30 días',
             'query' => "SELECT COUNT(*) FROM users WHERE role IN ('customer','user') AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)"
         ],
         'no_orders' => [

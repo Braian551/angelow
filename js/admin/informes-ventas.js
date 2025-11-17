@@ -73,7 +73,7 @@ async function loadSalesSummary() {
         document.getElementById('total-orders').textContent = totals.orders;
         
         const avgOrderValue = totals.orders > 0 ? totals.revenue / totals.orders : 0;
-        document.getElementById('avg-order-value').textContent = 'Ticket promedio: ' + formatCurrency(avgOrderValue);
+        document.getElementById('avg-order-value').textContent = 'Valor promedio por pedido: ' + formatCurrency(avgOrderValue);
         
         document.getElementById('total-shipping').textContent = formatCurrency(totals.shipping);
         

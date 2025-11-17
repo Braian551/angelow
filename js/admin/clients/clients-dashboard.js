@@ -132,6 +132,7 @@ class ClientsDashboard {
                     strong.textContent = this.formatCurrency(stats.lifetime_value);
                     break;
                 case 'ticket':
+                    // Mostrar 'valor promedio por pedido' (etiqueta en UI ya traducida)
                     strong.textContent = this.formatCurrency(stats.avg_ticket);
                     break;
                 default:

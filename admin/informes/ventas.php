@@ -99,7 +99,7 @@ require_once __DIR__ . '/../../layouts/headeradmin2.php';
                         <div class="card-content">
                             <h3>Total Órdenes</h3>
                             <p class="card-value" id="total-orders">0</p>
-                            <span class="card-subtitle" id="avg-order-value">Ticket promedio: $0</span>
+                            <span class="card-subtitle" id="avg-order-value">Valor promedio por pedido: $0</span>
                         </div>
                     </div>
 
@@ -162,7 +162,7 @@ require_once __DIR__ . '/../../layouts/headeradmin2.php';
                                     <th>Envío</th>
                                     <th>Descuentos</th>
                                     <th>Total</th>
-                                    <th>Ticket Promedio</th>
+                                    <th>Valor promedio por pedido (COP)</th>
                                 </tr>
                             </thead>
                             <tbody>

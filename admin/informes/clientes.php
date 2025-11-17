@@ -137,7 +137,7 @@ require_once __DIR__ . '/../../layouts/headeradmin2.php';
                                     <th>Teléfono</th>
                                     <th>Total Órdenes</th>
                                     <th>Total Gastado</th>
-                                    <th>Ticket Promedio</th>
+                                    <th>Valor promedio por pedido (COP)</th>
                                     <th>Primera Compra</th>
                                     <th>Última Compra</th>
                                 </tr>

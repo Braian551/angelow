@@ -88,7 +88,10 @@ function fetchCustomerOrders(PDO $conn, string $customerId): array {
             'order_number' => $row['order_number'],
             'total' => round((float) $row['total'], 2),
             'status' => $row['status'],
+            // Labels en español para mostrar en UI sin cambiar el valor base
+            'status_label' => translateOrderStatus($row['status']),
             'payment_status' => $row['payment_status'],
+            'payment_status_label' => translatePaymentStatus($row['payment_status']),
             'created_at' => $row['created_at']
         ];
     }, $stmt->fetchAll(PDO::FETCH_ASSOC) ?: []);
@@ -106,12 +109,14 @@ function buildActivityTimeline(array $orders, array $reviews): array {
         $events[] = [
             'type' => 'order',
             'title' => 'Orden ' . $order['order_number'],
-            'description' => 'Estado: ' . ($order['status'] ?? 'desconocido'),
+            'description' => 'Estado: ' . ($order['status_label'] ?? translateOrderStatus($order['status'] ?? null)),
             'created_at' => $order['created_at'],
             'meta' => [
                 'total' => $order['total'],
                 'status' => $order['status'],
-                'payment_status' => $order['payment_status']
+                'status_label' => $order['status_label'] ?? translateOrderStatus($order['status'] ?? null),
+                'payment_status' => $order['payment_status'],
+                'payment_status_label' => $order['payment_status_label'] ?? translatePaymentStatus($order['payment_status'] ?? null)
             ]
         ];
     }
@@ -119,7 +124,7 @@ function buildActivityTimeline(array $orders, array $reviews): array {
     foreach ($reviews as $review) {
         $events[] = [
             'type' => 'review',
-            'title' => 'Resena ' . $review['rating'] . ' estrellas',
+            'title' => 'Reseña ' . $review['rating'] . ' estrellas',
             'description' => $review['product_name'] ?? 'Producto',
             'created_at' => $review['created_at'],
             'meta' => [
@@ -134,6 +139,38 @@ function buildActivityTimeline(array $orders, array $reviews): array {
     });
 
     return array_slice($events, 0, 8);
+}
+
+// Traducciones de estados de orden y pago al español (contexto colombiano)
+function translateOrderStatus(?string $status): string {
+    if (!$status) return 'Desconocido';
+    $map = [
+        'pending' => 'Pendiente',
+        'processing' => 'En proceso',
+        'completed' => 'Completada',
+        'shipped' => 'Enviado',
+        'delivered' => 'Entregada',
+        'cancelled' => 'Cancelada',
+        'refunded' => 'Reembolsada',
+        'on-hold' => 'En espera',
+        'in_transit' => 'En tránsito'
+    ];
+    $key = strtolower($status);
+    return $map[$key] ?? ucfirst($status);
+}
+
+function translatePaymentStatus(?string $payment): string {
+    if (!$payment) return 'Desconocido';
+    $map = [
+        'pending' => 'Pendiente',
+        'paid' => 'Pagado',
+        'failed' => 'Fallido',
+        'refunded' => 'Reembolsado',
+        'partially_refunded' => 'Parcialmente reembolsado',
+        'on-hold' => 'En espera'
+    ];
+    $key = strtolower($payment);
+    return $map[$key] ?? ucfirst($payment);
 }
 
 function formatProfile(array $profile): array {
