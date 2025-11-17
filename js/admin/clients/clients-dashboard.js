@@ -1,0 +1,310 @@
+class ClientsDashboard {
+    constructor(config) {
+        this.config = config;
+        this.state = {
+            page: 1,
+            perPage: 10,
+            search: '',
+            segment: 'all',
+            sort: 'recent'
+        };
+        this.cacheDom();
+        this.bindEvents();
+        this.loadOverview();
+        this.loadList();
+    }
+
+    cacheDom() {
+        this.hub = document.getElementById('clients-hub');
+        this.statCards = this.hub?.querySelectorAll('.stat-card') || [];
+        this.segmentContainer = document.getElementById('client-segments');
+        this.trendList = document.getElementById('acquisition-trend');
+        this.engagementContainer = document.getElementById('engagement-matrix');
+        this.topCustomersList = document.getElementById('top-customers');
+        this.searchInput = document.getElementById('clients-search');
+        this.segmentSelect = document.getElementById('clients-segment');
+        this.sortSelect = document.getElementById('clients-sort');
+        this.tableBody = document.getElementById('clients-table-body');
+        this.pagination = document.getElementById('clients-pagination');
+        this.detailPanel = document.getElementById('client-detail-panel');
+        this.refreshBtn = document.getElementById('clients-refresh-btn');
+    }
+
+    bindEvents() {
+        if (this.searchInput) {
+            this.searchInput.addEventListener('input', this.debounce((evt) => {
+                this.state.search = evt.target.value.trim();
+                this.state.page = 1;
+                this.loadList();
+            }, 350));
+        }
+
+        this.segmentSelect?.addEventListener('change', (evt) => {
+            this.state.segment = evt.target.value;
+            this.state.page = 1;
+            this.loadList();
+        });
+
+        this.sortSelect?.addEventListener('change', (evt) => {
+            this.state.sort = evt.target.value;
+            this.state.page = 1;
+            this.loadList();
+        });
+
+        this.pagination?.querySelectorAll('button[data-page]')?.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const dir = btn.getAttribute('data-page');
+                if (dir === 'prev' && this.state.page > 1) {
+                    this.state.page -= 1;
+                    this.loadList();
+                } else if (dir === 'next') {
+                    this.state.page += 1;
+                    this.loadList();
+                }
+            });
+        });
+
+        this.refreshBtn?.addEventListener('click', () => {
+            this.loadOverview();
+            this.loadList();
+        });
+    }
+
+    async loadOverview() {
+        try {
+            const response = await fetch(this.config.endpoints.overview, { credentials: 'same-origin' });
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const payload = await response.json();
+            if (!payload.success) return;
+            this.renderStats(payload.stats);
+            this.renderSegments(payload.segments);
+            this.renderTrend(payload.acquisition_trend);
+            this.renderEngagement(payload.engagement_matrix);
+            this.renderTopCustomers(payload.top_customers);
+        } catch (error) {
+            console.error('clients overview', error);
+        }
+    }
+
+    async loadList() {
+        if (!this.tableBody) return;
+        this.tableBody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
+        const query = new URLSearchParams({
+            page: this.state.page,
+            per_page: this.state.perPage,
+            search: this.state.search,
+            segment: this.state.segment,
+            sort: this.state.sort
+        });
+        try {
+            const response = await fetch(`${this.config.endpoints.list}?${query.toString()}`, { credentials: 'same-origin' });
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const payload = await response.json();
+            if (!payload.success) throw new Error('API error');
+            this.renderTable(payload.items);
+            this.renderPagination(payload.pagination);
+        } catch (error) {
+            console.error('clients list', error);
+            this.tableBody.innerHTML = '<tr><td colspan="5">No se pudo cargar la informacion</td></tr>';
+        }
+    }
+
+    renderStats(stats = {}) {
+        this.statCards.forEach((card) => {
+            const metric = card.getAttribute('data-metric');
+            const strong = card.querySelector('strong');
+            const delta = card.querySelector('.delta');
+            switch (metric) {
+                case 'total':
+                    strong.textContent = stats.total_customers?.toLocaleString('es-CO') || '--';
+                    break;
+                case 'new':
+                    strong.textContent = stats.new_customers?.toLocaleString('es-CO') || '--';
+                    delta.textContent = 'Ultimos 30 dias';
+                    break;
+                case 'active':
+                    strong.textContent = stats.active_customers?.toLocaleString('es-CO') || '--';
+                    break;
+                case 'repeat':
+                    strong.textContent = `${stats.repeat_rate ?? '--'}%`;
+                    break;
+                case 'ltv':
+                    strong.textContent = this.formatCurrency(stats.lifetime_value);
+                    break;
+                case 'ticket':
+                    strong.textContent = this.formatCurrency(stats.avg_ticket);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
+    renderSegments(segments = []) {
+        if (!this.segmentContainer) return;
+        this.segmentContainer.innerHTML = segments.map((segment) => `
+            <article class="segment-tile">
+                <h3>${segment.label}</h3>
+                <p>${segment.description}</p>
+                <strong>${segment.count.toLocaleString('es-CO')}</strong>
+            </article>
+        `).join('');
+    }
+
+    renderTrend(trend = []) {
+        if (!this.trendList) return;
+        if (!trend.length) {
+            this.trendList.innerHTML = '<li>No hay datos suficientes</li>';
+            return;
+        }
+        this.trendList.innerHTML = trend.map((point) => {
+            const width = Math.min(100, (point.count || 0) * 4);
+            return `
+                <li>
+                    <strong>${point.label}</strong>
+                    <span>${point.count} clientes</span>
+                    <div class="progress-bar" style="background: var(--hub-primary-soft); border-radius: 8px; margin-top: 0.35rem;">
+                        <div style="height:6px;background:var(--hub-primary);width:${width}%"></div>
+                    </div>
+                </li>
+            `;
+        }).join('');
+    }
+
+    renderEngagement(matrix = {}) {
+        if (!this.engagementContainer) return;
+        const orders = matrix.orders || {};
+        const recency = matrix.recency || {};
+        this.engagementContainer.innerHTML = `
+            <article class="segment-tile">
+                <h3>Por pedidos</h3>
+                ${this.renderMiniList(orders)}
+            </article>
+            <article class="segment-tile">
+                <h3>Por recencia</h3>
+                ${this.renderMiniList(recency)}
+            </article>
+        `;
+    }
+
+    renderMiniList(bucket) {
+        const entries = Object.entries(bucket);
+        if (!entries.length) return '<p>Sin datos</p>';
+        return `<ul class="text-muted">${entries.map(([label, value]) => `<li>${label}: <strong>${value}</strong></li>`).join('')}</ul>`;
+    }
+
+    renderTopCustomers(list = []) {
+        if (!this.topCustomersList) return;
+        if (!list.length) {
+            this.topCustomersList.innerHTML = '<li>Sin clientes destacados</li>';
+            return;
+        }
+        this.topCustomersList.innerHTML = list.map((item) => `
+            <li>
+                <strong>${item.name || item.email}</strong>
+                <span>${this.formatCurrency(item.total_spent)} • ${item.orders_count} pedidos</span>
+            </li>
+        `).join('');
+    }
+
+    renderTable(items = []) {
+        if (!items.length) {
+            this.tableBody.innerHTML = '<tr><td colspan="5">No se encontraron clientes con los filtros actuales</td></tr>';
+            return;
+        }
+        this.tableBody.innerHTML = items.map((item) => `
+            <tr data-id="${item.id}">
+                <td>
+                    <div>${item.name || item.email}</div>
+                    <small class="text-muted">${item.email}</small>
+                </td>
+                <td>${item.orders_count}</td>
+                <td>${item.last_order ? this.formatDate(item.last_order) : 'Sin datos'}</td>
+                <td>${this.formatCurrency(item.avg_ticket)}</td>
+                <td>${this.renderStatusChip(item.status)}</td>
+            </tr>
+        `).join('');
+
+        this.tableBody.querySelectorAll('tr').forEach((row) => {
+            row.addEventListener('click', () => {
+                const id = row.getAttribute('data-id');
+                this.openDetail(id);
+            });
+        });
+    }
+
+    renderPagination(meta) {
+        if (!this.pagination) return;
+        const info = this.pagination.querySelector('[data-role="meta"]');
+        info.textContent = `${meta.total} resultados`;
+        this.state.page = Math.max(1, Math.min(meta.pages, this.state.page));
+        const [prevBtn, nextBtn] = this.pagination.querySelectorAll('button[data-page]');
+        if (prevBtn) prevBtn.disabled = this.state.page <= 1;
+        if (nextBtn) nextBtn.disabled = this.state.page >= meta.pages;
+    }
+
+    async openDetail(id) {
+        if (!id) return;
+        try {
+            const response = await fetch(`${this.config.endpoints.detail}?id=${encodeURIComponent(id)}`, { credentials: 'same-origin' });
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const payload = await response.json();
+            if (!payload.success) throw new Error('API error');
+            this.renderDetail(payload);
+        } catch (error) {
+            console.error('client detail', error);
+        }
+    }
+
+    renderDetail(payload) {
+        if (!this.detailPanel) return;
+        const emptyState = this.detailPanel.querySelector('[data-state="empty"]');
+        const content = this.detailPanel.querySelector('[data-state="content"]');
+        emptyState?.setAttribute('hidden', 'hidden');
+        content?.removeAttribute('hidden');
+
+        content.querySelector('.detail-name').textContent = payload.profile.name || payload.profile.email;
+        content.querySelector('[data-role="segment"]').textContent = (payload.metrics.segments || []).join(', ') || 'Sin segmento';
+        content.querySelector('[data-role="email"]').textContent = payload.profile.email;
+        content.querySelector('[data-role="phone"]').textContent = payload.profile.phone || 'Sin telefono';
+        content.querySelector('[data-role="created"]').textContent = this.formatDate(payload.profile.created_at);
+
+        const timeline = document.getElementById('client-activity');
+        if (timeline) {
+            const events = payload.activity || [];
+            timeline.innerHTML = events.length ? events.map((event) => `
+                <li>
+                    <strong>${event.title}</strong>
+                    <span>${this.formatDate(event.created_at)} · ${event.description}</span>
+                </li>
+            `).join('') : '<li>Sin actividad reciente</li>';
+        }
+    }
+
+    renderStatusChip(status) {
+        const className = status === 'Activo' ? 'success' : status === 'En riesgo' ? 'warning' : 'muted';
+        return `<span class="status-chip ${className}">${status}</span>`;
+    }
+
+    formatCurrency(value) {
+        const amount = Number(value || 0);
+        return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(amount);
+    }
+
+    formatDate(value) {
+        if (!value) return 'Sin datos';
+        return new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+    }
+
+    debounce(fn, delay) {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => fn(...args), delay);
+        };
+    }
+}
+
+if (window.CLIENTS_DASHBOARD_CONFIG) {
+    document.addEventListener('DOMContentLoaded', () => new ClientsDashboard(window.CLIENTS_DASHBOARD_CONFIG));
+}

@@ -87,14 +87,14 @@ try {
             </li>
 
             <li class="nav-item">
-                <a href="#clientes">
+                <a href="<?= BASE_URL ?>/admin/clientes/index.php">
                     <i class="fas fa-users"></i>
                     <span>Clientes</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="#reseñas">
+                <a href="<?= BASE_URL ?>/admin/resenas/index.php">
                     <i class="fas fa-star"></i>
                     <span>Reseñas</span>
                 </a>
@@ -160,12 +160,12 @@ try {
                 </div>
                 <ul class="submenu">
                     <li><a href="<?= BASE_URL ?>/admin/sliders/sliders_list.php">Sliders</a></li>
-                    <li><a href="#general">General</a></li>
+                    <li><a href="<?= BASE_URL ?>/admin/settings/general.php">General</a></li>
                 </ul>
             </li>
 
             <li class="nav-item">
-                <a href="#administradores">
+                <a href="<?= BASE_URL ?>/admin/admins/index.php">
                     <i class="fas fa-user-shield"></i>
                     <span>Administradores</span>
                 </a>
@@ -192,20 +192,29 @@ try {
     document.addEventListener('DOMContentLoaded', function() {
         // 1. Función para marcar el ítem activo según la página actual
         function setActiveMenuItem() {
-            const currentPath = window.location.pathname;
-            const currentPage = currentPath.split('/').pop();
+            const currentPath = window.location.pathname.replace(/\/index\.php$/i, '');
 
             // Resetear todos los activos
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
 
+            const toPath = (href) => {
+                try {
+                    const url = new URL(href, window.location.origin);
+                    return url.pathname.replace(/\/index\.php$/i, '');
+                } catch (e) {
+                    return href.replace(/\/index\.php$/i, '');
+                }
+            };
+
             // Buscar coincidencia en enlaces del submenú
             document.querySelectorAll('.submenu a').forEach(link => {
                 const href = link.getAttribute('href');
                 if (href && href !== '#') {
-                    if (currentPath.includes(href) || currentPage === href.split('/').pop()) {
-                        // Marcar el ítem padre como activo
+                    const linkPath = toPath(href);
+                    // Si el path actual esta en el mismo directorio del link entonces marcar activo
+                    if (currentPath === linkPath || currentPath.startsWith(linkPath + '/')) {
                         const parentMenu = link.closest('.with-submenu');
                         if (parentMenu) {
                             parentMenu.classList.add('active');
@@ -222,7 +231,8 @@ try {
             document.querySelectorAll('.nav-menu > li > a').forEach(link => {
                 const href = link.getAttribute('href');
                 if (href && href !== '#') {
-                    if (currentPath.includes(href) || currentPage === href.split('/').pop()) {
+                    const linkPath = toPath(href);
+                    if (currentPath === linkPath || currentPath.startsWith(linkPath + '/')) {
                         const parentItem = link.closest('li');
                         if (parentItem) {
                             parentItem.classList.add('active');
