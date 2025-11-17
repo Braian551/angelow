@@ -24,6 +24,8 @@ if (empty($input)) {
 
 $productId = isset($input['product_id']) ? intval($input['product_id']) : 0;
 $questionText = isset($input['question']) ? trim($input['question']) : '';
+// Optional rating for question (1..5). Keep nullable if not provided.
+$questionRating = isset($input['rating']) ? intval($input['rating']) : null;
 
 // Validate
 if (!$productId) {
@@ -65,8 +67,23 @@ try {
 
     // Insertar pregunta - la columna id debería ser AUTO_INCREMENT, pero puede faltar en algunas instalaciones.
     try {
-        $stmt = $conn->prepare("INSERT INTO product_questions (product_id, user_id, question) VALUES (?, ?, ?)");
-        $stmt->execute([$productId, $_SESSION['user_id'], $questionText]);
+        try {
+            if (!is_null($questionRating) && $questionRating >= 1 && $questionRating <= 5) {
+                $stmt = $conn->prepare("INSERT INTO product_questions (product_id, user_id, question, rating) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$productId, $_SESSION['user_id'], $questionText, $questionRating]);
+            } else {
+                $stmt = $conn->prepare("INSERT INTO product_questions (product_id, user_id, question) VALUES (?, ?, ?)");
+                $stmt->execute([$productId, $_SESSION['user_id'], $questionText]);
+            }
+        } catch (PDOException $e) {
+            // Some installations might not have the rating column for questions. Fallback to insert without rating.
+            if (stripos($e->getMessage(), 'unknown column') !== false || stripos($e->getMessage(), 'column') !== false) {
+                $stmt = $conn->prepare("INSERT INTO product_questions (product_id, user_id, question) VALUES (?, ?, ?)");
+                $stmt->execute([$productId, $_SESSION['user_id'], $questionText]);
+            } else {
+                throw $e;
+            }
+        }
     } catch (PDOException $e) {
         // SQLSTATE 1364: Field 'id' doesn't have a default value - fallback temporal
         if (strpos($e->getMessage(), "1364") !== false || stripos($e->getMessage(), "doesn't have a default value") !== false) {
@@ -76,8 +93,23 @@ try {
             $nextStmt = $conn->query('SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM product_questions');
             $nextId = intval($nextStmt->fetchColumn());
 
-            $ins = $conn->prepare('INSERT INTO product_questions (id, product_id, user_id, question) VALUES (?, ?, ?, ?)');
-            $ins->execute([$nextId, $productId, $_SESSION['user_id'], $questionText]);
+            // Fallback path: include rating if available
+            try {
+                if (!is_null($questionRating) && $questionRating >= 1 && $questionRating <= 5) {
+                    $ins = $conn->prepare('INSERT INTO product_questions (id, product_id, user_id, question, rating) VALUES (?, ?, ?, ?, ?)');
+                    $ins->execute([$nextId, $productId, $_SESSION['user_id'], $questionText, $questionRating]);
+                } else {
+                    $ins = $conn->prepare('INSERT INTO product_questions (id, product_id, user_id, question) VALUES (?, ?, ?, ?)');
+                    $ins->execute([$nextId, $productId, $_SESSION['user_id'], $questionText]);
+                }
+            } catch (PDOException $e2) {
+                if (stripos($e2->getMessage(), 'unknown column') !== false || stripos($e2->getMessage(), 'column') !== false) {
+                    $ins = $conn->prepare('INSERT INTO product_questions (id, product_id, user_id, question) VALUES (?, ?, ?, ?)');
+                    $ins->execute([$nextId, $productId, $_SESSION['user_id'], $questionText]);
+                } else {
+                    throw $e2;
+                }
+            }
         } else {
             throw $e; // volver a lanzar para ser capturado por el catch exterior
         }
@@ -104,6 +136,7 @@ try {
             'product_id' => $productId,
             'user_id' => $_SESSION['user_id'],
             'question' => $questionText,
+            'rating' => $questionRating, // may be null
             'created_at' => date('Y-m-d H:i:s')
         ]
     ]);

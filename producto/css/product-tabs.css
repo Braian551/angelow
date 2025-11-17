@@ -735,6 +735,7 @@
   display: flex;
   align-items: flex-start;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .user-info {
@@ -905,6 +906,21 @@
   gap: 1.5rem;
   font-size: 1.4rem;
   color: var(--text-light);
+  flex-wrap: wrap;
+}
+
+.question-rating {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--warning-color);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.question-rating i {
+  color: inherit;
 }
 
 .question-user {

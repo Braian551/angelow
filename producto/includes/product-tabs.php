@@ -186,7 +186,7 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
             <?php endif; ?>
             
             <!-- Lista de reseñas -->
-            <div class="reviews-list questions-list" data-qa-reviews-count="<?= $reviewsCount ?>">
+            <div class="reviews-list" data-qa-reviews-count="<?= $reviewsCount ?>">
                 <?php if (empty($reviewsData['reviews'])): ?>
                     <div class="no-reviews">
                         <i class="fas fa-comment-alt"></i>
@@ -267,6 +267,16 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                                   placeholder="Escribe tu pregunta sobre este producto (mín. 10 caracteres)"></textarea>
                         <small class="form-note">Las preguntas serán respondidas por el vendedor u otros compradores.</small>
                     </div>
+
+                    <div class="form-group">
+                        <label>Calificación (opcional)</label>
+                        <div class="rating-input question-rating-input">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <i class="far fa-star" data-rating="<?= $i ?>"></i>
+                            <?php endfor; ?>
+                            <input type="hidden" name="rating" id="question-rating-value">
+                        </div>
+                    </div>
                     
                     <div class="form-actions">
                         <button type="button" id="cancel-question" class="tab-action-btn review-btn">
@@ -297,6 +307,21 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                                     <strong><?= htmlspecialchars($question['user_name'] ?? 'Usuario') ?></strong>
                                     <span class="time"><?= date('d/m/Y H:i', strtotime($question['created_at'])) ?></span>
                                 </div>
+                                <?php
+                                    $questionRating = isset($question['rating']) && is_numeric($question['rating']) ? (float)$question['rating'] : 0;
+                                    if ($questionRating > 0):
+                                        $ratingLabel = rtrim(rtrim(sprintf('%.1f', $questionRating), '0'), '.');
+                                ?>
+                                    <div class="user-rating question-rating" aria-label="Calificación de <?= $ratingLabel ?> sobre 5">
+                                        <?php for ($i = 1; $i <= 5; $i++):
+                                            $iconClass = $i <= floor($questionRating)
+                                                ? 'fas fa-star'
+                                                : ($i - $questionRating <= 0.5 ? 'fas fa-star-half-alt' : 'far fa-star');
+                                        ?>
+                                            <i class="<?= $iconClass ?>"></i>
+                                        <?php endfor; ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                             <div class="question-text">
                                 <p><?= nl2br(htmlspecialchars($question['question'])) ?></p>

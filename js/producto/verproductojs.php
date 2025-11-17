@@ -75,6 +75,11 @@ if (!empty($reviewsClientPayload['reviews'])) {
             return stars.join('');
         }
 
+        function formatRatingLabel(value) {
+            if (!Number.isFinite(value)) return '';
+            return Number.isInteger(value) ? String(value) : value.toFixed(1).replace(/\.0$/, '');
+        }
+
         function buildReviewImages(images) {
             if (!Array.isArray(images) || !images.length) return '';
             return `<div class="review-images">${images.map(img => {
@@ -642,18 +647,23 @@ if (!empty($reviewsClientPayload['reviews'])) {
         });
 
         // Rating con estrellas
-        $('.rating-input .fa-star').hover(function() {
+        // Star rating interactivity (supports multiple .rating-input groups, e.g., review form and question form)
+        $(document).on('mouseenter', '.rating-input .fa-star', function() {
             const rating = $(this).data('rating');
-            $('.rating-input .fa-star').each(function() {
+            const group = $(this).closest('.rating-input');
+            group.find('.fa-star').each(function() {
                 if ($(this).data('rating') <= rating) {
                     $(this).removeClass('far').addClass('fas');
                 } else {
                     $(this).removeClass('fas').addClass('far');
                 }
             });
-        }, function() {
-            const currentRating = $('#rating-value').val();
-            $('.rating-input .fa-star').each(function() {
+        });
+
+        $(document).on('mouseleave', '.rating-input .fa-star', function() {
+            const group = $(this).closest('.rating-input');
+            const currentRating = group.find('input[type="hidden"]').val();
+            group.find('.fa-star').each(function() {
                 if ($(this).data('rating') <= currentRating) {
                     $(this).removeClass('far').addClass('fas');
                 } else {
@@ -662,9 +672,18 @@ if (!empty($reviewsClientPayload['reviews'])) {
             });
         });
 
-        $('.rating-input .fa-star').click(function() {
+        $(document).on('click', '.rating-input .fa-star', function() {
             const rating = $(this).data('rating');
-            $('#rating-value').val(rating);
+            const group = $(this).closest('.rating-input');
+            group.find('input[type="hidden"]').val(rating);
+            // Add active classes visually
+            group.find('.fa-star').each(function() {
+                if ($(this).data('rating') <= rating) {
+                    $(this).removeClass('far').addClass('fas active');
+                } else {
+                    $(this).removeClass('fas active').addClass('far');
+                }
+            });
         });
 
         // Formulario de pregunta (delegated so it works with injected buttons)
@@ -673,7 +692,9 @@ if (!empty($reviewsClientPayload['reviews'])) {
         });
 
         $(document).on('click', '#cancel-question', function() {
-            $('#question-form-container').slideUp();
+                    $('#question-form-container').slideUp();
+                    $('#question-rating-value').val('');
+                    $('.question-rating-input .fa-star').removeClass('fas active').addClass('far');
         });
 
         // Enviar pregunta via AJAX (evita recarga completa)
@@ -690,7 +711,8 @@ if (!empty($reviewsClientPayload['reviews'])) {
                 return;
             }
 
-            const payload = { product_id: productId, question };
+            const questionRating = $('#question-rating-value').val();
+            const payload = { product_id: productId, question, rating: questionRating ? parseInt(questionRating) : null };
 
             // Deshabilitar botones
             form.find('button[type="submit"]').prop('disabled', true);
@@ -722,6 +744,10 @@ if (!empty($reviewsClientPayload['reviews'])) {
                             } else {
                                 console.error('Could not fetch updated questions', newRes.error);
                             }
+                        }).finally(() => {
+                            // Reset rating input in question form
+                            $('#question-rating-value').val('');
+                            $('.question-rating-input .fa-star').removeClass('fas active').addClass('far');
                         }).catch(err => console.error(err));
                 } else {
                     showNotification(data.message || data.error || 'Error al enviar la pregunta', 'error');
@@ -750,14 +776,28 @@ if (!empty($reviewsClientPayload['reviews'])) {
             // Si ya existe un editor, no añadir otro
             if (qItem.find('.edit-question-form').length) return;
 
+            // Try to reuse the existing rating markup (if any) so the user sees the stars while editing
+            const existingRatingHtml = qItem.find('.question-rating').length ? qItem.find('.question-rating').prop('outerHTML') : '';
+
+            // Build interactive rating input from current displayed rating
+            const currentRating = qItem.find('.question-rating i.fas').length || 0;
+            const ratingInputs = [];
+            for (let r = 1; r <= 5; r++) {
+                const cls = r <= currentRating ? 'fas fa-star active' : 'far fa-star';
+                ratingInputs.push(`<i class="${cls}" data-rating="${r}"></i>`);
+            }
+
+            const ratingInputHtml = `<div class="rating-input edit-question-rating-input">${ratingInputs.join('')}<input type="hidden" class="edit-question-rating-value" value="${currentRating}"></div>`;
+
             const editor = $(
-                `<div class="edit-question-form">
-                    <textarea class="edit-question-textarea">${$('<div/>').text(currentText).html()}</textarea>
-                    <div class="edit-question-actions">
-                        <button class="btn small secondary cancel-edit">Cancelar</button>
-                        <button class="btn small primary save-edit">Guardar</button>
-                    </div>
-                </div>`
+                `<div class="edit-question-form">` +
+                    ratingInputHtml +
+                    `<textarea class="edit-question-textarea">${$('<div/>').text(currentText).html()}</textarea>` +
+                    `<div class="edit-question-actions">` +
+                        `<button class="btn small secondary cancel-edit">Cancelar</button>` +
+                        `<button class="btn small primary save-edit">Guardar</button>` +
+                    `</div>` +
+                `</div>`
             );
 
             qItem.append(editor);
@@ -777,12 +817,26 @@ if (!empty($reviewsClientPayload['reviews'])) {
                 fetch('<?= BASE_URL ?>/api/edit_question.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({ question_id: qId, question: newText })
+                    body: JSON.stringify({ question_id: qId, question: newText, rating: editor.find('.edit-question-rating-value').val() })
                 }).then(r => r.json()).then(data => {
                     if (data.success) {
                         // Update internal questions array so future rerenders don't bring it back
                         try { removeQuestionFromInitial(qId); } catch (err) { if (PRODUCT_PAGE_DEBUG) console.warn('removeQuestionFromInitial failed', err); }
                         qItem.find('.question-text p').text(newText);
+                        // Update rating display in the question item (append or replace)
+                        const updatedRating = parseInt(editor.find('.edit-question-rating-value').val() || 0, 10);
+                        const existingRatingEl = qItem.find('.question-rating');
+                        if (updatedRating > 0) {
+                            const starsHtml = buildReviewStars(updatedRating);
+                            if (existingRatingEl.length) {
+                                existingRatingEl.html(starsHtml);
+                            } else {
+                                qItem.find('.question-meta').append(`<div class="user-rating question-rating" aria-label="Calificación: ${updatedRating} sobre 5">${starsHtml}</div>`);
+                            }
+                        } else {
+                            // Remove rating display if rating set to 0 or empty
+                            if (existingRatingEl.length) existingRatingEl.remove();
+                        }
                         editor.remove();
                         // Usar las alertas de usuario para notificar éxito
                         showUserSuccess('Pregunta actualizada correctamente', { confirmText: 'OK' });
@@ -905,6 +959,15 @@ if (!empty($reviewsClientPayload['reviews'])) {
                 const userInfo = $('<div>').addClass('user-info').append($('<strong>').text(userName)).append($('<span>').addClass('time').text(q.created_at ? new Date(q.created_at).toLocaleString() : ''));
                 qMeta.append(avatar).append(userInfo);
 
+                const ratingValue = typeof q.rating !== 'undefined' ? parseFloat(q.rating) : NaN;
+                if (!Number.isNaN(ratingValue) && ratingValue > 0) {
+                    const ratingLabel = formatRatingLabel(ratingValue);
+                    const ratingEl = $('<div>').addClass('user-rating question-rating')
+                        .attr('aria-label', `Calificación: ${ratingLabel} de 5`)
+                        .html(buildReviewStars(ratingValue));
+                    qMeta.append(ratingEl);
+                }
+
                 const qText = $('<div>').addClass('question-text').append($('<p>').html($('<div/>').text(q.question).html()));
 
                 qItem.append(qMeta).append(qText);
@@ -960,7 +1023,10 @@ if (!empty($reviewsClientPayload['reviews'])) {
                             const uName = q2.user_name || 'Usuario';
                             const uImg = q2.user_image ? '<?= BASE_URL ?>/' + q2.user_image : '<?= BASE_URL ?>/images/default-avatar.png';
                             const answersHtml = (q2.answers || []).map(a => `<div class="answer-item"><div class="answer-meta"><strong>${(a.user_name||'Usuario')}</strong>${a.is_seller ? ' <span class="badge seller">Vendedor</span>' : ''} <span class="time">${a.created_at ? new Date(a.created_at).toLocaleString() : ''}</span></div><p>${(a.answer || '')}</p></div>`).join('');
-                            return `<div class="question-item"><div class="question-meta"><div class="user-avatar"><img src="${uImg}" alt="${uName}"></div><div class="user-info"><strong>${uName}</strong><span class="time">${q2.created_at ? new Date(q2.created_at).toLocaleString() : ''}</span></div></div><div class="question-text"><p>${(q2.question || '')}</p></div>${answersHtml}</div>`;
+                            const ratingVal = typeof q2.rating !== 'undefined' ? parseFloat(q2.rating) : NaN;
+                            const ratingLabel = !Number.isNaN(ratingVal) && ratingVal > 0 ? formatRatingLabel(ratingVal) : null;
+                            const ratingHtml = ratingLabel ? `<div class="user-rating question-rating" aria-label="Calificación: ${ratingLabel} de 5">${buildReviewStars(ratingVal)}</div>` : '';
+                            return `<div class="question-item"><div class="question-meta"><div class="user-avatar"><img src="${uImg}" alt="${uName}"></div><div class="user-info"><strong>${uName}</strong><span class="time">${q2.created_at ? new Date(q2.created_at).toLocaleString() : ''}</span></div>${ratingHtml}</div><div class="question-text"><p>${(q2.question || '')}</p></div>${answersHtml}</div>`;
                         }).join('');
                         container.html(fallbackHtml);
                     }

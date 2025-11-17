@@ -18,7 +18,7 @@ if (!$productId) {
 }
 
 try {
-    $stmt = $conn->prepare("SELECT pq.id, pq.product_id, pq.user_id, pq.question, pq.created_at, u.name as user_name, u.image as user_image
+    $stmt = $conn->prepare("SELECT pq.id, pq.product_id, pq.user_id, pq.question, pq.created_at, pq.rating, u.name as user_name, u.image as user_image
         FROM product_questions pq
         LEFT JOIN users u ON pq.user_id = u.id
         WHERE pq.product_id = ?
