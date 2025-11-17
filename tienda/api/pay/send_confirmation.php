@@ -279,8 +279,12 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
                     $body .= '<p><strong>Ciudad:</strong> ' . htmlspecialchars($order['shipping_city']) . '</p>';
                 }
                 
-                if (!empty($order['delivery_notes'])) {
-                    $body .= '<p><strong>Instrucciones de entrega:</strong><br>' . nl2br(htmlspecialchars($order['delivery_notes'])) . '</p>';
+                // Mostrar instrucciones de entrega: preferir instrucciones guardadas en la dirección del usuario,
+                // si no están, mostrar notas administrativas si las hubo.
+                if (!empty($order['address_delivery_instructions'])) {
+                    $body .= '<p><strong>Instrucciones de entrega:</strong><br>' . nl2br(htmlspecialchars($order['address_delivery_instructions'])) . '</p>';
+                } elseif (!empty($order['notes'])) {
+                    $body .= '<p><strong>Notas:</strong><br>' . nl2br(htmlspecialchars($order['notes'])) . '</p>';
                 }
 
                 if ($isStorePickup) {

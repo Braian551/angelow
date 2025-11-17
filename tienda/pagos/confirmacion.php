@@ -58,6 +58,7 @@ try {
         SELECT o.*, u.name as user_name, u.email as user_email, u.phone as user_phone,
                pt.reference_number, pt.payment_proof, pt.created_at as payment_date" . $shippingSelect . ",
                ua.gps_latitude, ua.gps_longitude, ua.recipient_name AS address_recipient,
+               ua.delivery_instructions AS address_delivery_instructions,
                ua.recipient_phone AS address_phone, ua.alias AS address_alias
         FROM orders o
         JOIN users u ON o.user_id = u.id

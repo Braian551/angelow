@@ -20,8 +20,9 @@ if (!$orderId) {
 
 try {
     // Obtener información completa de la orden
-    $stmt = $conn->prepare("
-        SELECT o.*, ua.address as shipping_address, ua.neighborhood
+    $stmt = $conn->prepare(" 
+        SELECT o.*, ua.address as shipping_address, ua.neighborhood,
+               ua.delivery_instructions as address_delivery_instructions
         FROM orders o
         LEFT JOIN user_addresses ua ON ua.id = o.shipping_address_id
         WHERE o.id = :id AND o.user_id = :user_id
@@ -241,8 +242,11 @@ function calculateDiscountAmount($order, $subtotal) {
                                     <?php if ($order['neighborhood']): ?>
                                         <strong>Barrio:</strong> <?= htmlspecialchars($order['neighborhood']) ?><br>
                                     <?php endif; ?>
-                                    <?php if ($order['delivery_notes']): ?>
-                                        <strong>Notas:</strong> <?= htmlspecialchars($order['delivery_notes']) ?>
+                                    <?php if (!empty($order['address_delivery_instructions'])): ?>
+                                        <strong>Instrucciones de envío:</strong> <?= htmlspecialchars($order['address_delivery_instructions']) ?><br>
+                                    <?php endif; ?>
+                                    <?php if (!empty($order['notes'])): ?>
+                                        <strong>Notas:</strong> <?= htmlspecialchars($order['notes']) ?>
                                     <?php endif; ?>
                                 </span>
                             </div>

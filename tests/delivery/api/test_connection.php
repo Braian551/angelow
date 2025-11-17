@@ -80,7 +80,7 @@ try {
             o.total,
             o.shipping_address,
             o.shipping_city,
-            o.delivery_notes,
+            o.notes AS delivery_notes,
             o.created_at,
             o.status as order_status,
             o.payment_status,

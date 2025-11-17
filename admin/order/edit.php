@@ -57,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         // Obtener estatus actual antes de actualizar
+        // Obtener estatus actual antes de actualizar
         $stmtCurrentStatus = $conn->prepare("SELECT status, payment_status FROM orders WHERE id = ?");
         $stmtCurrentStatus->execute([$orderId]);
         $statusRow = $stmtCurrentStatus->fetch(PDO::FETCH_ASSOC);
@@ -147,7 +148,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 shipping_address_id = :shipping_address_id,
                 shipping_address = :shipping_address,
                 shipping_city = :shipping_city,
-                delivery_notes = :delivery_notes,
                 notes = :notes,
                 updated_at = NOW()
                 WHERE id = :id";
@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':shipping_address_id' => $shippingAddressId,
                 ':shipping_address' => $snapshotAddress,
                 ':shipping_city' => $snapshotCity,
-                ':delivery_notes' => trim($_POST['delivery_notes'] ?? ''),
+                // Not updating delivery_notes from edit form (now managed elsewhere)
                 ':notes' => trim($_POST['notes'] ?? ''),
                 ':id' => $orderId
             ];
@@ -169,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 payment_status = :payment_status,
                 shipping_address = :shipping_address,
                 shipping_city = :shipping_city,
-                delivery_notes = :delivery_notes,
+                -- delivery_notes column removed from orders
                 notes = :notes,
                 updated_at = NOW()
                 WHERE id = :id";
@@ -179,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':payment_status' => $payment_status,
                 ':shipping_address' => trim($_POST['shipping_address'] ?? ''),
                 ':shipping_city' => trim($_POST['shipping_city'] ?? ''),
-                ':delivery_notes' => trim($_POST['delivery_notes'] ?? ''),
+                /* delivery_notes removed */
                 ':notes' => trim($_POST['notes'] ?? ''),
                 ':id' => $orderId
             ];
@@ -1196,13 +1196,7 @@ try {
                                     </div>
                                 <?php endif; ?>
 
-                                <div class="form-group full-width">
-                                    <label for="delivery_notes">
-                                        <i class="fas fa-sticky-note"></i>
-                                        Instrucciones de Entrega
-                                    </label>
-                                    <textarea id="delivery_notes" name="delivery_notes" class="form-control" rows="3" placeholder="Instrucciones para el domiciliario..."><?= htmlspecialchars($order['delivery_notes'] ?? '') ?></textarea>
-                                </div>
+                                <!-- Eliminado: instrucciones para el domiciliario (admin ahora gestiona estados/entregas desde detalle) -->
 
                                 <div class="form-group full-width">
                                     <label for="notes">

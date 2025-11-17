@@ -35,12 +35,14 @@ try {
             o.shipping_state,
             o.shipping_zip,
             o.total,
-            o.delivery_notes,
+            o.notes AS delivery_notes,
+            ua.delivery_instructions AS address_delivery_instructions,
             CONCAT(u.name) AS customer_name,
             u.phone AS customer_phone
         FROM order_deliveries od
         INNER JOIN orders o ON od.order_id = o.id
         INNER JOIN users u ON o.user_id = u.id
+        LEFT JOIN user_addresses ua ON o.shipping_address_id = ua.id
         WHERE od.id = ? 
         AND od.driver_id = ?
         AND od.delivery_status IN ('driver_accepted', 'in_transit', 'arrived')

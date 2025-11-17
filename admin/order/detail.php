@@ -492,14 +492,14 @@ function translateValue($value, $field = '') {
                                         <?php endif; ?>
                                     </div>
                                     
-                                    <?php if ($order['address_delivery_instructions'] || $order['delivery_notes']): ?>
+                                    <?php if ($order['address_delivery_instructions'] || !empty($order['notes'])): ?>
                                         <div class="delivery-notes">
                                             <h4><i class="fas fa-sticky-note"></i> Instrucciones de Entrega:</h4>
                                             <?php if ($order['address_delivery_instructions']): ?>
                                                 <p><?= nl2br(htmlspecialchars($order['address_delivery_instructions'])) ?></p>
                                             <?php endif; ?>
-                                            <?php if ($order['delivery_notes']): ?>
-                                                <p><?= nl2br(htmlspecialchars($order['delivery_notes'])) ?></p>
+                                            <?php if (!empty($order['notes'])): ?>
+                                                <p><?= nl2br(htmlspecialchars($order['notes'])) ?></p>
                                             <?php endif; ?>
                                         </div>
                                     <?php endif; ?>
@@ -547,10 +547,10 @@ function translateValue($value, $field = '') {
                                     <?php if ($order['shipping_city']): ?>
                                         <p><strong>Ciudad:</strong> <?= htmlspecialchars($order['shipping_city']) ?></p>
                                     <?php endif; ?>
-                                    <?php if ($order['delivery_notes']): ?>
+                                    <?php if (!empty($order['notes'])): ?>
                                         <div class="delivery-notes">
                                             <h4>Notas de Entrega:</h4>
-                                            <p><?= nl2br(htmlspecialchars($order['delivery_notes'])) ?></p>
+                                            <p><?= nl2br(htmlspecialchars($order['notes'])) ?></p>
                                         </div>
                                     <?php endif; ?>
                                 </div>
