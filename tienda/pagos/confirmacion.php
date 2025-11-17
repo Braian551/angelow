@@ -439,7 +439,7 @@ try {
                                 <label>Indicaciones:</label>
                                 <p>
                                     Te avisaremos por correo o notificaciones de la plataforma cuando el pedido esté listo.
-                                    Presenta tu documento y el número de orden al recogerlo.
+                                    Presenta tu número de orden al recogerlo; presenta tu documento de identidad solo si el personal lo solicita.
                                 </p>
                             </div>
                             <?php if (!empty($shippingMethodDesc)): ?>

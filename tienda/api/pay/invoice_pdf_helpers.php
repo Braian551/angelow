@@ -189,7 +189,7 @@ function generateInvoicePdfContent(array $order, array $orderItems)
                     <div class="info-section">
                         <h3 class="section-title">Datos del cliente</h3>
                         <div class="info-item"><span class="info-label">Nombre:</span><span class="info-value">' . htmlspecialchars($order['user_name']) . '</span></div>
-                        <div class="info-item"><span class="info-label">Documento:</span><span class="info-value">' . htmlspecialchars($order['identification_number'] ?? 'No reportado') . '</span></div>
+                        ' . (!empty($order['identification_number']) ? '<div class="info-item"><span class="info-label">Número de identificación:</span><span class="info-value">' . htmlspecialchars($order['identification_number']) . '</span></div>' : '') . '
                         <div class="info-item"><span class="info-label">Correo:</span><span class="info-value">' . htmlspecialchars($order['user_email']) . '</span></div>
                         <div class="info-item"><span class="info-label">Teléfono:</span><span class="info-value">' . htmlspecialchars($order['user_phone'] ?? 'No reportado') . '</span></div>
                     </div>
@@ -264,7 +264,7 @@ function generateInvoicePdfContent(array $order, array $orderItems)
             </div>
 
             <div class="footer">
-                Angelow Ropa Infantil · Documento generado el ' . $issueDate . '
+                Angelow Ropa Infantil · Comprobante generado el ' . $issueDate . '
             </div>
         </div>
     </body>

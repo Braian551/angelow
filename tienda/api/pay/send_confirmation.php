@@ -288,7 +288,7 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
                 }
 
                 if ($isStorePickup) {
-                    $body .= '<p><strong>Indicaciones:</strong><br>Presenta tu documento y el número de orden para recoger tu pedido en tienda. Horario de recogida: Lunes a Viernes 9:00 AM - 6:00 PM.</p>';
+                    $body .= '<p><strong>Indicaciones:</strong><br>Presenta tu número de orden para recoger tu pedido en tienda. Lleva tu documento de identidad solo si el personal lo solicita. Horario de recogida: Lunes a Viernes 9:00 AM - 6:00 PM.</p>';
                     if ($routeLink) {
                         $body .= '<p><a href="' . htmlspecialchars($routeLink) . '" style="color: #2968c8; text-decoration:none; font-weight:600;">Ver ruta sugerida en Google Maps</a></p>';
                     }
@@ -316,7 +316,7 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
                                         '<div class="step-number">3</div>' .
                                         '<div class="step-title">Recogida</div>' .
                                         '<div class="step-divider"></div>' .
-                                        '<div class="step-description">Presenta tu documento y el número de orden en la tienda para recoger tu pedido.</div>' .
+                                        '<div class="step-description">Presenta tu número de orden en la tienda para retirar tu pedido; presenta tu documento de identidad solamente si te lo solicitan.</div>' .
                                     '</div>'
                                 : '<div class="step">' .
                                         '<div class="step-number">1</div>' .

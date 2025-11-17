@@ -672,11 +672,7 @@ try {
                         <span class="info-label">Nombre:</span>
                         <span class="info-value">' . htmlspecialchars($order['client_name'] ?? 'N/A') . '</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Documento:</span>
-                        <span class="info-value">' . htmlspecialchars($order['identification_number'] ?? 'N/A') . 
-                          ' (' . htmlspecialchars($order['identification_type'] ?? 'CC') . ')</span>
-                    </div>
+                                        ' . (!empty($order['identification_number']) ? '<div class="info-item"><span class="info-label">Número de identificación:</span><span class="info-value">' . htmlspecialchars($order['identification_number']) . ' (' . htmlspecialchars($order['identification_type'] ?? 'CC') . ')</span></div>' : '') . '
                     <div class="info-item">
                         <span class="info-label">Teléfono:</span>
                         <span class="info-value">' . htmlspecialchars($order['client_phone'] ?? 'N/A') . '</span>
@@ -885,7 +881,7 @@ try {
             <div class="footer">
                 <strong style="font-size: 11px; color: #006699;">ANGELOW ROPA INFANTIL</strong><br>
                 <span style="font-style: italic; color: #888;">Moda infantil de calidad para tus pequeños</span><br><br>
-                Documento generado el <strong>' . date('d/m/Y') . '</strong> a las <strong>' . date('H:i') . '</strong><br>
+                Comprobante generado el <strong>' . date('d/m/Y') . '</strong> a las <strong>' . date('H:i') . '</strong><br>
                 Para consultas: <strong>contacto@angelow.com</strong> | Tel: <strong>+57 604 1234567</strong><br>
                 Visitanos en: <strong style="color: #006699;">www.angelow.com</strong>
             </div>

@@ -1007,7 +1007,7 @@ try {
                                 <div class="info-item">
                                     <span class="info-label">
                                         <i class="fas fa-id-card"></i>
-                                        Documento
+                                        Número de identificación
                                     </span>
                                     <span class="info-value"><?= htmlspecialchars($order['identification_number'] ?: 'N/A') ?></span>
                                 </div>

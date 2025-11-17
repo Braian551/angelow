@@ -193,7 +193,7 @@ function sendInvoiceEmail(array $order, array $orderItems, ?string $pdfContent =
             <a class="btn" href="' . BASE_URL . '/tienda/pedidos.php">Ver historial de pedidos</a>
         </div>
         <div class="footer">
-            © ' . date('Y') . ' Angelow Ropa Infantil · Documento generado automáticamente tras confirmar la entrega.
+            © ' . date('Y') . ' Angelow Ropa Infantil · Comprobante generado automáticamente tras confirmar la entrega.
         </div>
     </div>
 </body>

@@ -379,8 +379,8 @@ function translateValue($value, $field = '') {
                                     <span><?= $order['user_phone'] ?: 'N/A' ?></span>
                                 </div>
                                 <div class="info-group">
-                                    <label>Documento:</label>
-                                    <span><?= getIdentificationType($order['identification_type']) ?>: <?= $order['identification_number'] ?: 'N/A' ?></span>
+                                    <label>Número de identificación:</label>
+                                        <span><?= $order['identification_number'] ? getIdentificationType($order['identification_type']) . ': ' . $order['identification_number'] : 'N/A' ?></span>
                                 </div>
                                 <div class="info-group">
                                     <label>Estado:</label>
