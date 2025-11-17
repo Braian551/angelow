@@ -11,6 +11,7 @@ const usernameInput = document.getElementById('username');
 const emailInput = document.getElementById('email');
 const phoneInput = document.getElementById('phone');
 const passwordInput = document.getElementById('password');
+const passwordConfirmInput = document.getElementById('password_confirm');
 const termsCheckbox = document.getElementById('terms');
 
 // Elementos para mostrar errores
@@ -29,6 +30,13 @@ phoneInput.parentNode.appendChild(phoneError);
 const passwordError = document.createElement('div');
 passwordError.className = 'error-message';
 passwordInput.parentNode.parentNode.appendChild(passwordError);
+
+const passwordConfirmError = document.createElement('div');
+passwordConfirmError.className = 'error-message';
+// Attach confirm error after its input container (same parent as password)
+if (passwordConfirmInput) {
+    passwordConfirmInput.parentNode.parentNode.appendChild(passwordConfirmError);
+}
 
 const termsError = document.createElement('div');
 termsError.className = 'error-message';
@@ -242,6 +250,21 @@ const passwordValidationSteps = [
     }
 ];
 
+// ===== VALIDACIONES PARA CONFIRMACION DE CONTRASEÑA =====
+const passwordConfirmValidationSteps = [
+    {
+        check: (confirm) => confirm !== '',
+        message: "Debes confirmar tu contraseña"
+    },
+    {
+        check: (confirm) => confirm === passwordInput.value,
+        message: "Las contraseñas no coinciden"
+    }
+];
+
+// Flag para activar validación en confirm solo después de empezar a escribir
+let passwordConfirmDirty = false;
+
 // ===== VALIDACIONES PARA TÉRMINOS =====
 const termsValidationSteps = [
     {
@@ -322,6 +345,21 @@ function validateStep(step) {
                 isValid = false;
             } else {
                 setFieldValid(passwordInput, passwordError);
+            }
+            // Confirmación de contraseña (validación progresiva)
+            if (passwordConfirmInput) {
+                // Si aún no se empezó a escribir en confirm, no mostrar el error obligatorio
+                if (!passwordConfirmDirty && passwordConfirmInput.value === '') {
+                    // No forzar el error de 'Debes confirmar tu contraseña' hasta que el usuario escriba
+                } else {
+                    const confirmResult = validateProgressively(passwordConfirmInput.value, passwordConfirmValidationSteps);
+                    if (!confirmResult.isValid) {
+                        setFieldError(passwordConfirmInput, passwordConfirmError, confirmResult.message);
+                        isValid = false;
+                    } else {
+                        setFieldValid(passwordConfirmInput, passwordConfirmError);
+                    }
+                }
             }
             
             const termsResult = validateProgressively(termsCheckbox.checked, termsValidationSteps);
@@ -440,7 +478,37 @@ document.addEventListener('DOMContentLoaded', function() {
             setFieldValid(this, passwordError);
         }
         updatePasswordStrength(this.value);
+        // Re-validar confirmación de contraseña en tiempo real (solo si el usuario empezó a escribir)
+        if (passwordConfirmInput && (passwordConfirmDirty || passwordConfirmInput.value !== '')) {
+            const confirmResult = validateProgressively(passwordConfirmInput.value, passwordConfirmValidationSteps);
+            if (!confirmResult.isValid) {
+                setFieldError(passwordConfirmInput, passwordConfirmError, confirmResult.message);
+            } else {
+                setFieldValid(passwordConfirmInput, passwordConfirmError);
+            }
+        }
     });
+
+    // Validación en tiempo real para confirmación de contraseña
+    if (passwordConfirmInput) {
+        passwordConfirmInput.addEventListener('input', function() {
+            // activamos validación sólo cuando el usuario empieza a escribir
+            passwordConfirmDirty = true;
+
+            // Si está vacío, no mostramos el error aún (salvo en el submit/validateStep)
+            if (this.value === '') {
+                setFieldValid(this, passwordConfirmError);
+                return;
+            }
+
+            const confirmResult = validateProgressively(this.value, passwordConfirmValidationSteps);
+            if (!confirmResult.isValid) {
+                setFieldError(this, passwordConfirmError, confirmResult.message);
+            } else {
+                setFieldValid(this, passwordConfirmError);
+            }
+        });
+    }
     
     // Validación en tiempo real para términos
     termsCheckbox.addEventListener('change', function() {

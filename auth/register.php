@@ -21,11 +21,20 @@ function handleRegistration($conn) {
     $email = filter_var(sanitizeInput($_POST['email']), FILTER_VALIDATE_EMAIL);
     $phone = isset($_POST['phone']) ? sanitizeInput($_POST['phone']) : null;
     $password = $_POST['password'];
+    $password_confirm = isset($_POST['password_confirm']) ? $_POST['password_confirm'] : null;
     $terms = isset($_POST['terms']) ? true : false;
 
     // Validaciones básicas
     if (empty($name) || empty($email) || empty($password)) {
         return "Todos los campos obligatorios deben ser completados";
+    }
+
+    // Validación de confirmación de contraseña
+    if ($password_confirm === null || $password_confirm === '') {
+        return "Debes confirmar tu contraseña";
+    }
+    if ($password !== $password_confirm) {
+        return "Las contraseñas no coinciden";
     }
 
     if (!$terms) {

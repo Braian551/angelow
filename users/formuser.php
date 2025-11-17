@@ -115,6 +115,18 @@ if (isset($_SESSION['register_warning'])) {
                     <div id="password-strength-bar"></div>
                 </div>
                 
+                <!-- Confirmar contraseña -->
+                <div class="form-group password-group">
+                    <label for="password_confirm">Confirmar contraseña</label>
+                    <div class="password-input-container">
+                        <input type="password" id="password_confirm" name="password_confirm" placeholder="Repite tu contraseña" required>
+                        <button type="button" class="toggle-password" aria-label="Mostrar contraseña">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="form-hint">Asegúrate de que coincida con la contraseña</div>
+                </div>
+                
                 <div class="terms-container">
                     <input type="checkbox" id="terms" name="terms" required>
                     <label for="terms">Acepto los <a href="<?= BASE_URL ?>/informacion/terminos.php" target="_blank">Términos y condiciones</a> y las <a href="<?= BASE_URL ?>/informacion/privacidad.php" target="_blank">Políticas de privacidad</a> de Angelow</label>
