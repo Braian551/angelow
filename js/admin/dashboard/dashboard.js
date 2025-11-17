@@ -145,7 +145,9 @@ class AdminDashboard {
         const cards = this.elements.statsSection.querySelectorAll('[data-stat-card]');
         cards.forEach((card) => card.classList.remove('is-loading'));
 
-        const { formatNumber, formatCurrency } = this;
+        // Don't destructure instance methods: binding to `this` is required (formatNumber uses this.formatters)
+        const formatNumber = (v) => this.formatNumber(v);
+        const formatCurrency = (v) => this.formatCurrency(v);
 
         const mapping = {
             orders: {

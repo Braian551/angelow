@@ -5,6 +5,8 @@ require_once __DIR__ . '/../../../conexion.php';
 
 header('Content-Type: application/json');
 
+$debug = defined('DEBUG_MODE') && DEBUG_MODE;
+
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'No autorizado']);
@@ -60,7 +62,12 @@ try {
 } catch (Throwable $e) {
     error_log('Error generando dashboard overview: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Error interno']);
+    $payload = ['success' => false, 'message' => 'Error interno'];
+    if ($debug) {
+        $payload['message'] = $e->getMessage();
+        $payload['trace'] = $e->getTraceAsString();
+    }
+    echo json_encode($payload);
 }
 
 function fetchDashboardStats(PDO $conn): array {
@@ -170,8 +177,8 @@ function fetchStatusBreakdown(PDO $conn): array {
 }
 
 function fetchRecentOrders(PDO $conn): array {
-    $stmt = $conn->query("SELECT o.id, o.order_number, o.total, o.status, o.payment_status, o.created_at,
-            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name), u.email, 'Sin asignar') AS customer_name
+        $stmt = $conn->query("SELECT o.id, o.order_number, o.total, o.status, o.payment_status, o.created_at,
+            COALESCE(u.name, u.email, 'Sin asignar') AS customer_name
         FROM orders o
         LEFT JOIN users u ON o.user_id = u.id
         ORDER BY o.created_at DESC
