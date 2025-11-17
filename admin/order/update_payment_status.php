@@ -62,6 +62,7 @@ try {
 
     $affected = 0;
     $ordersToConfirmRefund = [];
+    $notifications = [];
     foreach ($orderIds as $orderId) {
         $stmt = $conn->prepare("SELECT payment_status FROM orders WHERE id = ?");
         $stmt->execute([$orderId]);
@@ -89,9 +90,15 @@ try {
                 $ordersToConfirmRefund[] = (int) $orderId;
             } else {
                 try {
-                    createPaymentNotification($conn, (int)$orderId, $newStatus);
+                    $ok = createPaymentNotification($conn, (int)$orderId, $newStatus);
+                    $notifications[] = [
+                        'order_id' => (int)$orderId,
+                        'ok' => $ok,
+                        'message' => $ok ? 'Notificación de pago creada' : 'No fue posible crear la notificación de pago'
+                    ];
                 } catch (Throwable $e) {
                     error_log('[ORDER_NOTIFY] Error al crear notificación de pago: ' . $e->getMessage());
+                    $notifications[] = ['order_id' => (int)$orderId, 'ok' => false, 'message' => 'Excepción al crear notificación: ' . $e->getMessage()];
                 }
             }
         }
@@ -99,7 +106,7 @@ try {
 
     $conn->commit();
     $refundSummary = '';
-    if (!empty($ordersToConfirmRefund)) {
+        if (!empty($ordersToConfirmRefund)) {
         $successRefunds = 0;
         $failedRefunds = 0;
         foreach ($ordersToConfirmRefund as $refundOrderId) {
@@ -113,6 +120,12 @@ try {
                 $failedRefunds++;
                 error_log('[ORDER_NOTIFY] Error notifyRefundCompleted order ' . $refundOrderId . ': ' . $result['message']);
             }
+                // Add notification result to response so client can show it
+                $notifications[] = [
+                    'order_id' => (int)$refundOrderId,
+                    'ok' => $result['ok'] ?? false,
+                    'message' => $result['message'] ?? null
+                ];
         }
         $refundSummary = ' · Reembolsos confirmados: ' . $successRefunds;
         if ($failedRefunds > 0) {
