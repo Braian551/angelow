@@ -214,9 +214,18 @@
                         <div class="no-products">
                             <i class="fas fa-exclamation-triangle"></i>
                             <p>Error al cargar los productos. Inténtalo de nuevo.</p>
-                            <button onclick="loadProducts(${JSON.stringify(params).replace(/"/g, '&quot;')})" class="btn">Reintentar</button>
+                            <button class="btn retry-load">Reintentar</button>
                         </div>
                     `;
+
+                    // Agregar manejador de evento al botón Reintentar en lugar de inline onclick
+                    const retryBtn = productsGrid.querySelector('.no-products .retry-load');
+                    if (retryBtn) {
+                        retryBtn.addEventListener('click', function() {
+                            // Reintentar con los mismos parámetros
+                            loadProducts(params);
+                        });
+                    }
                 });
         }
 
@@ -260,9 +269,9 @@
 
             let html = '';
             data.products.forEach(product => {
-                // Obtener información de valoración
-                const ratingInfo = data.productRatings[product.id] || null;
-                const avgRating = ratingInfo ? round(ratingInfo.avg_rating, 1) : 0;
+                    // Obtener información de valoración (comprobación segura)
+                    const ratingInfo = (data.productRatings && data.productRatings[product.id]) ? data.productRatings[product.id] : null;
+                    const avgRating = ratingInfo ? round(ratingInfo.avg_rating, 1) : 0;
                 const reviewCount = ratingInfo ? ratingInfo.review_count : 0;
 
                 // Determinar precio a mostrar
@@ -399,6 +408,12 @@
         }
 
         // Funciones auxiliares
+        // Helper para redondear (empleado en la visualización de reviews)
+        function round(value, decimals = 0) {
+            const num = Number(value);
+            if (isNaN(num)) return 0;
+            return Number(num.toFixed(decimals));
+        }
         function renderStars(rating) {
             let stars = '';
             const fullStars = Math.floor(rating);

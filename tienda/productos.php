@@ -193,6 +193,14 @@ try {
                     </div>
                 <?php else: ?>
                     <?php foreach ($products as $product):
+                        // Resolver nombre de categoría antes de usarlo en la clase del producto
+                        $categoryName = 'Sin categoría';
+                        foreach ($categories as $cat) {
+                            if ($cat['id'] == $product['category_id']) {
+                                $categoryName = $cat['name'];
+                                break;
+                            }
+                        }
                         // Obtener información de valoración desde el producto
                         $avgRating = isset($product['avg_rating']) ? round($product['avg_rating'], 1) : 0;
                         $reviewCount = isset($product['review_count']) ? $product['review_count'] : 0;
@@ -200,7 +208,7 @@ try {
                         // Determinar precio a mostrar
                         $displayPrice = $product['min_price'] ?? ($product['price'] ?? 0);
                     ?>
-                        <div class="product-card <?= strtolower($categoryName) === 'ropa deportiva' ? 'no-hover' : '' ?>" data-product-id="<?= $product['id'] ?>">
+                        <div class="product-card <?= strtolower((string)$categoryName) === 'ropa deportiva' ? 'no-hover' : '' ?>" data-product-id="<?= $product['id'] ?>">
                             <!-- Badge para productos destacados -->
                             <?php if ($product['is_featured']): ?>
                                 <div class="product-badge">Destacado</div>
@@ -225,16 +233,7 @@ try {
                             <!-- Información del producto -->
                             <div class="product-info">
                                 <span class="product-category">
-                                    <?php
-                                    $categoryName = 'Sin categoría';
-                                    foreach ($categories as $cat) {
-                                        if ($cat['id'] == $product['category_id']) {
-                                            $categoryName = $cat['name'];
-                                            break;
-                                        }
-                                    }
-                                    echo htmlspecialchars($categoryName);
-                                    ?>
+                                        <?= htmlspecialchars($categoryName) ?>
                                 </span>
 
                                 <h3 class="product-title">
@@ -272,7 +271,7 @@ try {
                                 <!-- Precio -->
                                 <div class="product-price">
                                     <span class="current-price">$<?= number_format($displayPrice, 0, ',', '.') ?></span>
-                                    <?php if ($product['compare_price'] && $product['compare_price'] > $displayPrice): ?>
+                                    <?php if (!empty($product['compare_price']) && $product['compare_price'] > $displayPrice): ?>
                                         <span class="original-price">$<?= number_format($product['compare_price'], 0, ',', '.') ?></span>
                                     <?php endif; ?>
                                 </div>
