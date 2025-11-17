@@ -493,10 +493,193 @@
   box-shadow: var(--shadow-md);
 }
 
-/* Lista de reseñas mejorada */
+/* ===== REVIEWS LAYOUT - RESET ===== */
 .reviews-list {
-  border-top: 1px solid var(--border-color);
-  padding-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+  margin-top: 2.5rem;
+}
+
+.review-card {
+  background: #fff;
+  border: 1px solid rgba(12, 52, 84, 0.08);
+  border-radius: 18px;
+  padding: 2.4rem 3rem;
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  column-gap: 1.8rem;
+  row-gap: 1.2rem;
+  box-shadow: 0 10px 30px rgba(12, 52, 84, 0.07);
+  position: relative; /* allow absolute positioning of stars */
+}
+
+.review-card .review-meta {
+  display: contents; /* allow avatar + info to align with grid */
+}
+
+.review-card .user-avatar {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(12, 52, 84, 0.08);
+}
+
+.review-card .user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.review-card .user-info {
+  grid-column: 2 / -1;
+  display: block;
+  text-align: left; /* follow standard review layout: left aligned */
+}
+
+.review-card .user-info strong {
+  font-size: 1.5rem;
+  color: var(--primary-dark);
+}
+
+.review-card .user-info .badge.verified {
+  background: #eaf4ff;
+  color: var(--primary-dark);
+  border: none;
+  padding: 0.2rem 0.8rem;
+  border-radius: 999px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.06);
+}
+
+.review-card .user-info .time {
+  font-size: 1.2rem;
+  color: var(--text-light);
+}
+
+/* Make name + badge inline and the time on a second line (standard) */
+.review-card .user-info strong {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.review-card .user-info .badge.verified {
+  margin-left: 0.6rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.review-card .user-info .time {
+  display: block;
+  margin-top: 0.4rem;
+}
+
+/* Place the rating stars to the top-right of the card like the mock */
+.review-card .user-rating {
+  position: absolute;
+  top: 1.8rem;
+  right: 2.4rem;
+  display: inline-flex;
+  gap: 0.4rem;
+  color: var(--warning-color);
+  font-size: 1.6rem;
+}
+
+/* Keep layout tidy: ensure review head leaves room for the absolute rating */
+.review-card .review-head {
+  margin-right: 11rem; /* reserve space for top-right rating - bigger on desktop */
+}
+
+.review-card .review-body {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.review-card .review-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.review-card .review-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.review-card .user-rating {
+  display: inline-flex;
+  gap: 0.3rem;
+  color: var(--warning-color);
+  font-size: 1.5rem;
+}
+
+.review-card .user-rating i {
+  color: inherit;
+}
+
+.review-card .review-comment {
+  font-size: 1.5rem;
+  line-height: 1.7;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.review-card .review-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.review-card .review-images .review-image {
+  width: 110px;
+  height: 110px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-dark);
+}
+
+.review-card .review-images img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.review-card .review-images img:hover {
+  transform: scale(1.05);
+}
+
+.review-card .review-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.review-card .helpful-btn {
+  border: 1px solid rgba(12, 52, 84, 0.15);
+  background: rgba(64, 158, 255, 0.15);
+  color: var(--primary-dark);
+  border-radius: 999px;
+  padding: 0.6rem 1.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.review-card .helpful-btn:hover {
+  background: var(--primary-color);
+  color: #fff;
+  transform: translateY(-1px);
 }
 
 .no-reviews {
@@ -520,147 +703,6 @@
   font-size: 1.7rem;
   margin-bottom: 2rem;
   color: var(--text-dark);
-}
-
-.review-item {
-  padding: 3rem 0;
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  gap: 3rem;
-}
-
-.review-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 120px;
-}
-
-.review-avatar {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background-color: var(--bg-dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  overflow: hidden;
-}
-
-.review-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.review-avatar .initials {
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--primary-dark);
-}
-
-.review-user {
-  font-weight: 600;
-  color: var(--text-dark);
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-
-.review-date {
-  font-size: 1.3rem;
-  color: var(--text-light);
-}
-
-.review-content {
-  flex: 1;
-}
-
-.review-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.review-stars {
-  color: var(--warning-color);
-  font-size: 1.6rem;
-  letter-spacing: 2px;
-}
-
-.review-title {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: var(--text-dark);
-  margin-bottom: 1.5rem;
-}
-
-.review-text {
-  font-size: 1.5rem;
-  line-height: 1.8;
-  color: var(--text-color);
-  margin-bottom: 2rem;
-}
-
-.review-images {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.review-image {
-  width: 120px;
-  height: 120px;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.review-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.review-image:hover img {
-  transform: scale(1.05);
-}
-
-.review-actions {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  font-size: 1.4rem;
-}
-
-.review-helpful {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  color: var(--text-light);
-}
-
-.review-helpful button {
-  background: none;
-  border: none;
-  color: var(--text-light);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: var(--transition);
-}
-
-.review-helpful button:hover {
-  color: var(--primary-color);
-}
-
-.review-helpful button i {
-  font-size: 1.6rem;
 }
 
 .see-all-reviews {
@@ -1145,23 +1187,16 @@
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
-  .review-item {
-    flex-direction: column;
-    gap: 2rem;
-  }
-  
-  .review-header {
-    flex-direction: row;
-    align-items: center;
-    gap: 2rem;
-  }
-  
-  .review-avatar {
-    margin-bottom: 0;
+  .review-card {
+    padding: 2rem 2.4rem;
   }
 }
 
 @media (max-width: 992px) {
+  .review-card {
+    grid-template-columns: 64px 1fr;
+  }
+  .review-card .review-head { margin-right: 6.5rem; }
   .tabs-header {
     overflow-x: auto;
     white-space: nowrap;
@@ -1202,6 +1237,37 @@
 @media (max-width: 768px) {
   .rating-bars {
     width: 100%;
+  }
+
+  .review-card {
+    grid-template-columns: 1fr;
+    padding: 2rem;
+  }
+  
+  .review-card .user-avatar {
+    grid-row: auto;
+  }
+  
+  .review-card .user-info,
+  .review-card .review-body {
+    grid-column: 1;
+  }
+  
+  .review-card .review-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* On mobile make rating part of the flow; center user-info remains vertical */
+  .review-card .user-rating {
+    position: static;
+    align-self: flex-start;
+    margin-left: 0;
+    font-size: 1.25rem;
+  }
+
+  .review-card .review-head {
+    margin-right: 0; /* remove reserved right space on small screens */
   }
   
   .form-actions {
@@ -1256,20 +1322,16 @@
     font-size: 1.4rem;
   }
   
-  .review-item {
-    padding: 2rem 0;
+  .review-card {
+    padding: 1.8rem;
   }
   
-  .review-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .review-avatar {
+  .review-card .user-avatar {
     width: 50px;
     height: 50px;
   }
+
+  .user-rating, .review-stars { font-size: 1.25rem; }
   
   .floating-tab-action-btn {
     width: 5rem;
@@ -1333,3 +1395,4 @@
   padding: 0.5rem 0.8rem;
   border-radius: 6px;
 }
+

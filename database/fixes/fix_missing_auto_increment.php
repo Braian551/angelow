@@ -51,7 +51,47 @@ try {
         }
     }
 
+        // Asegurarse de que AUTO_INCREMENT sea mayor que MAX(id)
+        try {
+            $maxRow = $conn->query("SELECT COALESCE(MAX(id), 0) as maxid FROM `$table`")->fetch(PDO::FETCH_ASSOC);
+            $maxId = intval($maxRow['maxid']);
+            $aiRow = $conn->prepare("SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table");
+            $aiRow->execute([':table' => $table]);
+            $ai = intval($aiRow->fetch(PDO::FETCH_ASSOC)['AUTO_INCREMENT']);
+
+            if ($ai <= $maxId) {
+                $newAi = $maxId + 1;
+                echo "- Ajustando AUTO_INCREMENT de $table a $newAi (max id: $maxId)\n";
+                $conn->exec("ALTER TABLE `$table` AUTO_INCREMENT = $newAi");
+                echo "  ✓ AUTO_INCREMENT actualizado a $newAi\n";
+            }
+        } catch (Exception $e) {
+            echo "  ✗ Falló al ajustar AUTO_INCREMENT en $table: " . $e->getMessage() . "\n";
+        }
+
     echo "\nProceso finalizado. Re-ejecuta las pruebas de pago.\n";
+    
+    // Segunda pasada: Asegurarse de que AUTO_INCREMENT > MAX(id) para todas las tablas con id int/bigint
+    echo "\nVerificando AUTO_INCREMENT contra MAX(id) para todas las tablas (id int/bigint)...\n";
+    $tables = $conn->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND COLUMN_NAME = 'id' AND DATA_TYPE IN ('int','bigint')")->fetchAll(PDO::FETCH_COLUMN);
+    foreach ($tables as $table) {
+        try {
+            $maxRow = $conn->query("SELECT COALESCE(MAX(id), 0) as maxid FROM `$table`")->fetch(PDO::FETCH_ASSOC);
+            $maxId = intval($maxRow['maxid']);
+            $aiRow = $conn->prepare("SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table");
+            $aiRow->execute([':table' => $table]);
+            $ai = intval($aiRow->fetch(PDO::FETCH_ASSOC)['AUTO_INCREMENT']);
+
+            if ($ai <= $maxId) {
+                $newAi = $maxId + 1;
+                echo "- Ajustando AUTO_INCREMENT de $table a $newAi (max id: $maxId)\n";
+                $conn->exec("ALTER TABLE `$table` AUTO_INCREMENT = $newAi");
+                echo "  ✓ AUTO_INCREMENT actualizado a $newAi\n";
+            }
+        } catch (Exception $e) {
+            echo "  ✗ Falló al ajustar AUTO_INCREMENT en $table: " . $e->getMessage() . "\n";
+        }
+    }
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage() . "\n";
     exit(1);

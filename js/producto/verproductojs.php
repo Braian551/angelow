@@ -101,7 +101,7 @@ if (!empty($reviewsClientPayload['reviews'])) {
             const starsHtml = buildReviewStars(review.rating);
 
             return `
-                <div class="review-item question-item" data-review-id="${safeId}">
+                <div class="review-card" data-review-id="${safeId}">
                     <div class="review-meta">
                         <div class="user-avatar">
                             <img src="${avatarSrc}" alt="${safeName}">
@@ -111,10 +111,13 @@ if (!empty($reviewsClientPayload['reviews'])) {
                             ${badge}
                             <span class="time">${displayDate}</span>
                         </div>
-                        <div class="user-rating">${starsHtml}</div>
+                        <!-- stars moved to the review body to align with title -->
                     </div>
                     <div class="review-body">
-                        <h4 class="review-title">${title}</h4>
+                        <div class="review-head">
+                            <h4 class="review-title">${title}</h4>
+                            <div class="user-rating review-stars">${starsHtml}</div>
+                        </div>
                         <p class="review-comment">${comment}</p>
                         ${imagesHtml}
                         <div class="review-actions">

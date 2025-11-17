@@ -10,6 +10,14 @@ requireRole(['user', 'customer']);
 
 $userId = $_SESSION['user_id'];
 
+// Mostrar advertencia si el correo de bienvenida falló
+if (isset($_SESSION['register_warning'])) {
+    $warning_message = $_SESSION['register_warning'];
+    unset($_SESSION['register_warning']);
+    includeFromRoot('alertas/alerta1.php');
+    echo "<script>document.addEventListener('DOMContentLoaded', function() { showAlert(".json_encode($warning_message).", 'info'); });</script>";
+}
+
 // ====== OBTENER ESTADÍSTICAS DEL USUARIO ======
 $stats = [
     'orders_count' => 0,

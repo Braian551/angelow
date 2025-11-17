@@ -61,19 +61,32 @@ function handleRegistration($conn) {
         $conn->commit();
         
         // Enviar email de confirmación
-        if (sendWelcomeEmail($email, $name)) {
-            // Crear sesión y redirigir
-            createUserSession($userId);
-            header("Location: " . BASE_URL . "/users/dashboarduser.php");
-            exit();
-        } else {
-            return "Registro completado, pero no se pudo enviar el correo de confirmación";
+        $mailSent = sendWelcomeEmail($email, $name);
+
+        // Crear sesión y redirigir. No bloqueamos el acceso por falla del correo.
+        createUserSession($userId);
+
+        if (!$mailSent) {
+            // Guardar advertencia en sesión para notificar al usuario
+            $_SESSION['register_warning'] = "Registro completado, pero no se pudo enviar el correo de confirmación";
         }
+
+        header("Location: " . BASE_URL . "/users/dashboarduser.php");
+        exit();
         
     } catch (PDOException $e) {
         $conn->rollBack();
         error_log("Error en registro: " . $e->getMessage());
-        return "Error al registrar el usuario. Por favor intenta nuevamente.";
+        $errorMsg = "Error al registrar el usuario. Por favor intenta nuevamente.";
+        // Si estamos en modo DEBUG, mostrar el mensaje de excepción (no usar en producción)
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            $errorMsg .= " (" . $e->getMessage() . ")";
+        }
+        // Mensaje adicional para errores comunes relacionados con triggers de auditoría
+        if (stripos($e->getMessage(), 'audit_users') !== false || stripos($e->getMessage(), 'audit_users.PRIMARY') !== false) {
+            $errorMsg .= " — Puede ser causado por un índice AUTO_INCREMENT faltante en la tabla 'audit_users'. Ejecuta 'php database/fixes/fix_missing_auto_increment.php' desde la raíz del proyecto para intentar solucionarlo.";
+        }
+        return $errorMsg;
     }
 }
 
@@ -158,7 +171,8 @@ $errorMessage = handleRegistration($conn);
 // Si hay error, guardar en sesión para mostrar en el formulario
 if ($errorMessage) {
     $_SESSION['register_error'] = $errorMessage;
-    header("Location: " . BASE_URL . "/auth/formregister.php");
+    // La vista de registro real está en `users/formuser.php`.
+    header("Location: " . BASE_URL . "/users/formuser.php");
     exit();
 }
 ?>

@@ -194,7 +194,7 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                     </div>
                 <?php else: ?>
                     <?php foreach ($reviewsData['reviews'] as $review): ?>
-                        <div class="review-item question-item" data-review-id="<?= $review['id'] ?>">
+                            <div class="review-card" data-review-id="<?= $review['id'] ?>">
                             <div class="review-meta">
                                 <div class="user-avatar">
                                     <img src="<?= BASE_URL ?>/<?= htmlspecialchars($review['user_image'] ?? 'images/default-avatar.png') ?>" alt="<?= htmlspecialchars($review['user_name'] ?? 'Usuario') ?>">
@@ -206,19 +206,18 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                                     <?php endif; ?>
                                     <span class="time"><?= date('d/m/Y H:i', strtotime($review['created_at'])) ?></span>
                                 </div>
-                                <div class="user-rating">
-                                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                                        <?php if ($i <= $review['rating']): ?>
-                                            <i class="fas fa-star"></i>
-                                        <?php else: ?>
-                                            <i class="far fa-star"></i>
-                                        <?php endif; ?>
-                                    <?php endfor; ?>
-                                </div>
+                                <!-- Stars moved into review body to align with the title -->
                             </div>
 
                             <div class="review-body">
-                                <h4 class="review-title"><?= htmlspecialchars($review['title']) ?></h4>
+                                <div class="review-head">
+                                    <h4 class="review-title"><?= htmlspecialchars($review['title']) ?></h4>
+                                    <div class="user-rating review-stars">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <?= $i <= $review['rating'] ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>' ?>
+                                        <?php endfor; ?>
+                                    </div>
+                                </div>
                                 <p class="review-comment"><?= nl2br(htmlspecialchars($review['comment'])) ?></p>
 
                                 <?php if (!empty($review['images'])): 

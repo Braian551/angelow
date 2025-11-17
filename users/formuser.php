@@ -10,6 +10,13 @@ if (isset($_SESSION['register_error'])) {
     includeFromRoot('alertas/alerta1.php');
     echo "<script>document.addEventListener('DOMContentLoaded', function() { showAlert(".json_encode($error_message)."); });</script>";
 }
+// Mostrar una advertencia si no se pudo enviar correo pero el registro fue exitoso
+if (isset($_SESSION['register_warning'])) {
+    $warning_message = $_SESSION['register_warning'];
+    unset($_SESSION['register_warning']);
+    includeFromRoot('alertas/alerta1.php');
+    echo "<script>document.addEventListener('DOMContentLoaded', function() { showAlert(".json_encode($warning_message).", 'info'); });</script>";
+}
 ?>
 
 <!DOCTYPE html>
