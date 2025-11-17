@@ -3,10 +3,7 @@ session_start();
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
 require_once __DIR__ . '/../../auth/role_redirect.php';
-require_once __DIR__ . '/../../admin/services/admin_profiles.php';
-
 requireRole('admin');
-ensure_admin_profiles_table($conn);
 
 $userId = $_GET['id'] ?? $_POST['user_id'] ?? null;
 if (!$userId) {
@@ -19,10 +16,8 @@ $success = false;
 
 try {
     // Load current user + profile
-    $stmt = $conn->prepare("SELECT u.id, u.name, u.email, u.phone, u.image, u.created_at, u.last_access, u.is_blocked,
-            ap.job_title, ap.department, ap.responsibilities, ap.emergency_contact
+    $stmt = $conn->prepare("SELECT u.id, u.name, u.email, u.phone, u.image, u.created_at, u.last_access, u.is_blocked
         FROM users u
-        LEFT JOIN admin_profiles ap ON ap.user_id COLLATE utf8mb4_general_ci = u.id
         WHERE u.id = ? LIMIT 1");
     $stmt->execute([$userId]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -37,10 +32,7 @@ try {
         $name = trim($_POST['name'] ?? '');
         $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
         $phone = trim($_POST['phone'] ?? '');
-        $jobTitle = trim($_POST['job_title'] ?? '');
-        $department = trim($_POST['department'] ?? '');
-        $responsibilities = trim($_POST['responsibilities'] ?? '');
-        $emergencyContact = trim($_POST['emergency_contact'] ?? '');
+        $image = trim($_POST['image'] ?? '');
         $isBlocked = isset($_POST['is_blocked']) && $_POST['is_blocked'] ? 1 : 0;
 
         if ($name === '' || !$email) {
@@ -56,17 +48,13 @@ try {
             }
         }
 
+
         if (empty($errors)) {
             $conn->beginTransaction();
-            $update = $conn->prepare('UPDATE users SET name = ?, email = ?, phone = ?, is_blocked = ? WHERE id = ?');
-            $update->execute([$name, $email, $phone ?: null, $isBlocked, $userId]);
+            $update = $conn->prepare('UPDATE users SET name = ?, email = ?, phone = ?, image = ?, is_blocked = ? WHERE id = ?');
+            $update->execute([$name, $email, $phone ?: null, $image ?: null, $isBlocked, $userId]);
 
-            save_admin_profile($conn, $userId, [
-                'job_title' => $jobTitle,
-                'department' => $department,
-                'responsibilities' => $responsibilities,
-                'emergency_contact' => $emergencyContact
-            ]);
+            // admin_profiles dropped; no profile save
 
             $conn->commit();
 
@@ -122,21 +110,11 @@ try {
                             <label>Teléfono</label>
                             <input type="text" name="phone" value="<?= htmlspecialchars($user['phone']) ?>">
                         </div>
+                        <!-- identification and admin_profiles removed -->
+
                         <div class="form-row">
-                            <label>Título / Cargo</label>
-                            <input type="text" name="job_title" value="<?= htmlspecialchars($user['job_title'] ?? '') ?>">
-                        </div>
-                        <div class="form-row">
-                            <label>Departamento</label>
-                            <input type="text" name="department" value="<?= htmlspecialchars($user['department'] ?? '') ?>">
-                        </div>
-                        <div class="form-row">
-                            <label>Responsabilidades</label>
-                            <textarea name="responsibilities"><?= htmlspecialchars($user['responsibilities'] ?? '') ?></textarea>
-                        </div>
-                        <div class="form-row">
-                            <label>Contacto de emergencia</label>
-                            <input type="text" name="emergency_contact" value="<?= htmlspecialchars($user['emergency_contact'] ?? '') ?>">
+                            <label>Imagen (ruta)</label>
+                            <input type="text" name="image" value="<?= htmlspecialchars($user['image'] ?? '') ?>">
                         </div>
 
                         <div class="form-row">

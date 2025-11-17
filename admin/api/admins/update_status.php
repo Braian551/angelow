@@ -3,12 +3,10 @@ session_start();
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
 require_once __DIR__ . '/../../../auth/role_redirect.php';
-require_once __DIR__ . '/../../services/admin_profiles.php';
 
 header('Content-Type: application/json');
 
 requireRole('admin');
-ensure_admin_profiles_table($conn);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -59,12 +57,7 @@ try {
                 $params[] = $userId;
                 $conn->prepare('UPDATE users SET ' . implode(', ', $fields) . ' WHERE id = ?')->execute($params);
             }
-            save_admin_profile($conn, $userId, [
-                'job_title' => trim($input['job_title'] ?? ''),
-                'department' => trim($input['department'] ?? ''),
-                'responsibilities' => trim($input['responsibilities'] ?? ''),
-                'emergency_contact' => trim($input['emergency_contact'] ?? '')
-            ]);
+            // admin_profiles removed: do not save profile fields
             break;
         case 'reset_password':
             $temporaryPassword = bin2hex(random_bytes(5));
@@ -77,10 +70,7 @@ try {
             exit;
     }
 
-    $stmt = $conn->prepare("SELECT u.id, u.name, u.email, u.phone, u.image, u.created_at, u.last_access, u.is_blocked,
-            ap.job_title, ap.department, ap.responsibilities, ap.emergency_contact
-        FROM users u
-        LEFT JOIN admin_profiles ap ON ap.user_id COLLATE utf8mb4_general_ci = u.id
+    $stmt = $conn->prepare("SELECT u.id, u.name, u.email, u.phone, u.image, u.created_at, u.last_access, u.is_blocked
         WHERE u.id = ? LIMIT 1");
     $stmt->execute([$userId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -106,9 +96,6 @@ function formatAdminRow(array $row): array {
         'created_at' => $row['created_at'],
         'last_access' => $row['last_access'],
         'is_blocked' => (bool) $row['is_blocked'],
-        'job_title' => $row['job_title'],
-        'department' => $row['department'],
-        'responsibilities' => $row['responsibilities'],
-        'emergency_contact' => $row['emergency_contact']
+        // Admin profiles removed
     ];
 }

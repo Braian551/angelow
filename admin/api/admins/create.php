@@ -3,12 +3,10 @@ session_start();
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
 require_once __DIR__ . '/../../../auth/role_redirect.php';
-require_once __DIR__ . '/../../services/admin_profiles.php';
 
 header('Content-Type: application/json');
 
 requireRole('admin');
-ensure_admin_profiles_table($conn);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -20,10 +18,10 @@ $input = $_POST ?: json_decode(file_get_contents('php://input'), true) ?: [];
 $name = trim($input['name'] ?? '');
 $email = filter_var(trim($input['email'] ?? ''), FILTER_VALIDATE_EMAIL);
 $phone = trim($input['phone'] ?? '');
-$jobTitle = trim($input['job_title'] ?? 'Administrador');
-$department = trim($input['department'] ?? 'Operaciones');
-$responsibilities = trim($input['responsibilities'] ?? '');
-$emergencyContact = trim($input['emergency_contact'] ?? '');
+$jobTitle = null; // admin_profiles removed
+$department = null;
+$responsibilities = null;
+$emergencyContact = null;
 
 if ($name === '' || !$email) {
     http_response_code(422);
@@ -52,19 +50,13 @@ try {
         $insert->execute([$userId, $name, $email, $phone ?: null, $passwordHash]);
     }
 
-    save_admin_profile($conn, $userId, [
-        'job_title' => $jobTitle,
-        'department' => $department,
-        'responsibilities' => $responsibilities,
-        'emergency_contact' => $emergencyContact
-    ]);
+    // Admin profile service removed — no additional profile stored
 
     $conn->commit();
 
     $stmt = $conn->prepare("SELECT u.id, u.name, u.email, u.phone, u.image, u.created_at, u.last_access, u.is_blocked,
-            ap.job_title, ap.department, ap.responsibilities, ap.emergency_contact
+            -- admin_profiles removed, profile fields are no longer returned
         FROM users u
-        LEFT JOIN admin_profiles ap ON ap.user_id COLLATE utf8mb4_general_ci = u.id
         WHERE u.id = ? LIMIT 1");
     $stmt->execute([$userId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -91,9 +83,6 @@ function formatAdminRow(array $row): array {
         'created_at' => $row['created_at'],
         'last_access' => $row['last_access'],
         'is_blocked' => (bool) $row['is_blocked'],
-        'job_title' => $row['job_title'],
-        'department' => $row['department'],
-        'responsibilities' => $row['responsibilities'],
-        'emergency_contact' => $row['emergency_contact']
+        // admin_profiles removed: no profile fields returned
     ];
 }

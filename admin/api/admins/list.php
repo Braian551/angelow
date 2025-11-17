@@ -3,12 +3,10 @@ session_start();
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
 require_once __DIR__ . '/../../../auth/role_redirect.php';
-require_once __DIR__ . '/../../services/admin_profiles.php';
 
 header('Content-Type: application/json');
 
 requireRole('admin');
-ensure_admin_profiles_table($conn);
 
 $search = trim($_GET['search'] ?? '');
 $status = $_GET['status'] ?? 'active';
@@ -23,10 +21,6 @@ try {
         $params['search'] = '%' . $search . '%';
     }
 
-    if ($department !== '') {
-        $conditions[] = 'ap.department = :department';
-        $params['department'] = $department;
-    }
 
     switch ($status) {
         case 'blocked':
@@ -42,9 +36,8 @@ try {
     $where = 'WHERE ' . implode(' AND ', $conditions);
 
     $sql = "SELECT u.id, u.name, u.email, u.phone, u.image, u.created_at, u.last_access, u.is_blocked,
-            ap.job_title, ap.department, ap.responsibilities, ap.emergency_contact
-        FROM users u
-        LEFT JOIN admin_profiles ap ON ap.user_id COLLATE utf8mb4_general_ci = u.id
+            -- profile fields removed (admin_profiles table dropped)
+            FROM users u
         $where
         ORDER BY COALESCE(u.last_access, u.created_at) DESC";
 
@@ -83,10 +76,7 @@ function formatAdminRow(array $row): array {
         'created_at' => $row['created_at'],
         'last_access' => $lastAccess,
         'is_blocked' => (bool) $row['is_blocked'],
-        'job_title' => $row['job_title'],
-        'department' => $row['department'],
-        'responsibilities' => $row['responsibilities'],
-        'emergency_contact' => $row['emergency_contact']
+        // profile fields removed (admin_profiles table dropped)
     ];
 }
 

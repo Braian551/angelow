@@ -42,7 +42,7 @@ class AdminsHub {
             <tr data-id="${a.id}">
                 <td>${a.name || 'Administrador'}</td>
                 <td>${a.email}</td>
-                <td>${a.job_title || a.role || 'Admin'}</td>
+                <td>${a.role || 'Admin'}</td>
                 <td>${!a.is_blocked ? '<span class="status-chip success">Activo</span>' : '<span class="status-chip warning">Bloqueado</span>'}</td>
                 <td>
                     <button class="btn-soft" data-action="${a.is_blocked ? 'unblock' : 'block'}">${a.is_blocked ? 'Activar' : 'Bloquear'}</button>
