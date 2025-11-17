@@ -630,7 +630,11 @@ function translateValue($value, $field = '') {
                             <div class="card-body">
                                 <?php foreach ($transactions as $tx): ?>
                                     <div class="payment-details">
-                                        <h4>Transacción #<?= $tx['id'] ?></h4>
+                                        <h4>Transacción #<?= $tx['id'] ?>
+                                            <?php if ($tx['amount'] < 0): ?>
+                                                <span class="badge badge-secondary" style="margin-left:8px;">Reembolso</span>
+                                            <?php endif; ?>
+                                        </h4>
                                         <div class="payment-details-grid">
                                             <div class="info-group">
                                                 <label>Monto:</label>

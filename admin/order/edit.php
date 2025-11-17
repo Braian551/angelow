@@ -211,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $alertMessage = 'Orden actualizada y comprobante enviado al cliente';
                     }
                 } elseif ($_POST['status'] === 'cancelled') {
-                    $notificationResult = notifyOrderCancelled($conn, $orderId, 'admin');
+                    $notificationResult = notifyOrderCancelled($conn, $orderId, 'admin', true);
                     if (!$notificationResult['ok']) {
                         $alertType = 'warning';
                         $alertMessage = 'Orden cancelada, pero no fue posible notificar al cliente: ' . $notificationResult['message'];

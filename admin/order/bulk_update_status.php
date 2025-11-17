@@ -360,7 +360,8 @@ try {
         ];
     }
     foreach ($ordersToNotifyCancelled as $orderIdToNotify) {
-        $result = notifyOrderCancelled($conn, (int) $orderIdToNotify, 'admin');
+        // Registrar reembolso en DB y notificar al usuario
+        $result = notifyOrderCancelled($conn, (int) $orderIdToNotify, 'admin', true);
         if ($result['ok']) {
             $notificationsSent++;
         }

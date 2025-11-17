@@ -145,7 +145,7 @@ function notifyOrderDelivered(PDO $conn, int $orderId): array
 /**
  * Envia notificaciones y correo cuando una orden es cancelada.
  */
-function notifyOrderCancelled(PDO $conn, int $orderId, string $initiator = 'system'): array
+function notifyOrderCancelled(PDO $conn, int $orderId, string $initiator = 'system', bool $registerRefund = false): array
 {
     try {
         $payload = getOrderPayloadForInvoice($conn, $orderId);
@@ -182,10 +182,82 @@ function notifyOrderCancelled(PDO $conn, int $orderId, string $initiator = 'syst
             return ['ok' => false, 'message' => 'El correo de cancelación no pudo enviarse'];
         }
 
-        return ['ok' => true, 'message' => 'Cancelación notificada'];
+        // Registrar reembolso en payment_transactions (solo rastro en DB). Si quieres integrar con el gateway,
+        // esto debe llamarse con la información del gateway y después validar la respuesta del proveedor.
+        $refundLogId = null;
+        if ($registerRefund) {
+            // Registrar solo si la orden tiene payment_status 'paid' o 'pending'
+            $currentPaymentStatus = $order['payment_status'] ?? 'pending';
+            if (in_array($currentPaymentStatus, ['paid', 'pending'])) {
+                $refundLogId = createRefundRecord($conn, $orderId, (float) ($order['total'] ?? 0), null, null, null);
+            }
+        }
+
+        $message = 'Cancelación notificada';
+        if ($refundLogId) $message .= ' · Reembolso registrado en sistema (id: ' . $refundLogId . ')';
+        return ['ok' => true, 'message' => $message];
     } catch (Throwable $e) {
         error_log('[ORDER_NOTIFY] Error al notificar cancelación de orden ' . $orderId . ': ' . $e->getMessage());
         return ['ok' => false, 'message' => $e->getMessage()];
+    }
+}
+
+
+/**
+ * Crea un registro en payment_transactions para registrar el reembolso.
+ * No hace la devolución en el gateway — solo deja rastro en la base de datos.
+ * Retorna el ID del registro o null si no se creó.
+ */
+function createRefundRecord(PDO $conn, int $orderId, ?float $amount = null, ?string $reference = null, ?string $gateway = null, ?int $adminId = null): ?int
+{
+    try {
+        // Evitar duplicados: revisar si ya existe un registro con amount negativo
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM payment_transactions WHERE order_id = ? AND amount < 0");
+        $stmt->execute([$orderId]);
+        $exists = ((int)$stmt->fetchColumn()) > 0;
+        if ($exists) return null;
+
+        // Obtener usuario y monto si no se proporcionaron
+        if ($amount === null) {
+            $stmt = $conn->prepare("SELECT total, user_id FROM orders WHERE id = ?");
+            $stmt->execute([$orderId]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $amount = isset($row['total']) ? (float)$row['total'] : 0.0;
+            $userId = $row['user_id'] ?? null;
+        } else {
+            $stmt = $conn->prepare("SELECT user_id FROM orders WHERE id = ?");
+            $stmt->execute([$orderId]);
+            $userId = $stmt->fetchColumn();
+        }
+
+        // Insertar registro negativo para indicar reembolso
+        $refundAmount = -1 * abs((float)$amount);
+        $adminNotes = 'Reembolso registrado';
+        if ($gateway) $adminNotes .= ' vía ' . $gateway;
+        if ($reference) $adminNotes .= ' · Ref: ' . $reference;
+
+        $stmtIns = $conn->prepare("INSERT INTO payment_transactions (order_id, user_id, amount, reference_number, payment_proof, status, admin_notes, verified_by, verified_at, created_at) VALUES (?, ?, ?, ?, NULL, 'verified', ?, ?, NOW(), NOW())");
+        $verifiedBy = $adminId ? (string)$adminId : 'system';
+        $stmtIns->execute([$orderId, $userId, $refundAmount, $reference, $adminNotes, $verifiedBy]);
+        $paymentId = (int)$conn->lastInsertId();
+
+        // Registrar en histori de orden
+        try {
+            $stmtHist = $conn->prepare("INSERT INTO order_status_history (order_id, changed_by, changed_by_name, change_type, field_changed, old_value, new_value, description, ip_address, user_agent, created_at) VALUES (?, ?, ?, 'refunded', 'payment_status', ?, 'refunded', ?, ?, ?, NOW())");
+            $changedBy = $adminId ? $adminId : null;
+            $changedByName = $changedBy ? (string)$changedBy : 'Sistema';
+            $description = 'Reembolso de ' . number_format(abs($refundAmount), 0, ',', '.') . ' registrado en sistema. ' . ($reference ? 'Ref: ' . $reference : '');
+            $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+            $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'cli';
+            $stmtHist->execute([$orderId, $changedBy, $changedByName, ($amount ? (string)$amount : null), $description, $ip, $ua]);
+        } catch (Throwable $e) {
+            error_log('[ORDER_NOTIFY] No fue posible crear historial de reembolso: ' . $e->getMessage());
+        }
+
+        return $paymentId;
+    } catch (Throwable $e) {
+        error_log('[ORDER_NOTIFY] Error al crear registro de reembolso: ' . $e->getMessage());
+        return null;
     }
 }
 
