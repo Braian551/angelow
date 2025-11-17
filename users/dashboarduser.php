@@ -284,15 +284,9 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                 <?php else: ?>
                     <div class="orders-list">
                         <?php foreach ($recentOrders as $order):
-                            $statusLabels = [
-                                'pending' => 'Pendiente',
-                                'processing' => 'Procesando',
-                                'shipped' => 'Enviado',
-                                'completed' => 'Completado',
-                                'cancelled' => 'Cancelado'
-                            ];
                             $statusClass = strtolower($order['status']);
-                            $statusLabel = $statusLabels[$order['status']] ?? $order['status'];
+                            // Usar la función genérica para traducir estados consistentemente
+                            $statusLabel = function_exists('getStatusText') ? getStatusText($order['status']) : ucfirst($order['status']);
                         ?>
                             <div class="order-card">
                                 <div class="order-header">
