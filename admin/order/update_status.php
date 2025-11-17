@@ -95,31 +95,74 @@ try {
     $conn->beginTransaction();
     
     $affectedRows = 0;
-    $ordersToNotify = [];
+    $ordersToNotifyDelivered = [];
+    $ordersToNotifyCancelled = [];
+    $skippedOrders = [];
     
     // Actualizar cada orden individualmente para que los triggers funcionen correctamente
     foreach ($orderIds as $orderId) {
-        // Obtener el estado actual antes de actualizar
-        $stmt = $conn->prepare("SELECT status FROM orders WHERE id = ?");
+        // Obtener el estado actual y estado de pago antes de actualizar
+        $stmt = $conn->prepare("SELECT status, payment_status FROM orders WHERE id = ? FOR UPDATE");
         $stmt->execute([$orderId]);
         $currentOrder = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($currentOrder && $currentOrder['status'] !== $newStatus) {
+            // Validaciones adicionales antes de permitir ciertos cambios
+            $skip = false;
+            $skipReason = null;
+
+            // No permitir enviar a procesamiento o envío si el pago no está aprobado
+            if (in_array($newStatus, ['processing', 'shipped']) && ($currentOrder['payment_status'] ?? 'pending') !== 'paid') {
+                $skip = true;
+                $skipReason = 'El pedido no está pagado';
+            }
+
+            // Mapear status 'refunded' a 'cancelled' + payment_status = 'refunded' (seguimos la convención)
+            $targetStatus = $newStatus;
+            $targetPaymentStatus = null;
+            if ($newStatus === 'refunded') {
+                $targetStatus = 'cancelled';
+                $targetPaymentStatus = 'refunded';
+            }
+
+            // Si el admin cancela la orden, marcar como reembolsado si estaba pagada o pendiente
+            if ($targetStatus === 'cancelled') {
+                $curPay = $currentOrder['payment_status'] ?? 'pending';
+                if (in_array($curPay, ['paid', 'pending'])) {
+                    $targetPaymentStatus = 'refunded';
+                }
+            }
+
+            if ($skip) {
+                // Registrar informacion y continuar
+                $skippedOrders[] = ['order_id' => $orderId, 'reason' => $skipReason];
+                continue;
+            }
             // Actualizar el estado de la orden (el trigger registrará el cambio)
-            $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?");
-            $stmt->execute([$newStatus, $orderId]);
+            if ($targetPaymentStatus !== null) {
+                $stmt = $conn->prepare("UPDATE orders SET status = ?, payment_status = ?, updated_at = NOW() WHERE id = ?");
+                $stmt->execute([$targetStatus, $targetPaymentStatus, $orderId]);
+            } else {
+                $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?");
+                $stmt->execute([$targetStatus, $orderId]);
+            }
             
             if ($stmt->rowCount() > 0) {
                 $affectedRows++;
 
-                if ($newStatus === 'delivered') {
-                    $ordersToNotify[] = $orderId;
+                if ($targetStatus === 'delivered') {
+                    $ordersToNotifyDelivered[] = $orderId;
                 } else {
                     // Crear notificación para otros estados (processing, shipped, cancelled, etc.)
-                    try {
-                        createOrderStatusNotification($conn, (int)$orderId, $newStatus);
+                    if ($targetStatus === 'cancelled') {
+                        // Deferir notificación/correo hasta después del commit
+                        $ordersToNotifyCancelled[] = $orderId;
+                    } else {
+                        try {
+                            createOrderStatusNotification($conn, (int)$orderId, $targetStatus);
                     } catch (Throwable $e) {
                         error_log('[ORDER_NOTIFY] Error al crear notificación de estado: ' . $e->getMessage());
+                    }
                     }
                 }
                 
@@ -152,7 +195,7 @@ try {
     
     $notifications = [];
     $notificationsSent = 0;
-    foreach ($ordersToNotify as $orderIdToNotify) {
+    foreach ($ordersToNotifyDelivered as $orderIdToNotify) {
         $result = notifyOrderDelivered($conn, (int) $orderIdToNotify);
         if ($result['ok']) {
             $notificationsSent++;
@@ -163,7 +206,19 @@ try {
             'message' => $result['message']
         ];
     }
-    $notificationsFailed = count($ordersToNotify) - $notificationsSent;
+    // Ejecutar notificaciones para cancelaciones después del commit
+    foreach ($ordersToNotifyCancelled as $orderIdToNotify) {
+        $result = notifyOrderCancelled($conn, (int) $orderIdToNotify, 'admin');
+        if ($result['ok']) {
+            $notificationsSent++;
+        }
+        $notifications[] = [
+            'order_id' => $orderIdToNotify,
+            'ok' => $result['ok'],
+            'message' => $result['message']
+        ];
+    }
+    $notificationsFailed = count($ordersToNotifyDelivered) + count($ordersToNotifyCancelled) - $notificationsSent;
     
     if ($affectedRows > 0) {
         $message = "Estado de $affectedRows orden(es) actualizado correctamente";
@@ -173,11 +228,15 @@ try {
         if ($notificationsFailed > 0) {
             $message .= " · $notificationsFailed correo(s) con error";
         }
+        if (!empty($skippedOrders)) {
+            $message .= ' · ' . count($skippedOrders) . " orden(es) omitida(s) por no estar pagadas";
+        }
         
         echo json_encode([
             'success' => true,
             'message' => $message,
             'notifications' => $notifications
+            , 'skipped' => $skippedOrders
         ]);
     } else {
         echo json_encode([

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
+require_once __DIR__ . '/../../admin/order/order_notification_service.php';
 
 header('Content-Type: application/json');
 
@@ -26,7 +27,7 @@ try {
     $conn->beginTransaction();
 
     // Verificar que la orden sea del usuario y cancelable
-    $stmt = $conn->prepare("SELECT status FROM orders WHERE id = ? AND user_id = ?");
+    $stmt = $conn->prepare("SELECT status, payment_status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE");
     $stmt->execute([$orderId, $_SESSION['user_id']]);
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -38,16 +39,31 @@ try {
         throw new Exception('Esta orden no puede ser cancelada');
     }
 
-    // Actualizar status
-    $stmt = $conn->prepare("UPDATE orders SET status = 'cancelled', updated_at = NOW() WHERE id = ?");
-    $stmt->execute([$orderId]);
+    $currentPaymentStatus = $order['payment_status'] ?: 'pending';
+    $newPaymentStatus = $currentPaymentStatus;
+    if (in_array($currentPaymentStatus, ['paid', 'pending'], true)) {
+        $newPaymentStatus = 'refunded';
+    }
 
-    // Log (opcional: inserta en una tabla de logs si existe)
-    // $stmtLog = $conn->prepare("INSERT INTO order_logs (order_id, action) VALUES (?, 'cancelled by user')");
-    // $stmtLog->execute([$orderId]);
+    $stmt = $conn->prepare("UPDATE orders SET status = 'cancelled', payment_status = :payment_status, updated_at = NOW() WHERE id = :id");
+    $stmt->execute([
+        ':payment_status' => $newPaymentStatus,
+        ':id' => $orderId,
+    ]);
 
     $conn->commit();
-    echo json_encode(['success' => true, 'message' => 'Orden cancelada exitosamente']);
+
+    $notificationResult = notifyOrderCancelled($conn, $orderId, 'user');
+    $responseMessage = $notificationResult['ok']
+        ? 'Pedido cancelado. Iniciaremos el reembolso y te enviaremos un correo con los detalles.'
+        : 'Pedido cancelado. ' . ($notificationResult['message'] ?? 'No fue posible enviar las notificaciones.');
+
+    echo json_encode([
+        'success' => true,
+        'message' => $responseMessage,
+        'status' => 'cancelled',
+        'payment_status' => $newPaymentStatus,
+    ]);
 } catch (Exception $e) {
     $conn->rollBack();
     error_log("Error al cancelar orden: " . $e->getMessage());

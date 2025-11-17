@@ -221,6 +221,18 @@ try {
                                     <?php endif; ?>
                                 </div>
                                 
+                                <?php if ($order['status'] === 'cancelled'): ?>
+                                <div class="order-status-note" style="margin-top:12px; padding:12px; border-radius:12px; background:#fff3cd; color:#7c5700; display:flex; gap:10px; align-items:flex-start;">
+                                    <i class="fas fa-money-bill-wave" style="margin-top:2px;"></i>
+                                    <div>
+                                        <strong>Reembolso en proceso.</strong>
+                                        <div style="font-size:0.9rem; line-height:1.4;">
+                                            Te enviaremos el reembolso con el mismo método de pago. Estado actual: <?= getPaymentStatusText($order['payment_status'] ?? 'refunded') ?>.
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+
                                 <div class="order-actions">
                                     <button class="btn-view-details" data-order-id="<?= $order['id'] ?>">
                                         <i class="fas fa-eye"></i> Ver Detalles
@@ -326,6 +338,10 @@ function getPaymentStatusText($status) {
 }
 
 function renderOrderTimeline($status) {
+    if ($status === 'cancelled') {
+        return '<div class="order-timeline-modern"><span class="status-badge status-cancelled"><i class="fas fa-ban"></i> Pedido cancelado</span></div>';
+    }
+
     $steps = [
         'pending' => ['icon' => 'fas fa-clock', 'label' => 'Pendiente'],
         'processing' => ['icon' => 'fas fa-cog', 'label' => 'En Proceso'],

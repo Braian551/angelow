@@ -347,7 +347,7 @@ function translateValue($value, $field = '') {
                                 <a href="<?= BASE_URL ?>/admin/order/edit.php?id=<?= $orderId ?>" class="btn btn-primary">
                                     <i class="fas fa-edit"></i> Editar
                                 </a>
-                                <button onclick='openStatusChangeModal(<?= $orderId ?>, <?= json_encode($order['status']) ?>)' class="btn btn-info">
+                                <button onclick='openStatusChangeModal(<?= $orderId ?>, <?= json_encode($order['status']) ?>, <?= json_encode($order['payment_status']) ?>)' class="btn btn-info">
                                     <i class="fas fa-sync-alt"></i> Cambiar Estado
                                 </button>
                                 <button onclick='openPaymentStatusModal(<?= $orderId ?>, <?= json_encode($order['payment_status']) ?>)' class="btn btn-info">
@@ -834,7 +834,11 @@ function translateValue($value, $field = '') {
             })
             .then(data => {
                 if (data.success) {
-                    showAlert('Estado de la orden actualizado correctamente', 'success');
+                    let msg = data.message || 'Estado de la orden actualizado correctamente';
+                    if (data.skipped && data.skipped.length) {
+                        msg += ' (' + data.skipped.length + ' orden(es) omitida(s) por no estar pagadas)';
+                    }
+                    showAlert(msg, 'success');
                     closeStatusModal();
                     setTimeout(() => location.reload(), 1500);
                 } else {

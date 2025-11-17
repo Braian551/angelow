@@ -62,13 +62,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         // Obtener estatus actual antes de actualizar
-        $stmtCurrentStatus = $conn->prepare("SELECT status FROM orders WHERE id = ?");
+        $stmtCurrentStatus = $conn->prepare("SELECT status, payment_status FROM orders WHERE id = ?");
         $stmtCurrentStatus->execute([$orderId]);
         $statusRow = $stmtCurrentStatus->fetch(PDO::FETCH_ASSOC);
         if (!$statusRow) {
             throw new Exception("La orden no existe");
         }
         $previousStatus = $statusRow['status'];
+        $previousPaymentStatus = $statusRow['payment_status'] ?? 'pending';
 
         // Obtener nombre del usuario actual para el historial
         $stmtUser = $conn->prepare("SELECT name FROM users WHERE id = ?");
@@ -123,6 +124,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
+        // Mapear 'refunded' (estado confuso) a 'cancelled' + payment_status 'refunded'
+        if ($_POST['status'] === 'refunded') {
+            $_POST['status'] = 'cancelled';
+            $_POST['payment_status'] = 'refunded';
+        }
+
+        // Evitar mover a 'processing' o 'shipped' si el pago NO fue aprobado
+        if (in_array($_POST['status'], ['processing', 'shipped']) && ($previousPaymentStatus ?? 'pending') !== 'paid') {
+            throw new Exception('No se puede poner en proceso o marcar como enviado si el pago no está aprobado');
+        }
+
+        // Ajustar pago si se cancela la orden desde el admin
+        if ($_POST['status'] === 'cancelled' && in_array($previousPaymentStatus, ['paid', 'pending'])) {
+            $_POST['payment_status'] = 'refunded';
+        }
+
         // Construir query de actualización
         if ($updateSnapshot) {
             $query = "UPDATE orders SET 
@@ -178,28 +195,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->exec("SET @current_user_ip = NULL");
         
         if ($result) {
-            $shouldNotify = ($previousStatus !== 'delivered' && $_POST['status'] === 'delivered');
-            $notificationResult = null;
-            if ($shouldNotify) {
-                $notificationResult = notifyOrderDelivered($conn, $orderId);
-            } else {
-                // Crear notificación para otros cambios de estado (processing, shipped, cancelled, etc.)
-                if ($previousStatus !== $_POST['status']) {
+            $statusChanged = ($previousStatus !== $_POST['status']);
+            $paymentStatusChanged = ($previousPaymentStatus !== $_POST['payment_status']);
+
+            $alertType = 'success';
+            $alertMessage = 'Orden actualizada correctamente';
+
+            if ($statusChanged) {
+                if ($_POST['status'] === 'delivered') {
+                    $notificationResult = notifyOrderDelivered($conn, $orderId);
+                    if (!$notificationResult['ok']) {
+                        $alertType = 'warning';
+                        $alertMessage = 'Orden actualizada pero el comprobante no pudo enviarse: ' . $notificationResult['message'];
+                    } else {
+                        $alertMessage = 'Orden actualizada y comprobante enviado al cliente';
+                    }
+                } elseif ($_POST['status'] === 'cancelled') {
+                    $notificationResult = notifyOrderCancelled($conn, $orderId, 'admin');
+                    if (!$notificationResult['ok']) {
+                        $alertType = 'warning';
+                        $alertMessage = 'Orden cancelada, pero no fue posible notificar al cliente: ' . $notificationResult['message'];
+                    } else {
+                        $alertMessage = 'Orden cancelada. El cliente fue notificado sobre el reembolso.';
+                    }
+                } else {
                     try {
                         createOrderStatusNotification($conn, $orderId, $_POST['status']);
                     } catch (Throwable $e) {
+                        $alertType = 'warning';
+                        $alertMessage = 'Orden actualizada, pero no fue posible crear la notificación de estado.';
                         error_log('[ORDER_NOTIFY] Error al crear notificación de estado en edit: ' . $e->getMessage());
                     }
                 }
             }
 
-            if ($notificationResult && !$notificationResult['ok']) {
-                $_SESSION['alert'] = ['type' => 'warning', 'message' => 'Orden actualizada pero el comprobante no pudo enviarse: ' . $notificationResult['message']];
-            } elseif ($notificationResult && $notificationResult['ok']) {
-                $_SESSION['alert'] = ['type' => 'success', 'message' => 'Orden actualizada y comprobante enviado al cliente'];
-            } else {
-                $_SESSION['alert'] = ['type' => 'success', 'message' => 'Orden actualizada correctamente'];
+            if ($paymentStatusChanged && $_POST['status'] !== 'cancelled') {
+                try {
+                    if (!createPaymentNotification($conn, $orderId, $_POST['payment_status'])) {
+                        $alertType = $alertType === 'error' ? 'error' : 'warning';
+                        $alertMessage .= ' No fue posible crear la notificación de pago.';
+                    }
+                } catch (Throwable $e) {
+                    $alertType = $alertType === 'error' ? 'error' : 'warning';
+                    $alertMessage .= ' No fue posible notificar el cambio en el pago.';
+                    error_log('[ORDER_NOTIFY] Error createPaymentNotification en edit: ' . $e->getMessage());
+                }
             }
+
+            $_SESSION['alert'] = ['type' => $alertType, 'message' => $alertMessage];
             header("Location: " . BASE_URL . "/admin/order/detail.php?id=$orderId");
             exit();
         } else {
@@ -1014,7 +1057,13 @@ try {
                                     </label>
                                     <select id="status" name="status" class="form-control" required>
                                         <?php foreach ($statuses as $value => $label): ?>
-                                            <option value="<?= $value ?>" <?= $value === $order['status'] ? 'selected' : '' ?>>
+                                            <?php
+                                                $disabled = '';
+                                                if (in_array($value, ['processing', 'shipped']) && ($order['payment_status'] ?? 'pending') !== 'paid') {
+                                                    $disabled = 'disabled';
+                                                }
+                                            ?>
+                                            <option value="<?= $value ?>" <?= $value === $order['status'] ? 'selected' : '' ?> <?= $disabled ?>>
                                                 <?= $label ?>
                                             </option>
                                         <?php endforeach; ?>

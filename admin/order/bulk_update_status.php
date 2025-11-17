@@ -135,7 +135,8 @@ try {
     $affectedRows = 0;
     $skippedOrders = 0;
     $updatedOrders = [];
-    $ordersToNotify = [];
+    $ordersToNotifyDelivered = [];
+    $ordersToNotifyCancelled = [];
     
     // Actualizar cada orden individualmente para que los triggers funcionen correctamente
     foreach ($orderIds as $orderId) {
@@ -150,24 +151,52 @@ try {
             continue;
         }
         
-        if ($currentOrder['status'] === $newStatus) {
+        // Mapear 'refunded' a 'cancelled' y decidir si se reembolsará
+        $targetStatus = $newStatus;
+        if ($newStatus === 'refunded') {
+            $targetStatus = 'cancelled';
+        }
+
+        if ($currentOrder['status'] === $targetStatus) {
             error_log("BULK_UPDATE - Orden {$currentOrder['order_number']} ya tiene el estado $newStatus");
             $skippedOrders++;
             continue;
         }
         
         // Actualizar el estado de la orden
-        $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?");
-        $stmt->execute([$newStatus, $orderId]);
+        // Si se está cancelando y la orden estaba pagada o pendiente, marcar pago como 'refunded'
+        $stmtPay = $conn->prepare("SELECT payment_status FROM orders WHERE id = ?");
+        $stmtPay->execute([$orderId]);
+        $payRow = $stmtPay->fetch(PDO::FETCH_ASSOC);
+        $currentPaymentStatus = $payRow['payment_status'] ?? 'pending';
+
+        // No permitir processing/shipped si no está pagada
+        if (in_array($targetStatus, ['processing', 'shipped']) && $currentPaymentStatus !== 'paid') {
+            $skippedOrders++;
+            error_log("BULK_UPDATE - Orden {$currentOrder['order_number']} omitida porque no está pagada (payment_status={$currentPaymentStatus})");
+            continue;
+        }
+
+        if ($targetStatus === 'cancelled' && in_array($currentPaymentStatus, ['paid', 'pending'])) {
+            $stmt = $conn->prepare("UPDATE orders SET status = ?, payment_status = ?, updated_at = NOW() WHERE id = ?");
+            $stmt->execute([$targetStatus, 'refunded', $orderId]);
+        } else {
+            $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?");
+            $stmt->execute([$targetStatus, $orderId]);
+        }
         
         if ($stmt->rowCount() > 0) {
             $affectedRows++;
             $updatedOrders[] = $currentOrder['order_number'];
-            if ($newStatus === 'delivered') {
-                $ordersToNotify[] = (int) $orderId;
+            if ($targetStatus === 'delivered') {
+                $ordersToNotifyDelivered[] = (int) $orderId;
             } else {
                 try {
-                    createOrderStatusNotification($conn, (int)$orderId, $newStatus);
+                    if ($targetStatus === 'cancelled') {
+                        $ordersToNotifyCancelled[] = $orderId;
+                    } else {
+                        createOrderStatusNotification($conn, (int)$orderId, $targetStatus);
+                    }
                 } catch (Throwable $e) {
                     error_log('[ORDER_NOTIFY] Error al crear notificación de estado (bulk): ' . $e->getMessage());
                 }
@@ -319,7 +348,7 @@ try {
     // Enviar comprobantes si aplica
     $notifications = [];
     $notificationsSent = 0;
-    foreach ($ordersToNotify as $orderIdToNotify) {
+    foreach ($ordersToNotifyDelivered as $orderIdToNotify) {
         $result = notifyOrderDelivered($conn, $orderIdToNotify);
         if ($result['ok']) {
             $notificationsSent++;
@@ -330,7 +359,18 @@ try {
             'message' => $result['message']
         ];
     }
-    $notificationsFailed = count($ordersToNotify) - $notificationsSent;
+    foreach ($ordersToNotifyCancelled as $orderIdToNotify) {
+        $result = notifyOrderCancelled($conn, (int) $orderIdToNotify, 'admin');
+        if ($result['ok']) {
+            $notificationsSent++;
+        }
+        $notifications[] = [
+            'order_id' => $orderIdToNotify,
+            'ok' => $result['ok'],
+            'message' => $result['message']
+        ];
+    }
+    $notificationsFailed = count($ordersToNotifyDelivered) + count($ordersToNotifyCancelled) - $notificationsSent;
 
     // Traducir estado para el mensaje
     $statusLabels = [

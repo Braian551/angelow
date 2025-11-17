@@ -113,10 +113,10 @@ function sendInvoiceEmail(array $order, array $orderItems, ?string $pdfContent =
             </tr>';
         }
 
-        $subtotal = $order['subtotal'] ?? array_sum(array_column($orderItems, 'total'));
-        $discount = $order['discount_amount'] ?? 0;
-        $shipping = $order['shipping_cost'] ?? 0;
-        $total = $order['total'] ?? ($subtotal - $discount + $shipping);
+        $subtotal = (float) ($order['subtotal'] ?? array_sum(array_column($orderItems, 'total')));
+        $discount = (float) ($order['discount_amount'] ?? 0);
+        $shipping = (float) ($order['shipping_cost'] ?? 0);
+        $total = (float) ($order['total'] ?? ($subtotal - $discount + $shipping));
 
         $mail->isHTML(true);
         $mail->Subject = 'Factura electrónica #' . htmlspecialchars($order['order_number'] ?? 'N/A');
@@ -200,6 +200,136 @@ function sendInvoiceEmail(array $order, array $orderItems, ?string $pdfContent =
         return true;
     } catch (Exception $e) {
         error_log('[INVOICE_EMAIL] Error: ' . $e->getMessage());
+        return false;
+    }
+}
+
+function sendOrderCancellationEmail(array $order, array $orderItems): bool
+{
+    if (empty($order['user_email'])) {
+        error_log('[INVOICE_EMAIL] Orden sin email para cancelación: ' . ($order['order_number'] ?? 'N/A'));
+        return false;
+    }
+
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'angelow2025sen@gmail.com';
+        $mail->Password = 'djaf tdju nyhr scgd';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+        $mail->CharSet = 'UTF-8';
+
+        $mail->setFrom('soporte@angelow.com', 'Angelow Atención al Cliente');
+        $mail->addAddress($order['user_email'], $order['user_name'] ?? 'Cliente Angelow');
+
+        $logoPath = realpath(__DIR__ . '/../../../images/logo2.png');
+        $logoEmbedId = 'cancellation_logo';
+        $logoUrl = BASE_URL . '/images/logo2.png';
+        if ($logoPath && file_exists($logoPath)) {
+            $mail->addEmbeddedImage($logoPath, $logoEmbedId);
+            $logoUrl = 'cid:' . $logoEmbedId;
+        }
+
+        $itemsHtml = '';
+        foreach ($orderItems as $item) {
+            $imageUrl = invoiceEmbedImageForMail($mail, $item['primary_image'] ?? null);
+            $itemsHtml .= '<tr style="border-bottom:1px solid #e2e8f0;">
+                <td style="padding:12px 8px; width:64px;"><img src="' . htmlspecialchars($imageUrl) . '" style="width:48px; height:48px; border-radius:8px; object-fit:cover;" alt="Producto"></td>
+                <td style="padding:12px 8px; color:#0f172a;">
+                    <div style="font-weight:600; margin-bottom:4px;">' . htmlspecialchars($item['product_name'] ?? $item['name'] ?? 'Producto Angelow') . '</div>
+                    <div style="color:#64748b; font-size:13px;">Cantidad: ' . (int) ($item['quantity'] ?? 1) . '</div>
+                </td>
+                <td style="padding:12px 8px; text-align:right; color:#0f172a; font-weight:600;">$' . number_format($item['total'] ?? (($item['quantity'] ?? 1) * ($item['price'] ?? 0)), 0, ',', '.') . '</td>
+            </tr>';
+        }
+
+        if ($itemsHtml === '') {
+            $itemsHtml = '<tr><td colspan="3" style="padding:18px; text-align:center; color:#64748b;">No fue posible cargar el detalle de los productos.</td></tr>';
+        }
+
+        $subtotal = $order['subtotal'] ?? array_sum(array_column($orderItems, 'total'));
+        $discount = $order['discount_amount'] ?? 0;
+        $shipping = $order['shipping_cost'] ?? 0;
+        $total = $order['total'] ?? ($subtotal - $discount + $shipping);
+
+        $paymentStatus = invoiceTranslatePaymentStatus($order['payment_status'] ?? 'pending');
+        $orderNumber = $order['order_number'] ?? $order['id'] ?? 'N/A';
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Cancelación del pedido #' . htmlspecialchars($orderNumber) . ' - Reembolso en proceso';
+        $mail->Body = '<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancelación de pedido Angelow</title>
+    <style>
+        body { font-family: "Inter", Arial, sans-serif; background-color: #f6f7fb; margin: 0; padding: 24px; color: #0f172a; }
+        .container { max-width: 720px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08); border: 1px solid #e5e7eb; }
+        .header { background: linear-gradient(135deg, #0f172a, #1d4ed8); color: #ffffff; padding: 36px 32px; text-align: center; }
+        .header img { max-height: 56px; margin-bottom: 18px; }
+        .subtitle { color: rgba(255,255,255,0.85); font-size: 15px; margin: 8px 0 0 0; }
+        .content { padding: 32px; }
+        .card { border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; margin-bottom: 24px; background: #fdfdfd; }
+        .card h3 { margin: 0 0 18px 0; color: #0f172a; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .detail-line { display: flex; justify-content: space-between; margin-bottom: 12px; color: #475569; font-size: 14px; }
+        .detail-label { font-weight: 600; color: #0f172a; }
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
+        .items-table tr:nth-child(even) { background: #f8fafc; }
+        .items-table td { padding: 14px 10px; font-size: 14px; color: #0f172a; vertical-align: middle; border-bottom: 1px solid #e2e8f0; }
+        .totals { margin-top: 16px; border-top: 1px solid #e2e8f0; padding-top: 16px; }
+        .totals-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #475569; }
+        .totals-row strong { color: #0f172a; }
+        .footer { text-align: center; color: #94a3b8; padding: 24px; font-size: 13px; background: #f8fafc; }
+        .btn { display: inline-block; padding: 12px 20px; background: #1d4ed8; color: #fff; border-radius: 999px; text-decoration: none; font-weight: 600; margin-top: 20px; box-shadow: 0 10px 20px rgba(29,78,216,0.25); }
+        .highlight { display: inline-block; padding: 8px 14px; border-radius: 10px; background: rgba(30,64,175,0.08); color: #1e40af; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="' . $logoUrl . '" alt="Angelow">
+            <h1>Confirmamos la cancelación del pedido</h1>
+            <p class="subtitle">El reembolso se está procesando con el mismo método de pago utilizado.</p>
+        </div>
+        <div class="content">
+            <div class="card">
+                <h3>Resumen de la cancelación</h3>
+                <div class="detail-line"><span class="detail-label">Pedido:</span><span>#' . htmlspecialchars($orderNumber) . '</span></div>
+                <div class="detail-line"><span class="detail-label">Fecha de cancelación:</span><span>' . date('d/m/Y H:i') . '</span></div>
+                <div class="detail-line"><span class="detail-label">Estado del reembolso:</span><span>' . htmlspecialchars($paymentStatus) . '</span></div>
+            </div>
+            <div class="card">
+                <h3>Productos del pedido</h3>
+                <table class="items-table">
+                    <tbody>' . $itemsHtml . '</tbody>
+                </table>
+                <div class="totals">
+                    <div class="totals-row"><span>Subtotal:</span><span>$' . number_format($subtotal, 0, ',', '.') . '</span></div>
+                    <div class="totals-row"><span>Descuentos:</span><span>-$' . number_format($discount, 0, ',', '.') . '</span></div>
+                    <div class="totals-row"><span>Envío:</span><span>$' . number_format($shipping, 0, ',', '.') . '</span></div>
+                    <div class="totals-row"><strong>Total pagado:</strong><strong>$' . number_format($total, 0, ',', '.') . '</strong></div>
+                </div>
+            </div>
+            <p style="color:#475569; font-size:14px; line-height:1.6;">El reembolso puede tardar entre <span class="highlight">3 y 7 días hábiles</span> dependiendo de tu entidad financiera. Si el cobro todavía estaba pendiente, verás la liberación automática en las próximas horas.</p>
+            <p style="color:#475569; font-size:14px; line-height:1.6;">Para cualquier inquietud adicional escríbenos a <strong>soporte@angelow.com</strong> o envíanos un mensaje por WhatsApp.</p>
+            <a class="btn" href="' . BASE_URL . '/users/orders.php">Revisar mis pedidos</a>
+        </div>
+        <div class="footer">
+            © ' . date('Y') . ' Angelow Ropa Infantil · Mensaje generado automáticamente.
+        </div>
+    </div>
+</body>
+</html>';
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log('[INVOICE_EMAIL] Error cancelación: ' . $e->getMessage());
         return false;
     }
 }

@@ -90,6 +90,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Actualizar timeline
                 orderCard.querySelector('.order-timeline').innerHTML = renderOrderTimeline('cancelled');
+                // Actualizar badge de pago si viene en la respuesta
+                if (data.payment_status) {
+                    const payEl = orderCard.querySelector('.payment-status');
+                    if (payEl) {
+                        payEl.textContent = getPaymentStatusText(data.payment_status);
+                        payEl.className = 'payment-status payment-' + data.payment_status;
+                    }
+                }
+
+                const paymentStatus = (data.payment_status || 'refunded').toLowerCase();
+                const paymentBadge = orderCard.querySelector('.payment-status');
+                if (paymentBadge) {
+                    paymentBadge.textContent = paymentStatus === 'refunded' ? 'Reembolsado' : paymentStatus === 'pending' ? 'Pendiente' : paymentStatus === 'paid' ? 'Pagado' : paymentStatus === 'failed' ? 'Fallido' : paymentStatus;
+                    paymentBadge.className = `payment-status payment-${paymentStatus}`;
+                }
+
+                if (!orderCard.querySelector('.order-status-note')) {
+                    const actions = orderCard.querySelector('.order-actions');
+                    const note = document.createElement('div');
+                    note.className = 'order-status-note';
+                    note.style.cssText = 'margin-top:12px; padding:12px; border-radius:12px; background:#fff3cd; color:#7c5700; display:flex; gap:10px; align-items:flex-start;';
+                    note.innerHTML = `
+                        <i class="fas fa-money-bill-wave" style="margin-top:2px;"></i>
+                        <div>
+                            <strong>Reembolso en proceso.</strong>
+                            <div style="font-size:0.9rem; line-height:1.4;">
+                                Te enviaremos el reembolso con el mismo método de pago. Estado actual: ${paymentBadge ? paymentBadge.textContent : 'Reembolsado'}.
+                            </div>
+                        </div>
+                    `;
+                    if (actions) {
+                        orderCard.insertBefore(note, actions);
+                    } else {
+                        orderCard.appendChild(note);
+                    }
+                }
             } else {
                 showNotification(data.message, 'error');
             }
@@ -201,6 +237,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderOrderTimeline(status) {
+        if (status === 'cancelled') {
+            return '<div class="order-timeline-modern"><span class="status-badge status-cancelled"><i class="fas fa-ban"></i> Pedido cancelado</span></div>';
+        }
+
         // Implementación simplificada para JS
         const steps = ['pending', 'processing', 'shipped', 'delivered'];
         const currentIndex = steps.indexOf(status);
@@ -226,6 +266,17 @@ document.addEventListener('DOMContentLoaded', function() {
             'processing': 'En Proceso',
             'shipped': 'Enviado',
             'delivered': 'Entregado',
+            'cancelled': 'Cancelado'
+        };
+        return statuses[status] || status;
+    }
+
+    function getPaymentStatusText(status) {
+        const statuses = {
+            'pending': 'Pendiente',
+            'paid': 'Pagado',
+            'failed': 'Fallido',
+            'refunded': 'Reembolsado',
             'cancelled': 'Cancelado'
         };
         return statuses[status] || status;

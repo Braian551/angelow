@@ -22,11 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentOrderIdForChange = null;
     let currentChangeType = null; // 'status' | 'payment'
 
-    window.openStatusChangeModal = function(orderId, currentValue = null) {
+    window.openStatusChangeModal = function(orderId, currentValue = null, paymentStatus = null) {
         openChangeFieldModal(orderId, {
             type: 'status',
             title: 'Cambiar estado',
-            options: window.orderStatuses || window.statuses || {}
+            options: window.orderStatuses || window.statuses || {},
+            paymentStatus: paymentStatus
         }, currentValue);
     };
 
@@ -123,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function openChangeFieldModal(orderId, { type = 'status', title = 'Cambiar', options = {} } = {}, currentValue = null) {
+    function openChangeFieldModal(orderId, { type = 'status', title = 'Cambiar', options = {}, paymentStatus = null } = {}, currentValue = null) {
         currentOrderIdForChange = orderId;
         currentChangeType = type;
         notesField.value = '';
@@ -137,6 +138,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const option = document.createElement('option');
             option.value = value;
             option.textContent = label;
+            // Si el admin intenta poner en proceso/enviado sin pago, deshabilitar la opción
+            if (type === 'status' && paymentStatus && ['processing', 'shipped'].includes(value) && paymentStatus !== 'paid') {
+                option.disabled = true;
+                option.textContent += ' (requiere pago)';
+            }
             selectField.appendChild(option);
         });
 

@@ -387,7 +387,7 @@ exportBtn.addEventListener('click', function() {
                             <button class="action-btn edit" title="Editar" onclick="editOrder(${order.id})">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="action-btn status" title="Cambiar estado" onclick='openStatusChangeModal(${order.id}, ${JSON.stringify(order.status)})'>
+                            <button class="action-btn status" title="Cambiar estado" onclick='openStatusChangeModal(${order.id}, ${JSON.stringify(order.status)}, ${JSON.stringify(order.payment_status)})'>
                                 <i class="fas fa-exchange-alt"></i>
                             </button>
                             <button class="action-btn delete" title="Eliminar" onclick="openDeleteOrderModal(${order.id})">
@@ -568,7 +568,7 @@ exportBtn.addEventListener('click', function() {
             })
             .then(data => {
                 if (data.success) {
-                    showAlert(`Estado de ${orderIds.length} órdenes actualizado correctamente`, 'success');
+                    showAlert(data.message || `Estado de ${orderIds.length} órdenes actualizado correctamente`, 'success');
                     loadOrders();
                     window.selectedOrders = [];
                     selectAllCheckbox.checked = false;

@@ -143,6 +143,53 @@ function notifyOrderDelivered(PDO $conn, int $orderId): array
 }
 
 /**
+ * Envia notificaciones y correo cuando una orden es cancelada.
+ */
+function notifyOrderCancelled(PDO $conn, int $orderId, string $initiator = 'system'): array
+{
+    try {
+        $payload = getOrderPayloadForInvoice($conn, $orderId);
+        $order = $payload['order'];
+        $items = $payload['items'];
+
+        if (empty($order['user_id'])) {
+            return ['ok' => false, 'message' => 'La orden no tiene usuario asociado'];
+        }
+
+        $orderNumber = $order['order_number'] ?? $orderId;
+
+        $title = 'Pedido cancelado #' . $orderNumber;
+        $messageBase = $initiator === 'user'
+            ? 'Hemos confirmado la cancelación del pedido #' . $orderNumber . ' que solicitaste.'
+            : 'Tu pedido #' . $orderNumber . ' fue cancelado por el equipo de Angelow.';
+        $message = $messageBase . ' El reembolso se procesará con el mismo método de pago y puede tardar entre 3 y 7 días hábiles.';
+
+        if (!createNotification(
+            $conn,
+            (int) $order['user_id'],
+            1,
+            $title,
+            $message,
+            'order',
+            $orderId
+        )) {
+            error_log('[ORDER_NOTIFY] No fue posible registrar la notificación de cancelación para la orden ' . $orderId);
+        }
+
+        $emailSent = sendOrderCancellationEmail($order, $items);
+
+        if (!$emailSent) {
+            return ['ok' => false, 'message' => 'El correo de cancelación no pudo enviarse'];
+        }
+
+        return ['ok' => true, 'message' => 'Cancelación notificada'];
+    } catch (Throwable $e) {
+        error_log('[ORDER_NOTIFY] Error al notificar cancelación de orden ' . $orderId . ': ' . $e->getMessage());
+        return ['ok' => false, 'message' => $e->getMessage()];
+    }
+}
+
+/**
  * Inserta una notificación genérica para un usuario.
  */
 function createNotification(PDO $conn, $userId, int $typeId, string $title, string $message, string $relatedEntityType = 'order', ?int $relatedEntityId = null): bool
@@ -174,8 +221,8 @@ function createOrderStatusNotification(PDO $conn, int $orderId, string $newStatu
         $labels = [
             'processing' => ['Pedido en proceso', "Tu pedido #$orderNumber está en proceso y pronto saldrá para entrega."],
             'shipped' => ['Tu envío está en camino', "Tu pedido #$orderNumber ha salido para entrega. Pronto lo recibirás."],
-            'cancelled' => ['Pedido cancelado', "Tu pedido #$orderNumber ha sido cancelado. Si necesitas ayuda, contáctanos."],
-            'refunded' => ['Pago reembolsado', "El pago de tu pedido #$orderNumber ha sido reembolsado."],
+            'cancelled' => ['Pedido cancelado', "Tu pedido #$orderNumber ha sido cancelado. Iniciaremos el reembolso en las próximas horas."],
+            'refunded' => ['Pedido reembolsado', "Tu pedido #$orderNumber fue reembolsado y no se continuará con la entrega."],
             'pending' => ['Pedido pendiente', "Tu pedido #$orderNumber está pendiente de confirmación."],
         ];
 
@@ -207,7 +254,7 @@ function createPaymentNotification(PDO $conn, int $orderId, string $newPaymentSt
         $labels = [
             'paid' => ['Pago aprobado', "Hemos recibido el pago de tu pedido #$orderNumber. Gracias."],
             'failed' => ['Pago rechazado', "Tu pago para el pedido #$orderNumber no fue aprobado. Revisa la referencia o contáctanos."],
-            'refunded' => ['Pago reembolsado', "Se ha reembolsado el pago del pedido #$orderNumber."],
+            'refunded' => ['Pago reembolsado', "El reembolso del pedido #$orderNumber está en trámite y se reflejará en tu método de pago en los próximos días."],
         ];
 
         if (!isset($labels[$newPaymentStatus])) return false;
