@@ -333,3 +333,140 @@ function sendOrderCancellationEmail(array $order, array $orderItems): bool
         return false;
     }
 }
+
+function sendRefundConfirmationEmail(array $order, array $orderItems, array $metadata = []): bool
+{
+    if (empty($order['user_email'])) {
+        error_log('[INVOICE_EMAIL] Orden sin email para confirmación de reembolso: ' . ($order['order_number'] ?? 'N/A'));
+        return false;
+    }
+
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'angelow2025sen@gmail.com';
+        $mail->Password = 'djaf tdju nyhr scgd';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+        $mail->CharSet = 'UTF-8';
+
+        $mail->setFrom('soporte@angelow.com', 'Angelow Pagos');
+        $mail->addAddress($order['user_email'], $order['user_name'] ?? 'Cliente Angelow');
+
+        $logoPath = realpath(__DIR__ . '/../../../images/logo2.png');
+        $logoEmbedId = 'refund_logo';
+        $logoUrl = BASE_URL . '/images/logo2.png';
+        if ($logoPath && file_exists($logoPath)) {
+            $mail->addEmbeddedImage($logoPath, $logoEmbedId);
+            $logoUrl = 'cid:' . $logoEmbedId;
+        }
+
+        $refundAmount = $metadata['amount'] ?? $order['total'] ?? array_sum(array_column($orderItems, 'total'));
+        $paymentMethod = $metadata['payment_method'] ?? ($order['payment_method'] ?? 'Transferencia bancaria');
+        $reference = $metadata['reference'] ?? ($order['reference_number'] ?? 'N/A');
+        $gateway = $metadata['gateway'] ?? 'Angelow';
+        $orderNumber = $order['order_number'] ?? $order['id'] ?? 'N/A';
+
+        $itemsHtml = '';
+        foreach ($orderItems as $item) {
+            $imageUrl = invoiceEmbedImageForMail($mail, $item['primary_image'] ?? null);
+            $itemsHtml .= '<tr style="border-bottom:1px solid #eef2ff;">
+                <td style="padding:12px 8px; width:60px;"><img src="' . htmlspecialchars($imageUrl) . '" style="width:48px; height:48px; border-radius:8px; object-fit:cover; border:1px solid #e2e8f0;"></td>
+                <td style="padding:12px 8px;">
+                    <div style="font-weight:600; color:#0f172a;">' . htmlspecialchars($item['product_name'] ?? 'Producto Angelow') . '</div>
+                    <div style="color:#64748b; font-size:13px;">Cantidad: ' . (int) ($item['quantity'] ?? 1) . '</div>
+                </td>
+                <td style="padding:12px 8px; text-align:right; font-weight:600; color:#0f172a;">$' . number_format($item['total'] ?? (($item['quantity'] ?? 1) * ($item['price'] ?? 0)), 0, ',', '.') . '</td>
+            </tr>';
+        }
+        if ($itemsHtml === '') {
+            $itemsHtml = '<tr><td colspan="3" style="padding:16px; text-align:center; color:#64748b;">No fue posible mostrar los productos de este pedido.</td></tr>';
+        }
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Reembolso confirmado · Pedido #' . htmlspecialchars($orderNumber);
+        $mail->Body = '<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reembolso Angelow</title>
+    <style>
+        body { font-family: "Inter", Arial, sans-serif; background-color: #f4f6fb; margin: 0; padding: 24px; color: #0f172a; }
+        .container { max-width: 720px; margin: 0 auto; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 25px 60px rgba(15,23,42,0.08); border: 1px solid #e2e8f0; }
+        .header { background: linear-gradient(135deg, #2968c8, #1e4d9c); color: white; padding: 40px 32px; text-align: center; }
+        .header img { max-height: 56px; margin-bottom: 18px; }
+        .header h1 { margin: 0; font-size: 26px; }
+        .content { padding: 32px; }
+        .highlight-card { background: #f0f7ff; border: 1px solid #cbdffd; border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+        .highlight-card h3 { margin: 0 0 12px 0; color: #1e40af; text-transform: uppercase; letter-spacing: 0.5px; font-size: 14px; }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 16px; }
+        .detail-box { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
+        .detail-label { font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .detail-value { font-size: 18px; font-weight: 700; color: #0f172a; }
+        .items-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        .items-table td { padding: 12px 10px; font-size: 14px; }
+        .items-table tr:nth-child(even) { background: #f8fafc; }
+        .badge { display: inline-block; padding: 6px 14px; border-radius: 999px; background: rgba(16,185,129,0.15); color: #0f9d58; font-weight: 600; font-size: 13px; }
+        .footer { text-align: center; padding: 28px; background: #f8fafc; color: #64748b; font-size: 13px; border-top: 1px solid #e2e8f0; }
+        .support { background: linear-gradient(135deg,#fff,#f0f7ff); border: 1px solid #d0e2ff; border-radius: 14px; padding: 20px; margin-top: 24px; text-align: center; }
+        .support a { color: #1e4d9c; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="' . $logoUrl . '" alt="Angelow">
+            <h1>Reembolso completado</h1>
+            <p style="opacity:0.9; font-size:15px;">El dinero ya fue devuelto con el mismo método de pago que usaste.</p>
+            <div style="margin-top:14px;"><span class="badge">Pedido #' . htmlspecialchars($orderNumber) . '</span></div>
+        </div>
+        <div class="content">
+            <div class="highlight-card">
+                <h3>Resumen del reembolso</h3>
+                <div class="detail-grid">
+                    <div class="detail-box">
+                        <div class="detail-label">Monto devuelto</div>
+                        <div class="detail-value">$' . number_format((float) $refundAmount, 0, ',', '.') . '</div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-label">Método</div>
+                        <div class="detail-value" style="font-size:16px;">' . htmlspecialchars(ucfirst($paymentMethod)) . '</div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-label">Referencia</div>
+                        <div class="detail-value" style="font-size:16px;">' . htmlspecialchars($reference) . '</div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-label">Procesado por</div>
+                        <div class="detail-value" style="font-size:16px;">' . htmlspecialchars($gateway) . '</div>
+                    </div>
+                </div>
+                <p style="margin-top:16px; color:#475569; font-size:14px; line-height:1.6;">Dependiendo de tu banco, el reembolso puede visualizarse en tu extracto entre <strong>24 y 72 horas</strong>. Conserva este correo como comprobante.</p>
+            </div>
+            <h3 style="color:#1f2937; font-size:16px; margin-bottom:12px;">Productos asociados</h3>
+            <table class="items-table">
+                <tbody>' . $itemsHtml . '</tbody>
+            </table>
+            <div class="support">
+                <p style="margin:0 0 10px 0; font-size:15px; color:#1f2937; font-weight:600;">¿Necesitas soporte adicional?</p>
+                <p style="margin:0; color:#475569;">Escríbenos a <strong>soporte@angelow.com</strong> o responde este correo con tu número de contacto.</p>
+            </div>
+        </div>
+        <div class="footer">
+            © ' . date('Y') . ' Angelow Ropa Infantil · Este es un mensaje automático.
+        </div>
+    </div>
+</body>
+</html>';
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log('[INVOICE_EMAIL] Error reembolso: ' . $e->getMessage());
+        return false;
+    }
+}

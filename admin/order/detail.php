@@ -155,7 +155,7 @@ function getPaymentStatusBadge($status) {
         'pending' => ['label' => 'Pendiente', 'class' => 'badge-warning'],
         'paid' => ['label' => 'Pagado', 'class' => 'badge-success'],
         'failed' => ['label' => 'Fallido', 'class' => 'badge-danger'],
-        'refunded' => ['label' => 'Reembolsado', 'class' => 'badge-secondary']
+        'refunded' => ['label' => 'Reembolso', 'class' => 'badge-secondary']
     ];
     
     $statusInfo = $statuses[$status] ?? ['label' => $status, 'class' => 'badge-light'];
@@ -232,7 +232,7 @@ function translateValue($value, $field = '') {
         'pending' => 'Pendiente',
         'paid' => 'Pagado',
         'failed' => 'Fallido',
-        'refunded' => 'Reembolsado',
+        'refunded' => 'Reembolso',
         'partial' => 'Pago Parcial'
     ];
     
@@ -794,7 +794,7 @@ function translateValue($value, $field = '') {
             'pending' => 'Pendiente',
             'paid' => 'Pagado',
             'failed' => 'Fallido',
-            'refunded' => 'Reembolsado',
+            'refunded' => 'Reembolso',
             'partial' => 'Pago Parcial'
         ]) ?>;
     </script>

@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const paymentStatus = (data.payment_status || 'refunded').toLowerCase();
                 const paymentBadge = orderCard.querySelector('.payment-status');
                 if (paymentBadge) {
-                    paymentBadge.textContent = paymentStatus === 'refunded' ? 'Reembolsado' : paymentStatus === 'pending' ? 'Pendiente' : paymentStatus === 'paid' ? 'Pagado' : paymentStatus === 'failed' ? 'Fallido' : paymentStatus;
+                    paymentBadge.textContent = getPaymentStatusText(paymentStatus);
                     paymentBadge.className = `payment-status payment-${paymentStatus}`;
                 }
 
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div>
                             <strong>Reembolso en proceso.</strong>
                             <div style="font-size:0.9rem; line-height:1.4;">
-                                Te enviaremos el reembolso con el mismo método de pago. Estado actual: ${paymentBadge ? paymentBadge.textContent : 'Reembolsado'}.
+                                Te enviaremos el reembolso con el mismo método de pago. Estado actual: ${paymentBadge ? paymentBadge.textContent : 'Reembolso'}.
                             </div>
                         </div>
                     `;
@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'pending': 'Pendiente',
             'paid': 'Pagado',
             'failed': 'Fallido',
-            'refunded': 'Reembolsado',
+            'refunded': 'Reembolso',
             'cancelled': 'Cancelado'
         };
         return statuses[status] || status;

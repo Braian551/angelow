@@ -202,6 +202,48 @@ function notifyOrderCancelled(PDO $conn, int $orderId, string $initiator = 'syst
     }
 }
 
+function notifyRefundCompleted(PDO $conn, int $orderId, array $options = []): array
+{
+    try {
+        $payload = getOrderPayloadForInvoice($conn, $orderId);
+        $order = $payload['order'];
+        $items = $payload['items'];
+
+        $amount = $options['amount'] ?? ($order['total'] ?? null);
+        $reference = $options['reference'] ?? ($order['reference_number'] ?? null);
+        $gateway = $options['gateway'] ?? null;
+        $adminId = $options['admin_id'] ?? null;
+
+        $refundRecordId = createRefundRecord($conn, $orderId, $amount, $reference, $gateway, $adminId);
+
+        $emailSent = sendRefundConfirmationEmail($order, $items, [
+            'amount' => $amount,
+            'reference' => $reference,
+            'payment_method' => $order['payment_method'] ?? 'Transferencia bancaria',
+            'gateway' => $gateway ?? 'Angelow'
+        ]);
+
+        $notificationSent = createPaymentNotification($conn, $orderId, 'refunded');
+
+        $messages = [];
+        if ($refundRecordId) {
+            $messages[] = 'Reembolso registrado (#' . $refundRecordId . ')';
+        } else {
+            $messages[] = 'Reembolso ya registrado previamente';
+        }
+        $messages[] = $emailSent ? 'Correo enviado' : 'Fallo al enviar correo';
+        $messages[] = $notificationSent ? 'Notificación creada' : 'Fallo al crear notificación';
+
+        return [
+            'ok' => $emailSent && $notificationSent,
+            'message' => implode(' · ', $messages)
+        ];
+    } catch (Throwable $e) {
+        error_log('[ORDER_NOTIFY] Error al notificar reembolso completado para orden ' . $orderId . ': ' . $e->getMessage());
+        return ['ok' => false, 'message' => $e->getMessage()];
+    }
+}
+
 
 /**
  * Crea un registro en payment_transactions para registrar el reembolso.
@@ -326,7 +368,7 @@ function createPaymentNotification(PDO $conn, int $orderId, string $newPaymentSt
         $labels = [
             'paid' => ['Pago aprobado', "Hemos recibido el pago de tu pedido #$orderNumber. Gracias."],
             'failed' => ['Pago rechazado', "Tu pago para el pedido #$orderNumber no fue aprobado. Revisa la referencia o contáctanos."],
-            'refunded' => ['Pago reembolsado', "El reembolso del pedido #$orderNumber está en trámite y se reflejará en tu método de pago en los próximos días."],
+            'refunded' => ['Reembolso completado', "Tu reembolso del pedido #$orderNumber fue acreditado. Dependiendo de tu banco, lo verás reflejado en 24-72 horas."],
         ];
 
         if (!isset($labels[$newPaymentStatus])) return false;

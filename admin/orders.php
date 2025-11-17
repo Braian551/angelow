@@ -33,7 +33,7 @@ $paymentStatuses = [
     'pending' => 'Pendiente',
     'paid' => 'Pagado',
     'failed' => 'Fallido',
-    'refunded' => 'Reembolsado'
+    'refunded' => 'Reembolso'
 ];
 
 

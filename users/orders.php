@@ -331,7 +331,7 @@ function getPaymentStatusText($status) {
         'pending' => 'Pendiente',
         'paid' => 'Pagado',
         'failed' => 'Fallido',
-        'refunded' => 'Reembolsado',
+        'refunded' => 'Reembolso',
         'cancelled' => 'Cancelado'
     ];
     return $statuses[$status] ?? ucfirst($status);

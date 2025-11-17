@@ -61,6 +61,7 @@ try {
     $conn->beginTransaction();
 
     $affected = 0;
+    $ordersToConfirmRefund = [];
     foreach ($orderIds as $orderId) {
         $stmt = $conn->prepare("SELECT payment_status FROM orders WHERE id = ?");
         $stmt->execute([$orderId]);
@@ -83,18 +84,42 @@ try {
                 $stmtNotes = $conn->prepare("INSERT INTO order_status_history (order_id, changed_by, changed_by_name, change_type, field_changed, description, ip_address, created_at) VALUES (?, ?, ?, 'notes', 'admin_notes', ?, ?, NOW())");
                 $stmtNotes->execute([$orderId, $currentUser['id'] ?? null, $currentUser['name'] ?? 'Sistema', $notes, $_SERVER['REMOTE_ADDR']]);
             }
-            // Crear notificación para cambios de estado de pago
-            try {
-                createPaymentNotification($conn, (int)$orderId, $newStatus);
-            } catch (Throwable $e) {
-                error_log('[ORDER_NOTIFY] Error al crear notificación de pago: ' . $e->getMessage());
+
+            if ($newStatus === 'refunded') {
+                $ordersToConfirmRefund[] = (int) $orderId;
+            } else {
+                try {
+                    createPaymentNotification($conn, (int)$orderId, $newStatus);
+                } catch (Throwable $e) {
+                    error_log('[ORDER_NOTIFY] Error al crear notificación de pago: ' . $e->getMessage());
+                }
             }
         }
     }
 
     $conn->commit();
+    $refundSummary = '';
+    if (!empty($ordersToConfirmRefund)) {
+        $successRefunds = 0;
+        $failedRefunds = 0;
+        foreach ($ordersToConfirmRefund as $refundOrderId) {
+            $result = notifyRefundCompleted($conn, $refundOrderId, [
+                'admin_id' => $currentUser['id'] ?? null
+            ]);
+            if ($result['ok']) {
+                $successRefunds++;
+            } else {
+                $failedRefunds++;
+                error_log('[ORDER_NOTIFY] Error notifyRefundCompleted order ' . $refundOrderId . ': ' . $result['message']);
+            }
+        }
+        $refundSummary = ' · Reembolsos confirmados: ' . $successRefunds;
+        if ($failedRefunds > 0) {
+            $refundSummary .= " · Fallidos: $failedRefunds";
+        }
+    }
 
-    echo json_encode(['success' => true, 'message' => "Estados de pago actualizados: $affected"]); 
+    echo json_encode(['success' => true, 'message' => "Estados de pago actualizados: $affected$refundSummary"]); 
 } catch (PDOException $e) {
     if ($conn->inTransaction()) $conn->rollBack();
     error_log('ERR update_payment_status: ' . $e->getMessage());

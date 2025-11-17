@@ -229,16 +229,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            if ($paymentStatusChanged && $_POST['status'] !== 'cancelled') {
-                try {
-                    if (!createPaymentNotification($conn, $orderId, $_POST['payment_status'])) {
+            if ($paymentStatusChanged) {
+                if ($_POST['payment_status'] === 'refunded') {
+                    try {
+                        $refundResult = notifyRefundCompleted($conn, $orderId, [
+                            'admin_id' => $_SESSION['user_id'] ?? null
+                        ]);
+                        if ($refundResult['ok']) {
+                            $alertMessage .= ' El cliente recibió la confirmación del reembolso.';
+                        } else {
+                            $alertType = $alertType === 'error' ? 'error' : 'warning';
+                            $alertMessage .= ' Reembolso registrado pero no se pudo notificar: ' . $refundResult['message'];
+                        }
+                    } catch (Throwable $e) {
                         $alertType = $alertType === 'error' ? 'error' : 'warning';
-                        $alertMessage .= ' No fue posible crear la notificación de pago.';
+                        $alertMessage .= ' No fue posible confirmar el reembolso al cliente.';
+                        error_log('[ORDER_NOTIFY] Error notifyRefundCompleted en edit: ' . $e->getMessage());
                     }
-                } catch (Throwable $e) {
-                    $alertType = $alertType === 'error' ? 'error' : 'warning';
-                    $alertMessage .= ' No fue posible notificar el cambio en el pago.';
-                    error_log('[ORDER_NOTIFY] Error createPaymentNotification en edit: ' . $e->getMessage());
+                } elseif ($_POST['status'] !== 'cancelled') {
+                    try {
+                        if (!createPaymentNotification($conn, $orderId, $_POST['payment_status'])) {
+                            $alertType = $alertType === 'error' ? 'error' : 'warning';
+                            $alertMessage .= ' No fue posible crear la notificación de pago.';
+                        }
+                    } catch (Throwable $e) {
+                        $alertType = $alertType === 'error' ? 'error' : 'warning';
+                        $alertMessage .= ' No fue posible notificar el cambio en el pago.';
+                        error_log('[ORDER_NOTIFY] Error createPaymentNotification en edit: ' . $e->getMessage());
+                    }
                 }
             }
 

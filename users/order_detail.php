@@ -476,7 +476,7 @@ function getPaymentStatusText($status) {
         'pending' => 'Pendiente',
         'paid' => 'Pagado',
         'failed' => 'Fallido',
-        'refunded' => 'Reembolsado',
+        'refunded' => 'Reembolso',
         'cancelled' => 'Cancelado',
         'partially_refunded' => 'Parcialmente Reembolsado'
     ];

@@ -525,7 +525,7 @@ exportBtn.addEventListener('click', function() {
             'pending': 'Pendiente',
             'paid': 'Pagado',
             'failed': 'Fallido',
-            'refunded': 'Reembolsado'
+            'refunded': 'Reembolso'
         } [status] || status;
     }
 

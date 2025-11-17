@@ -15,7 +15,7 @@ function invoiceTranslatePaymentStatus(?string $status): string
         'pending' => 'Pendiente',
         'paid' => 'Pagado',
         'failed' => 'Fallido',
-        'refunded' => 'Reembolsado',
+        'refunded' => 'Reembolso',
         'cancelled' => 'Cancelado',
         'canceled' => 'Cancelado',
     ];
