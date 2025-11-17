@@ -14,7 +14,7 @@
   --dashboard-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
   --dashboard-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
   --dashboard-transition: all 0.3s ease;
-}
+/* end btn-view-order */
 
 
 .back-button {
@@ -719,12 +719,14 @@ Don't show
   gap: 1rem;
 }
 
+/* previous orange style removed - using dashboard blue */
+
 .btn-view-order {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 1rem 2rem;
-  background: #FE5000;
+  background: var(--dashboard-primary);
   color: white;
   text-decoration: none;
   border-radius: 8px;
@@ -734,27 +736,11 @@ Don't show
   border: none;
   cursor: pointer;
 }
-
 .btn-view-order:hover {
-  background: #e64800;
+  background: var(--dashboard-primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(254, 80, 0, 0.3);
+  box-shadow: 0 6px 16px rgba(0, 119, 182, 0.25);
 }
-
-/* Empty state */
-.no-orders {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  text-align: center;
-}
-
-.no-orders i {
-  font-size: 6rem;
-  color: #d1d5db;
-  margin-bottom: 2rem;
 }
 
 .no-orders p {
