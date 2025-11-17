@@ -1,6 +1,7 @@
 class AdminsHub {
     constructor(cfg) {
         this.cfg = cfg;
+        this.baseUrl = cfg.baseUrl || document.querySelector('meta[name="base-url"]')?.content || '';
         this.table = document.getElementById('admins-table');
         this.load();
         this.bind();
@@ -35,15 +36,17 @@ class AdminsHub {
             this.table.innerHTML = '<tr><td colspan="5">Sin administradores</td></tr>';
             return;
         }
+        const baseUrl = this.baseUrl;
+
         this.table.innerHTML = items.map((a) => `
             <tr data-id="${a.id}">
                 <td>${a.name || 'Administrador'}</td>
                 <td>${a.email}</td>
                 <td>${a.job_title || a.role || 'Admin'}</td>
-                <td>${a.is_active ? '<span class="status-chip success">Activo</span>' : '<span class="status-chip warning">Bloqueado</span>'}</td>
+                <td>${!a.is_blocked ? '<span class="status-chip success">Activo</span>' : '<span class="status-chip warning">Bloqueado</span>'}</td>
                 <td>
-                    <button class="btn-soft" data-action="toggle">${a.is_active ? 'Bloquear' : 'Activar'}</button>
-                    <a class="btn-soft" href="<?= BASE_URL ?>/admin/services/admin_edit.php?id=${a.id}">Editar</a>
+                    <button class="btn-soft" data-action="${a.is_blocked ? 'unblock' : 'block'}">${a.is_blocked ? 'Activar' : 'Bloquear'}</button>
+                    <a class="btn-soft" href="${baseUrl}/admin/services/admin_edit.php?id=${a.id}">Editar</a>
                 </td>
             </tr>
         `).join('');
@@ -52,7 +55,8 @@ class AdminsHub {
     async perform(action, id) {
         if (!confirm('Confirmar accion?')) return;
         try {
-            const body = JSON.stringify({ admin_id: id, action: action });
+            // API expects a 'user_id' field and actions 'block'/'unblock'
+            const body = JSON.stringify({ user_id: id, action: action });
             const res = await fetch(this.cfg.endpoints.update, {
                 method: 'POST',
                 credentials: 'same-origin',

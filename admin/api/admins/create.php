@@ -64,7 +64,7 @@ try {
     $stmt = $conn->prepare("SELECT u.id, u.name, u.email, u.phone, u.image, u.created_at, u.last_access, u.is_blocked,
             ap.job_title, ap.department, ap.responsibilities, ap.emergency_contact
         FROM users u
-        LEFT JOIN admin_profiles ap ON ap.user_id = u.id
+        LEFT JOIN admin_profiles ap ON ap.user_id COLLATE utf8mb4_general_ci = u.id
         WHERE u.id = ? LIMIT 1");
     $stmt->execute([$userId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);

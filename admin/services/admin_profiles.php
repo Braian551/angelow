@@ -7,7 +7,7 @@ if (!function_exists('ensure_admin_profiles_table')) {
         }
 
         $conn->exec("CREATE TABLE IF NOT EXISTS admin_profiles (
-            user_id VARCHAR(64) PRIMARY KEY,
+            user_id VARCHAR(64) COLLATE utf8mb4_general_ci PRIMARY KEY,
             job_title VARCHAR(120) NULL,
             department VARCHAR(120) NULL,
             responsibilities TEXT NULL,
@@ -15,7 +15,16 @@ if (!function_exists('ensure_admin_profiles_table')) {
             last_notified_at DATETIME NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+
+        // Ensure table collation matches the existing 'users' table to avoid
+        // Illegal mix of collations errors when joining on user_id.
+        try {
+            $conn->exec("ALTER TABLE admin_profiles CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci");
+        } catch (Throwable $e) {
+            // If alter fails, log and continue -- table may already be in correct collation
+            error_log('admin_profiles collation update failed: ' . $e->getMessage());
+        }
 
         $ensured = true;
     }

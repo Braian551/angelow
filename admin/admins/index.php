@@ -67,6 +67,7 @@ window.ADMINS_HUB_CONFIG = {
         update: '<?= BASE_URL ?>/admin/api/admins/update_status.php'
     }
 }
+window.ADMINS_HUB_CONFIG.baseUrl = '<?= BASE_URL ?>';
 </script>
 <script src="<?= BASE_URL ?>/js/admin/admins/admins-dashboard.js"></script>
 </body>
