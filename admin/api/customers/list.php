@@ -67,7 +67,11 @@ function buildCustomerQuery(string $search, string $segment, string $sort): arra
         'MAX(o.created_at) AS last_order, CASE WHEN COUNT(DISTINCT o.id) > 0 THEN COALESCE(SUM(o.total), 0) / COUNT(DISTINCT o.id) ELSE 0 END AS avg_ticket';
 
     $selectId = 'SELECT u.id';
-    $group = ' GROUP BY u.id';
+    // In strict SQL modes (ONLY_FULL_GROUP_BY) MySQL requires
+    // all non-aggregated columns present in SELECT to be
+    // included in GROUP BY. Include the commonly used
+    // user columns to avoid SQL errors on strict setups.
+    $group = ' GROUP BY u.id, u.name, u.email, u.phone, u.created_at, u.image, u.is_blocked';
 
     $havingParts = [];
     switch ($segment) {

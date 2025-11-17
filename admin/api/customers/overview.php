@@ -34,7 +34,10 @@ try {
 
 function getCustomerStats(PDO $conn, int $rangeDays): array {
     $totalCustomers = scalarQuery($conn, "SELECT COUNT(*) FROM users WHERE role IN ('customer','user')");
-    $newCustomers = scalarQuery($conn, "SELECT COUNT(*) FROM users WHERE role IN ('customer','user') AND created_at >= DATE_SUB(NOW(), INTERVAL :range DAY)", ['range' => $rangeDays]);
+    // Bind an integer directly into the INTERVAL expression; using a bound
+    // parameter in INTERVAL can cause SQL syntax errors in some MySQL setups.
+    $range = (int) $rangeDays;
+    $newCustomers = scalarQuery($conn, "SELECT COUNT(*) FROM users WHERE role IN ('customer','user') AND created_at >= DATE_SUB(NOW(), INTERVAL $range DAY)");
     $activeCustomers = scalarQuery($conn, "SELECT COUNT(DISTINCT user_id) FROM orders WHERE user_id IS NOT NULL AND status != 'cancelled' AND created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)");
     $repeatCustomers = scalarQuery($conn, "SELECT COUNT(*) FROM (SELECT user_id FROM orders WHERE user_id IS NOT NULL AND status != 'cancelled' GROUP BY user_id HAVING COUNT(*) >= 2) AS repeaters");
     $lifetimeAverage = (float) scalarQuery($conn, "SELECT COALESCE(AVG(customer_total), 0) FROM (SELECT COALESCE(SUM(total), 0) AS customer_total FROM orders WHERE user_id IS NOT NULL AND status != 'cancelled' GROUP BY user_id) AS totals");
@@ -157,7 +160,7 @@ function getTopCustomers(PDO $conn, int $limit): array {
         FROM users u
         LEFT JOIN orders o ON o.user_id = u.id AND o.status != 'cancelled'
         WHERE u.role IN ('customer','user')
-        GROUP BY u.id
+        GROUP BY u.id, u.name, u.email, u.phone
         ORDER BY total_spent DESC
         LIMIT :limit");
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);

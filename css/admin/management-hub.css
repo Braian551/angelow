@@ -288,6 +288,18 @@
     margin-bottom: 0.25rem;
 }
 
+.question-block p {
+    padding: 0.4rem 0.6rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid var(--hub-border);
+}
+
+.question-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
 .timeline li span {
     font-size: 0.85rem;
     color: var(--hub-muted);

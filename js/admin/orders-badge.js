@@ -47,7 +47,12 @@
      * Actualizar el contador del badge
      */
     function updateBadgeCount() {
-        fetch(`${baseUrl}/admin/api/get_new_orders_count.php`, {
+        const endpoint = `${baseUrl}/admin/api/get_new_orders_count.php`.replace(/([^:]\/\/)/, '$1');
+
+        // Try main configured path first; if not found (404), try a fallback
+        // computed from location.pathname so the badge works when the app
+        // runs from a subfolder (Laragon, XAMPP, etc.).
+        fetch(endpoint, {
             method: 'GET',
             credentials: 'same-origin'
         })
@@ -80,7 +85,25 @@
             }
         })
         .catch(error => {
-            console.error('Error al obtener el conteo de órdenes:', error);
+            // If we got a 404-like failure, try a fallback using pathname root
+            try {
+                const segments = window.location.pathname.split('/').filter(Boolean);
+                if (segments.length > 0) {
+                    const appRoot = window.location.origin + '/' + segments[0];
+                    const fallback = `${appRoot}/admin/api/get_new_orders_count.php`;
+                    return fetch(fallback, { method: 'GET', credentials: 'same-origin' })
+                        .then(resp => resp.json())
+                        .then(d => {
+                            if (d.success && d.count > 0) {
+                                const badge = document.getElementById('orders-badge');
+                                if (badge) badge.textContent = d.count;
+                            }
+                        })
+                        .catch(err => console.error('Error fallback al obtener el conteo de órdenes:', err));
+                }
+            } catch (e) {
+                console.error('Error al obtener el conteo de órdenes:', error);
+            }
         });
     }
 

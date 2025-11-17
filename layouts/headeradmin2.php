@@ -93,11 +93,16 @@ try {
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a href="<?= BASE_URL ?>/admin/resenas/index.php">
+            <li class="nav-item with-submenu">
+                <div class="menu-item">
                     <i class="fas fa-star"></i>
                     <span>Reseñas</span>
-                </a>
+                    <i class="fas fa-chevron-down submenu-toggle"></i>
+                </div>
+                <ul class="submenu">
+                    <li><a href="<?= BASE_URL ?>/admin/resenas/index.php">Reseñas</a></li>
+                    <li><a href="<?= BASE_URL ?>/admin/resenas/preguntas.php">Preguntas</a></li>
+                </ul>
             </li>
             <li class="nav-item">
                 <a href="<?= BASE_URL ?>/admin/pagos/define_pay.php">
