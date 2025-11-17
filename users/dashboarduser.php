@@ -4,6 +4,7 @@ require_once __DIR__ . '/../conexion.php';
 require_once __DIR__ . '/../layouts/functions.php';
 require_once __DIR__ . '/../auth/role_redirect.php';
 require_once __DIR__ . '/../layouts/headerproducts.php';
+require_once __DIR__ . '/../helpers/product_pricing.php';
 
 // Verificar que el usuario tenga rol de user o customer
 requireRole(['user', 'customer']);
@@ -111,7 +112,7 @@ try {
     ");
 
     $stmt->execute([$userId, $userId]);
-    $recommendedProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $recommendedProducts = hydrateProductsPricing($conn, $stmt->fetchAll(PDO::FETCH_ASSOC));
 
     // Si no hay suficientes productos, agregar algunos aleatorios
     if (count($recommendedProducts) < 6) {
@@ -158,7 +159,7 @@ try {
         $params = array_merge([$userId], $existingIds);
         $stmt->execute($params);
 
-        $additionalProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $additionalProducts = hydrateProductsPricing($conn, $stmt->fetchAll(PDO::FETCH_ASSOC));
         $recommendedProducts = array_merge($recommendedProducts, $additionalProducts);
     }
 
@@ -180,7 +181,7 @@ try {
             LIMIT 6
         ");
         $stmt->execute();
-        $recommendedProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $recommendedProducts = hydrateProductsPricing($conn, $stmt->fetchAll(PDO::FETCH_ASSOC));
     } catch (Exception $fallbackError) {
         error_log("Fallback error: " . $fallbackError->getMessage());
         $recommendedProducts = [];
@@ -331,9 +332,10 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                 <div class="recommendations-grid" id="recommendations-grid">
                     <?php if (!empty($recommendedProducts)): ?>
                         <?php foreach ($recommendedProducts as $product):
-                            // Obtener información de valoración (se reasigna después de fallback)
-                            $displayPrice = $product['price'];
-                            $displayPrice = $product['price'];
+                            $displayPrice = $product['display_price'] ?? $product['price'];
+                            $comparePrice = $product['compare_price'] ?? null;
+                            $hasDiscount = !empty($product['has_discount']) && $comparePrice !== null;
+                            $discountPercentage = $hasDiscount ? ($product['discount_percentage'] ?? 0) : 0;
                         ?>
                             <?php
                                 // Asegurar is_favorite y ratings aunque la consulta pueda no traerlos
@@ -368,9 +370,12 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                                  data-avg-rating="<?= htmlspecialchars(round($product['avg_rating'],1)) ?>"
                                  data-review-count="<?= htmlspecialchars($product['review_count'] ?? 0) ?>"
                                  data-is-favorite="<?= htmlspecialchars($product['is_favorite'] ?? 0) ?>">
-                                <!-- Badge para productos destacados -->
-                                <?php if ($product['is_featured']): ?>
+                                <!-- Badge para productos destacados / descuentos -->
+                                <?php if (!empty($product['is_featured'])): ?>
                                     <div class="product-badge">Destacado</div>
+                                <?php endif; ?>
+                                <?php if ($hasDiscount && $discountPercentage > 0): ?>
+                                    <div class="product-badge sale"><?= $discountPercentage ?>% OFF</div>
                                 <?php endif; ?>
 
                                 <!-- Botón de favoritos -->
@@ -430,8 +435,8 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                                     <!-- Precio -->
                                     <div class="product-price">
                                         <span class="current-price">$<?= number_format($displayPrice, 0, ',', '.') ?></span>
-                                        <?php if ($product['compare_price'] && $product['compare_price'] > $displayPrice): ?>
-                                            <span class="original-price">$<?= number_format($product['compare_price'], 0, ',', '.') ?></span>
+                                        <?php if ($hasDiscount): ?>
+                                            <span class="original-price">$<?= number_format($comparePrice, 0, ',', '.') ?></span>
                                         <?php endif; ?>
                                     </div>
 

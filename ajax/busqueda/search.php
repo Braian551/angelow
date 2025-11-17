@@ -27,9 +27,11 @@ if (isset($_GET['term']) && !empty($_GET['term'])) {
         // Obtener el primer conjunto de resultados (productos)
         $response['suggestions'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Avanzar al siguiente conjunto de resultados (términos)
-        $stmt->nextRowset();
-        $terms = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+        // Avanzar al siguiente conjunto de resultados (términos) si existe
+        $terms = [];
+        if ($stmt->nextRowset()) {
+            $terms = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+        }
         
         // Filtrar términos válidos
         $response['terms'] = array_values(array_filter($terms, function($term) {

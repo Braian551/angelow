@@ -25,6 +25,7 @@ BEGIN
         p.name,
         p.slug,
         p.description,
+            p.compare_price,
         p.price as min_price,
         p.price as max_price,
         p.gender,

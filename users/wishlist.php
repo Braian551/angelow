@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
 require_once __DIR__ . '/../layouts/headerproducts.php';
+require_once __DIR__ . '/../helpers/product_pricing.php';
 
 // Verificar si el usuario está logueado
 if (!isset($_SESSION['user_id'])) {
@@ -42,7 +43,7 @@ try {
     
     $stmt = $conn->prepare($query);
     $stmt->execute([':user_id' => $userId]);
-    $wishlistProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $wishlistProducts = hydrateProductsPricing($conn, $stmt->fetchAll(PDO::FETCH_ASSOC));
     
 } catch (PDOException $e) {
     error_log("Error fetching wishlist: " . $e->getMessage());
@@ -121,15 +122,17 @@ try {
 
             <!-- Grid de productos -->
             <div class="products-grid">
-                <?php foreach ($wishlistProducts as $product): ?>
+                <?php foreach ($wishlistProducts as $product): 
+                    $displayPrice = $product['display_price'] ?? $product['price'];
+                    $comparePrice = $product['compare_price'] ?? null;
+                    $hasDiscount = !empty($product['has_discount']) && $comparePrice !== null;
+                ?>
                     <div class="product-card" data-product-id="<?= $product['id'] ?>">
-                        <?php if ($product['is_featured']): ?>
+                        <?php if (!empty($product['is_featured'])): ?>
                             <div class="product-badge">Destacado</div>
-                        <?php elseif (!empty($product['compare_price']) && $product['compare_price'] > $product['price']): ?>
-                            <?php 
-                            $discount = round((($product['compare_price'] - $product['price']) / $product['compare_price']) * 100);
-                            ?>
-                            <div class="product-badge sale"><?= $discount ?>% OFF</div>
+                        <?php endif; ?>
+                        <?php if ($hasDiscount && !empty($product['discount_percentage'])): ?>
+                            <div class="product-badge sale"><?= $product['discount_percentage'] ?>% OFF</div>
                         <?php endif; ?>
 
                         <!-- Botón de favoritos (siempre activo en esta página) -->
@@ -189,9 +192,9 @@ try {
 
                             <!-- Precio -->
                             <div class="product-price">
-                                <span class="current-price">$<?= number_format($product['price'], 0, ',', '.') ?></span>
-                                <?php if ($product['compare_price'] && $product['compare_price'] > $product['price']): ?>
-                                    <span class="original-price">$<?= number_format($product['compare_price'], 0, ',', '.') ?></span>
+                                <span class="current-price">$<?= number_format($displayPrice, 0, ',', '.') ?></span>
+                                <?php if ($hasDiscount): ?>
+                                    <span class="original-price">$<?= number_format($comparePrice, 0, ',', '.') ?></span>
                                 <?php endif; ?>
                             </div>
 

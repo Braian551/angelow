@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
 require_once __DIR__ . '/../layouts/headerproducts.php';
+require_once __DIR__ . '/../helpers/product_pricing.php';
 
 // Verificar si el usuario está logueado
 $isLoggedIn = isset($_SESSION['user_id']);
@@ -45,11 +46,24 @@ try {
         return $product;
     }, $products);
 
+    // Asegurar que cada producto tenga información consistente de precios
+    $products = hydrateProductsPricing($conn, $products);
+
     // Obtener el conteo total (segundo conjunto de resultados)
-    $stmt->nextRowset();
-    $totalResult = $stmt->fetch(PDO::FETCH_ASSOC);
-    $totalProducts = $totalResult['total'];
-    $totalPages = ceil($totalProducts / $limit);
+    $totalProducts = 0;
+    $totalPages = 1;
+
+    try {
+        if ($stmt->nextRowset()) {
+            $totalResult = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($totalResult !== false && isset($totalResult['total'])) {
+                $totalProducts = (int) $totalResult['total'];
+                $totalPages = max(1, (int) ceil($totalProducts / $limit));
+            }
+        }
+    } catch (\Exception $ex) {
+        error_log("Error fetching total products rowset: " . $ex->getMessage());
+    }
 
 } catch (PDOException $e) {
     error_log("Error fetching products: " . $e->getMessage());
@@ -193,9 +207,6 @@ try {
                     </div>
                 <?php else: ?>
                     <?php foreach ($products as $product):
-                        // Default category name in case it's missing
-                        $categoryName = 'Sin categoría';
-                        // Resolver nombre de categoría antes de usarlo en la clase del producto
                         $categoryName = 'Sin categoría';
                         foreach ($categories as $cat) {
                             if ($cat['id'] == $product['category_id']) {
@@ -203,17 +214,21 @@ try {
                                 break;
                             }
                         }
-                        // Obtener información de valoración desde el producto
+
                         $avgRating = isset($product['avg_rating']) ? round($product['avg_rating'], 1) : 0;
                         $reviewCount = isset($product['review_count']) ? $product['review_count'] : 0;
 
-                        // Determinar precio a mostrar
-                        $displayPrice = $product['min_price'] ?? ($product['price'] ?? 0);
+                        $displayPrice = $product['display_price'] ?? ($product['min_price'] ?? ($product['price'] ?? 0));
+                        $hasDiscount = !empty($product['has_discount']);
+                        $comparePrice = $product['compare_price'] ?? null;
+                        $discountPercentage = $product['discount_percentage'] ?? 0;
                     ?>
                         <div class="product-card <?= strtolower((string)($categoryName ?? 'Sin categoría')) === 'ropa deportiva' ? 'no-hover' : '' ?>" data-product-id="<?= $product['id'] ?>">
-                            <!-- Badge para productos destacados -->
-                            <?php if ($product['is_featured']): ?>
+                            <?php if (!empty($product['is_featured'])): ?>
                                 <div class="product-badge">Destacado</div>
+                            <?php endif; ?>
+                            <?php if ($hasDiscount && $discountPercentage > 0): ?>
+                                <div class="product-badge sale"><?= $discountPercentage ?>% OFF</div>
                             <?php endif; ?>
 
                             <!-- Botón de favoritos -->
@@ -273,8 +288,8 @@ try {
                                 <!-- Precio -->
                                 <div class="product-price">
                                     <span class="current-price">$<?= number_format($displayPrice, 0, ',', '.') ?></span>
-                                    <?php if (isset($product['compare_price']) && $product['compare_price'] > $displayPrice): ?>
-                                        <span class="original-price">$<?= number_format($product['compare_price'], 0, ',', '.') ?></span>
+                                    <?php if ($hasDiscount && $comparePrice !== null): ?>
+                                        <span class="original-price">$<?= number_format($comparePrice, 0, ',', '.') ?></span>
                                     <?php endif; ?>
                                 </div>
 

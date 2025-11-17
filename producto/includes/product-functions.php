@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../helpers/product_pricing.php';
 function getProductBySlug($conn, $slug) {
     try {
         $stmt = $conn->prepare("
@@ -282,10 +283,12 @@ function getProductQuestions($conn, $productId) {
 function getRelatedProducts($conn, $productId, $categoryId) {
     try {
         $stmt = $conn->prepare("
-        SELECT p.id, p.name, p.slug, p.price, p.compare_price, pi.image_path,
-           COALESCE(pr.avg_rating, 0) as avg_rating, COALESCE(pr.review_count, 0) as review_count
+          SELECT p.id, p.name, p.slug, p.price, p.compare_price, p.is_featured, pi.image_path,
+              c.name as category_name,
+              COALESCE(pr.avg_rating, 0) as avg_rating, COALESCE(pr.review_count, 0) as review_count
         FROM products p
         LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_primary = 1
+          LEFT JOIN categories c ON p.category_id = c.id
         LEFT JOIN (
         SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count
         FROM product_reviews
@@ -297,7 +300,8 @@ function getRelatedProducts($conn, $productId, $categoryId) {
         LIMIT 4
     ");
         $stmt->execute([$categoryId, $productId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $relatedProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return hydrateProductsPricing($conn, $relatedProducts);
     } catch (PDOException $e) {
         error_log("Error al obtener productos relacionados: " . $e->getMessage());
         return [];

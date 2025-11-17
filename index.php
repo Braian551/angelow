@@ -3,6 +3,7 @@
 require_once __DIR__ . '/conexion.php';
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/layouts/headerproducts.php';
+require_once __DIR__ . '/helpers/product_pricing.php';
 
 // Obtener anuncios activos para barra superior (solo el de mayor prioridad)
 $top_bar_query = "SELECT * FROM announcements 
@@ -68,7 +69,7 @@ $products_query = "
 ";
 $products_stmt = $conn->prepare($products_query);
 $products_stmt->execute();
-$products = $products_stmt->fetchAll(PDO::FETCH_ASSOC);
+$products = hydrateProductsPricing($conn, $products_stmt->fetchAll(PDO::FETCH_ASSOC));
 
 // Obtener colecciones activas
 $collections_query = "SELECT * FROM collections WHERE is_active = 1 ORDER BY launch_date DESC LIMIT 3";
@@ -194,13 +195,11 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php if (!empty($products)): ?>
                 <?php foreach ($products as $product): ?>
                     <div class="product-card" data-product-id="<?php echo $product['id']; ?>">
-                        <?php if ($product['is_featured']): ?>
+                        <?php if (!empty($product['is_featured'])): ?>
                             <div class="product-badge">Destacado</div>
-                        <?php elseif (!empty($product['compare_price']) && $product['compare_price'] > $product['price']): ?>
-                            <?php 
-                            $discount = round((($product['compare_price'] - $product['price']) / $product['compare_price']) * 100);
-                            ?>
-                            <div class="product-badge sale"><?php echo $discount; ?>% OFF</div>
+                        <?php endif; ?>
+                        <?php if (!empty($product['has_discount']) && !empty($product['discount_percentage'])): ?>
+                            <div class="product-badge sale"><?php echo $product['discount_percentage']; ?>% OFF</div>
                         <?php endif; ?>
                         
                         <!-- Botón de favoritos -->
@@ -254,8 +253,8 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
                             
                             <!-- Precio -->
                             <div class="product-price">
-                                <span class="current-price">$<?php echo number_format($product['price'], 0, ',', '.'); ?></span>
-                                <?php if (!empty($product['compare_price']) && $product['compare_price'] > $product['price']): ?>
+                                <span class="current-price">$<?php echo number_format($product['display_price'] ?? $product['price'], 0, ',', '.'); ?></span>
+                                <?php if (!empty($product['has_discount']) && $product['compare_price'] !== null): ?>
                                     <span class="original-price">$<?php echo number_format($product['compare_price'], 0, ',', '.'); ?></span>
                                 <?php endif; ?>
                             </div>

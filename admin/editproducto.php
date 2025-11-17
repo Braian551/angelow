@@ -181,6 +181,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("El precio de comparación debe ser mayor que cero");
             }
         }
+        // Validar que el precio de comparación sea mayor que el precio base para mostrar descuento
+        if ($compare_price !== null && isset($price) && $compare_price <= $price) {
+            throw new Exception("El precio de comparación debe ser mayor que el precio base para que el descuento se muestre.");
+        }
 
         if (empty($_POST['variant_color']) || !is_array($_POST['variant_color'])) {
             throw new Exception("Debes agregar al menos una variante para el producto");
@@ -255,6 +259,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // 3. Eliminar variantes existentes y recrearlas (simplificación)
+        // Antes de eliminar, obtener imágenes existentes agrupadas por color_id para poder preservarlas
+        $existingVariantImagesByColor = [];
+        try {
+            $stmt = $conn->prepare("SELECT vi.*, pcv.color_id FROM variant_images vi JOIN product_color_variants pcv ON vi.color_variant_id = pcv.id WHERE vi.product_id = ?");
+            $stmt->execute([$product_id]);
+            $oldImages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($oldImages as $img) {
+                $existingVariantImagesByColor[$img['color_id']][] = $img;
+            }
+        } catch (PDOException $e) {
+            $existingVariantImagesByColor = [];
+        }
+
+        // Lista de imágenes marcadas para eliminación por el usuario
+        $deleteVariantImages = $_POST['delete_variant_images'] ?? [];
+
+        // Borrar las variantes y sus tallas y luego recrearlas. Las imágenes que no fueron marcadas
+        // para eliminación se reinsertarán más abajo en el loop para preservar fotos existentes.
         $conn->prepare("DELETE FROM product_size_variants WHERE color_variant_id IN (SELECT id FROM product_color_variants WHERE product_id = ?)")->execute([$product_id]);
         $conn->prepare("DELETE FROM variant_images WHERE product_id = ?")->execute([$product_id]);
         $conn->prepare("DELETE FROM product_color_variants WHERE product_id = ?")->execute([$product_id]);
@@ -276,6 +299,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $color_variant_id = $conn->lastInsertId();
 
             // Procesar imágenes para esta variante de color
+            // Si existen imágenes antiguas para este color y el usuario no las marcó para eliminar,
+            // las reinsertamos para preservar las fotos al actualizar.
+            if (!empty($existingVariantImagesByColor[$color_id])) {
+                foreach ($existingVariantImagesByColor[$color_id] as $oldImg) {
+                    if (in_array($oldImg['id'], $deleteVariantImages)) continue;
+
+                    // Reinsertar imagen existente con el nuevo color_variant_id
+                    $stmt = $conn->prepare("INSERT INTO variant_images (
+                        color_variant_id, product_id, image_path, alt_text, `order`, is_primary
+                    ) VALUES (?, ?, ?, ?, ?, ?)");
+
+                    $stmt->execute([
+                        $color_variant_id,
+                        $product_id,
+                        $oldImg['image_path'],
+                        $oldImg['alt_text'] ?? '',
+                        $oldImg['order'] ?? 0,
+                        $oldImg['is_primary'] ?? 0
+                    ]);
+                }
+            }
+
             if (!empty($_FILES['variant_images']['name'][$index])) {
                 foreach ($_FILES['variant_images']['tmp_name'][$index] as $key => $tmp_name) {
                     if ($_FILES['variant_images']['error'][$index][$key] !== UPLOAD_ERR_OK) continue;
@@ -333,6 +378,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $variant_compare_price = null;
                 if (!empty($variant_compare_prices[$size_id])) {
                     $variant_compare_price = (float) str_replace(['.', ','], ['', '.'], $variant_compare_prices[$size_id]);
+                }
+                // Validar que compare_price de variante sea mayor que su precio para que se muestre
+                $variant_price_value = (float) str_replace(['.', ','], ['', '.'], $variant_prices[$size_id] ?? 0);
+                if ($variant_compare_price !== null && $variant_compare_price <= $variant_price_value) {
+                    throw new Exception("El precio de comparación de la talla debe ser mayor que su precio para que el descuento se muestre (color: $color_id, talla: $size_id).");
                 }
 
                 $stmt = $conn->prepare("INSERT INTO product_size_variants (
@@ -473,7 +523,7 @@ if (isset($_SESSION['alert'])) {
                             <div class="form-group">
                                 <label for="compare_price">Precio de comparación</label>
                                 <input type="text" id="compare_price" name="compare_price" value="<?= $product['compare_price'] ? number_format($product['compare_price'], 2, '.', '') : '' ?>" class="price-input" min="0" step="0.01">
-                                <small>El precio tachado que muestra el descuento</small>
+                                <small>El precio tachado que muestra el descuento. Debe ser mayor que el precio base. Formato: miles con puntos, decimales con coma o punto (ej: 2.500.000 o 12.499,99).</small>
                             </div>
 
                             <div class="form-group full-width">

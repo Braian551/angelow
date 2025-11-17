@@ -24,7 +24,7 @@ if (!empty($reviewsClientPayload['reviews'])) {
         let selectedColorId = <?= $variantsData['defaultColorId'] ?? 'null' ?>;
         let selectedSizeId = <?= $variantsData['defaultSizeId'] ?? 'null' ?>;
         let selectedVariantId = <?= $variantsData['defaultVariant']['variant_id'] ?? 'null' ?>;
-        let selectedQuantity = 1;
+        let selectedQuantity = <?= ($variantsData['defaultVariant']['quantity'] ?? 0) > 0 ? 1 : 0 ?>;
         let variantsByColor = <?= json_encode($variantsData['variantsByColor']) ?>;
         let productId = <?= $product['id'] ?? 'null' ?>;
         let isInWishlist = false;
@@ -36,6 +36,8 @@ if (!empty($reviewsClientPayload['reviews'])) {
         let reviewsState = <?= json_encode($reviewsClientPayload, JSON_UNESCAPED_UNICODE) ?>;
         const reviewsEndpoint = productId ? '<?= BASE_URL ?>/api/get_reviews.php?product_id=' + productId : null;
         const seeAllReviewsUrl = <?= json_encode(BASE_URL . '/producto/opiniones/' . ($product['slug'] ?? '')) ?>;
+
+        updateVariantBindings(selectedVariantId);
 
         // Read product page debug flag from the <meta name="debug"> tag (set to 1 to enable)
         const PRODUCT_PAGE_DEBUG = document.querySelector('meta[name="debug"]')?.content === '1';
@@ -444,6 +446,60 @@ if (!empty($reviewsClientPayload['reviews'])) {
             nextBtn.toggleClass('hidden', container.scrollLeft >= container.scrollWidth - container.offsetWidth - 10);
         }
 
+        function formatCurrency(value) {
+            const numericValue = Number(value ?? 0);
+            return '$' + numericValue.toLocaleString('es-CO', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+        }
+
+        function updateVariantBindings(variantId) {
+            const targetId = variantId || '';
+            $('#add-to-cart, #buy-now').attr('data-variant-id', targetId);
+        }
+
+        function updatePriceInfo(price, comparePrice) {
+            const pricingSection = $('.product-pricing');
+            if (!pricingSection.length) return;
+
+            const currentPriceEl = pricingSection.find('.current-price');
+            const originalPriceEl = pricingSection.find('.original-price');
+            const discountBadge = pricingSection.find('.discount-badge');
+
+            const fallbackPrice = Number(currentPriceEl.data('current-price')) || 0;
+            const numericPrice = Number(price);
+            const currentValue = Number.isFinite(numericPrice) && numericPrice > 0 ? numericPrice : fallbackPrice;
+
+            currentPriceEl
+                .text(formatCurrency(currentValue))
+                .attr('data-current-price', currentValue)
+                .data('current-price', currentValue);
+
+            const baseCompareRaw = pricingSection.data('product-compare');
+            const baseCompare = Number(baseCompareRaw);
+            const normalizedBaseCompare = Number.isFinite(baseCompare) && baseCompare > currentValue ? baseCompare : null;
+
+            const variantCompare = Number(comparePrice);
+            let effectiveCompare = Number.isFinite(variantCompare) && variantCompare > currentValue ? variantCompare : null;
+            if (!effectiveCompare) {
+                effectiveCompare = normalizedBaseCompare;
+            }
+
+            if (effectiveCompare) {
+                originalPriceEl
+                    .text(formatCurrency(effectiveCompare))
+                    .show();
+                const discount = Math.max(0, Math.round(((effectiveCompare - currentValue) / effectiveCompare) * 100));
+                discountBadge
+                    .text(`${discount}% OFF`)
+                    .show();
+            } else {
+                originalPriceEl.hide();
+                discountBadge.hide();
+            }
+        }
+
         // Inicializar navegación
         updateThumbNavs();
 
@@ -467,6 +523,7 @@ if (!empty($reviewsClientPayload['reviews'])) {
 
             // Cambiar imágenes
             const colorData = variantsByColor[colorId];
+            if (!colorData) return;
             const images = colorData.images.length ? colorData.images : [{
                 image_path: '<?= $product['primary_image'] ?>',
                 alt_text: '<?= $product['name'] ?> - Imagen principal'
@@ -530,6 +587,17 @@ if (!empty($reviewsClientPayload['reviews'])) {
         // Actualizar opciones de talla cuando cambia el color
         function updateSizeOptions(colorId) {
             const colorData = variantsByColor[colorId];
+            if (!colorData) {
+                $('#size-options').html('<div class="no-sizes">No hay tallas disponibles para este color</div>');
+                $('#selected-size-name').text('No disponible');
+                $('#product-sku').text('N/A');
+                selectedSizeId = null;
+                selectedVariantId = null;
+                updateVariantBindings(null);
+                updatePriceInfo(null, null);
+                updateStockInfo(0);
+                return;
+            }
             const firstAvailableSize = colorData.sizes ? Object.keys(colorData.sizes)[0] : null;
 
             $('#size-options').empty();
@@ -550,6 +618,8 @@ if (!empty($reviewsClientPayload['reviews'])) {
                 selectedVariantId = colorData.sizes[firstAvailableSize].variant_id;
                 $('#selected-size-name').text(colorData.sizes[firstAvailableSize].size_name);
                 $('#product-sku').text(colorData.sizes[firstAvailableSize].sku);
+                updateVariantBindings(selectedVariantId);
+                updatePriceInfo(colorData.sizes[firstAvailableSize].price, colorData.sizes[firstAvailableSize].compare_price);
 
                 // Actualizar disponibilidad
                 updateStockInfo(colorData.sizes[firstAvailableSize].quantity);
@@ -557,6 +627,10 @@ if (!empty($reviewsClientPayload['reviews'])) {
                 $('#size-options').html('<div class="no-sizes">No hay tallas disponibles para este color</div>');
                 $('#selected-size-name').text('No disponible');
                 $('#product-sku').text('N/A');
+                selectedSizeId = null;
+                selectedVariantId = null;
+                updateVariantBindings(null);
+                updatePriceInfo(null, null);
                 updateStockInfo(0);
             }
         }
@@ -575,35 +649,60 @@ if (!empty($reviewsClientPayload['reviews'])) {
             // Actualizar disponibilidad
             const colorData = variantsByColor[selectedColorId];
             updateStockInfo(colorData.sizes[sizeId].quantity);
+            updateVariantBindings(selectedVariantId);
+            updatePriceInfo(colorData.sizes[sizeId].price, colorData.sizes[sizeId].compare_price);
         });
 
         // Actualizar información de stock
         function updateStockInfo(quantity) {
             const stockInfo = $('.stock-info');
             const quantityInput = $('#product-quantity');
+            const addToCartBtn = $('#add-to-cart');
+            const buyNowBtn = $('#buy-now');
+            const normalizedQuantity = Number(quantity) || 0;
 
             // Actualizar el texto de stock
-            if (quantity > 5) {
-                stockInfo.html('<i class="fas fa-check-circle in-stock"></i> Disponible (' + quantity + ' unidades)');
-                quantityInput.attr('max', Math.min(quantity, 10));
-            } else if (quantity > 0) {
-                stockInfo.html('<i class="fas fa-exclamation-circle low-stock"></i> Últimas ' + quantity + ' unidades');
-                quantityInput.attr('max', quantity);
-
-                // Ajustar cantidad si es mayor al nuevo máximo
-                if (parseInt(quantityInput.val()) > quantity) {
-                    quantityInput.val(quantity);
-                    selectedQuantity = quantity;
-                }
+            if (normalizedQuantity > 5) {
+                stockInfo.html('<i class="fas fa-check-circle in-stock"></i> Disponible (' + normalizedQuantity + ' unidades)');
+            } else if (normalizedQuantity > 0) {
+                stockInfo.html('<i class="fas fa-exclamation-circle low-stock"></i> Últimas ' + normalizedQuantity + ' unidades');
             } else {
                 stockInfo.html('<i class="fas fa-times-circle out-of-stock"></i> Agotado');
-                quantityInput.attr('max', 0);
             }
+
+            if (normalizedQuantity > 0) {
+                const maxAllowed = Math.min(normalizedQuantity, 10);
+                quantityInput
+                    .attr('max', maxAllowed)
+                    .attr('min', 1)
+                    .prop('disabled', false);
+                let currentValue = parseInt(quantityInput.val(), 10);
+                if (!Number.isInteger(currentValue) || currentValue < 1) {
+                    currentValue = 1;
+                }
+                if (currentValue > maxAllowed) {
+                    currentValue = maxAllowed;
+                }
+                quantityInput.val(currentValue);
+                selectedQuantity = currentValue;
+            } else {
+                quantityInput
+                    .attr('max', 0)
+                    .attr('min', 0)
+                    .prop('disabled', true)
+                    .val(0);
+                selectedQuantity = 0;
+            }
+
+            const isAvailable = normalizedQuantity > 0;
+            addToCartBtn.prop('disabled', !isAvailable);
+            buyNowBtn.prop('disabled', !isAvailable);
         }
 
         // Control de cantidad
         $('.qty-btn.minus').click(function() {
             const input = $('#product-quantity');
+            if (input.prop('disabled')) return;
             let value = parseInt(input.val());
             if (value > 1) {
                 input.val(value - 1);
@@ -613,6 +712,7 @@ if (!empty($reviewsClientPayload['reviews'])) {
 
         $('.qty-btn.plus').click(function() {
             const input = $('#product-quantity');
+            if (input.prop('disabled')) return;
             const max = parseInt(input.attr('max'));
             let value = parseInt(input.val());
             if (value < max) {

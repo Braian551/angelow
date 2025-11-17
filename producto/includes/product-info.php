@@ -1,3 +1,42 @@
+<?php
+    $defaultVariant = $variantsData['defaultVariant'] ?? null;
+    $defaultColorId = $variantsData['defaultColorId'] ?? null;
+    $defaultSizeId = $variantsData['defaultSizeId'] ?? null;
+
+    if (!$defaultColorId && !empty($variantsData['variantsByColor'])) {
+        $colorKeys = array_keys($variantsData['variantsByColor']);
+        $defaultColorId = $colorKeys[0];
+    }
+
+    $defaultColorName = ($defaultColorId && isset($variantsData['variantsByColor'][$defaultColorId]['color_name']))
+        ? $variantsData['variantsByColor'][$defaultColorId]['color_name']
+        : 'No disponible';
+
+    $defaultSizesForColor = ($defaultColorId && !empty($variantsData['variantsByColor'][$defaultColorId]['sizes']))
+        ? $variantsData['variantsByColor'][$defaultColorId]['sizes']
+        : [];
+
+    $currentPrice = $defaultVariant['price'] ?? ($product['price'] ?? 0);
+    $variantComparePrice = $defaultVariant['compare_price'] ?? null;
+    $productComparePrice = $product['compare_price'] ?? null;
+
+    $effectiveComparePrice = null;
+    if ($variantComparePrice && $variantComparePrice > $currentPrice) {
+        $effectiveComparePrice = $variantComparePrice;
+    } elseif ($productComparePrice && $productComparePrice > $currentPrice) {
+        $effectiveComparePrice = $productComparePrice;
+    }
+
+    $discountPercentage = ($effectiveComparePrice && $effectiveComparePrice > 0)
+        ? max(0, round((($effectiveComparePrice - $currentPrice) / $effectiveComparePrice) * 100))
+        : 0;
+
+    $defaultVariantQuantity = $defaultVariant['quantity'] ?? 0;
+    $defaultVariantId = $defaultVariant['variant_id'] ?? null;
+    $initialQuantityValue = $defaultVariantQuantity > 0 ? 1 : 0;
+    $initialQuantityMax = $defaultVariantQuantity > 0 ? min($defaultVariantQuantity, 10) : 0;
+    $initialQuantityMin = $defaultVariantQuantity > 0 ? 1 : 0;
+?>
 <div class="product-info">
     <div class="product-header">
         <h1 class="product-title"><?= htmlspecialchars($product['name']) ?></h1>
@@ -28,15 +67,19 @@
         </div>
     </div>
     
-    <div class="product-pricing">
+    <div class="product-pricing" data-product-compare="<?= htmlspecialchars($productComparePrice ?? '') ?>">
         <?php if (!empty($variantsData['defaultVariant'])): ?>
-            <div class="current-price">$<?= number_format($variantsData['defaultVariant']['price'], 0, ',', '.') ?></div>
-            <?php if ($product['compare_price'] && $product['compare_price'] > $variantsData['defaultVariant']['price']): ?>
-                <div class="original-price">$<?= number_format($product['compare_price'], 0, ',', '.') ?></div>
-                <div class="discount-badge">
-                    <?= round(100 - ($variantsData['defaultVariant']['price'] / $product['compare_price'] * 100)) ?>% OFF
-                </div>
-            <?php endif; ?>
+            <div class="current-price" data-current-price="<?= htmlspecialchars($currentPrice) ?>">
+                $<?= number_format($currentPrice, 0, ',', '.') ?>
+            </div>
+            <div class="original-price" <?= $effectiveComparePrice ? '' : 'style="display:none;"' ?>>
+                <?php if ($effectiveComparePrice): ?>
+                    $<?= number_format($effectiveComparePrice, 0, ',', '.') ?>
+                <?php endif; ?>
+            </div>
+            <div class="discount-badge" <?= $effectiveComparePrice ? '' : 'style="display:none;"' ?>>
+                <?= $effectiveComparePrice ? $discountPercentage . '% OFF' : '' ?>
+            </div>
         <?php else: ?>
             <div class="current-price">Precio no disponible</div>
         <?php endif; ?>
@@ -75,10 +118,10 @@
     <div class="product-variants">
         <?php if (!empty($variantsData['variantsByColor'])): ?>
             <div class="variant-selector color-selector">
-                <h4>Color: <span id="selected-color-name"><?= $variantsData['variantsByColor'][$variantsData['defaultColorId']]['color_name'] ?? 'No disponible' ?></span></h4>
+                <h4>Color: <span id="selected-color-name"><?= htmlspecialchars($defaultColorName) ?></span></h4>
                 <div class="color-options">
                     <?php foreach ($variantsData['variantsByColor'] as $colorId => $colorData): ?>
-                        <div class="color-option <?= $colorId == $variantsData['defaultColorId'] ? 'selected' : '' ?>" 
+                        <div class="color-option <?= $colorId == $defaultColorId ? 'selected' : '' ?>" 
                              data-color-id="<?= $colorId ?>"
                              data-color-name="<?= htmlspecialchars($colorData['color_name']) ?>"
                              title="<?= htmlspecialchars($colorData['color_name']) ?>">
@@ -93,11 +136,11 @@
             </div>
             
             <div class="variant-selector size-selector">
-                <h4>Talla: <span id="selected-size-name"><?= $variantsData['defaultVariant']['size_name'] ?? 'No disponible' ?></span></h4>
+                <h4>Talla: <span id="selected-size-name"><?= htmlspecialchars($defaultVariant['size_name'] ?? 'No disponible') ?></span></h4>
                 <div class="size-options" id="size-options">
-                    <?php if (!empty($variantsData['variantsByColor'][$variantsData['defaultColorId']]['sizes'])): ?>
-                        <?php foreach ($variantsData['variantsByColor'][$variantsData['defaultColorId']]['sizes'] as $sizeId => $sizeData): ?>
-                            <div class="size-option <?= $sizeId == $variantsData['defaultSizeId'] ? 'selected' : '' ?>" 
+                    <?php if (!empty($defaultSizesForColor)): ?>
+                        <?php foreach ($defaultSizesForColor as $sizeId => $sizeData): ?>
+                            <div class="size-option <?= $sizeId == $defaultSizeId ? 'selected' : '' ?>" 
                                  data-size-id="<?= $sizeId ?>"
                                  data-size-name="<?= htmlspecialchars($sizeData['size_name']) ?>"
                                  data-variant-id="<?= $sizeData['variant_id'] ?>">
@@ -114,12 +157,12 @@
           <div class="variant-info">
         <div class="stock-info">
             <?php if (!empty($variantsData['defaultVariant'])): ?>
-                <?php if ($variantsData['defaultVariant']['quantity'] > 5): ?>
+                <?php if ($defaultVariantQuantity > 5): ?>
                     <i class="fas fa-check-circle in-stock"></i> 
-                    <span class="stock-quantity">Disponible (<?= $variantsData['defaultVariant']['quantity'] ?> unidades)</span>
-                <?php elseif ($variantsData['defaultVariant']['quantity'] > 0): ?>
+                    <span class="stock-quantity">Disponible (<?= $defaultVariantQuantity ?> unidades)</span>
+                <?php elseif ($defaultVariantQuantity > 0): ?>
                     <i class="fas fa-exclamation-circle low-stock"></i> 
-                    <span class="stock-quantity">Últimas <?= $variantsData['defaultVariant']['quantity'] ?> unidades</span>
+                    <span class="stock-quantity">Últimas <?= $defaultVariantQuantity ?> unidades</span>
                 <?php else: ?>
                     <i class="fas fa-times-circle out-of-stock"></i> 
                     <span class="stock-quantity">Agotado</span>
@@ -144,20 +187,20 @@
         <?php if (!empty($variantsData['defaultVariant'])): ?>
             <div class="quantity-selector">
                 <button class="qty-btn minus" aria-label="Reducir cantidad">-</button>
-                <input type="number" id="product-quantity" min="1" max="<?= min($variantsData['defaultVariant']['quantity'], 10) ?>" value="1">
+                <input type="number" id="product-quantity" min="<?= $initialQuantityMin ?>" max="<?= $initialQuantityMax ?>" value="<?= $initialQuantityValue ?>" <?= $defaultVariantQuantity <= 0 ? 'disabled' : '' ?>>
                 <button class="qty-btn plus" aria-label="Aumentar cantidad">+</button>
             </div>
             
             <div class="action-buttons">
                 <button id="add-to-cart" class="btn-primary" 
-                        data-variant-id="<?= $variantsData['defaultVariant']['variant_id'] ?>"
-                        <?= $variantsData['defaultVariant']['quantity'] <= 0 ? 'disabled' : '' ?>>
+                    data-variant-id="<?= htmlspecialchars($defaultVariantId ?? '') ?>"
+                        <?= $defaultVariantQuantity <= 0 ? 'disabled' : '' ?>>
                     <i class="fas fa-shopping-cart"></i> Añadir al carrito
                 </button>
                 
                 <button id="buy-now" class="btn-secondary"
-                        data-variant-id="<?= $variantsData['defaultVariant']['variant_id'] ?>"
-                        <?= $variantsData['defaultVariant']['quantity'] <= 0 ? 'disabled' : '' ?>>
+                    data-variant-id="<?= htmlspecialchars($defaultVariantId ?? '') ?>"
+                        <?= $defaultVariantQuantity <= 0 ? 'disabled' : '' ?>>
                     Comprar ahora
                 </button>
                 
@@ -166,7 +209,7 @@
                 </button>
             </div>
             
-            <?php if ($variantsData['defaultVariant']['quantity'] <= 0): ?>
+            <?php if ($defaultVariantQuantity <= 0): ?>
                 <div class="out-of-stock-alert">
                     <i class="fas fa-bell"></i> ¿Quieres que te avisemos cuando esté disponible?
                     <button id="notify-me" class="btn-link">Avísame</button>

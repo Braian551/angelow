@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
+require_once __DIR__ . '/../../helpers/product_pricing.php';
 
 header('Content-Type: application/json');
 
@@ -39,10 +40,15 @@ try {
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Obtener el conteo total (segundo conjunto de resultados)
-    $stmt->nextRowset();
-    $totalResult = $stmt->fetch(PDO::FETCH_ASSOC);
-    $totalProducts = $totalResult['total'];
-    $totalPages = ceil($totalProducts / $limit);
+    $totalProducts = 0;
+    $totalPages = 1;
+    if ($stmt->nextRowset()) {
+        $totalResult = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($totalResult !== false && isset($totalResult['total'])) {
+            $totalProducts = (int)$totalResult['total'];
+            $totalPages = max(1, (int) ceil($totalProducts / $limit));
+        }
+    }
 
     // Cerrar el cursor
     $stmt->closeCursor();
@@ -80,14 +86,19 @@ try {
     error_log("Error fetching product ratings: " . $e->getMessage());
 }
 
+// Normalizar información de precios para cada producto
+$products = hydrateProductsPricing($conn, $products);
+
+// Convertir flags a tipos consistentes
+$products = array_map(function($product) {
+    $product['is_favorite'] = isset($product['is_favorite']) ? (int) $product['is_favorite'] : 0;
+    return $product;
+}, $products);
+
 // Preparar respuesta
 $response = [
     'success' => true,
-    'products' => array_map(function($product) {
-        // Asegurar que is_favorite sea un integer
-        $product['is_favorite'] = (int)$product['is_favorite'];
-        return $product;
-    }, $products),
+    'products' => $products,
     'totalProducts' => $totalProducts,
     'totalPages' => $totalPages,
     'currentPage' => $page,

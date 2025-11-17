@@ -274,8 +274,14 @@
                     const avgRating = ratingInfo ? round(ratingInfo.avg_rating, 1) : 0;
                 const reviewCount = ratingInfo ? ratingInfo.review_count : 0;
 
-                // Determinar precio a mostrar
-                const displayPrice = product.min_price ?? (product.price ?? 0);
+                // Determinar precio y descuento a mostrar
+                const displayPrice = Number(product.display_price ?? product.min_price ?? product.price ?? 0);
+                const hasDiscount = Boolean(product.has_discount);
+                const validDiscount = hasDiscount && Number(product.discount_percentage) > 0;
+                const discountBadge = (validDiscount)
+                    ? `<div class="product-badge sale">${product.discount_percentage}% OFF</div>`
+                    : '';
+                const featuredBadge = product.is_featured ? '<div class="product-badge">Destacado</div>' : '';
 
                 // Obtener nombre de categoría
                 let categoryName = 'Sin categoría';
@@ -287,7 +293,7 @@
 
                 html += `
                     <div class="product-card" data-product-id="${product.id}">
-                        ${product.is_featured ? '<div class="product-badge">Destacado</div>' : ''}
+                        ${featuredBadge}${discountBadge}
                         <button class="wishlist-btn ${product.is_favorite ? 'active' : ''}"
                             aria-label="Añadir a favoritos"
                             data-product-id="${product.id}">
@@ -312,7 +318,7 @@
                             </div>
                             <div class="product-price">
                                 <span class="current-price">$${formatPrice(displayPrice)}</span>
-                                ${product.compare_price && product.compare_price > displayPrice ? 
+                                ${validDiscount && product.compare_price ? 
                                     `<span class="original-price">$${formatPrice(product.compare_price)}</span>` : ''
                                 }
                             </div>
@@ -439,11 +445,19 @@
         }
 
         function formatPrice(price) {
-            return parseInt(price).toLocaleString('es-ES');
+            const numericPrice = Number(price ?? 0);
+            return numericPrice.toLocaleString('es-CO', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
         }
 
         function escapeHtml(unsafe) {
-            return unsafe
+            if (unsafe === null || unsafe === undefined) {
+                return '';
+            }
+
+            return String(unsafe)
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")

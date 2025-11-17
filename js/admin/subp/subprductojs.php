@@ -823,10 +823,14 @@
                         card.querySelector('.sizes-grid').closest('.form-group').classList.add('has-error');
                     }
 
-                    if (!imageInput || imageInput.files.length === 0) {
+                    // Allow existing images (already uploaded) — only require upload when there are
+                    // no existing images and no new files selected for this variant
+                    const hasExistingVariantImage = card.querySelector('.existing-image') !== null;
+                    if (!imageInput || (imageInput.files.length === 0 && !hasExistingVariantImage)) {
                         isValid = false;
                         errorMessages.push('Debes subir al menos una imagen para cada variante');
-                        imageInput.closest('.form-group').classList.add('has-error');
+                        const grp = imageInput ? imageInput.closest('.form-group') : card.querySelector('.features');
+                        if (grp) grp.classList.add('has-error');
                     }
 
                     sizeOptions.forEach(option => {
