@@ -40,24 +40,19 @@ $orderId = intval($_GET['id']);
 // Procesar formulario si se envió
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        // Validar datos
-        $requiredFields = ['status', 'payment_status'];
-        
-        foreach ($requiredFields as $field) {
-            if (!isset($_POST[$field]) || trim($_POST[$field]) === '') {
-                throw new Exception("Todos los campos son requeridos");
-            }
-        }
+        // Nota: 'status' y 'payment_status' ahora son opcionales para este formulario
+        // (se usan desde detail.php/Modal para cambiar estado)
         
         // Validar valores de estados
         $validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
         $validPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
         
-        if (!in_array($_POST['status'], $validStatuses)) {
+        // Validate status/payment_status only if they were provided in the POST
+        if (isset($_POST['status']) && !in_array($_POST['status'], $validStatuses)) {
             throw new Exception("Estado de orden inválido");
         }
-        
-        if (!in_array($_POST['payment_status'], $validPaymentStatuses)) {
+
+        if (isset($_POST['payment_status']) && !in_array($_POST['payment_status'], $validPaymentStatuses)) {
             throw new Exception("Estado de pago inválido");
         }
         
@@ -71,6 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $previousStatus = $statusRow['status'];
         $previousPaymentStatus = $statusRow['payment_status'] ?? 'pending';
 
+        // Establecer valores nuevos (opcional): si no vienen por POST, usamos los previos
+        $status = isset($_POST['status']) ? trim($_POST['status']) : $previousStatus;
+        $payment_status = isset($_POST['payment_status']) ? trim($_POST['payment_status']) : $previousPaymentStatus;
+
+        
         // Obtener nombre del usuario actual para el historial
         $stmtUser = $conn->prepare("SELECT name FROM users WHERE id = ?");
         $stmtUser->execute([$_SESSION['user_id']]);
@@ -125,18 +125,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         // Sincronizar estados cuando se marca como reembolsado desde el administrador
-        if ($_POST['status'] === 'refunded' && $_POST['payment_status'] !== 'refunded') {
-            $_POST['payment_status'] = 'refunded';
+        if ($status === 'refunded' && $payment_status !== 'refunded') {
+            $payment_status = 'refunded';
         }
 
         // Evitar mover a 'processing' o 'shipped' si el pago NO fue aprobado
-        if (in_array($_POST['status'], ['processing', 'shipped']) && ($previousPaymentStatus ?? 'pending') !== 'paid') {
+        if (in_array($status, ['processing', 'shipped']) && ($previousPaymentStatus ?? 'pending') !== 'paid') {
             throw new Exception('No se puede poner en proceso o marcar como enviado si el pago no está aprobado');
         }
 
         // Ajustar pago si se cancela la orden desde el admin
-        if ($_POST['status'] === 'cancelled' && in_array($previousPaymentStatus, ['paid', 'pending'])) {
-            $_POST['payment_status'] = 'refunded';
+        if ($status === 'cancelled' && in_array($previousPaymentStatus, ['paid', 'pending'])) {
+            $payment_status = 'refunded';
         }
 
         // Construir query de actualización
@@ -153,8 +153,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 WHERE id = :id";
                 
             $params = [
-                ':status' => $_POST['status'],
-                ':payment_status' => $_POST['payment_status'],
+                ':status' => $status,
+                ':payment_status' => $payment_status,
                 ':shipping_address_id' => $shippingAddressId,
                 ':shipping_address' => $snapshotAddress,
                 ':shipping_city' => $snapshotCity,
@@ -175,8 +175,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 WHERE id = :id";
                 
             $params = [
-                ':status' => $_POST['status'],
-                ':payment_status' => $_POST['payment_status'],
+                ':status' => $status,
+                ':payment_status' => $payment_status,
                 ':shipping_address' => trim($_POST['shipping_address'] ?? ''),
                 ':shipping_city' => trim($_POST['shipping_city'] ?? ''),
                 ':delivery_notes' => trim($_POST['delivery_notes'] ?? ''),
@@ -194,15 +194,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->exec("SET @current_user_ip = NULL");
         
         if ($result) {
-            $statusChanged = ($previousStatus !== $_POST['status']);
-            $paymentStatusChanged = ($previousPaymentStatus !== $_POST['payment_status']);
+            $statusChanged = ($previousStatus !== $status);
+            $paymentStatusChanged = ($previousPaymentStatus !== $payment_status);
             $refundNotificationDone = false;
 
             $alertType = 'success';
             $alertMessage = 'Orden actualizada correctamente';
 
             if ($statusChanged) {
-                if ($_POST['status'] === 'delivered') {
+                if ($status === 'delivered') {
                     $notificationResult = notifyOrderDelivered($conn, $orderId);
                     if (!$notificationResult['ok']) {
                         $alertType = 'warning';
@@ -210,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     } else {
                         $alertMessage = 'Orden actualizada y comprobante enviado al cliente';
                     }
-                } elseif ($_POST['status'] === 'cancelled') {
+                } elseif ($status === 'cancelled') {
                     $notificationResult = notifyOrderCancelled($conn, $orderId, 'admin', true);
                     if (!$notificationResult['ok']) {
                         $alertType = 'warning';
@@ -218,7 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     } else {
                         $alertMessage = 'Orden cancelada. El cliente fue notificado sobre el reembolso.';
                     }
-                } elseif ($_POST['status'] === 'refunded') {
+                } elseif ($status === 'refunded') {
                     try {
                         $adminId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
                         $refundResult = notifyRefundCompleted($conn, $orderId, [
@@ -239,7 +239,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 } else {
                     try {
-                        createOrderStatusNotification($conn, $orderId, $_POST['status']);
+                        createOrderStatusNotification($conn, $orderId, $status);
                     } catch (Throwable $e) {
                         $alertType = 'warning';
                         $alertMessage = 'Orden actualizada, pero no fue posible crear la notificación de estado.';
@@ -249,7 +249,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($paymentStatusChanged) {
-                if ($_POST['payment_status'] === 'refunded' && !$refundNotificationDone) {
+                if ($payment_status === 'refunded' && !$refundNotificationDone) {
                     try {
                         $adminId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
                         $refundResult = notifyRefundCompleted($conn, $orderId, [
@@ -267,9 +267,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $alertMessage .= ' No fue posible confirmar el reembolso al cliente.';
                         error_log('[ORDER_NOTIFY] Error notifyRefundCompleted en edit: ' . $e->getMessage());
                     }
-                } elseif ($_POST['status'] !== 'cancelled') {
+                } elseif ($status !== 'cancelled') {
                     try {
-                        if (!createPaymentNotification($conn, $orderId, $_POST['payment_status'])) {
+                        if (!createPaymentNotification($conn, $orderId, $payment_status)) {
                             $alertType = $alertType === 'error' ? 'error' : 'warning';
                             $alertMessage .= ' No fue posible crear la notificación de pago.';
                         }
@@ -1080,50 +1080,7 @@ try {
 
                     <!-- Formulario de edición -->
                     <form method="POST" class="edit-card">
-                        <!-- Estados -->
-                        <div class="card-header">
-                            <h3>
-                                <i class="fas fa-cog"></i>
-                                Estados de la Orden
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="status">
-                                        <i class="fas fa-info-circle"></i>
-                                        Estado de la Orden
-                                    </label>
-                                    <select id="status" name="status" class="form-control" required>
-                                        <?php foreach ($statuses as $value => $label): ?>
-                                            <?php
-                                                $disabled = '';
-                                                if (in_array($value, ['processing', 'shipped']) && ($order['payment_status'] ?? 'pending') !== 'paid') {
-                                                    $disabled = 'disabled';
-                                                }
-                                            ?>
-                                            <option value="<?= $value ?>" <?= $value === $order['status'] ? 'selected' : '' ?> <?= $disabled ?>>
-                                                <?= $label ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="payment_status">
-                                        <i class="fas fa-credit-card"></i>
-                                        Estado de Pago
-                                    </label>
-                                    <select id="payment_status" name="payment_status" class="form-control" required>
-                                        <?php foreach ($paymentStatuses as $value => $label): ?>
-                                            <option value="<?= $value ?>" <?= $value === $order['payment_status'] ? 'selected' : '' ?>>
-                                                <?= $label ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Estados: quitados del formulario de edición (se manejan en detail.php) -->
 
                         <!-- Dirección de Envío -->
                         <div class="card-header" style="border-top: 1px solid rgba(0, 119, 182, 0.1);">
@@ -1359,7 +1316,7 @@ try {
 
         // Validación del formulario
         document.querySelector('form').addEventListener('submit', function(e) {
-            const requiredFields = ['status', 'payment_status'];
+            const requiredFields = [];
             let isValid = true;
             let errorMessage = '';
 
