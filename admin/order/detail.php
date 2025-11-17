@@ -837,8 +837,13 @@ function translateValue($value, $field = '') {
                 return response.json();
             })
             .then(data => {
-                if (data.success) {
-                    let msg = data.message || 'Estado de la orden actualizado correctamente';
+                    if (data.success) {
+                        let msg = data.message || 'Estado de la orden actualizado correctamente';
+                        // Mostrar detalles de notificaciones si vienen del servidor
+                        if (Array.isArray(data.notifications) && data.notifications.length) {
+                        const notifLines = data.notifications.map(n => (n.order_id ? ('Orden #' + n.order_id + ': ') : '') + (n.message || (n.ok ? 'Notificación enviada' : 'Error en notificación')));
+                        msg += ' · Notificaciones: ' + notifLines.join(' · ');
+                        }
                     if (data.skipped && data.skipped.length) {
                         msg += ' (' + data.skipped.length + ' orden(es) omitida(s) por no estar pagadas)';
                     }

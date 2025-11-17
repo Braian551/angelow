@@ -223,7 +223,11 @@ function notifyRefundCompleted(PDO $conn, int $orderId, array $options = []): ar
             'gateway' => $gateway ?? 'Angelow'
         ]);
 
+
         $notificationSent = createPaymentNotification($conn, $orderId, 'refunded');
+
+        // También crear notificación de cambio de estado para que se muestre en el timeline
+        $statusNotificationSent = createOrderStatusNotification($conn, $orderId, 'refunded');
 
         $messages = [];
         if ($refundRecordId) {
@@ -232,10 +236,18 @@ function notifyRefundCompleted(PDO $conn, int $orderId, array $options = []): ar
             $messages[] = 'Reembolso ya registrado previamente';
         }
         $messages[] = $emailSent ? 'Correo enviado' : 'Fallo al enviar correo';
-        $messages[] = $notificationSent ? 'Notificación creada' : 'Fallo al crear notificación';
+        $messages[] = $notificationSent ? 'Notificación de pago creada' : 'Fallo al crear notificación de pago';
+        $messages[] = $statusNotificationSent ? 'Notificación de estado creada' : 'Fallo al crear notificación de estado';
+
+        $ok = ($emailSent || $notificationSent || $statusNotificationSent);
+
+        // Log para ayudar a debugging si algo falló
+        if (!$ok) {
+            error_log('[ORDER_NOTIFY] notifyRefundCompleted: fallo al notificar reembolso para orden ' . $orderId . ': email=' . ($emailSent ? 'ok' : 'fail') . ', payment_notification=' . ($notificationSent ? 'ok' : 'fail') . ', status_notification=' . ($statusNotificationSent ? 'ok' : 'fail'));
+        }
 
         return [
-            'ok' => $emailSent && $notificationSent,
+            'ok' => $ok,
             'message' => implode(' · ', $messages)
         ];
     } catch (Throwable $e) {
@@ -336,7 +348,7 @@ function createOrderStatusNotification(PDO $conn, int $orderId, string $newStatu
             'processing' => ['Pedido en proceso', "Tu pedido #$orderNumber está en proceso y pronto saldrá para entrega."],
             'shipped' => ['Tu envío está en camino', "Tu pedido #$orderNumber ha salido para entrega. Pronto lo recibirás."],
             'cancelled' => ['Pedido cancelado', "Tu pedido #$orderNumber ha sido cancelado. Iniciaremos el reembolso en las próximas horas."],
-            'refunded' => ['Pedido reembolsado', "Tu pedido #$orderNumber fue reembolsado y no se continuará con la entrega."],
+            'refunded' => ['Reembolso exitoso', "Confirmamos el reembolso de tu pedido #$orderNumber. Verás el dinero reflejado según los tiempos de tu banco."],
             'pending' => ['Pedido pendiente', "Tu pedido #$orderNumber está pendiente de confirmación."],
         ];
 
@@ -368,7 +380,7 @@ function createPaymentNotification(PDO $conn, int $orderId, string $newPaymentSt
         $labels = [
             'paid' => ['Pago aprobado', "Hemos recibido el pago de tu pedido #$orderNumber. Gracias."],
             'failed' => ['Pago rechazado', "Tu pago para el pedido #$orderNumber no fue aprobado. Revisa la referencia o contáctanos."],
-            'refunded' => ['Reembolso completado', "Tu reembolso del pedido #$orderNumber fue acreditado. Dependiendo de tu banco, lo verás reflejado en 24-72 horas."],
+            'refunded' => ['Reembolso exitoso', "Tu reembolso del pedido #$orderNumber fue acreditado con éxito. Dependiendo de tu banco, lo verás reflejado en 24-72 horas."],
         ];
 
         if (!isset($labels[$newPaymentStatus])) return false;

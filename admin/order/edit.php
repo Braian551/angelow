@@ -124,9 +124,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        // Mapear 'refunded' (estado confuso) a 'cancelled' + payment_status 'refunded'
-        if ($_POST['status'] === 'refunded') {
-            $_POST['status'] = 'cancelled';
+        // Sincronizar estados cuando se marca como reembolsado desde el administrador
+        if ($_POST['status'] === 'refunded' && $_POST['payment_status'] !== 'refunded') {
             $_POST['payment_status'] = 'refunded';
         }
 
@@ -197,6 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result) {
             $statusChanged = ($previousStatus !== $_POST['status']);
             $paymentStatusChanged = ($previousPaymentStatus !== $_POST['payment_status']);
+            $refundNotificationDone = false;
 
             $alertType = 'success';
             $alertMessage = 'Orden actualizada correctamente';
@@ -218,6 +218,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     } else {
                         $alertMessage = 'Orden cancelada. El cliente fue notificado sobre el reembolso.';
                     }
+                } elseif ($_POST['status'] === 'refunded') {
+                    try {
+                        $adminId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+                        $refundResult = notifyRefundCompleted($conn, $orderId, [
+                            'admin_id' => $adminId
+                        ]);
+                        $refundNotificationDone = true;
+                        if ($refundResult['ok']) {
+                            $alertMessage = 'Orden actualizada y el cliente recibió la confirmación del reembolso.';
+                        } else {
+                            $alertType = 'warning';
+                            $alertMessage = 'Orden actualizada, pero hubo un problema enviando la confirmación de reembolso: ' . $refundResult['message'];
+                        }
+                    } catch (Throwable $e) {
+                        $refundNotificationDone = true;
+                        $alertType = 'warning';
+                        $alertMessage = 'Orden actualizada, pero no fue posible confirmar el reembolso al cliente.';
+                        error_log('[ORDER_NOTIFY] Error notifyRefundCompleted en edit (status change): ' . $e->getMessage());
+                    }
                 } else {
                     try {
                         createOrderStatusNotification($conn, $orderId, $_POST['status']);
@@ -230,13 +249,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($paymentStatusChanged) {
-                if ($_POST['payment_status'] === 'refunded') {
+                if ($_POST['payment_status'] === 'refunded' && !$refundNotificationDone) {
                     try {
+                        $adminId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
                         $refundResult = notifyRefundCompleted($conn, $orderId, [
-                            'admin_id' => $_SESSION['user_id'] ?? null
+                            'admin_id' => $adminId
                         ]);
                         if ($refundResult['ok']) {
                             $alertMessage .= ' El cliente recibió la confirmación del reembolso.';
+                            $refundNotificationDone = true;
                         } else {
                             $alertType = $alertType === 'error' ? 'error' : 'warning';
                             $alertMessage .= ' Reembolso registrado pero no se pudo notificar: ' . $refundResult['message'];

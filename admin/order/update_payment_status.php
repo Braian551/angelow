@@ -103,8 +103,9 @@ try {
         $successRefunds = 0;
         $failedRefunds = 0;
         foreach ($ordersToConfirmRefund as $refundOrderId) {
+            $adminId = isset($currentUser['id']) ? (int)$currentUser['id'] : null;
             $result = notifyRefundCompleted($conn, $refundOrderId, [
-                'admin_id' => $currentUser['id'] ?? null
+                'admin_id' => $adminId
             ]);
             if ($result['ok']) {
                 $successRefunds++;
@@ -119,7 +120,7 @@ try {
         }
     }
 
-    echo json_encode(['success' => true, 'message' => "Estados de pago actualizados: $affected$refundSummary"]); 
+    echo json_encode(['success' => true, 'message' => "Estados de pago actualizados: $affected$refundSummary", 'notifications' => array_values($notifications)]);
 } catch (PDOException $e) {
     if ($conn->inTransaction()) $conn->rollBack();
     error_log('ERR update_payment_status: ' . $e->getMessage());

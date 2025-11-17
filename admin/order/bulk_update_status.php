@@ -137,6 +137,7 @@ try {
     $updatedOrders = [];
     $ordersToNotifyDelivered = [];
     $ordersToNotifyCancelled = [];
+    $ordersToNotifyRefunded = [];
     
     // Actualizar cada orden individualmente para que los triggers funcionen correctamente
     foreach ($orderIds as $orderId) {
@@ -151,11 +152,8 @@ try {
             continue;
         }
         
-        // Mapear 'refunded' a 'cancelled' y decidir si se reembolsará
+        // Usar el estado tal cual: 'refunded' se guarda como 'refunded'
         $targetStatus = $newStatus;
-        if ($newStatus === 'refunded') {
-            $targetStatus = 'cancelled';
-        }
 
         if ($currentOrder['status'] === $targetStatus) {
             error_log("BULK_UPDATE - Orden {$currentOrder['order_number']} ya tiene el estado $newStatus");
@@ -180,6 +178,10 @@ try {
         if ($targetStatus === 'cancelled' && in_array($currentPaymentStatus, ['paid', 'pending'])) {
             $stmt = $conn->prepare("UPDATE orders SET status = ?, payment_status = ?, updated_at = NOW() WHERE id = ?");
             $stmt->execute([$targetStatus, 'refunded', $orderId]);
+        } elseif ($targetStatus === 'refunded') {
+            // Si marcamos explícitamente como reembolsado, actualizar también el estado de pago
+            $stmt = $conn->prepare("UPDATE orders SET status = ?, payment_status = ?, updated_at = NOW() WHERE id = ?");
+            $stmt->execute([$targetStatus, 'refunded', $orderId]);
         } else {
             $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?");
             $stmt->execute([$targetStatus, $orderId]);
@@ -194,6 +196,8 @@ try {
                 try {
                     if ($targetStatus === 'cancelled') {
                         $ordersToNotifyCancelled[] = $orderId;
+                    } elseif ($targetStatus === 'refunded') {
+                        $ordersToNotifyRefunded[] = $orderId;
                     } else {
                         createOrderStatusNotification($conn, (int)$orderId, $targetStatus);
                     }
@@ -371,7 +375,25 @@ try {
             'message' => $result['message']
         ];
     }
-    $notificationsFailed = count($ordersToNotifyDelivered) + count($ordersToNotifyCancelled) - $notificationsSent;
+    // Ejecutar notificaciones para reembolsos después del commit
+    foreach ($ordersToNotifyRefunded as $orderIdToNotify) {
+        $adminId = isset($currentUser['id']) ? (int)$currentUser['id'] : null;
+        $result = notifyRefundCompleted($conn, (int) $orderIdToNotify, ['admin_id' => $adminId]);
+        if ($result['ok']) {
+            $notificationsSent++;
+        }
+        if (!$result['ok']) {
+            error_log("[ORDER_NOTIFY] notifyRefundCompleted failed for order $orderIdToNotify (bulk): " . ($result['message'] ?? 'unknown'));
+        } else {
+            error_log("[ORDER_NOTIFY] notifyRefundCompleted succeeded for order $orderIdToNotify (bulk): " . ($result['message'] ?? 'ok'));
+        }
+        $notifications[] = [
+            'order_id' => $orderIdToNotify,
+            'ok' => $result['ok'],
+            'message' => $result['message']
+        ];
+    }
+    $notificationsFailed = count($ordersToNotifyDelivered) + count($ordersToNotifyCancelled) + count($ordersToNotifyRefunded) - $notificationsSent;
 
     // Traducir estado para el mensaje
     $statusLabels = [

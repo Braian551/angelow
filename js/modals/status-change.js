@@ -107,10 +107,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(data.message || 'Error al actualizar estado');
             }
 
+            // Build success message and append any notification results returned by the server
             const successMsg = currentChangeType === 'payment'
                 ? 'Estado de pago actualizado correctamente'
                 : 'Estado actualizado correctamente';
-            showAlert(successMsg, 'success');
+
+            let fullMsg = successMsg;
+            if (Array.isArray(data.notifications) && data.notifications.length > 0) {
+                const notifLines = data.notifications.map(n => {
+                    return (n.order_id ? ('Orden #' + n.order_id + ': ') : '') + (n.message || (n.ok ? 'Notificación enviada' : 'Error en notificación'));
+                });
+                fullMsg += ' · Notificaciones: ' + notifLines.join(' · ');
+            }
+
+            showAlert(fullMsg, 'success');
 
             if (typeof window.loadOrders === 'function') {
                 window.loadOrders();

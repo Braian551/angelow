@@ -79,6 +79,13 @@ function sendInvoiceEmail(array $order, array $orderItems, ?string $pdfContent =
     $mail = new PHPMailer(true);
     try {
         $mail->isSMTP();
+        // If the application is in debug mode, enable PHPMailer SMTP debug and forward output to error_log
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            $mail->SMTPDebug = 2; // client and server messages
+            $mail->Debugoutput = function($str, $level) {
+                error_log('[INVOICE_EMAIL][SMTP_DEBUG] ' . trim($str));
+            };
+        }
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'angelow2025sen@gmail.com';
@@ -215,6 +222,12 @@ function sendOrderCancellationEmail(array $order, array $orderItems): bool
 
     try {
         $mail->isSMTP();
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            $mail->SMTPDebug = 2;
+            $mail->Debugoutput = function($str, $level) {
+                error_log('[INVOICE_EMAIL][SMTP_DEBUG] ' . trim($str));
+            };
+        }
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'angelow2025sen@gmail.com';
@@ -327,9 +340,34 @@ function sendOrderCancellationEmail(array $order, array $orderItems): bool
 </html>';
 
         $mail->send();
+        error_log('[INVOICE_EMAIL] Cancellation email sent successfully to ' . $order['user_email'] . ' for order ' . ($order['order_number'] ?? $order['id']));
         return true;
     } catch (Exception $e) {
-        error_log('[INVOICE_EMAIL] Error cancelación: ' . $e->getMessage());
+        error_log('[INVOICE_EMAIL] Error cancelación (PHPMailer): ' . $e->getMessage());
+
+        // Fallback: intentar enviar un email simple con mail() si PHPMailer falla
+        try {
+            $to = $order['user_email'];
+            $subject = 'Cancelación del pedido #' . ($order['order_number'] ?? $order['id']) . ' - Reembolso en proceso';
+            $plaintext = "Hola " . ($order['user_name'] ?? "") . ",\n\n" .
+                "Tu pedido #" . ($order['order_number'] ?? $order['id']) . " fue cancelado. El reembolso se procesará con el mismo método de pago.\n" .
+                "Monto: $" . number_format($order['total'] ?? 0, 0, ',', '.') . "\n\n" .
+                "Por favor contacta soporte si tienes dudas.\n\n" .
+                "--\nAngelow";
+
+            $headers = 'From: soporte@angelow.com' . "\r\n" .
+                       'Reply-To: soporte@angelow.com' . "\r\n" .
+                       'X-Mailer: PHP/' . phpversion();
+
+            $sent = @mail($to, $subject, $plaintext, $headers);
+            if ($sent) {
+                error_log('[INVOICE_EMAIL] Fallback mail() success for cancellation to ' . $to . ' (order ' . ($order['order_number'] ?? $order['id']) . ')');
+                return true;
+            }
+            error_log('[INVOICE_EMAIL] Fallback mail() failed for cancellation to ' . $to . ' (order ' . ($order['order_number'] ?? $order['id']) . ')');
+        } catch (Throwable $e2) {
+            error_log('[INVOICE_EMAIL] Fallback mail() exception for cancellation: ' . $e2->getMessage());
+        }
         return false;
     }
 }
@@ -345,6 +383,12 @@ function sendRefundConfirmationEmail(array $order, array $orderItems, array $met
 
     try {
         $mail->isSMTP();
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            $mail->SMTPDebug = 2;
+            $mail->Debugoutput = function($str, $level) {
+                error_log('[INVOICE_EMAIL][SMTP_DEBUG] ' . trim($str));
+            };
+        }
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'angelow2025sen@gmail.com';
@@ -387,7 +431,7 @@ function sendRefundConfirmationEmail(array $order, array $orderItems, array $met
         }
 
         $mail->isHTML(true);
-        $mail->Subject = 'Reembolso confirmado · Pedido #' . htmlspecialchars($orderNumber);
+        $mail->Subject = 'Reembolso exitoso · Pedido #' . htmlspecialchars($orderNumber);
         $mail->Body = '<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -420,8 +464,8 @@ function sendRefundConfirmationEmail(array $order, array $orderItems, array $met
     <div class="container">
         <div class="header">
             <img src="' . $logoUrl . '" alt="Angelow">
-            <h1>Reembolso completado</h1>
-            <p style="opacity:0.9; font-size:15px;">El dinero ya fue devuelto con el mismo método de pago que usaste.</p>
+            <h1>Reembolso exitoso</h1>
+            <p style="opacity:0.9; font-size:15px;">Confirmamos que devolvimos tu dinero con el mismo método de pago que usaste.</p>
             <div style="margin-top:14px;"><span class="badge">Pedido #' . htmlspecialchars($orderNumber) . '</span></div>
         </div>
         <div class="content">
@@ -464,9 +508,36 @@ function sendRefundConfirmationEmail(array $order, array $orderItems, array $met
 </html>';
 
         $mail->send();
+        error_log('[INVOICE_EMAIL] Refund email sent successfully to ' . $order['user_email'] . ' for order ' . ($order['order_number'] ?? $order['id']));
         return true;
     } catch (Exception $e) {
-        error_log('[INVOICE_EMAIL] Error reembolso: ' . $e->getMessage());
+        error_log('[INVOICE_EMAIL] Error reembolso (PHPMailer): ' . $e->getMessage());
+
+        // Fallback: intentar enviar un email simple con mail() para entornos donde SMTP falla
+        try {
+            $to = $order['user_email'];
+            $subject = 'Reembolso confirmado · Pedido #' . ($order['order_number'] ?? $order['id']);
+            $plaintext = "Hola " . ($order['user_name'] ?? "") . ",\n\n" .
+                "Tu reembolso por el pedido #" . ($order['order_number'] ?? $order['id']) . " se ha procesado.\n" .
+                "Monto: $" . number_format((float)$refundAmount, 0, ',', '.') . "\n" .
+                "Método: " . ($paymentMethod) . "\n" .
+                "Referencia: " . ($reference) . "\n\n" .
+                "Por favor contacta soporte si tienes dudas.\n\n" .
+                "--\nAngelow";
+
+            $headers = 'From: soporte@angelow.com' . "\r\n" .
+                       'Reply-To: soporte@angelow.com' . "\r\n" .
+                       'X-Mailer: PHP/' . phpversion();
+
+            $sent = @mail($to, $subject, $plaintext, $headers);
+            if ($sent) {
+                error_log('[INVOICE_EMAIL] Fallback mail() success for refund to ' . $to . ' (order ' . ($order['order_number'] ?? $order['id']) . ')');
+                return true;
+            }
+            error_log('[INVOICE_EMAIL] Fallback mail() failed for refund to ' . $to . ' (order ' . ($order['order_number'] ?? $order['id']) . ')');
+        } catch (Throwable $e2) {
+            error_log('[INVOICE_EMAIL] Fallback mail() exception: ' . $e2->getMessage());
+        }
         return false;
     }
 }

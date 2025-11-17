@@ -131,7 +131,16 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.success) {
-                showAlert(data.message, 'success');
+                // Append any notification results to the message
+                let message = data.message || 'Estado actualizado correctamente';
+                if (Array.isArray(data.notifications) && data.notifications.length > 0) {
+                    const notifLines = data.notifications.map(n => {
+                        return (n.order_id ? ('Orden #' + n.order_id + ': ') : '') + (n.message || (n.ok ? 'Notificación enviada' : 'Error en notificación'));
+                    });
+                    message += ' · Notificaciones: ' + notifLines.join(' · ');
+                }
+
+                showAlert(message, 'success');
                 
                 // Recargar órdenes si la función está disponible
                 if (typeof window.loadOrders === 'function') {

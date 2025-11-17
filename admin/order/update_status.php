@@ -97,6 +97,7 @@ try {
     $affectedRows = 0;
     $ordersToNotifyDelivered = [];
     $ordersToNotifyCancelled = [];
+    $ordersToNotifyRefunded = [];
     $skippedOrders = [];
     
     // Actualizar cada orden individualmente para que los triggers funcionen correctamente
@@ -117,11 +118,12 @@ try {
                 $skipReason = 'El pedido no está pagado';
             }
 
-            // Mapear status 'refunded' a 'cancelled' + payment_status = 'refunded' (seguimos la convención)
+            // Determinar status objetivo y payment_status.
+            // No mapeamos 'refunded' a 'cancelled' — dejamos 'refunded' como estado de orden.
             $targetStatus = $newStatus;
             $targetPaymentStatus = null;
             if ($newStatus === 'refunded') {
-                $targetStatus = 'cancelled';
+                // Establecer explícitamente payment_status a 'refunded' al marcar reembolso desde admin
                 $targetPaymentStatus = 'refunded';
             }
 
@@ -157,6 +159,9 @@ try {
                     if ($targetStatus === 'cancelled') {
                         // Deferir notificación/correo hasta después del commit
                         $ordersToNotifyCancelled[] = $orderId;
+                    } elseif ($targetStatus === 'refunded') {
+                        // Deferir notificación/correo hasta después del commit
+                        $ordersToNotifyRefunded[] = $orderId;
                     } else {
                         try {
                             createOrderStatusNotification($conn, (int)$orderId, $targetStatus);
@@ -219,7 +224,26 @@ try {
             'message' => $result['message']
         ];
     }
-    $notificationsFailed = count($ordersToNotifyDelivered) + count($ordersToNotifyCancelled) - $notificationsSent;
+    // Ejecutar notificaciones para reembolsos después del commit
+    foreach ($ordersToNotifyRefunded as $orderIdToNotify) {
+        // Registrar reembolso en DB y notificar al usuario (correo + notificación)
+        $adminId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+        $result = notifyRefundCompleted($conn, (int) $orderIdToNotify, ['admin_id' => $adminId]);
+        if ($result['ok']) {
+            $notificationsSent++;
+        }
+        if (!$result['ok']) {
+            error_log("[ORDER_NOTIFY] notifyRefundCompleted failed for order $orderIdToNotify: " . ($result['message'] ?? 'unknown'));
+        } else {
+            error_log("[ORDER_NOTIFY] notifyRefundCompleted succeeded for order $orderIdToNotify: " . ($result['message'] ?? 'ok'));
+        }
+        $notifications[] = [
+            'order_id' => $orderIdToNotify,
+            'ok' => $result['ok'],
+            'message' => $result['message']
+        ];
+    }
+    $notificationsFailed = count($ordersToNotifyDelivered) + count($ordersToNotifyCancelled) + count($ordersToNotifyRefunded) - $notificationsSent;
     
     if ($affectedRows > 0) {
         $message = "Estado de $affectedRows orden(es) actualizado correctamente";
