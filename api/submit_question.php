@@ -25,7 +25,7 @@ if (empty($input)) {
 $productId = isset($input['product_id']) ? intval($input['product_id']) : 0;
 $questionText = isset($input['question']) ? trim($input['question']) : '';
 // Optional rating for question (1..5). Keep nullable if not provided.
-$questionRating = isset($input['rating']) ? intval($input['rating']) : null;
+$questionRating = null; // Rating disabled for questions: ignore any input
 
 // Validate
 if (!$productId) {
@@ -67,14 +67,10 @@ try {
 
     // Insertar pregunta - la columna id debería ser AUTO_INCREMENT, pero puede faltar en algunas instalaciones.
     try {
-        try {
-            if (!is_null($questionRating) && $questionRating >= 1 && $questionRating <= 5) {
-                $stmt = $conn->prepare("INSERT INTO product_questions (product_id, user_id, question, rating) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$productId, $_SESSION['user_id'], $questionText, $questionRating]);
-            } else {
+            try {
+                // Always insert without rating
                 $stmt = $conn->prepare("INSERT INTO product_questions (product_id, user_id, question) VALUES (?, ?, ?)");
                 $stmt->execute([$productId, $_SESSION['user_id'], $questionText]);
-            }
         } catch (PDOException $e) {
             // Some installations might not have the rating column for questions. Fallback to insert without rating.
             if (stripos($e->getMessage(), 'unknown column') !== false || stripos($e->getMessage(), 'column') !== false) {
@@ -95,13 +91,9 @@ try {
 
             // Fallback path: include rating if available
             try {
-                if (!is_null($questionRating) && $questionRating >= 1 && $questionRating <= 5) {
-                    $ins = $conn->prepare('INSERT INTO product_questions (id, product_id, user_id, question, rating) VALUES (?, ?, ?, ?, ?)');
-                    $ins->execute([$nextId, $productId, $_SESSION['user_id'], $questionText, $questionRating]);
-                } else {
-                    $ins = $conn->prepare('INSERT INTO product_questions (id, product_id, user_id, question) VALUES (?, ?, ?, ?)');
-                    $ins->execute([$nextId, $productId, $_SESSION['user_id'], $questionText]);
-                }
+                // Fallback path: insert without rating
+                $ins = $conn->prepare('INSERT INTO product_questions (id, product_id, user_id, question) VALUES (?, ?, ?, ?)');
+                $ins->execute([$nextId, $productId, $_SESSION['user_id'], $questionText]);
             } catch (PDOException $e2) {
                 if (stripos($e2->getMessage(), 'unknown column') !== false || stripos($e2->getMessage(), 'column') !== false) {
                     $ins = $conn->prepare('INSERT INTO product_questions (id, product_id, user_id, question) VALUES (?, ?, ?, ?)');
@@ -136,7 +128,7 @@ try {
             'product_id' => $productId,
             'user_id' => $_SESSION['user_id'],
             'question' => $questionText,
-            'rating' => $questionRating, // may be null
+            'rating' => null,
             'created_at' => date('Y-m-d H:i:s')
         ]
     ]);

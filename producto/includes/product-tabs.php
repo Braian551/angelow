@@ -269,15 +269,7 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                         <small class="form-note">Las preguntas serán respondidas por el vendedor u otros compradores.</small>
                     </div>
 
-                    <div class="form-group">
-                        <label>Calificación (opcional)</label>
-                        <div class="rating-input question-rating-input">
-                            <?php for ($i = 1; $i <= 5; $i++): ?>
-                                <i class="far fa-star" data-rating="<?= $i ?>"></i>
-                            <?php endfor; ?>
-                            <input type="hidden" name="rating" id="question-rating-value">
-                        </div>
-                    </div>
+                    <!-- Rating for questions removed: questions cannot send a rating -->
                     
                     <div class="form-actions">
                         <button type="button" id="cancel-question" class="tab-action-btn review-btn">

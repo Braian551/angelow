@@ -858,9 +858,7 @@ if (!empty($reviewsClientPayload['reviews'])) {
         });
 
         $(document).on('click', '#cancel-question', function() {
-                    $('#question-form-container').slideUp();
-                    $('#question-rating-value').val('');
-                    $('.question-rating-input .fa-star').removeClass('fas active').addClass('far');
+                $('#question-form-container').slideUp();
         });
 
         // Enviar pregunta via AJAX (evita recarga completa)
@@ -877,8 +875,8 @@ if (!empty($reviewsClientPayload['reviews'])) {
                 return;
             }
 
-            const questionRating = $('#question-rating-value').val();
-            const payload = { product_id: productId, question, rating: questionRating ? parseInt(questionRating) : null };
+            // No se permite enviar calificación junto a la pregunta
+            const payload = { product_id: productId, question };
 
             // Deshabilitar botones
             form.find('button[type="submit"]').prop('disabled', true);
@@ -911,9 +909,7 @@ if (!empty($reviewsClientPayload['reviews'])) {
                                 console.error('Could not fetch updated questions', newRes.error);
                             }
                         }).finally(() => {
-                            // Reset rating input in question form
-                            $('#question-rating-value').val('');
-                            $('.question-rating-input .fa-star').removeClass('fas active').addClass('far');
+                                // No rating field to reset: questions don't accept ratings
                         }).catch(err => console.error(err));
                 } else {
                     showNotification(data.message || data.error || 'Error al enviar la pregunta', 'error');
@@ -953,7 +949,8 @@ if (!empty($reviewsClientPayload['reviews'])) {
                 ratingInputs.push(`<i class="${cls}" data-rating="${r}"></i>`);
             }
 
-            const ratingInputHtml = `<div class="rating-input edit-question-rating-input">${ratingInputs.join('')}<input type="hidden" class="edit-question-rating-value" value="${currentRating}"></div>`;
+            // Remove rating input in edit question flow — questions can't include ratings anymore
+            const ratingInputHtml = '';
 
             const editor = $(
                 `<div class="edit-question-form">` +
@@ -983,14 +980,14 @@ if (!empty($reviewsClientPayload['reviews'])) {
                 fetch('<?= BASE_URL ?>/api/edit_question.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({ question_id: qId, question: newText, rating: editor.find('.edit-question-rating-value').val() })
+                    body: JSON.stringify({ question_id: qId, question: newText })
                 }).then(r => r.json()).then(data => {
                     if (data.success) {
                         // Update internal questions array so future rerenders don't bring it back
                         try { removeQuestionFromInitial(qId); } catch (err) { if (PRODUCT_PAGE_DEBUG) console.warn('removeQuestionFromInitial failed', err); }
                         qItem.find('.question-text p').text(newText);
                         // Update rating display in the question item (append or replace)
-                        const updatedRating = parseInt(editor.find('.edit-question-rating-value').val() || 0, 10);
+                        // No rating update for questions
                         const existingRatingEl = qItem.find('.question-rating');
                         if (updatedRating > 0) {
                             const starsHtml = buildReviewStars(updatedRating);

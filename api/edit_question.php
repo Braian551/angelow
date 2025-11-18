@@ -14,7 +14,7 @@ $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
 $question_id = isset($input['question_id']) ? intval($input['question_id']) : 0;
 $new_text = isset($input['question']) ? trim($input['question']) : '';
 // Optional: allow updating rating on question while editing
-$new_rating = isset($input['rating']) ? (is_numeric($input['rating']) ? intval($input['rating']) : null) : null;
+$new_rating = null; // Do not allow rating updates via question edit
 
 if (!$question_id || strlen($new_text) < 10) {
     http_response_code(400);
@@ -45,23 +45,9 @@ try {
         exit;
     }
 
-    if (!is_null($new_rating) && $new_rating >= 1 && $new_rating <= 5) {
-        try {
-            $update = $conn->prepare('UPDATE product_questions SET question = ?, rating = ? WHERE id = ?');
-            $update->execute([$new_text, $new_rating, $question_id]);
-        } catch (PDOException $e) {
-            // Fallback if rating column is missing
-            if (stripos($e->getMessage(), 'unknown column') !== false || stripos($e->getMessage(), 'column') !== false) {
-                $update = $conn->prepare('UPDATE product_questions SET question = ? WHERE id = ?');
-                $update->execute([$new_text, $question_id]);
-            } else {
-                throw $e;
-            }
-        }
-    } else {
-        $update = $conn->prepare('UPDATE product_questions SET question = ? WHERE id = ?');
-        $update->execute([$new_text, $question_id]);
-    }
+    // Only update the question text - rating is not modifiable here
+    $update = $conn->prepare('UPDATE product_questions SET question = ? WHERE id = ?');
+    $update->execute([$new_text, $question_id]);
 
     echo json_encode(['success' => true, 'message' => 'Pregunta actualizada']);
 } catch (PDOException $e) {
