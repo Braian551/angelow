@@ -424,6 +424,40 @@
             updateSku();
         }
 
+        function updateCombinationDisplay(variantElement) {
+            if (!variantElement) return;
+
+            const colorSelect = variantElement.querySelector('.color-select');
+            const displayElement = variantElement.querySelector('.variant-combination');
+
+            const colorOption = colorSelect ? colorSelect.options[colorSelect.selectedIndex] : null;
+            const colorName = colorOption ? colorOption.text : '';
+            const colorHex = colorOption ? colorOption.getAttribute('data-hex') : '';
+
+            const selectedSizes = [];
+            const sizeOptions = variantElement.querySelectorAll('.size-option.selected');
+            sizeOptions.forEach(option => {
+                selectedSizes.push(option.querySelector('.size-label').textContent);
+            });
+
+            let combinationText = '';
+
+            if (colorName) {
+                combinationText = `<span class="color-option"><span class="color-swatch" style="background-color: ${colorHex || '#ccc'}"></span>${colorName}</span>`;
+            }
+
+            if (selectedSizes.length > 0) {
+                combinationText += combinationText ? ' / ' + selectedSizes.join(', ') : selectedSizes.join(', ');
+            }
+
+            if (!combinationText) {
+                combinationText = '<i class="fas fa-info-circle"></i> Seleccione color y tallas';
+            }
+
+            if (displayElement) displayElement.innerHTML = combinationText;
+            updateColorSelects();
+        }
+
         function setupCombinationDisplay(variantElement) {
             const colorSelect = variantElement.querySelector('.color-select');
             const displayElement = variantElement.querySelector('.variant-combination');
@@ -468,7 +502,7 @@
                 });
             });
 
-            updateCombination();
+                updateCombination();
         }
 
         function updateColorSelects() {
