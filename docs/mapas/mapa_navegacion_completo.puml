@@ -15,11 +15,11 @@ package "Tienda Online (Frontend Público)" as Tienda {
     component "Catálogo Global\n(tienda/productos.php)" as Catalogo
     component "Detalle Producto\n(producto/verproducto.php)" as DetalleProducto
     component "Buscador y Guardados\n(ajax/busqueda/*.php)" as Busqueda
-    component "Carrito Paso 1\n(tienda/pagos/cart.php)" as CheckoutPaso1
+    component "Carrito - Paso 1\n(tienda/pagos/cart.php)" as CheckoutPaso1
     component "Paso de Envío\n(tienda/pagos/envio.php)" as CheckoutPaso2
     component "Pago y Comprobantes\n(tienda/pagos/pay.php)" as CheckoutPaso3
     component "Confirmación\n(tienda/pagos/confirmacion.php)" as Confirmacion
-    component "Wishlist Rápido\n(tienda/api/wishlist/*.php)" as WishlistPublic
+    component "Lista de Deseos Rápida\n(tienda/api/wishlist/*.php)" as WishlistPublic
     component "Alertas Promocionales\n(alertas/*.php)" as AlertasFront
 }
 
@@ -41,7 +41,7 @@ package "Panel de Usuario" as UserPanel {
     component "Detalle Orden\n(users/order_detail.php)" as UserOrderDetail
     component "Comprobantes\n(users/orders/invoice.php)" as UserInvoice
     component "Direcciones con GPS\n(users/addresses.php)" as UserAddresses
-    component "Wishlist Usuario\n(users/wishlist.php)" as UserWishlist
+    component "Lista de Deseos Usuario\n(users/wishlist.php)" as UserWishlist
     component "Alertas Personalizadas\n(users/alertas/*.php)" as UserAlerts
     component "Notificaciones\n(users/notifications.php)" as UserNotifications
     component "Acciones AJAX\n(users/ajax/ajax_cancel_order.php)" as UserAjax
@@ -88,10 +88,10 @@ package "Capa AJAX y APIs" as InternalAPIs {
     component "AJAX Admin\n(ajax/admin/*)" as AjaxAdmin
     component "AJAX Busquedas\n(ajax/busqueda/*)" as AjaxSearch
     component "AJAX Carrito\n(ajax/cart/*)" as AjaxCart
-    component "AJAX Wishlist\n(ajax/wishlist/*)" as AjaxWishlist
+    component "AJAX Lista de Deseos\n(ajax/wishlist/*)" as AjaxWishlist
     component "APIs Tienda - Carrito\n(tienda/api/cart/*)" as ApiCart
     component "APIs Tienda - Pago\n(tienda/api/pay/*)" as ApiPay
-    component "APIs Tienda - Wishlist\n(tienda/api/wishlist/*)" as ApiWishlist
+    component "APIs Tienda - Lista de Deseos\n(tienda/api/wishlist/*)" as ApiWishlist
     component "APIs Usuarios\n(users/api/*.php)" as ApiUsers
     component "APIs Admin\n(admin/api/*)" as ApiAdmin
     component "APIs Opiniones Públicas\n(api/*.php)" as ApiReviews
@@ -112,7 +112,7 @@ database "Base de Datos MySQL" as DB {
     component "Órdenes y Historial\n(orders, order_items, order_status_history)" as DBOrders
     component "Pagos y Comprobantes\npayment_transactions, pay_receipts" as DBPayments
     component "Carrito\n(carts, cart_items)" as DBCart
-    component "Wishlist y Alertas\n(wishlist, wishlist_alerts)" as DBWishlist
+    component "Lista de Deseos y Alertas\n(wishlist, wishlist_alerts)" as DBWishlist
     component "Contenido\n(announcements, sliders)" as DBContent
     component "Notificaciones\n(user_notifications, admin_notification_dismissals, search_history)" as DBNotifications
     component "Histórico Delivery\n(order_deliveries, delivery_navigation_sessions, ... )" as DBDelivery

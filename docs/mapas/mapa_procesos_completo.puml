@@ -47,7 +47,7 @@ partition "Descubrimiento y Registro" as Discovery {
 partition "Selección y Carrito" as Selection {
     :Revisa detalle de producto con tabs, reseñas y preguntas;
     :Gestiona tallas/variantes e inventario real-time;
-    :Añade a carrito o wishlist;
+        :Añade a carrito o Lista de Deseos;
     if (¿Producto disponible?) then (Sí)
         :Carrito almacena en BD sesiones;
         :Permite aplicar cupones y calculadora envío;
@@ -57,13 +57,13 @@ partition "Selección y Carrito" as Selection {
     endif
 
     if (¿Desea finalizar compra?) then (Sí)
-        :Avanza a checkout Paso 1 (cart.php);
+            :Avanza al Paso 1 de Pago (cart.php);
     else (No)
         :Sigue navegando;
     endif
 }
 
-partition "Checkout y Pago" as Checkout {
+partition "Pago y Finalización" as Checkout {
     :Paso 1 - Confirma items y totales;
     :Paso 2 - Selecciona dirección + geocoding;
     :Paso 3 - Elige método envío y pago;
@@ -142,7 +142,7 @@ partition "Postventa y Engagement" as PostSale {
     :Accede a factura PDF y historial completo;
     :Puede calificar servicio, dejar reseña o pregunta;
     :Sistema actualiza rating y muestra en ficha producto;
-    :Activa alertas de wishlist o reordenar;
+        :Activa alertas de Lista de Deseos o reordenar;
     note right
         Se conservan logs y auditoría
         para todo el ciclo, incluyendo
@@ -166,10 +166,10 @@ AdminOps --> Shipping : Define reglas/logística
 ' ===== NOTAS ADICIONALES =====
 note as N1
     **Características Clave 2025:**
-    - Checkout en 3 pasos con geocoding
+    - Pago en 3 pasos con geocoding
     - Validación manual de transferencias
     - 80+ tablas con historial y auditoría
-    - Alertas de wishlist y anuncios dinámicos
+    - Alertas de Lista de Deseos y anuncios dinámicos
 end note
 
 note as N2
@@ -182,7 +182,7 @@ end note
 
 note as N3
     **Decisiones Críticas:**
-    - Autenticación previa a checkout
+    - Autenticación previa al pago
     - Verificación de stock antes de preparar
     - Aprobación o rechazo de comprobante
     - Selección de regla de envío disponible

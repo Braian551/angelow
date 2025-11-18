@@ -44,19 +44,19 @@ rectangle "Módulo de Tienda y Catálogo" <<module>> {
 }
 
 ' ===== WISHLIST Y ALERTAS =====
-rectangle "Módulo de Wishlist y Alertas" <<module>> {
-    usecase "UC-18: Agregar producto a wishlist" as UC18
-    usecase "UC-19: Gestionar wishlist personal" as UC19
-    usecase "UC-20: Configurar alertas de wishlist" as UC20
+rectangle "Módulo de Lista de Deseos y Alertas" <<module>> {
+    usecase "UC-18: Agregar producto a Lista de Deseos" as UC18
+    usecase "UC-19: Gestionar Lista de Deseos personal" as UC19
+    usecase "UC-20: Configurar alertas de Lista de Deseos" as UC20
 }
 
 ' ===== CARRITO Y CHECKOUT =====
-rectangle "Módulo de Carrito y Checkout" <<module>> {
+rectangle "Módulo de Carrito y Pago" <<module>> {
     usecase "UC-21: Agregar producto al carrito" as UC21
     usecase "UC-22: Gestionar carrito de compras" as UC22
     usecase "UC-23: Aplicar códigos de descuento" as UC23
     usecase "UC-24: Calcular costos de envío" as UC24
-    usecase "UC-25: Proceder al checkout" as UC25
+    usecase "UC-25: Proceder al pago" as UC25
     usecase "UC-26: Seleccionar método de pago" as UC26
     usecase "UC-27: Confirmar pedido" as UC27
 }
@@ -137,14 +137,14 @@ Cliente --> UC14 : Filtra catálogo
 Cliente --> UC15 : Ve detalles
 Cliente --> UC16 : Consulta variantes
 Cliente --> UC17 : Revisa reseñas
-Cliente --> UC18 : Agrega a wishlist
-Cliente --> UC19 : Gestiona wishlist
+Cliente --> UC18 : Agrega a Lista de Deseos
+Cliente --> UC19 : Gestiona Lista de Deseos
 Cliente --> UC20 : Configura alertas
 Cliente --> UC21 : Agrega al carrito
 Cliente --> UC22 : Gestiona carrito
 Cliente --> UC23 : Aplica descuentos
 Cliente --> UC24 : Calcula envío
-Cliente --> UC25 : Hace checkout
+Cliente --> UC25 : Procede al pago
 Cliente --> UC26 : Selecciona pago
 Cliente --> UC27 : Confirma pedido
 Cliente --> UC28 : Procesa transferencia
@@ -185,7 +185,7 @@ UC30 --> Pago : Confirma validación
 UC31 --> Pago : Genera datos de factura
 
 UC01 --> Email : Envía confirmación registro
-UC20 --> Email : Envía alertas wishlist
+UC20 --> Email : Envía alertas Lista de Deseos
 UC27 --> Email : Envía confirmación pedido
 UC32 --> Email : Envía comprobantes
 UC37 --> Email : Notifica cancelación
@@ -196,14 +196,14 @@ UC10 --> UC12 : Búsqueda
 UC12 --> UC13 : Historial
 UC14 --> UC15 : Resultados
 UC15 --> UC16 : Variantes
-UC15 --> UC18 : Wishlist
+UC15 --> UC18 : Lista de Deseos
 UC18 --> UC19 : Gestión
 UC19 --> UC20 : Alertas
 UC15 --> UC21 : Carrito
 UC21 --> UC22 : Gestión
 UC22 --> UC23 : Descuentos
 UC22 --> UC24 : Envío
-UC22 --> UC25 : Checkout
+UC22 --> UC25 : Pago
 UC25 --> UC26 : Método de pago
 UC26 --> UC27 : Confirmación
 UC27 --> UC28 : Transferencia
@@ -243,7 +243,7 @@ end note
 
 note right of Cliente
   Usuario registrado con acceso a:
-  - Wishlist y alertas personalizadas
+  - Lista de Deseos y alertas personalizadas
   - Historial de pedidos e invoices
   - Notificaciones internas
 end note
