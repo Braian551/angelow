@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz de Requisitos - Parte 7: Comunicaciones y Experiencia</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .info-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .info-item { display: flex; align-items: center; gap: 8px; }
+        .info-item strong { color: #667eea; }
+        .table-container { padding: 30px; overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        thead th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            vertical-align: middle;
+        }
+        thead th:last-child { border-right: none; }
+        tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.3s;
+        }
+        tbody tr:hover { background-color: #f5f5f5; }
+        tbody tr:nth-child(even) { background-color: #fafafa; }
+        tbody tr:nth-child(even):hover { background-color: #f0f0f0; }
+        td {
+            padding: 14px 12px;
+            vertical-align: top;
+            border-right: 1px solid #e8e8e8;
+            word-wrap: break-word;
+        }
+        td:last-child { border-right: none; }
+        .module-cell {
+            font-weight: 600;
+            color: #667eea;
+            background-color: #f0f4ff !important;
+            border-left: 4px solid #667eea;
+        }
+        .subprocess-cell { font-weight: 500; color: #555; }
+        .code-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #764ba2;
+            background-color: #faf5ff;
+        }
+        .description-cell { color: #333; line-height: 1.5; }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 3px solid #667eea;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MATRIZ DE REQUISITOS - PARTE 7</h1>
+            <p>Comunicaciones y Experiencia - Sistema Angelow</p>
+        </div>
+        <div class="info-bar">
+            <div class="info-item"><strong>Módulos:</strong> Anuncios Comerciales, Centro de Notificaciones, Recomendaciones, Cancelación Autogestionada, Asistente GPS</div>
+            <div class="info-item"><strong>Fecha:</strong> Noviembre 2025</div>
+            <div class="info-item"><strong>Requisitos:</strong> RF-111 a RF-120</div>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">Módulo</th>
+                        <th style="width: 10%;">Subproceso</th>
+                        <th style="width: 5%;">Nro.<br>RF</th>
+                        <th style="width: 25%;">Requisito Funcional</th>
+                        <th style="width: 5%;">Nro.<br>RN</th>
+                        <th style="width: 20%;">Reglas del Negocio</th>
+                        <th style="width: 5%;">Nro.<br>RI</th>
+                        <th style="width: 20%;">Requisitos de Información</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- ANUNCIOS COMERCIALES -->
+                    <tr>
+                        <td class="module-cell" rowspan="4">Anuncios Comerciales</td>
+                        <td class="subprocess-cell">Crear anuncio promocional</td>
+                        <td class="code-cell">RF-111</td>
+                        <td class="description-cell">
+                            El sistema debe permitir registrar anuncios con tipo (barra superior o banner), título, mensaje, icono profesional, prioridad, fechas de publicación y opciones visuales como subtítulo, botón y carga de imagen.
+                        </td>
+                        <td class="code-cell">RN-111</td>
+                        <td class="description-cell">Solo se permiten dos anuncios activos en simultáneo para mantener el sitio limpio. Se valida que el icono sea obligatorio, la imagen pese máximo 3 MB (JPG, PNG o WEBP) y que las fechas de inicio/fin estén en orden antes de guardar.</td>
+                        <td class="code-cell">RI-111</td>
+                        <td class="description-cell">
+                            Campos obligatorios: tipo, título, mensaje, icono, prioridad, estado, usuario creador, fecha de creación. Campos opcionales: subtítulo, texto y enlace del botón, imagen subida, fecha inicio/fin y color de fondo.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Gestionar anuncios publicados</td>
+                        <td class="code-cell">RF-112</td>
+                        <td class="description-cell">
+                            El panel de administración debe mostrar una cuadrícula con todos los anuncios creados, indicando tipo, estado, prioridad, fechas de vigencia y accesos directos para editar o eliminar cada registro.
+                        </td>
+                        <td class="code-cell">RN-112</td>
+                            <td class="description-cell">La grilla se actualiza en tiempo real y oculta el botón "Agregar anuncio" cuando ya existen dos registros. Cada tarjeta incluye distintivos de tipo (barra o banner), estado activo/inactivo, prioridad y fecha de creación para tomar decisiones rápidas.</td>
+                        <td class="code-cell">RI-112</td>
+                        <td class="description-cell">
+                            Listado con: identificador, tipo, título, mensaje resumido, prioridad, estado actual, fecha de creación, fecha de inicio/fin, miniatura de imagen (si existe) y enlace para edición o eliminación segura.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Barra superior en tienda</td>
+                        <td class="code-cell">RF-113</td>
+                        <td class="description-cell">
+                            La tienda debe mostrar automáticamente en la parte superior el anuncio de tipo "barra" con mayor prioridad que esté activo y dentro de la ventana de fechas, incluyendo icono y colores corporativos.
+                        </td>
+                        <td class="code-cell">RN-113</td>
+                        <td class="description-cell">Solo se pinta un anuncio a la vez. Si el anuncio expira, se desactiva o se programa para el futuro, la barra desaparece sin intervención manual. El mensaje se obtiene en cada carga de página para asegurarse de que siempre esté actualizado.</td>
+                        <td class="code-cell">RI-113</td>
+                        <td class="description-cell">
+                            Datos de renderizado: título corto, mensaje, icono FontAwesome seleccionado, color de fondo/texto, prioridad, estado, fecha de inicio/fin y enlace (si aplica) para convertir el mensaje en botón.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Banner promocional destacado</td>
+                        <td class="code-cell">RF-114</td>
+                        <td class="description-cell">
+                            La página principal debe mostrar un banner promocional con imagen, subtítulo, texto y botón cuando exista un anuncio de tipo "promo" activo con prioridad más alta.
+                        </td>
+                        <td class="code-cell">RN-114</td>
+                        <td class="description-cell">Si el anuncio incluye imagen se usa el archivo subido; de lo contrario se muestra un fondo degradado estándar. El botón solo aparece cuando hay texto y enlace configurados. Fuera de la vigencia el banner se oculta automáticamente.</td>
+                        <td class="code-cell">RI-114</td>
+                        <td class="description-cell">
+                            Información requerida: identificador del anuncio, subtítulo, texto principal, ruta de la imagen optimizada, texto del botón, enlace, prioridad, estado y marcas de tiempo para auditoría.
+                        </td>
+                    </tr>
+                    <!-- CENTRO DE NOTIFICACIONES -->
+                    <tr>
+                        <td class="module-cell" rowspan="3">Centro de Notificaciones</td>
+                        <td class="subprocess-cell">Bandeja de notificaciones</td>
+                        <td class="code-cell">RF-115</td>
+                        <td class="description-cell">
+                            Los usuarios deben contar con una bandeja donde consulten hasta 50 notificaciones recientes con filtros por estado (todas, leídas, sin leer) y por tipo (pedidos, productos, promociones, sistema o cuenta).
+                        </td>
+                        <td class="code-cell">RN-115</td>
+                        <td class="description-cell">Al ingresar se marcan automáticamente como leídas para evitar duplicar alertas. Cada tarjeta muestra icono contextual, título, mensaje, tiempo transcurrido y, cuando aplica, un enlace directo al pedido relacionado.</td>
+                        <td class="code-cell">RI-115</td>
+                        <td class="description-cell">
+                            Notificación con: id, usuario, título, mensaje, tipo, entidad relacionada, fecha de creación, indicador leído/no leído, fecha de lectura y enlace opcional para abrir el detalle que generó la alerta.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Contador en tiempo real</td>
+                        <td class="code-cell">RF-116</td>
+                            <td class="description-cell">El encabezado del sitio debe mostrar un contador dinámico de notificaciones pendientes alimentado por consultas automáticas y actualizarlo periódicamente sin recargar la página.</td>
+                            <td class="code-cell">RN-116</td>
+                            <td class="description-cell">El contador solo aparece para usuarios autenticados, toma en cuenta las preferencias del usuario y se actualiza cada pocos minutos o cuando el usuario elimina o lee una notificación.</td>
+                        <td class="code-cell">RI-116</td>
+                        <td class="description-cell">
+                            Respuesta JSON con: identificador del usuario, cantidad total de notificaciones sin leer, hora de cálculo y bandera de éxito para manejar errores o sesiones caducadas en el front.</td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Acciones sobre notificaciones</td>
+                        <td class="code-cell">RF-117</td>
+                        <td class="description-cell">
+                            El usuario debe poder eliminar notificaciones individuales, marcar todas como leídas en un clic y disparar acciones según el tipo (por ejemplo, abrir el pedido en seguimiento) sin abandonar la página.
+                        </td>
+                        <td class="code-cell">RN-117</td>
+                            <td class="description-cell">Cada acción se valida contra el usuario autenticado para evitar manipulaciones. Las operaciones muestran mensajes claros y actualizan de inmediato la bandeja y los contadores.</td>
+                        <td class="code-cell">RI-117</td>
+                        <td class="description-cell">
+                            Parámetros: id de notificación, usuario propietario, acción solicitada (leer, eliminar, leer todas), fecha/hora aplicada y respuesta del sistema para refrescar los contadores y el listado en pantalla.
+                        </td>
+                    </tr>
+                    <!-- RECOMENDACIONES -->
+                    <tr>
+                        <td class="module-cell">Recomendaciones Inteligentes</td>
+                        <td class="subprocess-cell">Sugerencias personalizadas</td>
+                        <td class="code-cell">RF-118</td>
+                        <td class="description-cell">
+                            El panel del usuario debe mostrar una rejilla de hasta 6 productos sugeridos calculados con base en categorías compatibles, calificaciones positivas y novedades recientes que el cliente aún no tiene en su lista de deseos.
+                        </td>
+                        <td class="code-cell">RN-118</td>
+                        <td class="description-cell">El motor ordena primero por calificación promedio y número de reseñas, luego por fecha de lanzamiento. Si no hay suficientes coincidencias, se completa con productos activos al azar. Nunca repite productos ya guardados como favoritos.</td>
+                        <td class="code-cell">RI-118</td>
+                        <td class="description-cell">
+                            Datos por producto: id, nombre, slug, categoría, precios (base y promocional), indicador de destacado, ruta de imagen principal, promedio de calificación, número de reseñas, estado favorito y fechas de creación.</td>
+                    </tr>
+                    <!-- CANCELACIÓN AUTOGESTIONADA -->
+                    <tr>
+                        <td class="module-cell">Cancelación Autogestionada</td>
+                        <td class="subprocess-cell">Cancelar pedido en línea</td>
+                        <td class="code-cell">RF-119</td>
+                        <td class="description-cell">
+                            Desde el historial de pedidos el cliente debe poder cancelar órdenes en estado pendiente o en preparación, recibiendo una confirmación inmediata y el compromiso de gestionar el reembolso por el mismo medio de pago.
+                        </td>
+                        <td class="code-cell">RN-119</td>
+                            <td class="description-cell">El servicio valida que la orden pertenezca al usuario y que el estado permita cancelación. Al confirmar, cambia el estado a "cancelado", ajusta el estado de pago a "reembolsado", envía las notificaciones correspondientes y registra la acción en el historial.</td>
+                        <td class="code-cell">RI-119</td>
+                        <td class="description-cell">
+                            Información almacenada: id de la orden, usuario solicitante, estado anterior y nuevo, estado de pago resultante, motivo automático, registro de notificación enviada, mensaje mostrado y fecha/hora de la cancelación.
+                        </td>
+                    </tr>
+                    <!-- ASISTENTE GPS -->
+                    <tr>
+                        <td class="module-cell">Asistente de Direcciones GPS</td>
+                        <td class="subprocess-cell">Búsqueda y geocodificación</td>
+                        <td class="code-cell">RF-120</td>
+                        <td class="description-cell">
+                            El formulario de direcciones debe ofrecer autocompletado usando OpenStreetMap y permitir convertir coordenadas en direcciones legibles para guardar ubicaciones precisas con un clic.
+                        </td>
+                        <td class="code-cell">RN-120</td>
+                            <td class="description-cell">Las búsquedas requieren mínimo dos caracteres, devuelven hasta 5 resultados enfocados en Colombia y muestran barrio, ciudad y coordenadas. El servicio que convierte coordenadas en direcciones valida rangos seguros y guarda la ubicación completa aunque falle el autocompletado.</td>
+                        <td class="code-cell">RI-120</td>
+                        <td class="description-cell">
+                            Datos por consulta: texto buscado, lista de resultados (latitud, longitud, nombre mostrado, barrio, ciudad, país), dirección confirmada, coordenadas finales y sello de tiempo para auditoría y control de uso de la API pública.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="footer">
+            <p><strong>Proyecto Angelow - Parte 7 de 8</strong></p>
+            <p>Comunicaciones y Experiencia | Requisitos: RF-111 a RF-120</p>
+            <p style="margin-top: 10px; font-size: 0.9em; color: #28a745;">
+                <strong>Total acumulado hasta esta parte: 120 RF | 120 RN | 120 RI</strong>
+            </p>
+            <p style="margin-top: 5px; font-size: 0.85em; color: #666;">
+                Módulos: Anuncios Comerciales, Centro de Notificaciones, Recomendaciones Inteligentes, Cancelación Autogestionada y Asistente de Direcciones GPS.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
