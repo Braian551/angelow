@@ -52,9 +52,11 @@ Por último, una vez verificado el sistema, es crucial realizar pruebas de funci
 
 En resumen, el desafío principal es asegurar que el proceso de desarrollo del software, desde la identificación de requerimientos hasta la implementación final y la capacitación de los usuarios, se lleve a cabo de manera efectiva, garantizando que el sistema final sea funcional, seguro y escalable para satisfacer las necesidades del negocio y los usuarios.
 
-**Justificación:** En Colombia, existen diversas plataformas de comercio electrónico y servicios en línea que buscan ofrecer soluciones de compra y venta de productos, como ropa, tecnología, alimentos, entre otros. Sin embargo, el sector de ropa infantil presenta oportunidades de mejora en términos de experiencia de usuario especializada, gestión eficiente de variantes de productos y seguimiento GPS de entregas.
+La solución Angelow responde a ese reto con un catálogo enfocado en ropa infantil, historial de búsquedas, listas de deseos y alertas que recuerdan los productos guardados. El checkout guía al cliente por tres pasos (resumen, dirección con geolocalización y comprobante de pago), mientras que el panel administrativo ofrece herramientas para validar transferencias, programar envíos, publicar anuncios, generar reportes y mantener notificaciones activas para cada usuario.
 
-A pesar de que existen tiendas en línea como Éxito, Falabella, MercadoLibre, y otras plataformas de comercio electrónico populares en Colombia, estas generalmente ofrecen soluciones genéricas que no se especializan en las necesidades específicas del mercado de ropa infantil, como la gestión de variantes de productos (tallas, colores), control de inventario avanzado y seguimiento GPS de entregas.
+**Justificación:** En Colombia, existen diversas plataformas de comercio electrónico y servicios en línea que buscan ofrecer soluciones de compra y venta de productos, como ropa, tecnología o alimentos. Sin embargo, el sector de ropa infantil aún necesita experiencias más cercanas, con vitrinas pensadas para padres, manejo fino de tallas y colores, recordatorios personalizados y comunicación clara sobre cada paso del envío.
+
+A pesar de que existen tiendas en línea como Éxito, Falabella o MercadoLibre, suelen manejar catálogos genéricos que no cubren particularidades como los paquetes familiares, la actualización inmediata del stock por variante, los carritos persistentes o las alertas de reposición que hoy exige este nicho. Angelow aprovecha ese vacío al combinar un checkout guiado, validación manual de pagos y paneles de seguimiento que mantienen informado al cliente desde la búsqueda hasta la entrega.
 
 Este vacío en el mercado abre una oportunidad de negocio significativa. Una plataforma especializada en E-commerce de ropa infantil, como lo planteamos en el proyecto, podría ser una ventaja competitiva al ofrecer funcionalidades específicas del sector, mejorando la experiencia de compra para padres y cuidadores.
 
@@ -69,13 +71,13 @@ Por lo tanto, la especialización en E-commerce de ropa infantil en Colombia no 
 ## APIS A UTILIZAR
 
 **Inicio de sesión:**  
-Registro y autenticación tradicional con email y contraseña.
+Registro y autenticación tradicional con email y contraseña, además de ingreso con Google para reducir pasos.
 
 **Pagos:**  
 Transferencia bancaria con validación de comprobante de pago.
 
 **Geolocalización:**  
-OpenStreetMap API: Ofrece mapas personalizados y funcionalidades de geolocalización.
+OpenStreetMap API: Apoya el autocompletado de direcciones y la validación del lugar de envío.
 
 **Seguridad:**  
 reCAPTCHA API: Para prevenir spam y abuso en formularios de contacto y registro.
@@ -84,7 +86,7 @@ reCAPTCHA API: Para prevenir spam y abuso en formularios de contacto y registro.
 
 ## OBJETIVOS DEL PROYECTO
 
-**General:** Desarrollar una plataforma de E-commerce integral para la comercialización mayorista y minorista de ropa infantil, incorporando funcionalidades avanzadas como seguimiento GPS de entregas y gestión especializada de productos infantiles.
+**General:** Desarrollar una plataforma de E-commerce integral para la comercialización mayorista y minorista de ropa infantil, incorporando funcionalidades avanzadas como un checkout guiado, validación segura de pagos y coordinación clara de envíos y notificaciones desde el mismo sistema.
 
 **Específicos:**  
 
@@ -122,16 +124,19 @@ La integración de APIs y sistemas de geolocalización en el E-commerce de Medel
 Resultado esperado: Un documento detallado de los requerimientos del software que describa las funcionalidades esenciales y deseables, como la gestión de usuarios, inventario, carrito de compras, pagos y seguimiento de entregas.  
 La selección adecuada de herramientas y tecnologías de desarrollo que garanticen un sistema robusto, escalable y seguro.  
 Una arquitectura bien definida que permita integrar todos los módulos del sistema de forma eficiente, asegurando que el software pueda crecer a medida que la tienda virtual expanda su base de usuarios y productos.
+Incluye la definición del checkout en tres pasos, el historial de búsquedas, las alertas de wishlist y las campañas de anuncios dentro de la misma hoja de ruta.
 
 **Diseño de la Base de Datos y Mockups (Interfaces Gráficas):**  
 Resultado esperado: Una base de datos eficiente que soporte todos los módulos del sistema, con relaciones bien definidas para gestionar usuarios, productos, pagos, inventario y entregas sin problemas de rendimiento.  
 Mockups funcionales y detallados de las interfaces gráficas que sean intuitivos, fáciles de usar y proporcionen una excelente experiencia de usuario. Esto incluirá formularios de pago, páginas de productos, vistas de carrito de compras, y el proceso de seguimiento de pedidos.  
 Interfaces que respondan a las necesidades del usuario final, con un diseño que sea coherente con la marca y atractivo visualmente, para facilitar la navegación y aumentar la tasa de conversión.
+Los prototipos cubren tanto la experiencia del cliente (alertas, wishlist, notificaciones) como los paneles administrativos para anuncios, inventario y logística.
 
 **Verificación de Requerimientos y Pruebas de Funcionalidad:**  
 Resultado esperado: Confirmación de que todos los requerimientos definidos se han implementado correctamente en cada módulo. Cada funcionalidad esencial (como el sistema de pago, seguimiento de pedidos y gestión de inventario) se verifica que funciona correctamente.  
 Un informe detallado de las pruebas de funcionalidad que certifique que el sistema cumple con los estándares de calidad requeridos. Las pruebas garantizarán que los módulos interactúan de manera fluida y eficiente, sin errores en el proceso de compra o gestión de entregas.  
 Un sistema que sea estable y fiable, con todos los procesos funcionando según lo previsto (pago seguro, gestión eficiente de inventario, y seguimiento de pedidos).
+Las pruebas contemplan escenarios reales: verificación de comprobantes, alertas de carrito, actualización de estados e informes descargables.
 
 **Implementación, Pruebas de Funcionalidad y Capacitación de Usuarios Finales:**  
 Resultado esperado: El sistema completamente implementado y funcionando de manera fluida, con todas las funcionalidades operativas, como la gestión de usuarios, el carrito de compras, la pasarela de pagos, el proceso de entregas, y la atención al cliente.  
@@ -173,24 +178,25 @@ Funcionalidad: Permite a los usuarios agregar, modificar y eliminar productos an
 Características:  
 - Agregar/eliminar productos del carrito.  
 - Calcular totales (subtotal, impuestos, descuentos, envío).  
-- Guardar carritos para compras futuras.  
+- Guardar carritos para compras futuras y conectarlos con un checkout guiado en tres pasos.  
 Resultado esperado: Una experiencia de compra fluida y sin fricciones que aumente la tasa de conversión.
 
 **Módulo de Pagos:**  
 Funcionalidad: Gestiona transacciones financieras de manera segura.  
 Características:  
 - Transferencia bancaria con validación de comprobante.  
-- Transferencia bancaria con validación de comprobante.  
-- Procesamiento seguro de pagos (SSL, encriptación).  
-- Confirmación de pagos y generación de facturas.  
+- Validación manual de comprobantes con soporte para imágenes o PDF y registro del responsable que aprobó.  
+- Procesamiento seguro de la información (SSL, cifrado) y verificación de intentos fallidos.  
+- Confirmación de pagos, generación de facturas en PDF y envío automático de correos de respaldo.  
 Resultado esperado: Un sistema de pagos confiable y seguro que inspire confianza en los clientes.
 
 **Módulo de Envío y Seguimiento de Pedidos:**  
-Funcionalidad: Gestiona el envío y seguimiento de pedidos.  
+Funcionalidad: Orquesta el despacho y seguimiento de pedidos desde el panel administrativo.  
 Características:  
-- Cálculo de costos de envío.  
-- Seguimiento en tiempo real del estado del pedido con GPS.  
-Resultado esperado: Un sistema que brinde transparencia y confianza a los clientes sobre el estado de sus pedidos.
+- Cálculo de costos de envío, selección del método disponible y registro de observaciones internas.  
+- Actualización manual de estados con soporte de evidencias (comprobantes, fotos, guías).  
+- Notificaciones automáticas al cliente cuando el pedido pasa a “Preparando”, “Enviado” o “Entregado”.  
+Resultado esperado: Un sistema que brinde transparencia y confianza a los clientes sobre el estado de sus pedidos mientras mantiene el control logístico dentro de la misma plataforma.
 
 **Módulo de Administración:**  
 Funcionalidad: Permite a los administradores gestionar toda la plataforma.  
@@ -207,6 +213,14 @@ Características:
 - Análisis de comportamiento del usuario.  
 - Exportación de datos en diferentes formatos (PDF, Excel).  
 Resultado esperado: Información clara y accesible que permita optimizar la operación y estrategia de la tienda.
+
+**Módulo de Wishlist y Alertas Personalizadas:**  
+Funcionalidad: Acompaña al cliente durante el descubrimiento y le recuerda sus productos favoritos.  
+Características:  
+- Guardar y organizar listas de deseos por talla y color.  
+- Activar alertas de reposición o promociones sobre productos seleccionados.  
+- Notificar por correo y dentro del panel de usuario cuando haya novedades relevantes.  
+Resultado esperado: Mayor fidelidad y retorno de clientes gracias a recordatorios oportunos y comunicación clara.
 
 ---
 
@@ -233,6 +247,7 @@ Resultado esperado: Información clara y accesible que permita optimizar la oper
   Realizar pruebas de usabilidad y rendimiento para verificar que los módulos funcionen de manera óptima, y que el sistema pueda soportar el tráfico de usuarios y realizar transacciones de manera segura.  
   Capacitar a los usuarios finales en el uso del software, enfocándose en cómo navegar por las interfaces gráficas, realizar compras, gestionar productos, y resolver cualquier problema a través del sistema de atención al cliente.  
   Ajustar el sistema según los resultados de las pruebas y la retroalimentación recibada, asegurando que los procesos sean fáciles de entender y ejecutar para los usuarios finales.
+  Esta fase culmina con capacitaciones cortas basadas en los manuales de panel administrativo, checklist del checkout y guías para publicar anuncios.
 
 ---
 
@@ -247,11 +262,12 @@ Resultado esperado: Información clara y accesible que permita optimizar la oper
 - Carrito de compras
 - Sistema de pagos
 - Gestión de órdenes
-- Sistema de entregas con GPS
+- Seguimiento logístico interno y notificaciones de envío
 - Panel administrativo
 - Sistema de descuentos
 - Búsqueda y filtros
 - Reportes y análisis
+- Wishlist y alertas personalizadas
 - Sistema de auditoría
 
 #### En Proceso
@@ -303,7 +319,7 @@ Resultado esperado: Información clara y accesible que permita optimizar la oper
 
 4. **Gestión Administrativa Eficiente:** Panel completo con reportes, análisis y control total del negocio.
 
-5. **Innovación en Entregas:** Sistema de seguimiento GPS que diferencia el servicio en el mercado local.
+5. **Innovación en Entregas:** Coordinación interna del despacho, reglas de envío documentadas y notificaciones automáticas que mantienen informado al cliente.
 
 6. **Escalabilidad:** Arquitectura preparada para crecimiento futuro y nuevas funcionalidades.
 
