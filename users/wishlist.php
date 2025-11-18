@@ -131,9 +131,7 @@ try {
                         <?php if (!empty($product['is_featured'])): ?>
                             <div class="product-badge">Destacado</div>
                         <?php endif; ?>
-                        <?php if ($hasDiscount && !empty($product['discount_percentage'])): ?>
-                            <div class="product-badge sale"><?= $product['discount_percentage'] ?>% OFF</div>
-                        <?php endif; ?>
+
 
                         <!-- Botón de favoritos (siempre activo en esta página) -->
                         <button class="wishlist-btn active" aria-label="Quitar de favoritos" data-product-id="<?= $product['id'] ?>">
@@ -149,6 +147,9 @@ try {
                                 <img src="<?= BASE_URL ?>/images/default-product.jpg" 
                                      alt="Producto sin imagen">
                             <?php endif; ?>
+                                <?php if ($hasDiscount && !empty($product['discount_percentage'])): ?>
+                                    <div class="product-badge sale"><?= $product['discount_percentage'] ?>% OFF</div>
+                                <?php endif; ?>
                         </a>
 
                         <!-- Información del producto -->

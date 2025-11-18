@@ -374,9 +374,7 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                                 <?php if (!empty($product['is_featured'])): ?>
                                     <div class="product-badge">Destacado</div>
                                 <?php endif; ?>
-                                <?php if ($hasDiscount && $discountPercentage > 0): ?>
-                                    <div class="product-badge sale"><?= $discountPercentage ?>% OFF</div>
-                                <?php endif; ?>
+                                <!-- Badge de venta: se muestra dentro del área de imagen para no tapar el badge 'Destacado' -->
 
                                 <!-- Botón de favoritos -->
                                 <button class="wishlist-btn <?= isset($product['is_favorite']) && $product['is_favorite'] ? 'active' : '' ?>"
@@ -395,6 +393,9 @@ require_once __DIR__ . '/../layouts/asideuser.php';
                                         <img src="<?= BASE_URL ?>/images/default-product.jpg" 
                                              alt="Producto sin imagen"
                                              loading="lazy">
+                                    <?php endif; ?>
+                                    <?php if ($hasDiscount && $discountPercentage > 0): ?>
+                                        <div class="product-badge sale"><?= $discountPercentage ?>% OFF</div>
                                     <?php endif; ?>
                                 </a>
 

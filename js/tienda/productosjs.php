@@ -278,6 +278,7 @@
                 const displayPrice = Number(product.display_price ?? product.min_price ?? product.price ?? 0);
                 const hasDiscount = Boolean(product.has_discount);
                 const validDiscount = hasDiscount && Number(product.discount_percentage) > 0;
+                // El badge de venta se ancla dentro de `product-image` para evitar tapar el badge "Destacado"
                 const discountBadge = (validDiscount)
                     ? `<div class="product-badge sale">${product.discount_percentage}% OFF</div>`
                     : '';
@@ -293,7 +294,7 @@
 
                 html += `
                     <div class="product-card" data-product-id="${product.id}">
-                        ${featuredBadge}${discountBadge}
+                        ${featuredBadge}
                         <button class="wishlist-btn ${product.is_favorite ? 'active' : ''}"
                             aria-label="Añadir a favoritos"
                             data-product-id="${product.id}">
@@ -304,6 +305,7 @@
                                 `<img src="<?= BASE_URL ?>/${escapeHtml(product.primary_image)}" alt="${escapeHtml(product.name)}">` : 
                                 `<img src="<?= BASE_URL ?>/images/default-product.jpg" alt="Producto sin imagen">`
                             }
+                                ${validDiscount ? discountBadge : ''}
                         </a>
                         <div class="product-info">
                             <span class="product-category">${escapeHtml(categoryName)}</span>

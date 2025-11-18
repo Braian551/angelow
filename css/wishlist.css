@@ -406,6 +406,16 @@
   animation: pulse-badge 2s ease-in-out infinite;
 }
 
+/* Mover badge de venta a la esquina inferior de la imagen */
+.product-image .product-badge.sale {
+  top: auto;
+  left: auto;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 3;
+  box-shadow: 0 6px 18px rgba(230, 57, 70, 0.18);
+}
+
 @keyframes pulse-badge {
   0%, 100% {
     transform: scale(1);

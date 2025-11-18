@@ -542,3 +542,14 @@
         font-size: 1rem;
     }
 }
+
+/* Ubicar badge de venta dentro del contenedor de imagen para no tapar el badge destacado */
+.product-image .product-badge.sale {
+    top: auto;
+    left: auto;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    z-index: 4;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+}

@@ -1237,3 +1237,15 @@ button {
     font-size: 2rem;
   }
 }
+
+/* Mover el badge de venta a la esquina inferior de la imagen cuando esté dentro de .product-image */
+.product-image .product-badge.sale {
+  right: 1rem;
+  bottom: 1rem;
+  left: auto;
+  top: auto;
+  z-index: 3;
+  font-size: 1.1rem;
+  padding: 0.3rem 1rem;
+  border-radius: 10px;
+}

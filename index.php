@@ -198,9 +198,7 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php if (!empty($product['is_featured'])): ?>
                             <div class="product-badge">Destacado</div>
                         <?php endif; ?>
-                        <?php if (!empty($product['has_discount']) && !empty($product['discount_percentage'])): ?>
-                            <div class="product-badge sale"><?php echo $product['discount_percentage']; ?>% OFF</div>
-                        <?php endif; ?>
+                        <!-- Badge de venta: lo colocamos dentro de la imagen para no tapar el badge 'Destacado' -->
                         
                         <!-- Botón de favoritos -->
                         <button class="wishlist-btn" aria-label="Añadir a favoritos" data-product-id="<?php echo $product['id']; ?>">
@@ -214,6 +212,9 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php else: ?>
                                 <img src="<?php echo BASE_URL; ?>/images/default-product.jpg" 
                                      alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            <?php endif; ?>
+                            <?php if (!empty($product['has_discount']) && !empty($product['discount_percentage'])): ?>
+                                <div class="product-badge sale"><?php echo $product['discount_percentage']; ?>% OFF</div>
                             <?php endif; ?>
                         </a>
                         

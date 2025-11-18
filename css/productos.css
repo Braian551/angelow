@@ -381,6 +381,16 @@
   box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
 }
 
+/* Colocar el badge de venta dentro del área de imagen sin tapar el badge 'Destacado' */
+.product-image .product-badge.sale {
+  top: auto;
+  left: auto;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  z-index: 3; /* sobre la imagen, pero debajo de botones como wishlist si es necesario */
+  box-shadow: 0 4px 16px rgba(230, 57, 70, 0.24);
+}
+
 .product-badge.new {
   background: linear-gradient(135deg, #06d6a0, #05a677);
   box-shadow: 0 4px 12px rgba(6, 214, 160, 0.3);

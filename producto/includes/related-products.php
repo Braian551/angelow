@@ -12,9 +12,7 @@
                 <?php if (!empty($related['is_featured'])): ?>
                     <div class="product-badge">Destacado</div>
                 <?php endif; ?>
-                <?php if ($hasDiscount && $discountPercentage > 0): ?>
-                    <div class="product-badge sale"><?= $discountPercentage ?>% OFF</div>
-                <?php endif; ?>
+                <!-- Mover badge de venta dentro del área de imagen para que no tape el badge 'Destacado' -->
                 <div class="product-wishlist">
                     <button aria-label="Añadir a favoritos">
                         <i class="far fa-heart"></i>
@@ -25,6 +23,9 @@
                         <img src="<?= BASE_URL ?>/<?= htmlspecialchars($related['image_path']) ?>" alt="<?= htmlspecialchars($related['name']) ?>">
                     <?php else: ?>
                         <img src="<?= BASE_URL ?>/images/default-product.jpg" alt="<?= htmlspecialchars($related['name']) ?>">
+                    <?php endif; ?>
+                    <?php if ($hasDiscount && $discountPercentage > 0): ?>
+                        <div class="product-badge sale"><?= $discountPercentage ?>% OFF</div>
                     <?php endif; ?>
                 </a>
                     <div class="product-info">
