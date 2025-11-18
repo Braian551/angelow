@@ -45,7 +45,8 @@
               </a>
           </noscript>
           <div class="user-avatar">
-              <img src="<?= BASE_URL ?>/<?php echo !empty($userData['image']) ? htmlspecialchars($userData['image']) : 'images/default-avatar.png'; ?>" alt="Foto de perfil">
+              <?php $avatar = !empty($userData['image']) ? (function_exists('normalizeUserImagePath') ? normalizeUserImagePath($userData['image']) : $userData['image']) : 'images/default-avatar.png'; ?>
+              <img src="<?= BASE_URL ?>/<?= htmlspecialchars($avatar) ?>" alt="Foto de perfil">
           </div>
           <div class="user-info">
               <h3><?php echo htmlspecialchars($userData['name'] ?? 'Usuario'); ?></h3>

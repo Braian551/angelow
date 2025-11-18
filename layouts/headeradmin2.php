@@ -180,7 +180,8 @@ try {
 
     <div class="sidebar-footer">
         <div class="admin-profile">
-            <img src="<?= BASE_URL ?>/<?php echo !empty($userData['image']) ? htmlspecialchars($userData['image']) : 'images/default-avatar.png'; ?>" alt="Foto de perfil" class="profile-avatar">
+            <?php $adminAvatar = !empty($userData['image']) ? (function_exists('normalizeUserImagePath') ? normalizeUserImagePath($userData['image']) : $userData['image']) : 'images/default-avatar.png'; ?>
+            <img src="<?= BASE_URL ?>/<?= htmlspecialchars($adminAvatar) ?>" alt="Foto de perfil" class="profile-avatar">
             <div class="profile-info">
                 <span class="profile-name"><?= htmlspecialchars($userData['name'] ?? 'Administrador') ?></span>
                 <span class="profile-email"><?= htmlspecialchars($userData['email'] ?? '') ?></span>

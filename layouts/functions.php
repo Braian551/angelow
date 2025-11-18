@@ -93,6 +93,21 @@ if (!function_exists('getStatusText')) {
     }
 }
 
+/**
+ * Normaliza el path de la imagen del usuario para asegurar que tenga la carpeta `uploads/users/`
+ * Si la ruta ya contiene `/` se devuelve tal cual (permite `images/default-avatar.png` o rutas completas).
+ */
+if (!function_exists('normalizeUserImagePath')) {
+    function normalizeUserImagePath($image) {
+        $image = trim((string)$image);
+        if ($image === '') return 'images/default-avatar.png';
+        // Si ya contiene una ruta o es un placeholder, devolver tal cual
+        if (strpos($image, '/') !== false) return $image;
+        // Sino, asumir que es solo el filename guardado en DB
+        return 'uploads/users/' . $image;
+    }
+}
+
 // Traducción/normalización de métodos de pago a etiquetas en español
 if (!function_exists('translatePaymentMethod')) {
     function translatePaymentMethod($method) {

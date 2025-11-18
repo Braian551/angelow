@@ -28,10 +28,8 @@ $userId = $_SESSION['user_id'] ?? null;
 requireRole(['user', 'customer']);
 $userData = getUserData($conn, $userId);
 
-// Obtener datos del usuario
-$stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->execute([$userId]);
-$userData = $stmt->fetch(PDO::FETCH_ASSOC);
+// `getUserData()` ya devuelve la ruta `uploads/users/` en `image`.
+// Evitamos volver a hacer `SELECT *` para no sobreescribir la ruta del avatar.
 
 // Asegurar que todos los campos existan
 $userData = array_merge([
@@ -100,15 +98,52 @@ if ($orderTypeId && isset($notificationPreferences[$orderTypeId])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Procesar cada sección según el formulario enviado
-        if (isset($_POST['update_profile'])) {
+            if (isset($_POST['update_profile'])) {
             // Actualizar información básica
             $stmt = $conn->prepare("UPDATE users SET name = ?, phone = ? WHERE id = ?");
             $stmt->execute([
                 $_POST['name'], 
                 $_POST['phone'], 
-                $_SESSION['user_id']
+                    $userId
             ]);
-            
+            // Subida de imagen de perfil si se ha seleccionado
+            if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+                $file = $_FILES['profile_picture'];
+                $allowedMimes = ['image/jpeg','image/png','image/webp'];
+                $maxSize = 2 * 1024 * 1024; // 2MB
+
+                // Validaciones básicas
+                if ($file['size'] > $maxSize) {
+                    $_SESSION['error_message'] = 'La imagen es demasiado grande. Máximo 2MB.';
+                } else {
+                    $info = @getimagesize($file['tmp_name']);
+                    if (!$info || !in_array($info['mime'], $allowedMimes)) {
+                        $_SESSION['error_message'] = 'Formato no válido. Usa JPG, PNG o WEBP.';
+                    } else {
+                        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                        $safeName = $userId . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . strtolower($ext);
+                        $destDir = __DIR__ . '/../uploads/users/';
+                        if (!is_dir($destDir)) mkdir($destDir, 0755, true);
+                        $destPath = $destDir . $safeName;
+
+                        if (move_uploaded_file($file['tmp_name'], $destPath)) {
+                            // Borrar foto previa si existia
+                            $oldImage = $userData['image'] ?? null;
+                            if ($oldImage && strpos($oldImage, 'uploads/users/') === 0) {
+                                $oldPath = __DIR__ . '/../' . $oldImage;
+                                if (file_exists($oldPath)) @unlink($oldPath);
+                            }
+
+                            // Guardar solo el nombre del archivo en users.image
+                            $stmtImg = $conn->prepare("UPDATE users SET image = ? WHERE id = ?");
+                            $stmtImg->execute([$safeName, $userId]);
+                        } else {
+                            $_SESSION['error_message'] = 'No se pudo subir la imagen.';
+                        }
+                    }
+                }
+            }
+
             $_SESSION['success_message'] = "Información actualizada correctamente";
             header("Location: ".BASE_URL."/users/settings.php");
             exit();
@@ -225,7 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- Sección de Perfil -->
                     <section id="profile" class="settings-section active">
                         <h2><i class="fas fa-user"></i> Información del Perfil</h2>
-                        <form method="POST" class="settings-form">
+                        <form method="POST" enctype="multipart/form-data" class="settings-form">
                             <div class="form-group">
                                 <label for="name">Nombre completo</label>
                                 <input type="text" id="name" name="name" value="<?= safeDisplay($userData['name']) ?>" required>
@@ -246,12 +281,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label>Foto de perfil</label>
                                 <div class="profile-picture-upload">
                                     <?php 
-                                    $imagePath = $userData['image'] ?? 'images/default-avatar.png';
+                                    $imagePath = !empty($userData['image']) ? (function_exists('normalizeUserImagePath') ? normalizeUserImagePath($userData['image']) : $userData['image']) : 'images/default-avatar.png';
                                     $imageUrl = BASE_URL . '/' . $imagePath;
                                     ?>
                                     <img src="<?= $imageUrl ?>" alt="Foto de perfil">
                                     <button type="button" class="btn-change-photo">Cambiar foto</button>
-                                    <input type="file" id="profile-picture" accept="image/*" style="display: none;">
+                                    <input type="file" id="profile-picture" name="profile_picture" accept="image/*" style="display: none;">
                                 </div>
                             </div>
                             
