@@ -9,257 +9,265 @@ skinparam usecase {
     BorderColor<<external>> #AAAAAA
 }
 
-title ANGELOW - Casos de Uso del Sistema de Tienda Virtual de Ropa Infantil
+title ANGELOW 2025 - Casos de Uso Actualizados
 
 ' ===== ACTORES =====
 actor "Cliente\n(Usuario Registrado)" as Cliente
 actor "Usuario Anónimo\n(Navegador)" as Anonimo
 actor "Administrador" as Admin
-actor "Repartidor/Delivery" as Delivery
 actor "Sistema de Pago\n(Transferencia Bancaria)" as Pago <<external>>
-actor "OpenStreetMap\n(Geolocalización)" as GPS <<external>>
 actor "Sistema de Correo\n(PHPMailer)" as Email <<external>>
 
-' ===== MÓDULO DE AUTENTICACIÓN Y USUARIOS =====
+' ===== AUTENTICACIÓN Y USUARIOS =====
 rectangle "Módulo de Autenticación y Usuarios" <<module>> {
-    usecase "UC-01: Registrar Nueva Cuenta" as UC01
-    usecase "UC-02: Iniciar Sesión" as UC02
-    usecase "UC-03: Cerrar Sesión" as UC03
-    usecase "UC-04: Gestionar Perfil Personal" as UC04
-    usecase "UC-05: Gestionar Direcciones de Envío" as UC05
-    usecase "UC-06: Cambiar Contraseña" as UC06
+    usecase "UC-01: Registrar nueva cuenta" as UC01
+    usecase "UC-02: Iniciar sesión" as UC02
+    usecase "UC-03: Iniciar sesión con Google" as UC03
+    usecase "UC-04: Cerrar sesión" as UC04
+    usecase "UC-05: Gestionar perfil personal" as UC05
+    usecase "UC-06: Gestionar direcciones de envío" as UC06
+    usecase "UC-07: Cambiar contraseña" as UC07
+    usecase "UC-08: Configurar preferencias de notificación" as UC08
 }
 
-' ===== MÓDULO DE TIENDA Y CATÁLOGO =====
+' ===== TIENDA Y CATÁLOGO =====
 rectangle "Módulo de Tienda y Catálogo" <<module>> {
-    usecase "UC-07: Explorar Página Principal" as UC07
-    usecase "UC-08: Navegar por Categorías" as UC08
-    usecase "UC-09: Buscar Productos" as UC09
-    usecase "UC-10: Filtrar Productos" as UC10
-    usecase "UC-11: Ver Detalles de Producto" as UC11
-    usecase "UC-12: Ver Variantes de Producto" as UC12
+    usecase "UC-09: Explorar página principal" as UC09
+    usecase "UC-10: Navegar categorías y colecciones" as UC10
+    usecase "UC-11: Consultar colecciones destacadas" as UC11
+    usecase "UC-12: Buscar productos" as UC12
+    usecase "UC-13: Registrar historial de búsqueda" as UC13
+    usecase "UC-14: Filtrar catálogo" as UC14
+    usecase "UC-15: Ver detalles de producto" as UC15
+    usecase "UC-16: Consultar variantes y disponibilidad" as UC16
+    usecase "UC-17: Revisar reseñas y preguntas" as UC17
 }
 
-' ===== MÓDULO DE CARRITO Y COMPRA =====
-rectangle "Módulo de Carrito y Compra" <<module>> {
-    usecase "UC-13: Agregar Producto al Carrito" as UC13
-    usecase "UC-14: Gestionar Carrito de Compras" as UC14
-    usecase "UC-15: Aplicar Código de Descuento" as UC15
-    usecase "UC-16: Calcular Costos de Envío" as UC16
-    usecase "UC-17: Proceder al Checkout" as UC17
-    usecase "UC-18: Seleccionar Método de Pago" as UC18
-    usecase "UC-19: Confirmar Pedido" as UC19
+' ===== WISHLIST Y ALERTAS =====
+rectangle "Módulo de Wishlist y Alertas" <<module>> {
+    usecase "UC-18: Agregar producto a wishlist" as UC18
+    usecase "UC-19: Gestionar wishlist personal" as UC19
+    usecase "UC-20: Configurar alertas de wishlist" as UC20
 }
 
-' ===== MÓDULO DE PAGOS =====
-rectangle "Módulo de Pagos" <<module>> {
-    usecase "UC-20: Procesar Transferencia Bancaria" as UC20
-    usecase "UC-21: Subir Comprobante de Pago" as UC21
-    usecase "UC-22: Validar Pago" as UC22
-    usecase "UC-23: Generar Recibo/Factura" as UC23
+' ===== CARRITO Y CHECKOUT =====
+rectangle "Módulo de Carrito y Checkout" <<module>> {
+    usecase "UC-21: Agregar producto al carrito" as UC21
+    usecase "UC-22: Gestionar carrito de compras" as UC22
+    usecase "UC-23: Aplicar códigos de descuento" as UC23
+    usecase "UC-24: Calcular costos de envío" as UC24
+    usecase "UC-25: Proceder al checkout" as UC25
+    usecase "UC-26: Seleccionar método de pago" as UC26
+    usecase "UC-27: Confirmar pedido" as UC27
 }
 
-' ===== MÓDULO DE GESTIÓN DE PEDIDOS =====
-rectangle "Módulo de Gestión de Pedidos" <<module>> {
-    usecase "UC-25: Ver Historial de Pedidos" as UC25
-    usecase "UC-26: Ver Detalle de Pedido" as UC26
-    usecase "UC-27: Rastrear Pedido en Tiempo Real" as UC27
-    usecase "UC-28: Cancelar Pedido" as UC28
-    usecase "UC-29: Reordenar Productos" as UC29
+' ===== PAGOS Y DOCUMENTOS =====
+rectangle "Módulo de Pagos y Documentos" <<module>> {
+    usecase "UC-28: Procesar transferencia bancaria" as UC28
+    usecase "UC-29: Subir comprobante de pago" as UC29
+    usecase "UC-30: Validar pago recibido" as UC30
+    usecase "UC-31: Generar recibo/factura" as UC31
+    usecase "UC-32: Enviar comprobantes por correo" as UC32
+}
+
+' ===== PEDIDOS Y POSTVENTA =====
+rectangle "Módulo de Pedidos y Postventa" <<module>> {
+    usecase "UC-33: Ver historial de pedidos" as UC33
+    usecase "UC-34: Ver detalle y seguimiento" as UC34
+    usecase "UC-35: Descargar factura PDF" as UC35
+    usecase "UC-36: Consultar estado del pedido" as UC36
+    usecase "UC-37: Cancelar pedido" as UC37
+    usecase "UC-38: Reordenar productos" as UC38
+}
+
+' ===== NOTIFICACIONES Y COMUNICACIONES =====
+rectangle "Módulo de Notificaciones" <<module>> {
+    usecase "UC-39: Revisar notificaciones" as UC39
+    usecase "UC-40: Marcar notificaciones como leídas" as UC40
 }
 
 ' ===== MÓDULO ADMINISTRATIVO =====
 rectangle "Módulo Administrativo" <<module>> {
-    usecase "UC-30: Gestionar Productos (CRUD)" as UC30
-    usecase "UC-31: Gestionar Categorías" as UC31
-    usecase "UC-32: Gestionar Colecciones" as UC32
-    usecase "UC-33: Gestionar Tallas y Variantes" as UC33
-    usecase "UC-34: Controlar Inventario" as UC34
-    usecase "UC-35: Gestionar Órdenes de Compra" as UC35
-    usecase "UC-36: Asignar Órdenes a Delivery" as UC36
-    usecase "UC-37: Gestionar Usuarios/Clientes" as UC37
-    usecase "UC-38: Gestionar Sliders/Banners" as UC38
-    usecase "UC-39: Gestionar Descuentos y Promociones" as UC39
-    usecase "UC-40: Gestionar Envíos y Costos" as UC40
-    usecase "UC-41: Generar Reportes de Ventas" as UC41
-    usecase "UC-42: Generar Reportes de Productos" as UC42
-    usecase "UC-43: Generar Reportes de Clientes" as UC43
-    usecase "UC-44: Gestionar Noticias/Contenido" as UC44
+    usecase "UC-41: Gestionar catálogo de productos" as UC41
+    usecase "UC-42: Gestionar categorías" as UC42
+    usecase "UC-43: Gestionar colecciones" as UC43
+    usecase "UC-44: Gestionar tallas y variantes" as UC44
+    usecase "UC-45: Controlar inventario" as UC45
+    usecase "UC-46: Gestionar sliders y banners" as UC46
+    usecase "UC-47: Gestionar anuncios y contenido" as UC47
+    usecase "UC-48: Administrar órdenes de compra" as UC48
+    usecase "UC-49: Validar pagos y comprobantes" as UC49
+    usecase "UC-50: Configurar reglas de envío y costos" as UC50
+    usecase "UC-51: Gestionar descuentos y campañas" as UC51
+    usecase "UC-52: Gestionar clientes/usuarios" as UC52
+    usecase "UC-53: Gestionar administradores y roles" as UC53
+    usecase "UC-54: Moderar reseñas y preguntas" as UC54
+    usecase "UC-55: Generar reportes analíticos" as UC55
+    usecase "UC-56: Exportar reportes PDF/Excel" as UC56
+    usecase "UC-57: Configurar ajustes globales" as UC57
+    usecase "UC-58: Monitorear alertas del dashboard" as UC58
 }
 
-' ===== MÓDULO DE DELIVERY =====
-rectangle "Módulo de Delivery" <<module>> {
-    usecase "UC-45: Ver Órdenes Asignadas" as UC45
-    usecase "UC-46: Aceptar Orden de Entrega" as UC46
-    usecase "UC-47: Iniciar Navegación GPS" as UC47
-    usecase "UC-48: Actualizar Ubicación en Tiempo Real" as UC48
-    usecase "UC-49: Cambiar Estado de Entrega" as UC49
-    usecase "UC-50: Confirmar Entrega Exitosa" as UC50
-    usecase "UC-51: Reportar Problema de Entrega" as UC51
-    usecase "UC-52: Contactar al Cliente" as UC52
-}
-
-' ===== RELACIONES USUARIO ANÓNIMO =====
-Anonimo --> UC07 : Explora tienda
-Anonimo --> UC08 : Navega categorías
-Anonimo --> UC09 : Busca productos
-Anonimo --> UC10 : Filtra productos
-Anonimo --> UC11 : Ve detalles
-Anonimo --> UC12 : Ve variantes
+' ===== RELACIONES - USUARIO ANÓNIMO =====
 Anonimo --> UC01 : Se registra
 Anonimo --> UC02 : Inicia sesión
+Anonimo --> UC09 : Explora tienda
+Anonimo --> UC10 : Navega categorías
+Anonimo --> UC11 : Consulta colecciones
+Anonimo --> UC12 : Busca productos
+Anonimo --> UC14 : Aplica filtros
+Anonimo --> UC15 : Ve detalles
+Anonimo --> UC16 : Consulta variantes
+Anonimo --> UC17 : Lee reseñas
 
-' ===== RELACIONES CLIENTE REGISTRADO =====
+' ===== RELACIONES - CLIENTE REGISTRADO =====
 Cliente --> UC02 : Inicia sesión
-Cliente --> UC03 : Cierra sesión
-Cliente --> UC04 : Gestiona perfil
-Cliente --> UC05 : Gestiona direcciones
-Cliente --> UC06 : Cambia contraseña
-Cliente --> UC07 : Explora tienda
-Cliente --> UC08 : Navega categorías
-Cliente --> UC09 : Busca productos
-Cliente --> UC10 : Filtra productos
-Cliente --> UC11 : Ve detalles producto
-Cliente --> UC12 : Ve variantes
-Cliente --> UC13 : Agrega al carrito
-Cliente --> UC14 : Gestiona carrito
-Cliente --> UC15 : Aplica descuentos
-Cliente --> UC16 : Calcula envío
-Cliente --> UC17 : Hace checkout
-Cliente --> UC18 : Selecciona pago
-Cliente --> UC19 : Confirma pedido
-Cliente --> UC20 : Procesa transferencia
-Cliente --> UC21 : Sube comprobante
-Cliente --> UC25 : Ve historial pedidos
-Cliente --> UC26 : Ve detalle pedido
-Cliente --> UC27 : Rastrea pedido
-Cliente --> UC28 : Cancela pedido
-Cliente --> UC29 : Reordena productos
+Cliente --> UC03 : Usa Google
+Cliente --> UC04 : Cierra sesión
+Cliente --> UC05 : Gestiona perfil
+Cliente --> UC06 : Gestiona direcciones
+Cliente --> UC07 : Cambia contraseña
+Cliente --> UC08 : Configura notificaciones
+Cliente --> UC09 : Explora tienda
+Cliente --> UC10 : Navega categorías
+Cliente --> UC11 : Consulta colecciones
+Cliente --> UC12 : Busca productos
+Cliente --> UC13 : Guarda historial
+Cliente --> UC14 : Filtra catálogo
+Cliente --> UC15 : Ve detalles
+Cliente --> UC16 : Consulta variantes
+Cliente --> UC17 : Revisa reseñas
+Cliente --> UC18 : Agrega a wishlist
+Cliente --> UC19 : Gestiona wishlist
+Cliente --> UC20 : Configura alertas
+Cliente --> UC21 : Agrega al carrito
+Cliente --> UC22 : Gestiona carrito
+Cliente --> UC23 : Aplica descuentos
+Cliente --> UC24 : Calcula envío
+Cliente --> UC25 : Hace checkout
+Cliente --> UC26 : Selecciona pago
+Cliente --> UC27 : Confirma pedido
+Cliente --> UC28 : Procesa transferencia
+Cliente --> UC29 : Sube comprobante
+Cliente --> UC33 : Consulta historial
+Cliente --> UC34 : Ve detalle
+Cliente --> UC35 : Descarga factura
+Cliente --> UC36 : Verifica estado
+Cliente --> UC37 : Cancela pedido
+Cliente --> UC38 : Reordena productos
+Cliente --> UC39 : Revisa notificaciones
+Cliente --> UC40 : Marca como leídas
 
-' ===== RELACIONES ADMINISTRADOR =====
-Admin --> UC30 : Gestiona productos
-Admin --> UC31 : Gestiona categorías
-Admin --> UC32 : Gestiona colecciones
-Admin --> UC33 : Gestiona tallas
-Admin --> UC34 : Controla inventario
-Admin --> UC35 : Gestiona órdenes
-Admin --> UC36 : Asigna a delivery
-Admin --> UC37 : Gestiona usuarios
-Admin --> UC38 : Gestiona sliders
-Admin --> UC39 : Gestiona descuentos
-Admin --> UC40 : Gestiona envíos
-Admin --> UC41 : Genera reportes ventas
-Admin --> UC42 : Genera reportes productos
-Admin --> UC43 : Genera reportes clientes
-Admin --> UC44 : Gestiona contenido
-
-' ===== RELACIONES DELIVERY =====
-Delivery --> UC45 : Ve órdenes asignadas
-Delivery --> UC46 : Acepta orden
-Delivery --> UC47 : Inicia navegación
-Delivery --> UC48 : Actualiza ubicación
-Delivery --> UC49 : Cambia estado
-Delivery --> UC50 : Confirma entrega
-Delivery --> UC51 : Reporta problema
-Delivery --> UC52 : Contacta cliente
+' ===== RELACIONES - ADMINISTRADOR =====
+Admin --> UC41 : Gestiona productos
+Admin --> UC42 : Gestiona categorías
+Admin --> UC43 : Gestiona colecciones
+Admin --> UC44 : Gestiona tallas
+Admin --> UC45 : Controla inventario
+Admin --> UC46 : Gestiona sliders
+Admin --> UC47 : Gestiona anuncios
+Admin --> UC48 : Administra órdenes
+Admin --> UC49 : Valida pagos
+Admin --> UC50 : Configura envíos
+Admin --> UC51 : Gestiona descuentos
+Admin --> UC52 : Gestiona clientes
+Admin --> UC53 : Gestiona administradores
+Admin --> UC54 : Modera reseñas
+Admin --> UC55 : Genera reportes
+Admin --> UC56 : Exporta reportes
+Admin --> UC57 : Ajusta parámetros
+Admin --> UC58 : Monitorea alertas
 
 ' ===== RELACIONES CON SISTEMAS EXTERNOS =====
-UC20 --> Pago : Procesa transferencia
-UC21 --> Pago : Valida comprobante
-UC22 --> Pago : Confirma validación
-UC23 --> Pago : Genera factura
-
-UC47 --> GPS : Obtiene rutas
-UC48 --> GPS : Envía coordenadas
-UC27 --> GPS : Consulta ubicación delivery
+UC28 --> Pago : Procesa transferencia
+UC29 --> Pago : Registra comprobante
+UC30 --> Pago : Confirma validación
+UC31 --> Pago : Genera datos de factura
 
 UC01 --> Email : Envía confirmación registro
-UC19 --> Email : Envía confirmación pedido
-UC22 --> Email : Notifica validación pago
-UC49 --> Email : Notifica cambios estado
+UC20 --> Email : Envía alertas wishlist
+UC27 --> Email : Envía confirmación pedido
+UC32 --> Email : Envía comprobantes
+UC37 --> Email : Notifica cancelación
 
 ' ===== RELACIONES ENTRE CASOS DE USO =====
-UC07 --> UC08 : Navegación
-UC08 --> UC09 : Búsqueda
-UC09 --> UC11 : Resultados
-UC10 --> UC11 : Filtros
-UC11 --> UC12 : Variantes
-UC11 --> UC13 : Agregar
-UC13 --> UC14 : Gestión
-UC14 --> UC15 : Descuentos
-UC14 --> UC16 : Envío
-UC14 --> UC17 : Checkout
-UC17 --> UC18 : Método pago
-UC18 --> UC19 : Confirmación
-UC18 --> UC20 : Transferencia
-UC20 --> UC21 : Comprobante
-UC21 --> UC22 : Validación
-UC22 --> UC23 : Factura
-UC19 --> UC25 : Historial
-UC25 --> UC26 : Detalle
-UC26 --> UC27 : Rastreo
-UC26 --> UC28 : Cancelar
-UC26 --> UC29 : Reordenar
+UC09 --> UC10 : Navegación
+UC10 --> UC12 : Búsqueda
+UC12 --> UC13 : Historial
+UC14 --> UC15 : Resultados
+UC15 --> UC16 : Variantes
+UC15 --> UC18 : Wishlist
+UC18 --> UC19 : Gestión
+UC19 --> UC20 : Alertas
+UC15 --> UC21 : Carrito
+UC21 --> UC22 : Gestión
+UC22 --> UC23 : Descuentos
+UC22 --> UC24 : Envío
+UC22 --> UC25 : Checkout
+UC25 --> UC26 : Método de pago
+UC26 --> UC27 : Confirmación
+UC27 --> UC28 : Transferencia
+UC28 --> UC29 : Comprobante
+UC29 --> UC30 : Validación
+UC30 --> UC31 : Factura
+UC31 --> UC32 : Envío correo
+UC27 --> UC33 : Historial
+UC33 --> UC34 : Detalle
+UC34 --> UC35 : Descarga PDF
+UC34 --> UC36 : Estado
+UC34 --> UC37 : Cancelar
+UC34 --> UC38 : Reordenar
+UC39 --> UC40 : Lectura total
 
-UC35 --> UC36 : Asignación
-UC36 --> UC45 : Órdenes delivery
-UC45 --> UC46 : Aceptación
-UC46 --> UC47 : Navegación
-UC47 --> UC48 : Tracking
-UC48 --> UC49 : Estados
-UC49 --> UC50 : Entrega
-UC49 --> UC51 : Problemas
+UC41 --> UC45 : Inventario
+UC41 --> UC46 : Contenido
+UC48 --> UC49 : Validar pagos
+UC48 --> UC50 : Envíos
+UC48 --> UC51 : Descuentos
+UC55 --> UC56 : Exportar
+UC57 --> UC58 : Alertas dashboard
 
-' ===== INCLUYE/EXTIENDE =====
-UC17 ..> UC04 : <<include>>
-UC17 ..> UC05 : <<include>>
-UC19 ..> UC04 : <<include>>
-UC27 ..> UC48 : <<include>>
+' ===== INCLUYE / EXTIENDE =====
+UC25 ..> UC05 : <<include>>
+UC25 ..> UC06 : <<include>>
+UC27 ..> UC32 : <<extend>>
+UC37 ..> UC33 : <<include>>
 
 ' ===== NOTAS EXPLICATIVAS =====
 note right of Anonimo
   Usuario no registrado que puede:
   - Explorar la tienda
-  - Ver productos
-  - Registrarse
+  - Buscar y filtrar productos
+  - Crear una cuenta
 end note
 
 note right of Cliente
   Usuario registrado con acceso a:
-  - Todas las funciones de tienda
-  - Gestión de perfil y direcciones
-  - Historial de pedidos
-  - Rastreo GPS
+  - Wishlist y alertas personalizadas
+  - Historial de pedidos e invoices
+  - Notificaciones internas
 end note
 
 note right of Admin
-  Administrador del sistema con control total:
-  - Gestión de catálogo
-  - Control de inventario
-  - Gestión de pedidos
-  - Reportes y análisis
+  Operador del sistema con control de:
+  - Catálogo completo
+  - Órdenes, pagos y envíos
+  - Reportes y exportaciones
+  - Configuración global
 end note
 
-note right of Delivery
-  Repartidor con funcionalidades GPS:
-  - Órdenes asignadas
-  - Navegación en tiempo real
-  - Actualización de estados
-  - Comunicación con cliente
-end note
-
-note bottom of GPS
-  Sistema de geolocalización que proporciona:
-  - Cálculo de rutas
-  - Seguimiento GPS
-  - Mapas interactivos
+note bottom of Email
+  Servicio SMTP utilizado para:
+  - Confirmaciones de registro
+  - Alertas y comprobantes
+  - Comunicaciones de órdenes
 end note
 
 note bottom of Pago
-  Sistema de pagos que maneja:
-  - Transferencias bancarias
+  Pasarela bancaria que procesa:
+  - Transferencias
   - Validación de comprobantes
-  - Generación de facturas
+  - Datos para facturación
 end note
 
 @enduml
