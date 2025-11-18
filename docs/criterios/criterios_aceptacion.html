@@ -194,10 +194,10 @@
                 <strong>Fecha:</strong> Noviembre 2025
             </div>
             <div class="info-item">
-                <strong>Total Criterios:</strong> 40+
+                <strong>Total Criterios:</strong> 60+
             </div>
             <div class="info-item">
-                <strong>Módulos:</strong> 6 Módulos principales
+                <strong>Módulos:</strong> 7 módulos principales
             </div>
         </div>
 
@@ -433,35 +433,35 @@
 
                     </tr>
 
-                    <!-- HU-16: Asignación de pedidos -->
+                    <!-- HU-16: Configuración de métodos de envío -->
                     <tr>
                         <td class="id-cell">HU-16</td>
                         <td class="scenario-cell">1</td>
-                        <td class="title-cell">Asignación exitosa</td>
-                        <td class="context-cell">Dado que un pedido está pagado y listo para envío</td>
-                        <td class="event-cell">Cuando el administrador lo asigna a un repartidor disponible</td>
-                        <td class="result-cell">Entonces el sistema asigna el pedido al repartidor, cambia el estado a 'enviando' y notifica al repartidor</td>
+                        <td class="title-cell">Método registrado correctamente</td>
+                        <td class="context-cell">Dado que soy responsable logístico y defino un nuevo método de envío con cobertura, costos y tiempos válidos</td>
+                        <td class="event-cell">Cuando guardo la configuración en el panel de envíos</td>
+                        <td class="result-cell">Entonces el sistema valida los datos, activa el método para el checkout y lo deja disponible para los cálculos automáticos</td>
 
                     </tr>
 
-                    <!-- HU-17: Lista de entregas -->
+                    <!-- HU-17: Programación de despachos -->
                     <tr>
                         <td class="id-cell">HU-17</td>
                         <td class="scenario-cell">1</td>
-                        <td class="title-cell">Visualización de asignaciones</td>
-                        <td class="context-cell">Dado que soy repartidor autenticado</td>
-                        <td class="event-cell">Cuando accedo al panel de delivery</td>
-                        <td class="result-cell">Entonces veo lista de órdenes asignadas con dirección completa, productos, total, e instrucciones especiales</td>
+                        <td class="title-cell">Despacho programado</td>
+                        <td class="context-cell">Dado que una orden fue pagada y está lista para salir de bodega</td>
+                        <td class="event-cell">Cuando asigno fecha de salida, transportista interno y número de guía</td>
+                        <td class="result-cell">Entonces el sistema cambia el estado a &quot;Enviado&quot;, registra la trazabilidad y notifica al cliente</td>
                     </tr>
 
                     <!-- HU-18: Actualización de estados -->
                     <tr>
                         <td class="id-cell">HU-18</td>
                         <td class="scenario-cell">1</td>
-                        <td class="title-cell">Cambio de estado</td>
-                        <td class="context-cell">Dado que tengo una entrega asignada</td>
-                        <td class="event-cell">Cuando actualizo el estado (en_camino, en_destino, entregado)</td>
-                        <td class="result-cell">Entonces el sistema registra la fecha y hora, actualiza el estado del pedido, envía una notificación al cliente y guarda el cambio en el historial</td>
+                        <td class="title-cell">Seguimiento actualizado</td>
+                        <td class="context-cell">Dado que administro una orden que se encuentra en tránsito</td>
+                        <td class="event-cell">Cuando cambio su estado a &quot;En tránsito&quot; o &quot;Entregado&quot; y adjunto evidencia opcional</td>
+                        <td class="result-cell">Entonces el sistema guarda la hora exacta, actualiza el historial y refleja el cambio en el panel del cliente</td>
 
                     </tr>
 
@@ -470,9 +470,9 @@
                         <td class="id-cell">HU-19</td>
                         <td class="scenario-cell">1</td>
                         <td class="title-cell">Notificación automática</td>
-                        <td class="context-cell">Dado que mi pedido cambió de estado</td>
-                        <td class="event-cell">Cuando el repartidor actualiza el progreso</td>
-                        <td class="result-cell">Entonces recibo email automático con detalles del cambio y posible hora de llegada</td>
+                        <td class="context-cell">Dado que la orden cambió de estado durante el seguimiento</td>
+                        <td class="event-cell">Cuando el sistema detecta la transición a &quot;Enviado&quot; o &quot;Entregado&quot;</td>
+                        <td class="result-cell">Entonces se envía un correo y una alerta interna al cliente con el nuevo estado y la hora estimada</td>
                     </tr>
 
                     <!-- HU-20: Gestión de productos -->
@@ -537,16 +537,117 @@
                         <td class="result-cell">Entonces el sistema guarda el código de descuento y permite usarlo al pagar según las reglas establecidas</td>
 
                     </tr>
+
+                    <!-- HU-25: Wishlist de clientes -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-25</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Producto agregado a favoritos</td>
+                        <td class="context-cell">Dado que estoy autenticado y visualizo la ficha de un producto con talla y color seleccionados</td>
+                        <td class="event-cell">Cuando presiono Guardar en mi lista</td>
+                        <td class="result-cell">Entonces el sistema crea el registro en mi wishlist, conserva la variante elegida y actualiza el contador del encabezado</td>
+
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">2</td>
+                        <td class="title-cell">Favorito eliminado</td>
+                        <td class="context-cell">Dado que tengo productos guardados en mi lista de deseos</td>
+                        <td class="event-cell">Cuando hago clic en Quitar o arrastro el elemento a eliminar</td>
+                        <td class="result-cell">Entonces el producto desaparece de la lista sin recargar la página y se sincroniza el total mostrado</td>
+                    </tr>
+
+                    <!-- HU-26: Alertas personalizadas -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-26</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Alerta registrada</td>
+                        <td class="context-cell">Dado que sigo un producto sin stock o con promoción próxima</td>
+                        <td class="event-cell">Cuando activo la opción de avisarme y selecciono correo o notificación interna</td>
+                        <td class="result-cell">Entonces el sistema guarda la alerta, muestra una confirmación y la deja pendiente de ejecución</td>
+
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">2</td>
+                        <td class="title-cell">Aviso entregado</td>
+                        <td class="context-cell">Dado que se actualiza el inventario o inicia la promoción del producto seguido</td>
+                        <td class="event-cell">Cuando se cumple la condición configurada</td>
+                        <td class="result-cell">Entonces recibo correo y notificación en mi panel con un enlace directo para finalizar la compra</td>
+                    </tr>
+
+                    <!-- HU-27: Centro de notificaciones -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-27</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Listado consultado</td>
+                        <td class="context-cell">Dado que tengo avisos pendientes y entro al centro de notificaciones</td>
+                        <td class="event-cell">Cuando abro el módulo</td>
+                        <td class="result-cell">Entonces se muestran los mensajes ordenados por fecha con iconos de estado y enlaces contextuales</td>
+
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">2</td>
+                        <td class="title-cell">Avisos marcados como leídos</td>
+                        <td class="context-cell">Dado que quiero limpiar mis pendientes</td>
+                        <td class="event-cell">Cuando uso la acción Marcar todo como leído o cierro cada alerta individual</td>
+                        <td class="result-cell">Entonces se reinician los contadores y se registra la fecha en el historial del usuario</td>
+                    </tr>
+
+                    <!-- HU-28: Cancelación de pedidos -->
+                    <tr>
+                        <td class="id-cell">HU-28</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Cancelación solicitada</td>
+                        <td class="context-cell">Dado que mi pedido sigue en estado Pendiente o Pagado</td>
+                        <td class="event-cell">Cuando presiono Cancelar pedido y confirmo la acción</td>
+                        <td class="result-cell">Entonces el sistema genera un folio de seguimiento, notifica al equipo interno y me envía el resumen por correo</td>
+
+                    </tr>
+
+                    <!-- HU-29: Anuncios y sliders -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-29</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Anuncio publicado</td>
+                        <td class="context-cell">Dado que defino título, mensaje, fechas y colores para una campaña</td>
+                        <td class="event-cell">Cuando guardo el anuncio en el módulo de marketing</td>
+                        <td class="result-cell">Entonces aparece en la barra superior con el estilo configurado y se activa solo durante las fechas definidas</td>
+
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">2</td>
+                        <td class="title-cell">Slider actualizado</td>
+                        <td class="context-cell">Dado que cargo una nueva imagen promocional con enlace y orden específico</td>
+                        <td class="event-cell">Cuando confirmo los cambios</td>
+                        <td class="result-cell">Entonces la diapositiva queda visible para los clientes y respeta la prioridad establecida</td>
+                    </tr>
+
+                    <!-- HU-30: Gestión de administradores -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-30</td>
+                        <td class="scenario-cell">1</td>
+                        <td class="title-cell">Nuevo administrador creado</td>
+                        <td class="context-cell">Dado que capturo datos personales, rol y permisos de un colaborador</td>
+                        <td class="event-cell">Cuando guardo el formulario</td>
+                        <td class="result-cell">Entonces el usuario recibe un correo de bienvenida, queda activo y se registra la creación en el historial</td>
+
+                    </tr>
+                    <tr>
+                        <td class="scenario-cell">2</td>
+                        <td class="title-cell">Administrador desactivado</td>
+                        <td class="context-cell">Dado que necesito revocar el acceso de un colaborador</td>
+                        <td class="event-cell">Cuando cambio su estado a Inactivo</td>
+                        <td class="result-cell">Entonces el ingreso se bloquea de inmediato y el evento queda trazado para auditoría</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
 
         <div class="footer">
             <p><strong>Proyecto Angelow</strong> - Sistema de Tienda Virtual de Ropa Infantil</p>
-            <p>Criterios de Aceptación Detallados - Actualizado: 2 de Noviembre, 2025</p>
-            <p>Total: <strong>40+ Criterios de Aceptación</strong> | <strong>24 Historias de Usuario</strong></p>
+            <p>Criterios de Aceptación Detallados - Actualizado: 18 de Noviembre, 2025</p>
+            <p>Total: <strong>60+ Criterios de Aceptación</strong> | <strong>30 Historias de Usuario</strong></p>
             <p style="margin-top: 10px; font-size: 0.85em; color: #666;">
-                <strong>Módulos cubiertos:</strong> Gestión de Usuarios, Catálogo y Búsqueda, Carrito y Compras, Pedidos y Logística, Sistema de Delivery, Módulo Administrativo
+                <strong>Módulos cubiertos:</strong> Gestión de Usuarios, Catálogo y Búsqueda, Wishlist y Alertas, Checkout y Pagos, Logística interna y Seguimiento, Centro de Notificaciones, Marketing y Panel Administrativo
             </p>
         </div>
     </div>

@@ -52,11 +52,11 @@ Por último, una vez verificado el sistema, es crucial realizar pruebas de funci
 
 En resumen, el desafío principal es asegurar que el proceso de desarrollo del software, desde la identificación de requerimientos hasta la implementación final y la capacitación de los usuarios, se lleve a cabo de manera efectiva, garantizando que el sistema final sea funcional, seguro y escalable para satisfacer las necesidades del negocio y los usuarios.
 
-La solución Angelow responde a ese reto con un catálogo enfocado en ropa infantil, historial de búsquedas, listas de deseos y alertas que recuerdan los productos guardados. El checkout guía al cliente por tres pasos (resumen, dirección con geolocalización y comprobante de pago), mientras que el panel administrativo ofrece herramientas para validar transferencias, programar envíos, publicar anuncios, generar reportes y mantener notificaciones activas para cada usuario.
+La solución Angelow responde a ese reto con un catálogo enfocado en ropa infantil, historial de búsquedas, listas de deseos y alertas que recuerdan los productos guardados. El proceso de pago guía al cliente por tres pasos (resumen, dirección con geolocalización y comprobante de pago), mientras que el panel administrativo ofrece herramientas para validar transferencias, programar envíos, publicar anuncios, generar reportes y mantener notificaciones activas para cada usuario.
 
 **Justificación:** En Colombia, existen diversas plataformas de comercio electrónico y servicios en línea que buscan ofrecer soluciones de compra y venta de productos, como ropa, tecnología o alimentos. Sin embargo, el sector de ropa infantil aún necesita experiencias más cercanas, con vitrinas pensadas para padres, manejo fino de tallas y colores, recordatorios personalizados y comunicación clara sobre cada paso del envío.
 
-A pesar de que existen tiendas en línea como Éxito, Falabella o MercadoLibre, suelen manejar catálogos genéricos que no cubren particularidades como los paquetes familiares, la actualización inmediata del stock por variante, los carritos persistentes o las alertas de reposición que hoy exige este nicho. Angelow aprovecha ese vacío al combinar un checkout guiado, validación manual de pagos y paneles de seguimiento que mantienen informado al cliente desde la búsqueda hasta la entrega.
+A pesar de que existen tiendas en línea como Éxito, Falabella o MercadoLibre, suelen manejar catálogos genéricos que no cubren particularidades como los paquetes familiares, la actualización inmediata del stock por variante, los carritos persistentes o las alertas de reposición que hoy exige este nicho. Angelow aprovecha ese vacío al combinar un proceso de pago guiado, validación manual de pagos y paneles de seguimiento que mantienen informado al cliente desde la búsqueda hasta la entrega.
 
 Este vacío en el mercado abre una oportunidad de negocio significativa. Una plataforma especializada en E-commerce de ropa infantil, como lo planteamos en el proyecto, podría ser una ventaja competitiva al ofrecer funcionalidades específicas del sector, mejorando la experiencia de compra para padres y cuidadores.
 
@@ -86,7 +86,7 @@ reCAPTCHA API: Para prevenir spam y abuso en formularios de contacto y registro.
 
 ## OBJETIVOS DEL PROYECTO
 
-**General:** Desarrollar una plataforma de E-commerce integral para la comercialización mayorista y minorista de ropa infantil, incorporando funcionalidades avanzadas como un checkout guiado, validación segura de pagos y coordinación clara de envíos y notificaciones desde el mismo sistema.
+**General:** Desarrollar una plataforma de E-commerce integral para la comercialización mayorista y minorista de ropa infantil, incorporando funcionalidades avanzadas como un proceso de pago guiado, validación segura de pagos y coordinación clara de envíos y notificaciones desde el mismo sistema.
 
 **Específicos:**  
 
@@ -124,7 +124,7 @@ La integración de APIs y sistemas de geolocalización en el E-commerce de Medel
 Resultado esperado: Un documento detallado de los requerimientos del software que describa las funcionalidades esenciales y deseables, como la gestión de usuarios, inventario, carrito de compras, pagos y seguimiento de entregas.  
 La selección adecuada de herramientas y tecnologías de desarrollo que garanticen un sistema robusto, escalable y seguro.  
 Una arquitectura bien definida que permita integrar todos los módulos del sistema de forma eficiente, asegurando que el software pueda crecer a medida que la tienda virtual expanda su base de usuarios y productos.
-Incluye la definición del checkout en tres pasos, el historial de búsquedas, las alertas de wishlist y las campañas de anuncios dentro de la misma hoja de ruta.
+Incluye la definición del proceso de pago en tres pasos, el historial de búsquedas, las alertas de wishlist y las campañas de anuncios dentro de la misma hoja de ruta.
 
 **Diseño de la Base de Datos y Mockups (Interfaces Gráficas):**  
 Resultado esperado: Una base de datos eficiente que soporte todos los módulos del sistema, con relaciones bien definidas para gestionar usuarios, productos, pagos, inventario y entregas sin problemas de rendimiento.  
@@ -178,7 +178,7 @@ Funcionalidad: Permite a los usuarios agregar, modificar y eliminar productos an
 Características:  
 - Agregar/eliminar productos del carrito.  
 - Calcular totales (subtotal, impuestos, descuentos, envío).  
-- Guardar carritos para compras futuras y conectarlos con un checkout guiado en tres pasos.  
+- Guardar carritos para compras futuras y conectarlos con un proceso de pago guiado en tres pasos.  
 Resultado esperado: Una experiencia de compra fluida y sin fricciones que aumente la tasa de conversión.
 
 **Módulo de Pagos:**  
@@ -247,7 +247,7 @@ Resultado esperado: Mayor fidelidad y retorno de clientes gracias a recordatorio
   Realizar pruebas de usabilidad y rendimiento para verificar que los módulos funcionen de manera óptima, y que el sistema pueda soportar el tráfico de usuarios y realizar transacciones de manera segura.  
   Capacitar a los usuarios finales en el uso del software, enfocándose en cómo navegar por las interfaces gráficas, realizar compras, gestionar productos, y resolver cualquier problema a través del sistema de atención al cliente.  
   Ajustar el sistema según los resultados de las pruebas y la retroalimentación recibada, asegurando que los procesos sean fáciles de entender y ejecutar para los usuarios finales.
-  Esta fase culmina con capacitaciones cortas basadas en los manuales de panel administrativo, checklist del checkout y guías para publicar anuncios.
+  Esta fase culmina con capacitaciones cortas basadas en los manuales de panel administrativo, checklist del proceso de pago y guías para publicar anuncios.
 
 ---
 
