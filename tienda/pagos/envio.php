@@ -17,12 +17,49 @@ $currentPage = 'envio';
 
 $user_id = $_SESSION['user_id'];
 
+// If the buy-now flow set a specific cart in session, prefer that cart
+$checkoutCartId = null;
+if (!empty($_SESSION['buy_now_cart_id'])) {
+    $checkoutCartId = $_SESSION['buy_now_cart_id'];
+}
+
+// Allow override with explicit cart_id in query string (used by buy now JS)
+if (empty($checkoutCartId) && !empty($_GET['cart_id'])) {
+    $checkoutCartId = (int) $_GET['cart_id'];
+}
+
 // Obtener el carrito activo
 try {
-    $cartQuery = "SELECT c.id FROM carts c WHERE c.user_id = :user_id ORDER BY c.created_at DESC LIMIT 1";
-    $stmt = $conn->prepare($cartQuery);
-    $stmt->execute([':user_id' => $user_id]);
-    $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+    // If we have a specific cart id (buy now), try to use it and verify ownership
+    if ($checkoutCartId) {
+        if ($user_id) {
+            $cartQuery = "SELECT c.id FROM carts c WHERE c.id = :cart_id AND c.user_id = :user_id LIMIT 1";
+            $stmt = $conn->prepare($cartQuery);
+            $stmt->execute([':cart_id' => $checkoutCartId, ':user_id' => $user_id]);
+        } else {
+            $cartQuery = "SELECT c.id FROM carts c WHERE c.id = :cart_id AND c.session_id = :session_id LIMIT 1";
+            $stmt = $conn->prepare($cartQuery);
+            $stmt->execute([':cart_id' => $checkoutCartId, ':session_id' => session_id()]);
+        }
+
+        $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // If the provided cart_id wasn't found/valid, fall back to the user's last cart
+        if (!$cart) {
+            $cartQuery = "SELECT c.id FROM carts c WHERE c.user_id = :user_id ORDER BY c.created_at DESC LIMIT 1";
+            $stmt = $conn->prepare($cartQuery);
+            $stmt->execute([':user_id' => $user_id]);
+            $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+        } else {
+            // Remove session flag once used
+            unset($_SESSION['buy_now_cart_id']);
+        }
+    } else {
+        $cartQuery = "SELECT c.id FROM carts c WHERE c.user_id = :user_id ORDER BY c.created_at DESC LIMIT 1";
+        $stmt = $conn->prepare($cartQuery);
+        $stmt->execute([':user_id' => $user_id]);
+        $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
     if (!$cart) {
         header("Location: " . BASE_URL . "/tienda/pagos/cart.php");

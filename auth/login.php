@@ -51,6 +51,17 @@ function checkRememberMe($conn) {
 // Verificar cookie al cargar la página
 checkRememberMe($conn);
 
+// Si la URL incluye ?redirect=, guárdala en la sesión para redirección post-login
+if (isset($_GET['redirect']) && !empty($_GET['redirect'])) {
+    // Decodificar la ruta solicitada
+    $requested = rawurldecode($_GET['redirect']);
+
+    // Validar que no apunte a un dominio externo (evitar open-redirect)
+    if (strpos($requested, BASE_URL) === 0 || strpos($requested, '/') === 0) {
+        $_SESSION['redirect_to'] = $requested;
+    }
+}
+
 function createUserSession($userId, $conn = null) {
     $_SESSION['user_id'] = $userId;
     $_SESSION['user_ip'] = $_SERVER['REMOTE_ADDR'];

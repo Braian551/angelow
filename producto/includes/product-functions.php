@@ -1,5 +1,16 @@
 <?php
 require_once __DIR__ . '/../../helpers/product_pricing.php';
+// Necesitamos `normalizeUserImagePath()` para mostrar los avatares de usuarios en preguntas y reseñas
+// Evitar incluir el archivo `layouts/functions.php` de forma global (puede redireccionar a login en páginas públicas)
+// Si la función `normalizeUserImagePath` no existe, la definimos localmente para normalizar rutas de avatar.
+if (!function_exists('normalizeUserImagePath')) {
+    function normalizeUserImagePath($image) {
+        $image = trim((string)$image);
+        if ($image === '') return 'images/default-avatar.png';
+        if (strpos($image, '/') !== false) return $image;
+        return 'uploads/users/' . $image;
+    }
+}
 function getProductBySlug($conn, $slug) {
     try {
         $stmt = $conn->prepare("
@@ -185,6 +196,11 @@ function getProductReviews($conn, $productId, $currentUserId = null) {
             $stmt->execute([$productId]);
         }
         $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Normalizar rutas de avatar (si vienen como filename o nulo, convertir a uploads/users/* o default)
+        foreach ($reviews as &$rev) {
+            $rev['user_image'] = function_exists('normalizeUserImagePath') ? normalizeUserImagePath($rev['user_image'] ?? '') : ($rev['user_image'] ?? 'images/default-avatar.png');
+        }
         
         // Estadísticas de reseñas
         $stmt = $conn->prepare("
@@ -282,6 +298,16 @@ function getProductQuestions($conn, $productId, $currentUserId = null) {
             $question['answers'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         
+        // Normalizar avatares para preguntas y sus respuestas
+        foreach ($questions as &$q) {
+            $q['user_image'] = function_exists('normalizeUserImagePath') ? normalizeUserImagePath($q['user_image'] ?? '') : ($q['user_image'] ?? 'images/default-avatar.png');
+            if (!empty($q['answers'])) {
+                foreach ($q['answers'] as &$ans) {
+                    $ans['user_image'] = function_exists('normalizeUserImagePath') ? normalizeUserImagePath($ans['user_image'] ?? '') : ($ans['user_image'] ?? 'images/default-avatar.png');
+                }
+            }
+        }
+
         return $questions;
     } catch (PDOException $e) {
         error_log("Error al obtener preguntas: " . $e->getMessage());

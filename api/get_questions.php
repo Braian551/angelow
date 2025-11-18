@@ -1,6 +1,15 @@
 <?php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
+// Normalización local de ruta de avatar para no forzar includes que redireccionen en páginas públicas
+if (!function_exists('normalizeUserImagePath')) {
+    function normalizeUserImagePath($image) {
+        $image = trim((string)$image);
+        if ($image === '') return 'images/default-avatar.png';
+        if (strpos($image, '/') !== false) return $image;
+        return 'uploads/users/' . $image;
+    }
+}
 
 header('Content-Type: application/json');
 
@@ -36,6 +45,15 @@ try {
             ORDER BY qa.created_at ASC");
         $ansStmt->execute([$q['id']]);
         $q['answers'] = $ansStmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    // Normalizar avatares de preguntas y respuestas
+    foreach ($questions as &$q) {
+        $q['user_image'] = normalizeUserImagePath($q['user_image'] ?? '');
+        if (!empty($q['answers'])) {
+            foreach ($q['answers'] as &$ans) {
+                $ans['user_image'] = normalizeUserImagePath($ans['user_image'] ?? '');
+            }
+        }
     }
 
     // Also include whether the current user already asked a question for this product

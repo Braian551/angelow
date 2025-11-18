@@ -332,6 +332,9 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                                     <?php foreach ($question['answers'] as $answer): ?>
                                         <div class="answer-item">
                                             <div class="answer-meta">
+                                                <div class="user-avatar small">
+                                                    <img src="<?= BASE_URL ?>/<?= htmlspecialchars($answer['user_image'] ?? 'images/default-avatar.png') ?>" alt="<?= htmlspecialchars($answer['user_name'] ?? 'Usuario') ?>">
+                                                </div>
                                                 <strong><?= htmlspecialchars($answer['user_name'] ?? 'Usuario') ?></strong>
                                                 <?php if (!empty($answer['is_seller'])): ?>
                                                     <span class="badge seller">Vendedor</span>

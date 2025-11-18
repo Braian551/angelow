@@ -10,6 +10,9 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// Necesitamos `$userData` en el `asideuser.php` para mostrar el avatar del usuario
+require_once __DIR__ . '/../layouts/functions.php';
+
 $userId = $_SESSION['user_id'];
 
 // Obtener productos de la lista de deseos con sus detalles

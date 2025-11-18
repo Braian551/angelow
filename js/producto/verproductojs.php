@@ -1230,6 +1230,10 @@ if (!empty($reviewsClientPayload['reviews'])) {
                     q.answers.forEach(a => {
                         const answerItem = $('<div>').addClass('answer-item');
                         const meta = $('<div>').addClass('answer-meta');
+                        const ansUserName = a.user_name || 'Usuario';
+                        const ansUserImage = a.user_image ? '<?= BASE_URL ?>/' + a.user_image : '<?= BASE_URL ?>/images/default-avatar.png';
+                        const ansAvatar = $('<div>').addClass('user-avatar').append($('<img>').attr('src', ansUserImage).attr('alt', ansUserName));
+                        meta.append(ansAvatar);
                         meta.append($('<strong>').text(a.user_name || 'Usuario'));
                         if (a.is_seller) meta.append(' ').append($('<span>').addClass('badge seller').text('Vendedor'));
                         meta.append(' ').append($('<span>').addClass('time').text(a.created_at ? new Date(a.created_at).toLocaleString() : ''));
@@ -1275,7 +1279,11 @@ if (!empty($reviewsClientPayload['reviews'])) {
                         const fallbackHtml = questions.map(q2 => {
                             const uName = q2.user_name || 'Usuario';
                             const uImg = q2.user_image ? '<?= BASE_URL ?>/' + q2.user_image : '<?= BASE_URL ?>/images/default-avatar.png';
-                            const answersHtml = (q2.answers || []).map(a => `<div class="answer-item"><div class="answer-meta"><strong>${(a.user_name||'Usuario')}</strong>${a.is_seller ? ' <span class="badge seller">Vendedor</span>' : ''} <span class="time">${a.created_at ? new Date(a.created_at).toLocaleString() : ''}</span></div><p>${(a.answer || '')}</p></div>`).join('');
+                            const answersHtml = (q2.answers || []).map(a => {
+                                const ansName = (a.user_name || 'Usuario');
+                                const ansImg = a.user_image ? '<?= BASE_URL ?>/' + a.user_image : '<?= BASE_URL ?>/images/default-avatar.png';
+                                return `<div class="answer-item"><div class="answer-meta"><div class="user-avatar"><img src="${ansImg}" alt="${ansName}"></div><strong>${ansName}</strong>${a.is_seller ? ' <span class="badge seller">Vendedor</span>' : ''} <span class="time">${a.created_at ? new Date(a.created_at).toLocaleString() : ''}</span></div><p>${(a.answer || '')}</p></div>`;
+                            }).join('');
                             const ratingVal = typeof q2.rating !== 'undefined' ? parseFloat(q2.rating) : NaN;
                             const ratingLabel = !Number.isNaN(ratingVal) && ratingVal > 0 ? formatRatingLabel(ratingVal) : null;
                             const ratingHtml = ratingLabel ? `<div class="user-rating question-rating" aria-label="Calificación: ${ratingLabel} de 5">${buildReviewStars(ratingVal)}</div>` : '';
@@ -1550,7 +1558,7 @@ if (!empty($reviewsClientPayload['reviews'])) {
             const colorVariantId = variantsByColor[selectedColorId].color_variant_id;
 
             $.ajax({
-                url: '<?= BASE_URL ?>/tienda/api/cart/add-cart.php',
+                url: '<?= BASE_URL ?>/tienda/api/cart/buy-now.php',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
@@ -1581,6 +1589,76 @@ if (!empty($reviewsClientPayload['reviews'])) {
                     }
                     showNotification(errorMsg, 'error');
                     console.error('Error:', xhr.responseJSON || xhr.statusText);
+                }
+            });
+        });
+
+        // Comprar ahora -> agregar al carrito y redirigir al paso de envío
+        $('#buy-now').click(function(e) {
+            e.preventDefault();
+
+            if (!selectedVariantId) {
+                showNotification('Por favor selecciona una variante válida', 'error');
+                return;
+            }
+
+            const colorVariantId = variantsByColor[selectedColorId].color_variant_id;
+
+            // Mostrar un estado de carga en el botón
+            const btn = $(this);
+            const originalHtml = btn.html();
+            btn.html('<i class="fas fa-spinner fa-spin"></i> Procesando...');
+            btn.prop('disabled', true);
+
+            $.ajax({
+                url: '<?= BASE_URL ?>/tienda/api/cart/add-cart.php',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    product_id: productId,
+                    color_variant_id: colorVariantId,
+                    size_variant_id: selectedVariantId,
+                    quantity: selectedQuantity
+                }),
+                dataType: 'json',
+                success: function(response) {
+                    if (!response || !response.success) {
+                        showNotification(response?.error || 'Error al procesar compra', 'error');
+                        btn.html(originalHtml);
+                        btn.prop('disabled', false);
+                        return;
+                    }
+
+                    // Si no está logueado, redirigir a login y luego a la página de envío
+                    if (!currentUserId) {
+                        // Mantener el carrito en la sesión actual; después de login, el usuario será redirigido a /tienda/pagos/envio.php
+                        const redirectUrl = encodeURIComponent('<?= BASE_URL ?>/tienda/pagos/envio.php');
+                        window.location.href = '<?= BASE_URL ?>/auth/login.php?redirect=' + redirectUrl;
+                        return;
+                    }
+
+                    // Redirigir al checkout (envío) — el paso de envío cargará el último carrito del usuario
+                    // We've stored the buy-now cart id in the session on the server. Redirect to envio.
+                    window.location.href = '<?= BASE_URL ?>/tienda/pagos/envio.php?buy_now=1&cart_id=' + encodeURIComponent(response.cart_id);
+                },
+                error: function(xhr) {
+                    let errorMsg = 'Error al procesar compra';
+                    if (xhr.status === 401) {
+                        // No autenticado — redirigir a login
+                        const redirectUrl = encodeURIComponent('<?= BASE_URL ?>/tienda/pagos/envio.php');
+                        window.location.href = '<?= BASE_URL ?>/auth/login.php?redirect=' + redirectUrl;
+                        return;
+                    }
+
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMsg = xhr.responseJSON.error;
+                    }
+                    showNotification(errorMsg, 'error');
+                },
+                complete: function() {
+                    // Restaurar estado del botón si no hubo redirección
+                    btn.html(originalHtml);
+                    btn.prop('disabled', false);
                 }
             });
         });
