@@ -18,34 +18,88 @@
         let activeVariantIndex = null;
         let activeSizeId = null;
 
+        function normalizeNumericString(value) {
+            if (value === null || value === undefined) return '';
+            let str = String(value).trim();
+            if (!str) return '';
+
+            str = str.replace(/\s+/g, '');
+            const hasComma = str.includes(',');
+            const hasDot = str.includes('.');
+            const lastComma = str.lastIndexOf(',');
+            const lastDot = str.lastIndexOf('.');
+
+            if (hasComma && hasDot) {
+                if (lastComma > lastDot) {
+                    str = str.replace(/\./g, '').replace(',', '.');
+                } else {
+                    str = str.replace(/,/g, '');
+                }
+            } else if (hasComma) {
+                const decimal = str.substring(lastComma + 1);
+                if (decimal.length > 0 && decimal.length <= 2) {
+                    const intPart = str.substring(0, lastComma).replace(/[.,]/g, '');
+                    str = `${intPart || '0'}.${decimal}`;
+                } else {
+                    str = str.replace(/,/g, '');
+                }
+            } else if (hasDot) {
+                const decimal = str.substring(lastDot + 1);
+                if (decimal.length > 0 && decimal.length <= 2) {
+                    const intPart = str.substring(0, lastDot).replace(/\./g, '');
+                    str = `${intPart || '0'}.${decimal}`;
+                } else {
+                    str = str.replace(/\./g, '');
+                }
+            }
+
+            str = str.replace(/[^0-9.\-]/g, '');
+            return str;
+        }
+
+        function parsePesosColombianos(formattedNumber) {
+            if (formattedNumber === null || formattedNumber === undefined || formattedNumber === '') return 0;
+            const normalized = normalizeNumericString(formattedNumber);
+            const num = parseFloat(normalized);
+            return Number.isFinite(num) ? num : 0;
+        }
+
         function formatPesosColombianos(number) {
             if (number === null || number === undefined || number === '') return '0';
-            const num = typeof number === 'string' ? parseFloat(number.replace(/\./g, '')) : number;
-            if (isNaN(num)) return '0';
+            const numericValue = typeof number === 'number' ? number : parsePesosColombianos(number);
+            if (!Number.isFinite(numericValue)) return '0';
             return new Intl.NumberFormat('es-CO', {
                 style: 'decimal',
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
-            }).format(num);
-        }
-
-        function parsePesosColombianos(formattedNumber) {
-            if (!formattedNumber) return 0;
-            const num = parseFloat(formattedNumber.replace(/\./g, ''));
-            return isNaN(num) ? 0 : num;
+            }).format(numericValue);
         }
 
         function initializePriceInputs() {
             document.querySelectorAll('.price-input').forEach(input => {
-                if (input.value) {
+                if (input.value && input.value.trim() !== '') {
                     input.value = formatPesosColombianos(input.value);
                 }
 
                 input.addEventListener('input', function(e) {
-                    const value = e.target.value.replace(/\./g, '');
-                    if (!isNaN(value) || value === '') {
-                        e.target.value = formatPesosColombianos(value);
+                    const rawValue = e.target.value;
+                    if (rawValue === '') {
+                        return;
                     }
+
+                    const normalized = normalizeNumericString(rawValue);
+                    if (!normalized) {
+                        e.target.value = '';
+                        return;
+                    }
+
+                    const numericValue = parseFloat(normalized);
+                    if (!Number.isFinite(numericValue)) {
+                        e.target.value = '';
+                        return;
+                    }
+
+                    e.target.value = formatPesosColombianos(numericValue);
                 });
             });
         }
@@ -160,10 +214,24 @@
         function attachCurrencyFormatter(input) {
             if (!input) return;
             input.addEventListener('input', function(e) {
-                const value = e.target.value.replace(/\./g, '');
-                if (!isNaN(value) || value === '') {
-                    e.target.value = formatPesosColombianos(value);
+                const rawValue = e.target.value;
+                if (rawValue === '') {
+                    return;
                 }
+
+                const normalized = normalizeNumericString(rawValue);
+                if (!normalized) {
+                    e.target.value = '';
+                    return;
+                }
+
+                const numericValue = parseFloat(normalized);
+                if (!Number.isFinite(numericValue)) {
+                    e.target.value = '';
+                    return;
+                }
+
+                e.target.value = formatPesosColombianos(numericValue);
             });
         }
 

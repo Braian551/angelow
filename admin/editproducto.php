@@ -117,6 +117,62 @@ function generarSKU($nombre, $color_id, $size_id, $conn) {
     return $sku;
 }
 
+function normalizarNumeroFormulario($valor) {
+    if ($valor === null) {
+        return null;
+    }
+
+    if (is_numeric($valor)) {
+        return (float) $valor;
+    }
+
+    $valor = trim((string) $valor);
+    if ($valor === '') {
+        return null;
+    }
+
+    $valor = str_replace(' ', '', $valor);
+
+    $tieneComa = strpos($valor, ',') !== false;
+    $tienePunto = strpos($valor, '.') !== false;
+    $ultimaComa = strrpos($valor, ',');
+    $ultimoPunto = strrpos($valor, '.');
+
+    if ($tieneComa && $tienePunto) {
+        if ($ultimaComa !== false && $ultimoPunto !== false && $ultimaComa > $ultimoPunto) {
+            $valor = str_replace('.', '', $valor);
+            $valor = str_replace(',', '.', $valor);
+        } else {
+            $valor = str_replace(',', '', $valor);
+        }
+    } elseif ($tieneComa) {
+        $decimal = substr($valor, $ultimaComa + 1);
+        if ($decimal !== '' && strlen($decimal) <= 2) {
+            $entero = substr($valor, 0, $ultimaComa);
+            $entero = str_replace(['.', ','], '', $entero);
+            $valor = ($entero === '' ? '0' : $entero) . '.' . $decimal;
+        } else {
+            $valor = str_replace(',', '', $valor);
+        }
+    } elseif ($tienePunto) {
+        $decimal = substr($valor, $ultimoPunto + 1);
+        if ($decimal !== '' && strlen($decimal) <= 2) {
+            $entero = substr($valor, 0, $ultimoPunto);
+            $entero = str_replace('.', '', $entero);
+            $valor = ($entero === '' ? '0' : $entero) . '.' . $decimal;
+        } else {
+            $valor = str_replace('.', '', $valor);
+        }
+    }
+
+    $valor = preg_replace('/[^0-9\.\-]/', '', $valor);
+    if ($valor === '' || $valor === '.' || $valor === '-.' || $valor === '-') {
+        return null;
+    }
+
+    return (float) $valor;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $conn->beginTransaction();
@@ -165,18 +221,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("El precio base es requerido");
         }
 
-        try {
-            $price = (float) str_replace(['.', ','], ['', '.'], $_POST['price']);
-            if ($price <= 0) {
-                throw new Exception("El precio debe ser mayor que cero");
-            }
-        } catch (Exception $e) {
+        $price = normalizarNumeroFormulario($_POST['price'] ?? null);
+        if ($price === null) {
             throw new Exception("Formato de precio inválido. Use números con punto o coma decimal");
+        }
+        if ($price <= 0) {
+            throw new Exception("El precio debe ser mayor que cero");
         }
 
         $compare_price = null;
         if (!empty($_POST['compare_price'])) {
-            $compare_price = (float) str_replace(['.', ','], ['', '.'], $_POST['compare_price']);
+            $compare_price = normalizarNumeroFormulario($_POST['compare_price']);
+            if ($compare_price === null) {
+                throw new Exception("Formato de precio de comparación inválido");
+            }
             if ($compare_price <= 0) {
                 throw new Exception("El precio de comparación debe ser mayor que cero");
             }
@@ -376,11 +434,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Validar y formatear el precio de comparación
                 $variant_compare_price = null;
-                if (!empty($variant_compare_prices[$size_id])) {
-                    $variant_compare_price = (float) str_replace(['.', ','], ['', '.'], $variant_compare_prices[$size_id]);
+                if (isset($variant_compare_prices[$size_id]) && $variant_compare_prices[$size_id] !== '') {
+                    $variant_compare_price = normalizarNumeroFormulario($variant_compare_prices[$size_id]);
+                    if ($variant_compare_price === null) {
+                        throw new Exception("Formato de precio de comparación inválido para la talla $size_id (color: $color_id).");
+                    }
                 }
                 // Validar que compare_price de variante sea mayor que su precio para que se muestre
-                $variant_price_value = (float) str_replace(['.', ','], ['', '.'], $variant_prices[$size_id] ?? 0);
+                $variant_price_value = normalizarNumeroFormulario($variant_prices[$size_id] ?? null);
+                if ($variant_price_value === null || $variant_price_value <= 0) {
+                    throw new Exception("Debes especificar un precio válido para la talla $size_id (color: $color_id).");
+                }
                 if ($variant_compare_price !== null && $variant_compare_price <= $variant_price_value) {
                     throw new Exception("El precio de comparación de la talla debe ser mayor que su precio para que el descuento se muestre (color: $color_id, talla: $size_id).");
                 }
@@ -395,7 +459,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $size_id,
                     $sku,
                     $variant_barcodes[$size_id] ?? null,
-                    (float) str_replace(['.', ','], ['', '.'], $variant_prices[$size_id] ?? 0),
+                    $variant_price_value,
                     $variant_compare_price,
                     (int) ($variant_quantities[$size_id] ?? 0),
                     1
