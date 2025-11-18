@@ -209,7 +209,7 @@ try {
     <title>Mi Cuenta - Angelow</title>
     <meta name="description" content="Panel de control de tu cuenta en Angelow Ropa Infantil. Gestiona tus pedidos, direcciones y preferencias.">
     <link rel="icon" href="<?= BASE_URL ?>/images/logo.png" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <!-- Preconexión para mejorar performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

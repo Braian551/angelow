@@ -22,11 +22,27 @@ try {
         'unread_count' => count($notifications)
     ]);
 } catch (Throwable $error) {
-    $code = in_array($error->getCode(), [401, 403], true) ? $error->getCode() : 500;
+    // Log errors for debugging (will be written to php_errors.log when DEBUG_MODE enabled)
+    error_log('[notifications] ' . $error->getMessage() . '\n' . $error->getTraceAsString());
+
+    $code = in_array($error->getCode(), [401, 403, 422, 400], true) ? $error->getCode() : 500;
     http_response_code($code);
+
+    $message = $error->getMessage();
+    // in production do not leak stack traces
+    if (!defined('DEBUG_MODE') || !DEBUG_MODE) {
+        if ($code === 500) {
+            $message = 'Error interno del servidor';
+        } elseif ($code === 401) {
+            $message = 'No autorizado';
+        } elseif ($code === 403) {
+            $message = 'Acceso restringido';
+        }
+    }
+
     echo json_encode([
         'success' => false,
-        'message' => $error->getMessage()
+        'message' => $message
     ]);
 }
 
@@ -149,11 +165,14 @@ function getInventoryAlerts(PDO $conn): array
 {
     $sql = "SELECT p.id, p.name, c.name AS category,
                    COALESCE(SUM(psv.quantity), 0) AS stock,
-                   COALESCE(MAX(psv.updated_at), p.created_at) AS reference_date
+                   -- some installations don't track update timestamps on size variants
+                   -- fall back to product creation date when psv.updated_at doesn't exist
+                COALESCE(MAX(sh.created_at), p.created_at) AS reference_date
             FROM products p
             LEFT JOIN categories c ON c.id = p.category_id
             LEFT JOIN product_color_variants pcv ON pcv.product_id = p.id
             LEFT JOIN product_size_variants psv ON psv.color_variant_id = pcv.id
+            LEFT JOIN stock_history sh ON sh.variant_id = psv.id
             WHERE p.is_active = 1
             GROUP BY p.id, p.name, c.name, p.created_at
             HAVING stock <= 5

@@ -280,7 +280,7 @@ try {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/envio.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/tienda/confirmacion.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/notificaciones/notification2.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <?php if ($isStorePickup): ?>
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css">

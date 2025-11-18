@@ -93,7 +93,7 @@ try {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/notificaciones/notification2.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
 
 <body>

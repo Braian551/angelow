@@ -66,7 +66,9 @@ function getProductDetails($conn, $product_id) {
 
 // Obtener variantes de un producto con información de stock
 function getProductVariantsWithStock($conn, $product_id) {
-    $sql = "SELECT psv.id, psv.sku, psv.quantity, psv.updated_at AS last_updated,
+    // Many installs don't store timestamps on size variants; fetch last stock movement from history instead
+    $sql = "SELECT psv.id, psv.sku, psv.quantity,
+                   (SELECT MAX(sh.created_at) FROM stock_history sh WHERE sh.variant_id = psv.id) AS last_updated,
                    c.name AS color_name, c.hex_code,
                    s.name AS size_name, s.description AS size_description
             FROM product_size_variants psv

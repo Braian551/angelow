@@ -117,7 +117,7 @@ try {
     <title>Notificaciones - Angelow</title>
     <meta name="description" content="Gestiona tus notificaciones en Angelow">
     <link rel="icon" href="<?= BASE_URL ?>/images/logo.png" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboarduser2.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/user/notifications.css">

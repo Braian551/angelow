@@ -173,7 +173,24 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Error ${response.status}`);
+                    // Try to surface a meaningful message from the API json body
+                    let remoteMessage = `Error ${response.status}`;
+                    try {
+                        const body = await response.json();
+                        if (body && body.message) {
+                            remoteMessage = body.message;
+                        }
+                    } catch (e) {
+                        // ignore parse errors
+                    }
+
+                    // If we got an unauthorized error, try to redirect to login
+                    if (response.status === 401) {
+                        window.location.href = this.baseUrl + '/auth/login.php?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                        return;
+                    }
+
+                    throw new Error(remoteMessage);
                 }
 
                 const payload = await response.json();
@@ -385,7 +402,16 @@
                 const response = await fetch(url.toString(), { credentials: 'same-origin' });
 
                 if (!response.ok) {
-                    throw new Error(`Error ${response.status}`);
+                    let remoteMessage = `Error ${response.status}`;
+                    try {
+                        const body = await response.json();
+                        if (body && body.message) {
+                            remoteMessage = body.message;
+                        }
+                    } catch (e) {
+                        // ignore
+                    }
+                    throw new Error(remoteMessage);
                 }
 
                 const payload = await response.json();
@@ -400,6 +426,13 @@
             } catch (error) {
                 console.error('Notifications error', error);
                 this.setNotificationsMessage('No pudimos cargar las notificaciones.');
+
+                // Also show a dashboard level error (if present) so admins notice a persistent failure
+                const dashboardErrorEl = document.getElementById('dashboard-error');
+                if (dashboardErrorEl) {
+                    dashboardErrorEl.style.display = 'block';
+                    dashboardErrorEl.textContent = error.message || 'Error cargando notificaciones';
+                }
             } finally {
                 this.state.notificationsLoading = false;
             }
@@ -514,12 +547,20 @@
 
         async markNotification(id, redirectUrl) {
             try {
-                await fetch(this.endpoints.notifications, {
+                const res = await fetch(this.endpoints.notifications, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin',
                     body: JSON.stringify({ action: 'mark_read', id })
                 });
+                if (!res.ok) {
+                    try {
+                        const body = await res.json();
+                        console.warn('No fue posible marcar la notificacion', body.message || res.statusText);
+                    } catch (_e) {
+                        console.warn('No fue posible marcar la notificacion', res.statusText);
+                    }
+                }
             } catch (error) {
                 console.warn('No fue posible marcar la notificacion', error);
             } finally {
@@ -537,12 +578,20 @@
                 return;
             }
             try {
-                await fetch(this.endpoints.notifications, {
+                const res = await fetch(this.endpoints.notifications, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin',
                     body: JSON.stringify({ action: 'mark_all_read' })
                 });
+                if (!res.ok) {
+                    try {
+                        const body = await res.json();
+                        console.warn('No fue posible marcar todas las notificaciones', body.message || res.statusText);
+                    } catch (_e) {
+                        console.warn('No fue posible marcar todas las notificaciones', res.statusText);
+                    }
+                }
             } catch (error) {
                 console.warn('No fue posible marcar todas las notificaciones', error);
             } finally {

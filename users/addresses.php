@@ -312,7 +312,7 @@ if ($action === 'edit' && $id) {
     <title>Mis Direcciones - Angelow</title>
     <meta name="description" content="Administra tus direcciones de envío en Angelow Ropa Infantil.">
     <link rel="icon" href="<?= BASE_URL ?>/images/logo.png" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     
     <!-- Leaflet CSS para el mapa GPS -->
