@@ -420,10 +420,10 @@
                     <tr>
                         <td class="no-cell">13</td>
                         <td class="id-cell">CP-TIENDA-007</td>
-                        <td class="description-cell">Proceso de checkout completo</td>
+                        <td class="description-cell">Proceso de pago completo</td>
                         <td class="precond-cell">Usuario autenticado, productos en carrito</td>
                         <td class="input-cell">Datos de envío, método de pago</td>
-                        <td class="steps-cell">1. Acceder a carrito<br>2. Proceder al checkout<br>3. Completar datos de envío<br>4. Seleccionar método de pago<br>5. Confirmar pedido</td>
+                        <td class="steps-cell">1. Acceder a carrito<br>2. Proceder al pago<br>3. Completar datos de envío<br>4. Seleccionar método de pago<br>5. Confirmar pedido</td>
                         <td class="expected-cell">Orden creada, número de orden generado, email de confirmación</td>
                         <td class="postcond-cell">Orden en estado "Pendiente" en BD</td>
                         <td class="status-cell status-pending">Pendiente</td>
@@ -789,7 +789,7 @@
                         <td class="description-cell">Inserción de nueva orden de compra</td>
                         <td class="precond-cell">Usuario autenticado, productos en carrito</td>
                         <td class="input-cell">Datos de orden: productos, dirección, pago</td>
-                        <td class="steps-cell">1. Completar checkout<br>2. Confirmar pedido<br>3. Verificar inserción en BD</td>
+                        <td class="steps-cell">1. Completar pago<br>2. Confirmar pedido<br>3. Verificar inserción en BD</td>
                         <td class="expected-cell">Orden creada en tabla 'orders', productos en 'order_items'</td>
                         <td class="postcond-cell">Orden registrada para procesamiento</td>
                         <td class="status-cell status-pending">Pendiente</td>
@@ -958,7 +958,7 @@
                         <td class="description-cell">Integración con OpenStreetMap</td>
                         <td class="precond-cell">API key válida, conexión a internet</td>
                         <td class="input-cell">Dirección de entrega</td>
-                        <td class="steps-cell">1. Ingresar dirección en checkout<br>2. Ver mapa generado<br>3. Verificar geocodificación correcta</td>
+                        <td class="steps-cell">1. Ingresar dirección en el pago<br>2. Ver mapa generado<br>3. Verificar geocodificación correcta</td>
                         <td class="expected-cell">Mapa muestra ubicación correcta, coordenadas precisas</td>
                         <td class="postcond-cell">Dirección validada para delivery</td>
                         <td class="status-cell status-pending">Pendiente</td>

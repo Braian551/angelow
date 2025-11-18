@@ -11,90 +11,90 @@ title Mapa de Navegación Completo - Sistema Angelow
 
 ' ===== USUARIO PÚBLICO / TIENDA =====
 package "Tienda Online (Frontend Público)" as Tienda {
-    component "Inicio\n(index.php)" as Inicio
-    component "Catálogo Global\n(tienda/productos.php)" as Catalogo
-    component "Detalle Producto\n(producto/verproducto.php)" as DetalleProducto
-    component "Buscador y Guardados\n(ajax/busqueda/*.php)" as Busqueda
-    component "Carrito - Paso 1\n(tienda/pagos/cart.php)" as CheckoutPaso1
-    component "Paso de Envío\n(tienda/pagos/envio.php)" as CheckoutPaso2
-    component "Pago y Comprobantes\n(tienda/pagos/pay.php)" as CheckoutPaso3
-    component "Confirmación\n(tienda/pagos/confirmacion.php)" as Confirmacion
-    component "Lista de Deseos Rápida\n(tienda/api/wishlist/*.php)" as WishlistPublic
-    component "Alertas Promocionales\n(alertas/*.php)" as AlertasFront
+    component "Inicio" as Inicio
+    component "Catálogo Global" as Catalogo
+    component "Detalle Producto" as DetalleProducto
+    component "Buscador y Guardados" as Busqueda
+    component "Carrito - Paso 1" as CheckoutPaso1
+    component "Paso de Envío" as CheckoutPaso2
+    component "Pago y Comprobantes" as CheckoutPaso3
+    component "Confirmación" as Confirmacion
+    component "Lista de Deseos Rápida" as WishlistPublic
+    component "Alertas Promocionales" as AlertasFront
 }
 
 ' ===== AUTENTICACIÓN =====
 package "Sistema de Autenticación" as Auth {
-    component "Login\n(auth/login.php)" as Login
-    component "Registro\n(auth/register.php)" as Registro
-    component "Google OAuth\n(auth/google_auth.php)" as GoogleAuth
-    component "Middleware Roles\n(auth/auth_middleware.php)" as Middleware
-    component "Redirección Roles\n(auth/role_redirect.php)" as RoleRedirect
-    component "Logout\n(auth/logout.php)" as Logout
+    component "Login" as Login
+    component "Registro" as Registro
+    component "Google OAuth" as GoogleAuth
+    component "Middleware Roles" as Middleware
+    component "Redirección Roles" as RoleRedirect
+    component "Logout" as Logout
 }
 
 ' ===== PANEL DE USUARIO =====
 package "Panel de Usuario" as UserPanel {
-    component "Dashboard Usuario\n(users/dashboarduser.php)" as UserDashboard
-    component "Perfil y Seguridad\n(users/settings.php)" as UserPerfil
-    component "Mis Órdenes\n(users/orders.php)" as UserOrders
-    component "Detalle Orden\n(users/order_detail.php)" as UserOrderDetail
-    component "Comprobantes\n(users/orders/invoice.php)" as UserInvoice
-    component "Direcciones con GPS\n(users/addresses.php)" as UserAddresses
-    component "Lista de Deseos Usuario\n(users/wishlist.php)" as UserWishlist
-    component "Alertas Personalizadas\n(users/alertas/*.php)" as UserAlerts
-    component "Notificaciones\n(users/notifications.php)" as UserNotifications
-    component "Acciones AJAX\n(users/ajax/ajax_cancel_order.php)" as UserAjax
+    component "Dashboard Usuario" as UserDashboard
+    component "Perfil y Seguridad" as UserPerfil
+    component "Mis Órdenes" as UserOrders
+    component "Detalle Orden" as UserOrderDetail
+    component "Comprobantes" as UserInvoice
+    component "Direcciones con GPS" as UserAddresses
+    component "Lista de Deseos Usuario" as UserWishlist
+    component "Alertas Personalizadas" as UserAlerts
+    component "Notificaciones" as UserNotifications
+    component "Acciones AJAX" as UserAjax
 }
 
 ' ===== PANEL DE ADMINISTRACIÓN =====
 package "Panel de Administración" as AdminPanel {
-    component "Dashboard Admin\n(admin/dashboardadmin.php)" as AdminDashboard
+    component "Dashboard Admin" as AdminDashboard
 
     package "Catálogo y Contenido" as AdminCatalogo {
-        component "Productos\n(admin/products.php)" as AdminProductsList
-        component "Nuevo Producto\n(admin/subproducto.php)" as AdminAddProduct
-        component "Edición Producto\n(admin/editproducto.php)" as AdminEditProduct
-        component "Categorías\n(admin/categoria/)" as AdminCategories
-        component "Colecciones\n(admin/colecciones/)" as AdminCollections
-        component "Tallas\n(admin/tallas/)" as AdminSizes
-        component "Inventario\n(admin/inventario/)" as AdminInventory
-        component "Sliders\n(admin/sliders/)" as AdminSliders
-        component "Anuncios\n(admin/announcements/)" as AdminAnnouncements
+        component "Productos" as AdminProductsList
+        component "Nuevo Producto" as AdminAddProduct
+        component "Edición Producto" as AdminEditProduct
+        component "Categorías" as AdminCategories
+        component "Colecciones" as AdminCollections
+        component "Tallas" as AdminSizes
+        component "Inventario" as AdminInventory
+        component "Sliders" as AdminSliders
+        component "Anuncios" as AdminAnnouncements
     }
 
     package "Ventas y Operaciones" as AdminSales {
-        component "Órdenes\n(admin/orders.php)" as AdminOrders
-        component "Gestión de Órdenes\n(admin/order/*.php)" as AdminOrderTools
-        component "Pagos\n(admin/pagos/define_pay.php)" as AdminPayments
-        component "Reglas de Envío\n(admin/envio/)" as AdminShipping
-        component "Descuentos Masivos\n(admin/descuento/)" as AdminDiscounts
-        component "Reportes Ventas\n(admin/informes/ventas.php)" as AdminSalesReport
-        component "Reportes Productos\n(admin/informes/productos.php)" as AdminProductReport
-        component "Reportes Clientes\n(admin/informes/clientes.php)" as AdminClientReport
+        component "Órdenes" as AdminOrders
+        component "Gestión de Órdenes" as AdminOrderTools
+        component "Pagos" as AdminPayments
+        component "Reglas de Envío" as AdminShipping
+        component "Descuentos Masivos" as AdminDiscounts
+        component "Reportes Ventas" as AdminSalesReport
+        component "Reportes Productos" as AdminProductReport
+        component "Reportes Clientes" as AdminClientReport
     }
 
     package "Personas y Configuración" as AdminPeople {
-        component "Clientes\n(admin/clientes/)" as AdminClients
-        component "Administradores\n(admin/admins/)" as AdminAdmins
-        component "Perfiles Admin\n(admin/services/admin_profiles.php)" as AdminProfiles
-        component "Ajustes Generales\n(admin/settings/general.php)" as AdminSettings
-        component "Reseñas y Preguntas\n(admin/resenas/)" as AdminReviews
+        component "Clientes" as AdminClients
+        component "Administradores" as AdminAdmins
+        component "Perfiles Admin" as AdminProfiles
+        component "Ajustes Generales" as AdminSettings
+        component "Reseñas y Preguntas" as AdminReviews
     }
 }
 
 ' ===== CAPA AJAX / APIS INTERNAS =====
 package "Capa AJAX y APIs" as InternalAPIs {
-    component "AJAX Admin\n(ajax/admin/*)" as AjaxAdmin
-    component "AJAX Busquedas\n(ajax/busqueda/*)" as AjaxSearch
-    component "AJAX Carrito\n(ajax/cart/*)" as AjaxCart
-    component "AJAX Lista de Deseos\n(ajax/wishlist/*)" as AjaxWishlist
-    component "APIs Tienda - Carrito\n(tienda/api/cart/*)" as ApiCart
-    component "APIs Tienda - Pago\n(tienda/api/pay/*)" as ApiPay
-    component "APIs Tienda - Lista de Deseos\n(tienda/api/wishlist/*)" as ApiWishlist
-    component "APIs Usuarios\n(users/api/*.php)" as ApiUsers
-    component "APIs Admin\n(admin/api/*)" as ApiAdmin
-    component "APIs Opiniones Públicas\n(api/*.php)" as ApiReviews
+    component "AJAX Admin" as AjaxAdmin
+    component "AJAX Busquedas" as AjaxSearch
+    component "AJAX Carrito" as AjaxCart
+    component "AJAX Lista de Deseos" as AjaxWishlist
+    component "APIs Tienda - Carrito" as ApiCart
+    component "APIs Tienda - Pago" as ApiPay
+    component "APIs Tienda - Lista de Deseos" as ApiWishlist
+    component "APIs Usuarios" as ApiUsers
+    component "APIs Admin" as ApiAdmin
+    component "APIs Opiniones Públicas" as ApiReviews
 }
 
 ' ===== SERVICIOS EXTERNOS =====
@@ -115,7 +115,7 @@ database "Base de Datos MySQL" as DB {
     component "Lista de Deseos y Alertas\n(wishlist, wishlist_alerts)" as DBWishlist
     component "Contenido\n(announcements, sliders)" as DBContent
     component "Notificaciones\n(user_notifications, admin_notification_dismissals, search_history)" as DBNotifications
-    component "Histórico Delivery\n(order_deliveries, delivery_navigation_sessions, ... )" as DBDelivery
+    component "Histórico de Envíos\n(order_deliveries, delivery_navigation_sessions, ... )" as DBDelivery
 }
 
 ' ===== CONEXIONES DEL FLUJO DE COMPRA =====
@@ -217,10 +217,10 @@ GoogleAuth --> GoogleService : OAuth
 
 ' ===== NOTAS EXPLICATIVAS =====
 note right of AlertasFront
-  Barra y modales reutilizados para:
-  - Alertas de wishlist
-  - Mensajes de stock
-  - Promociones urgentes
+    Barra y modales reutilizados para:
+    - Alertas de Lista de Deseos
+    - Mensajes de stock
+    - Promociones urgentes
 end note
 
 note right of AdminAnnouncements
@@ -237,10 +237,11 @@ note right of InternalAPIs
 end note
 
 note right of DBDelivery
-  Las tablas de delivery siguen
+    Las tablas de envíos siguen
   activas solo para históricos y
-  simulaciones. El rol delivery
-  fue removido del frontend.
+    simulaciones. El rol 'delivery' ya no existe en el frontend;
+    la gestión de entregas se maneja mediante reglas del sistema
+    y/o aplicaciones externas.
 end note
 
 note bottom of DB

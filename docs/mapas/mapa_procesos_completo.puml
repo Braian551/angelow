@@ -26,7 +26,7 @@ partition "Descubrimiento y Registro" as Discovery {
     :Usuario accede a index con sliders y anuncios;
     :Explora colecciones y categorías destacadas;
     :Utiliza buscador (guarda historial);
-    :Revisa alertas y wishlist pública;
+    :Revisa alertas y Lista de Deseos pública;
 
     if (¿Sesion activa?) then (No)
         :Limita funciones sensibles;
@@ -57,7 +57,7 @@ partition "Selección y Carrito" as Selection {
     endif
 
     if (¿Desea finalizar compra?) then (Sí)
-            :Avanza al Paso 1 de Pago (cart.php);
+            :Avanza al Paso 1 de Pago;
     else (No)
         :Sigue navegando;
     endif
@@ -114,9 +114,11 @@ partition "Preparación y Envío" as Shipping {
     :Actualiza estado a Enviado;
     :Dispara correos/SMS con tracking o instrucciones de retiro;
     note right
-        El rol delivery fue removido.
-        El control se realiza desde
-        reglas de envío y aliados externos.
+        El rol 'delivery' ya no existe como módulo/rol del sistema.
+        La lógica de envíos se maneja mediante reglas del sistema
+        y servicios/aliados externos (APIs). Las acciones que antes
+        realizaba el rol delivery ahora son coordinadas por lógica
+        de negocio (reglas de envío, asignaciones automatizadas).
     end note
 }
 
@@ -136,7 +138,7 @@ partition "Procesos Administrativos" as AdminOps {
     join
 }
 
-partition "Postventa y Engagement" as PostSale {
+partition "Postventa y Fidelización" as PostSale {
     :Cliente recibe notificación de entrega;
     :Puede confirmar recepción desde panel;
     :Accede a factura PDF y historial completo;

@@ -34,9 +34,7 @@ Centro Textil y de Gestión Industrial (proyecto formativo)
 | Documento de identidad | Nombres y Apellidos | E-mail | Teléfono |
 |------------------------|---------------------|--------|----------|
 | 1023526011 | Braian Andrés Oquendo Durango | braianoquen@gmail.com | 302 2613326 |
-| 1020111377 | Sara Hernández Higuita | sarahiguita21@gmail.com | 3188981654 |
-| 1015070475 | Julian David Cardenas Obando | cabeceguayabojuly@gmail.com | 3154839619 |
-| 1023632976 | Sofía Guisao Álvarez | sofiaalvarezruiz180@gmail.com | 3104861494 |
+
 
 ---
 

@@ -1,7 +1,7 @@
 # Mapa de Navegación Completo - Sistema Angelow
 
 ## Descripción General
-Este documento describe la arquitectura completa de navegación del sistema Angelow, una plataforma E-commerce especializada en ropa infantil con funcionalidades avanzadas de gestión administrativa y sistema de delivery con GPS.
+Este documento describe la arquitectura completa de navegación del sistema Angelow, una plataforma E-commerce especializada en ropa infantil con funcionalidades avanzadas de gestión administrativa y servicios de envío y seguimiento mediante aliados externos.
 
 ## Arquitectura del Sistema
 
@@ -33,7 +33,7 @@ Este documento describe la arquitectura completa de navegación del sistema Ange
   - Aplicación de descuentos
   - Persistencia de sesión
 
-- **Checkout/Pago** (`tienda/pay.php`)
+- **Pago** (`tienda/pay.php`)
   - Selección de dirección de envío
   - Método de pago (transferencia bancaria)
   - Validación de comprobantes
@@ -62,7 +62,7 @@ Este documento describe la arquitectura completa de navegación del sistema Ange
 
 - **Redirección por Roles** (`auth/role_redirect.php`)
   - Enrutamiento según tipo de usuario
-  - Roles: user, admin, delivery
+  - Roles: user, admin
 
 ### 3. Panel de Usuario
 **Propósito:** Área personal para gestión de cuenta y pedidos.
@@ -176,37 +176,12 @@ Este documento describe la arquitectura completa de navegación del sistema Ange
   - Gestión de permisos
   - Roles y accesos
 
-### 5. Panel de Delivery
-**Propósito:** Sistema completo para gestión de entregas con GPS.
+### 5. Envíos / Delivery (externo)
+**Propósito:** La gestión de entregas no se realiza desde un rol 'delivery' integrado en el frontend; se delega en servicios o aplicaciones externas que consumen APIs del sistema para tracking, estado de órdenes y notificaciones.
 
-#### Funcionalidades:
-- **Dashboard** (`delivery/dashboarddeli.php`)
-  - Órdenes asignadas
-  - Estado de entregas activas
-
-- **Órdenes Asignadas** (`delivery/orders.php`)
-  - Lista de entregas pendientes
-  - Información de clientes
-
-- **Navegación GPS** (`delivery/navigation.php`)
-  - Mapa interactivo con rutas
-  - Seguimiento en tiempo real
-  - Instrucciones de voz
-  - Actualización automática de ubicación
-
-- **Acciones de Entrega** (`delivery/delivery_actions.php`)
-  - Cambios de estado
-  - Confirmación de entrega
-  - Reporte de problemas
-
-#### APIs de Delivery:
-- **Actualizar Estado** (`delivery/api/update_status.php`)
-  - Cambios en tiempo real
-  - Notificaciones automáticas
-
-- **GPS Tracking** (`delivery/api/gps_tracking.php`)
-  - Coordenadas del conductor
-  - Historial de rutas
+#### Integración y APIs:
+- **Actualizar Estado** (`delivery/api/update_status.php`) — endpoint consumido por servicios externos para actualizar el estado de una orden.
+- **GPS Tracking** (`delivery/api/gps_tracking.php`) — endpoint para recibir/consultar coordenadas y tracking proporcionado por aliados logísticos.
 
 ### 6. APIs y Servicios Externos
 **Propósito:** Integración con servicios de terceros.
@@ -263,8 +238,8 @@ Este documento describe la arquitectura completa de navegación del sistema Ange
 1. **Inicio** → Explorar catálogo
 2. **Catálogo** → Ver detalles de producto
 3. **Producto** → Agregar al carrito (requiere login)
-4. **Carrito** → Proceder al checkout
-5. **Checkout** → Procesar pago
+4. **Carrito** → Proceder al pago
+5. **Pago** → Procesar pago
 6. **Confirmación** → Ver en historial
 
 ### Flujo Administrativo
@@ -273,8 +248,8 @@ Este documento describe la arquitectura completa de navegación del sistema Ange
 3. **Módulos** → CRUD operations
 4. **Reportes** → Análisis y exportación
 
-### Flujo de Delivery
-1. **Login Delivery** → Dashboard de entregas
+### Flujo de Envíos (externo)
+1. **Servicio de Envío** (externo) → Actualiza estado vía API
 2. **Dashboard** → Ver órdenes asignadas
 3. **Órdenes** → Iniciar navegación GPS
 4. **Navegación** → Actualización en tiempo real

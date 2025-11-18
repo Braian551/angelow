@@ -479,7 +479,7 @@
                         <td style="width: 50%; vertical-align: top; padding-left: 20px;">
                             <h4>Ejemplo práctico - Angelow</h4>
                             <p><strong>Carlos revisa y modifica su carrito antes de comprar</strong></p>
-                            <p>Carlos tiene 3 productos en su carrito. Decide cambiar la cantidad del primer producto de 2 a 3 unidades. Modifica el número y el sistema recalcula automáticamente los totales. También elimina un producto que ya no quiere. El sistema actualiza el subtotal, los descuentos aplicados, el costo de envío, y el total final. Carlos revisa que todo esté correcto antes de proceder al checkout.</p>
+                            <p>Carlos tiene 3 productos en su carrito. Decide cambiar la cantidad del primer producto de 2 a 3 unidades. Modifica el número y el sistema recalcula automáticamente los totales. También elimina un producto que ya no quiere. El sistema actualiza el subtotal, los descuentos aplicados, el costo de envío, y el total final. Carlos revisa que todo esté correcto antes de proceder al pago.</p>
                         </td>
                     </tr>
                 </table>
@@ -533,7 +533,7 @@
                     <tr>
                         <td style="width: 50%; vertical-align: top;">
                             <table class="uc-inner-table">
-                                <tr><th>Nombre del caso de uso</th><td>Proceder al Checkout</td></tr>
+                                <tr><th>Nombre del caso de uso</th><td>Proceder al Pago</td></tr>
                                 <tr><th>Autor</th><td>Equipo Angelow</td></tr>
                                 <tr><th>Fecha</th><td>2 de Noviembre, 2025</td></tr>
                                 <tr><th>Descripción</th><td>Iniciar proceso de compra</td></tr>
@@ -546,7 +546,7 @@
                         </td>
                         <td style="width: 50%; vertical-align: top; padding-left: 20px;">
                             <p><strong>Ana inicia el proceso de compra de sus productos</strong></p>
-                            <p>Ana tiene 2 vestidos infantiles y un conjunto deportivo en su carrito por un total de $67.50. Hace clic en "Proceder al Checkout". El sistema la lleva a la página de checkout donde recopila su información: dirección de envío (Casa: Calle Flores 123, Ciudad Central), dirección de facturación (la misma), y le pide confirmar el método de pago. Ana revisa todos los datos, confirma que están correctos, y el sistema prepara toda la información para el procesamiento del pago por transferencia bancaria.</p>
+                            <p>Ana tiene 2 vestidos infantiles y un conjunto deportivo en su carrito por un total de $67.50. Hace clic en "Proceder al pago". El sistema la lleva a la página de pago donde recopila su información: dirección de envío (Casa: Calle Flores 123, Ciudad Central), dirección de facturación (la misma), y le pide confirmar el método de pago. Ana revisa todos los datos, confirma que están correctos, y el sistema prepara toda la información para el procesamiento del pago por transferencia bancaria.</p>
                         </td>
                     </tr>
                 </table>
@@ -568,7 +568,7 @@
                         </td>
                         <td style="width: 50%; vertical-align: top; padding-left: 20px;">
                             <p><strong>Javier elige cómo pagar su pedido</strong></p>
-                            <p>Javier está en el checkout con su compra de $89.50. En la sección de método de pago, ve que Angelow solo acepta transferencias bancarias. Selecciona "Transferencia Bancaria" como método de pago. El sistema muestra inmediatamente las instrucciones detalladas: Banco XYZ, Cuenta Corriente 123456789, a nombre de Angelow S.A., con el monto exacto $89.50 y el número de referencia generado automáticamente. Javier anota los datos para realizar la transferencia desde su app bancaria.</p>
+                            <p>Javier está en el proceso de pago con su compra de $89.50. En la sección de método de pago, ve que Angelow solo acepta transferencias bancarias. Selecciona "Transferencia Bancaria" como método de pago. El sistema muestra inmediatamente las instrucciones detalladas: Banco XYZ, Cuenta Corriente 123456789, a nombre de Angelow S.A., con el monto exacto $89.50 y el número de referencia generado automáticamente. Javier anota los datos para realizar la transferencia desde su app bancaria.</p>
                         </td>
                     </tr>
                 </table>
@@ -590,7 +590,7 @@
                         </td>
                         <td style="width: 50%; vertical-align: top; padding-left: 20px;">
                             <p><strong>Sofia completa su compra exitosamente</strong></p>
-                            <p>Sofia ha completado todos los pasos del checkout: productos seleccionados ($72.30), dirección confirmada, método de pago elegido. Revisa el resumen final que muestra todos los detalles: 2 camisetas infantiles, dirección de envío, costo de envío $4.50, total $76.80. Hace clic en "Confirmar Pedido". El sistema crea la orden #12345 en la base de datos, asigna estado "Pendiente de Pago", y envía un email de confirmación a Sofia con todos los detalles y las instrucciones para realizar la transferencia bancaria.</p>
+                            <p>Sofia ha completado todos los pasos del pago: productos seleccionados ($72.30), dirección confirmada, método de pago elegido. Revisa el resumen final que muestra todos los detalles: 2 camisetas infantiles, dirección de envío, costo de envío $4.50, total $76.80. Hace clic en "Confirmar Pedido". El sistema crea la orden #12345 en la base de datos, asigna estado "Pendiente de Pago", y envía un email de confirmación a Sofia con todos los detalles y las instrucciones para realizar la transferencia bancaria.</p>
                         </td>
                     </tr>
                 </table>
@@ -795,7 +795,7 @@
                                 <tr><th>Descripción</th><td>Repetir compra anterior</td></tr>
                                 <tr><th>Actores</th><td>Cliente</td></tr>
                                 <tr><th>Precondiciones</th><td>N/A</td></tr>
-                                <tr><th>Flujo Normal</th><td>1. Usuario selecciona "reordenar" en pedido anterior.<br>2. Sistema agrega productos al carrito actual.<br>3. Usuario puede modificar y proceder al checkout.</td></tr>
+                                <tr><th>Flujo Normal</th><td>1. Usuario selecciona "reordenar" en pedido anterior.<br>2. Sistema agrega productos al carrito actual.<br>3. Usuario puede modificar y proceder al pago.</td></tr>
                                 <tr><th>Flujo Alternativo</th><td>N/A</td></tr>
                                 <tr><th>PosCondiciones</th><td>Productos agregados al carrito</td></tr>
                             </table>

@@ -190,10 +190,10 @@
                 <strong>Fecha:</strong> Noviembre 2025
             </div>
             <div class="info-item">
-                <strong>Total Historias:</strong> 24 HU
+                <strong>Total Historias:</strong> 30 HU
             </div>
             <div class="info-item">
-                <strong>Módulos:</strong> 6 Módulos principales
+                <strong>Módulos:</strong> Usuarios, Tienda, Checkout, Pagos, Logística/Envíos, Marketing y Admin
             </div>
         </div>
 
@@ -244,10 +244,10 @@
 
                     <!-- HU-02: Inicio de sesión -->
                     <tr>
-                        <td class="id-cell" rowspan="2">HU-02</td>
-                        <td class="role-cell" rowspan="2">Como un usuario registrado</td>
-                        <td class="description-cell" rowspan="2">Necesito iniciar sesión con mi correo y contraseña</td>
-                        <td class="description-cell" rowspan="2">Con la finalidad de acceder a mi cuenta personal y realizar compras</td>
+                        <td class="id-cell" rowspan="3">HU-02</td>
+                        <td class="role-cell" rowspan="3">Como un usuario registrado</td>
+                        <td class="description-cell" rowspan="3">Necesito iniciar sesión con mi correo, contraseña o Google</td>
+                        <td class="description-cell" rowspan="3">Con la finalidad de acceder a mi cuenta personal y realizar compras</td>
                         <td class="id-cell">1</td>
                         <td class="description-cell">Ingreso exitoso</td>
                         <td class="context-cell">En caso que ingrese mi correo y contraseña correctos</td>
@@ -261,6 +261,12 @@
                         <td class="context-cell">En caso que ingrese datos incorrectos</td>
                         <td class="event-cell">cuando intento iniciar sesión, el sistema me muestra un mensaje indicando que los datos son incorrectos</td>
 
+                    </tr>
+                    <tr>
+                        <td class="id-cell">3</td>
+                        <td class="description-cell">Inicio con Google</td>
+                        <td class="context-cell">En caso que elija "Continuar con Google" y acepte compartir mi nombre y correo</td>
+                        <td class="event-cell">cuando finalizo la autorización, entro a mi cuenta sin escribir contraseña y veo mi panel correspondiente</td>
                     </tr>
 
                     <!-- HU-03: Edición de perfil -->
@@ -443,52 +449,52 @@
                         <td class="event-cell">cuando consulto, veo el estado actual de cada pedido con fechas y detalles</td>
                     </tr>
 
-                    <!-- HU-16: Asignación a repartidores -->
+                    <!-- HU-16: Configuración de métodos de envío -->
                     <tr>
                         <td class="id-cell">HU-16</td>
-                        <td class="role-cell">Como un administrador</td>
-                        <td class="description-cell">Necesito asignar pedidos aprobados a repartidores disponibles</td>
-                        <td class="description-cell">Con la finalidad de iniciar el proceso de entrega</td>
+                        <td class="role-cell">Como un administrador de logística</td>
+                        <td class="description-cell">Necesito configurar métodos, tiempos y costos de envío disponibles</td>
+                        <td class="description-cell">Con la finalidad de ofrecer opciones claras durante el pago</td>
                         <td class="id-cell">1</td>
-                        <td class="description-cell">Asignación exitosa</td>
-                        <td class="context-cell">En caso que un pedido esté pagado y listo para envío</td>
-                        <td class="event-cell">cuando asigno un repartidor, el sistema registra la asignación y notifica al repartidor</td>
+                        <td class="description-cell">Método registrado correctamente</td>
+                        <td class="context-cell">En caso que defina reglas válidas en el módulo de envíos</td>
+                        <td class="event-cell">cuando guardo la configuración, el método queda disponible para el cálculo automático en el pago</td>
                     </tr>
 
-                    <!-- HU-17: Lista de entregas -->
+                    <!-- HU-17: Programación de despachos -->
                     <tr>
                         <td class="id-cell">HU-17</td>
-                        <td class="role-cell">Como un repartidor</td>
-                        <td class="description-cell">Necesito ver mi lista de entregas asignadas con sus detalles</td>
-                        <td class="description-cell">Con la finalidad de planificar mi ruta de entrega</td>
+                        <td class="role-cell">Como un operador logístico</td>
+                        <td class="description-cell">Necesito registrar despachos con aliados externos y números de guía</td>
+                        <td class="description-cell">Con la finalidad de dar seguimiento a cada envío preparado</td>
                         <td class="id-cell">1</td>
-                        <td class="description-cell">Entregas visibles</td>
-                        <td class="context-cell">En caso que ingrese a mi panel de repartidor</td>
-                        <td class="event-cell">cuando accedo, veo todas mis entregas asignadas con dirección, productos y contacto del cliente</td>
+                        <td class="description-cell">Despacho programado</td>
+                        <td class="context-cell">En caso que una orden esté pagada y lista para enviarse</td>
+                        <td class="event-cell">cuando asigno un aliado y número de guía, el sistema cambia la orden a "Enviado" y guarda la trazabilidad</td>
                     </tr>
 
-                    <!-- HU-18: Actualización de estado de entrega -->
+                    <!-- HU-18: Actualización de estado de envío -->
                     <tr>
                         <td class="id-cell">HU-18</td>
-                        <td class="role-cell">Como un repartidor</td>
-                        <td class="description-cell">Necesito actualizar el estado de las entregas</td>
-                        <td class="description-cell">Con la finalidad de mantener informados a clientes y administración</td>
+                        <td class="role-cell">Como un administrador</td>
+                        <td class="description-cell">Necesito actualizar manualmente el estado del envío y cargar evidencias</td>
+                        <td class="description-cell">Con la finalidad de mantener informados a clientes y al área comercial</td>
                         <td class="id-cell">1</td>
                         <td class="description-cell">Estado actualizado</td>
-                        <td class="context-cell">En caso que cambie el estado de una entrega a "en camino", "en destino" o "entregado"</td>
-                        <td class="event-cell">cuando actualizo el estado, el sistema registra el cambio y notifica automáticamente al cliente</td>
+                        <td class="context-cell">En caso que deba pasar una orden de "Preparando" a "Enviado" o "Entregado"</td>
+                        <td class="event-cell">cuando registro el cambio, el historial de la orden se actualiza y se disparan las notificaciones correspondientes</td>
                     </tr>
 
-                    <!-- HU-19: Notificaciones de entrega -->
+                    <!-- HU-19: Notificaciones de envío -->
                     <tr>
                         <td class="id-cell">HU-19</td>
-                        <td class="role-cell">Como un cliente</td>
-                        <td class="description-cell">Necesito recibir notificaciones cuando mi pedido esté en camino</td>
-                        <td class="description-cell">Con la finalidad de preparar la recepción</td>
+                        <td class="role-cell">Como el sistema</td>
+                        <td class="description-cell">Necesito enviar notificaciones automáticas cuando el estado de envío cambia</td>
+                        <td class="description-cell">Con la finalidad de que el cliente pueda prepararse para recibir su pedido</td>
                         <td class="id-cell">1</td>
-                        <td class="description-cell">Notificación recibida</td>
-                        <td class="context-cell">En caso que el repartidor actualice el estado de mi pedido</td>
-                        <td class="event-cell">cuando cambia el estado, recibo un correo electrónico con los detalles de la entrega</td>
+                        <td class="description-cell">Alerta enviada</td>
+                        <td class="context-cell">En caso que la orden cambie a "Enviado" o "Entregado"</td>
+                        <td class="event-cell">cuando detecto el nuevo estado, envío correo y notificación en el panel del cliente con los detalles actualizados</td>
                     </tr>
 
                     <!-- HU-20: Gestión de productos -->
@@ -556,16 +562,118 @@
                         <td class="context-cell">En caso que cree un código promocional con porcentaje, fechas de vigencia y condiciones</td>
                         <td class="event-cell">cuando lo activo, los clientes pueden usar el código en sus compras según las reglas definidas</td>
                     </tr>
+
+                    <!-- HU-25: Wishlist de clientes -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-25</td>
+                        <td class="role-cell" rowspan="2">Como un cliente recurrente</td>
+                        <td class="description-cell" rowspan="2">Necesito guardar y organizar productos en mi lista de deseos</td>
+                        <td class="description-cell" rowspan="2">Con la finalidad de retomarlos luego sin volver a buscarlos</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Producto guardado</td>
+                        <td class="context-cell">En caso que esté autenticado y pulse "Guardar" en la ficha del producto</td>
+                        <td class="event-cell">cuando confirmo, el artículo aparece en mi lista con la talla y color que elegí</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">2</td>
+                        <td class="description-cell">Producto eliminado</td>
+                        <td class="context-cell">En caso que decida retirar un favorito desde mi lista</td>
+                        <td class="event-cell">cuando lo quito, desaparece de inmediato y el contador se actualiza</td>
+                    </tr>
+
+                    <!-- HU-26: Alertas personalizadas -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-26</td>
+                        <td class="role-cell" rowspan="2">Como un cliente organizado</td>
+                        <td class="description-cell" rowspan="2">Necesito activar alertas de reposición o promociones sobre mis productos favoritos</td>
+                        <td class="description-cell" rowspan="2">Con la finalidad de enterarme apenas haya disponibilidad o descuentos</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Alerta activada</td>
+                        <td class="context-cell">En caso que marque "Avisarme" en un producto sin stock o con próxima oferta</td>
+                        <td class="event-cell">cuando guardo la alerta, recibo la confirmación de que seré notificado</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">2</td>
+                        <td class="description-cell">Notificación enviada</td>
+                        <td class="context-cell">En caso que el producto vuelva a estar disponible y yo tenga la alerta activa</td>
+                        <td class="event-cell">cuando sucede, recibo un correo y un aviso en mi panel para comprarlo antes de que se agote</td>
+                    </tr>
+
+                    <!-- HU-27: Centro de notificaciones -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-27</td>
+                        <td class="role-cell" rowspan="2">Como un cliente existente</td>
+                        <td class="description-cell" rowspan="2">Necesito revisar y marcar mis notificaciones en un solo lugar</td>
+                        <td class="description-cell" rowspan="2">Con la finalidad de no perderme actualizaciones importantes</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Listado de avisos</td>
+                        <td class="context-cell">En caso que tenga mensajes pendientes y abra el centro de notificaciones</td>
+                        <td class="event-cell">cuando ingreso, veo cada aviso con la fecha, el detalle y un enlace directo para atenderlo</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">2</td>
+                        <td class="description-cell">Marcar como leído</td>
+                        <td class="context-cell">En caso que pulse "Marcar todo" o cierre cada aviso individual</td>
+                        <td class="event-cell">cuando confirmo, desaparecen los indicadores rojos y el contador vuelve a cero</td>
+                    </tr>
+
+                    <!-- HU-28: Cancelación de pedidos -->
+                    <tr>
+                        <td class="id-cell">HU-28</td>
+                        <td class="role-cell">Como un cliente</td>
+                        <td class="description-cell">Necesito solicitar la cancelación de una orden que aún no se despacha</td>
+                        <td class="description-cell">Con la finalidad de corregir errores antes de que salga de bodega</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Cancelación solicitada</td>
+                        <td class="context-cell">En caso que mi pedido siga en estado "Pendiente" o "Pagado" y use el botón "Cancelar"</td>
+                        <td class="event-cell">cuando envío la solicitud, el sistema la registra, me muestra el folio y recibo un correo con los pasos a seguir</td>
+                    </tr>
+
+                    <!-- HU-29: Anuncios y sliders -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-29</td>
+                        <td class="role-cell" rowspan="2">Como un administrador de marketing</td>
+                        <td class="description-cell" rowspan="2">Necesito publicar anuncios en la barra superior y actualizar los sliders principales</td>
+                        <td class="description-cell" rowspan="2">Con la finalidad de comunicar campañas y novedades vigentes</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Anuncio publicado</td>
+                        <td class="context-cell">En caso que ingrese título, mensaje, fechas y colores para un nuevo aviso</td>
+                        <td class="event-cell">cuando lo guardo, aparece en la tienda con el estilo elegido y se activa solo durante las fechas definidas</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">2</td>
+                        <td class="description-cell">Slider actualizado</td>
+                        <td class="context-cell">En caso que cargue una imagen promocional y defina su orden de aparición</td>
+                        <td class="event-cell">cuando confirmo, la diapositiva queda visible para los clientes junto al enlace configurado</td>
+                    </tr>
+
+                    <!-- HU-30: Gestión de administradores -->
+                    <tr>
+                        <td class="id-cell" rowspan="2">HU-30</td>
+                        <td class="role-cell" rowspan="2">Como un coordinador administrativo</td>
+                        <td class="description-cell" rowspan="2">Necesito crear y controlar las cuentas del equipo interno</td>
+                        <td class="description-cell" rowspan="2">Con la finalidad de delegar tareas de forma segura</td>
+                        <td class="id-cell">1</td>
+                        <td class="description-cell">Nuevo administrador registrado</td>
+                        <td class="context-cell">En caso que capture los datos, rol y permisos de un colaborador</td>
+                        <td class="event-cell">cuando guardo, la persona recibe un correo de bienvenida y queda activa en el panel</td>
+                    </tr>
+                    <tr>
+                        <td class="id-cell">2</td>
+                        <td class="description-cell">Administrador inactivado</td>
+                        <td class="context-cell">En caso que detecte un uso indebido y cambie el estado a "Inactivo"</td>
+                        <td class="event-cell">cuando aplico el cambio, el acceso se bloquea al instante y se registra en el historial</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
 
         <div class="footer">
             <p><strong>Proyecto Angelow</strong> - Sistema de Tienda Virtual de Ropa Infantil</p>
-            <p>Historias de Usuario - Actualizado: 2 de Noviembre, 2025</p>
-            <p>Total: <strong>24 Historias de Usuario</strong> | <strong>40+ Criterios de Aceptación</strong></p>
+            <p>Historias de Usuario - Actualizado: 18 de Noviembre, 2025</p>
+            <p>Total: <strong>30 Historias de Usuario</strong> | <strong>50+ Criterios de Aceptación</strong></p>
             <p style="margin-top: 10px; font-size: 0.85em; color: #666;">
-                <strong>Módulos cubiertos:</strong> Gestión de Usuarios, Catálogo y Búsqueda, Carrito y Compras, Pedidos y Logística, Sistema de Delivery, Módulo Administrativo
+                <strong>Módulos cubiertos:</strong> Gestión de Usuarios, Catálogo y Búsqueda, Lista de Deseos y Alertas, Carrito y Pago, Pagos y Validación, Logística y Envíos Externos, Marketing y Panel Administrativo
             </p>
         </div>
     </div>

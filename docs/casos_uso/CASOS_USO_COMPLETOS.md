@@ -162,7 +162,7 @@ Este documento describe los casos de uso completos del sistema Angelow, una plat
 2. Sistema calcula costo basado en reglas configuradas
 3. Muestra costo total con envío
 
-#### UC-17: Proceder al Checkout
+#### UC-17: Proceder al Pago
 **Actor**: Cliente
 **Descripción**: Iniciar proceso de compra
 **Precondiciones**: Carrito con items
@@ -259,7 +259,7 @@ Este documento describe los casos de uso completos del sistema Angelow, una plat
 **Flujo Principal**:
 1. Usuario selecciona "reordenar" en pedido anterior
 2. Sistema agrega productos al carrito actual
-3. Usuario puede modificar y proceder al checkout
+3. Usuario puede modificar y proceder al pago
 
 ### 6. Módulo Administrativo
 
@@ -455,8 +455,8 @@ Este documento describe los casos de uso completos del sistema Angelow, una plat
 ### Dependencias Principales
 - **Registro → Inicio de Sesión**: Usuario debe tener cuenta para autenticarse
 - **Explorar Productos → Agregar al Carrito**: Requiere autenticación
-- **Carrito → Checkout**: Proceso secuencial de compra
-- **Checkout → Procesar Pago**: Diferentes métodos según selección
+- **Carrito → Pago**: Proceso secuencial de compra
+- **Pago → Procesar Pago**: Diferentes métodos según selección
 - **Pago → Confirmación**: Validación antes de finalizar
 - **Confirmación → Historial**: Pedido registrado para seguimiento
 

@@ -186,9 +186,9 @@ current_lng             DECIMAL(11,8)
 
 ## 💡 CÓMO FUNCIONA AHORA
 
-### **1. Al CREAR una orden (checkout):**
+### **1. Al CREAR una orden (pago):**
 ```php
-// Usuario selecciona dirección en checkout
+// Usuario selecciona dirección en el pago
 $addressId = $_POST['selected_address_id'];
 
 // Guardar orden con FK + snapshot
@@ -323,7 +323,7 @@ http://localhost/angelow/delivery/navigation.php?delivery_id=7
 
 ## 🚀 PRÓXIMOS PASOS
 
-### **1. Actualizar Checkout (users/checkout.php):**
+### **1. Actualizar Pago (users/checkout.php):**
 ```php
 // Al crear orden, guardar shipping_address_id
 $stmt = $conn->prepare("

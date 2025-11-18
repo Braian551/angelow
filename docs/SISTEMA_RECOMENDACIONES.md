@@ -1,9 +1,6 @@
 # Sistema de Recomendaciones Inteligente - Dashboard Usuario
 
-## 🎯 Descripción General
-
-El sistema de recomendaciones implementado en el dashboard de usuario utiliza un algoritmo multicapa sofisticado que analiza múltiples factores para ofrecer productos personalizados y relevantes para cada usuario.
-
+ Analiza las categorías de productos en la Lista de Deseos del usuario
 ## 🧠 Algoritmo de Recomendación
 
 ### Factores Considerados (Score 0-100)
@@ -12,7 +9,7 @@ El sistema calcula un `recommendation_score` para cada producto basándose en:
 
 #### 1. Categorías Preferidas (40 puntos máx.)
 - **Peso: 40%**
-- Analiza las categorías de productos en el wishlist del usuario
+- Analiza las categorías de productos en la Lista de Deseos del usuario
 - Analiza las categorías de productos comprados previamente
 - Mayor frecuencia de compra = mayor puntuación
 - **Fórmula**: Si el producto pertenece a una categoría preferida = +40 puntos
@@ -33,31 +30,14 @@ El sistema calcula un `recommendation_score` para cada producto basándose en:
 - **Peso: 15%**
 - Productos nuevos reciben impulso temporal
 - La puntuación decae con el tiempo
-- **Escala**:
-  - Menos de 30 días: 15 puntos
-  - Entre 30-60 días: 10 puntos
   - Entre 60-90 días: 5 puntos
   - Más de 90 días: 0 puntos
-
-## 📊 Proceso de Recomendación
-
 ```
 1. Análisis de Preferencias del Usuario
-   ├── Obtener categorías de wishlist
-   ├── Obtener categorías de compras anteriores
-   └── Calcular score por categoría
 
 2. Consulta de Productos Candidatos
-   ├── Aplicar filtros de exclusión
-   ├── Calcular recommendation_score
-   └── Ordenar por score descendente
-
 3. Filtros de Exclusión
-   ├── Productos ya en wishlist
-   ├── Productos comprados en últimos 30 días
-   └── Productos inactivos
-
-4. Complementar Resultados (si necesario)
+   ├── Productos ya en Lista de Deseos
    ├── Si menos de 6 productos recomendados
    └── Agregar productos populares generales
 
@@ -89,11 +69,6 @@ La consulta principal utiliza:
 - **Lógica**: Fallback a productos con alto total_sales y avg_rating
 - **Beneficio**: Experiencia inmediata sin datos previos
 
-### Usuario con Wishlist
-- **Resultado**: Productos de categorías similares
-- **Lógica**: Bonus de 40 puntos por categoría preferida
-- **Beneficio**: Recomendaciones altamente relevantes
-
 ### Usuario con Compras
 - **Resultado**: Productos complementarios o similares
 - **Lógica**: Score basado en frecuencia de compra por categoría
@@ -106,14 +81,11 @@ La consulta principal utiliza:
 
 ## 🎨 Características de UI/UX
 
-### Shimmer Loading
-- Placeholders animados mientras cargan los productos
-- Mejora la percepción de velocidad
 - Experiencia profesional y pulida
 
 ### Tarjetas Interactivas
 - Animaciones suaves en hover
-- Botón de wishlist con feedback visual
+- Botón de Lista de Deseos con feedback visual
 - Lazy loading de imágenes
 - Transiciones fluidas
 
@@ -126,11 +98,7 @@ La consulta principal utiliza:
 ## 🔧 Mantenimiento y Mejoras Futuras
 
 ### Posibles Mejoras
-
-1. **Machine Learning**
-   - Implementar algoritmos de filtrado colaborativo
    - Usar TensorFlow.js para predicciones en tiempo real
-
 2. **A/B Testing**
    - Experimentar con diferentes pesos de factores
    - Medir tasa de conversión por tipo de recomendación
@@ -155,7 +123,7 @@ Para medir la efectividad del sistema:
 
 - **CTR (Click-Through Rate)**: % de clicks en productos recomendados
 - **Conversión**: % de productos recomendados que se compran
-- **Engagement**: Tiempo promedio en productos recomendados
+- **Fidelización**: Tiempo promedio en productos recomendados
 - **Diversidad**: Variedad de categorías recomendadas
 - **Satisfacción**: Feedback directo de usuarios
 
@@ -185,7 +153,7 @@ $recommendedProducts = getRecommendations($userId);
 // - recommendation_score (para debug/ordenamiento)
 // - Información de categoría
 // - Valoraciones y reviews
-// - Estado de wishlist
+// - Estado de Lista de Deseos
 ```
 
 ## 🎓 Referencias

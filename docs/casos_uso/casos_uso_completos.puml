@@ -50,7 +50,7 @@ rectangle "Módulo de Lista de Deseos y Alertas" <<module>> {
     usecase "UC-20: Configurar alertas de Lista de Deseos" as UC20
 }
 
-' ===== CARRITO Y CHECKOUT =====
+' ===== CARRITO Y PAGO =====
 rectangle "Módulo de Carrito y Pago" <<module>> {
     usecase "UC-21: Agregar producto al carrito" as UC21
     usecase "UC-22: Gestionar carrito de compras" as UC22

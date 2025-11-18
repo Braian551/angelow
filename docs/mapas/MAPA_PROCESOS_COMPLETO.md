@@ -1,7 +1,7 @@
 # Mapa de Procesos - Sistema Angelow
 
 ## Descripción General
-Este documento describe el mapa completo de procesos del sistema Angelow, una plataforma E-commerce especializada en ropa infantil con funcionalidades avanzadas de gestión administrativa y sistema de delivery con GPS.
+Este documento describe el mapa completo de procesos del sistema Angelow, una plataforma E-commerce especializada en ropa infantil con funcionalidades avanzadas de gestión administrativa y servicios de envío/entregas mediante aliados externos.
 
 ## Arquitectura de Procesos
 
@@ -22,7 +22,7 @@ Este documento describe el mapa completo de procesos del sistema Angelow, una pl
 - **Recuperación de Contraseña**: Envío de códigos de verificación
 
 ### 2. Proceso de Compra
-**Propósito:** Gestionar el flujo completo desde selección hasta checkout.
+**Propósito:** Gestionar el flujo completo desde selección hasta pago.
 
 #### Flujo Principal:
 1. **Selección de Producto**: Exploración de catálogo y detalles
@@ -32,7 +32,7 @@ Este documento describe el mapa completo de procesos del sistema Angelow, una pl
    - Aplicar códigos de descuento
    - Calcular costos de envío automáticos
 
-3. **Checkout**: Proceso de finalización de compra
+3. **Pago**: Proceso de finalización de compra
    - Verificación de autenticación
    - Selección de dirección de envío
    - Elección de método de pago
@@ -73,14 +73,14 @@ Este documento describe el mapa completo de procesos del sistema Angelow, una pl
 #### Subprocesos Paralelos:
 - **Validación de Pago**: Proceso manual para transferencias
 - **Preparación de Productos**: Verificación de stock y empaque
-- **Asignación de Delivery**: Selección y notificación de repartidor
+- **Asignación de Envíos**: Selección y notificación de método/aliado
 
 #### Reglas de Negocio:
 - **Cancelación**: Permitida solo en estados iniciales
 - **Reembolso**: Según política por método de pago
 - **Tiempo Límite**: 48 horas para validación de pagos
 
-### 5. Proceso de Delivery
+### 5. Proceso de Envíos / Delivery (externo)
 **Propósito:** Gestionar entregas con seguimiento GPS en tiempo real.
 
 #### Flujo de Entrega:
@@ -116,7 +116,7 @@ Este documento describe el mapa completo de procesos del sistema Angelow, una pl
 - **Inventario**: Control de stock con alertas automáticas
 - **Pedidos**: Supervisión de todas las órdenes
 - **Usuarios**: Gestión de cuentas y roles
-- **Delivery**: Asignación y seguimiento de repartidores
+- **Envíos**: Gestión y seguimiento por servicios externos
 
 #### Gestión de Contenido:
 - **Sliders**: Banners promocionales de la página principal
@@ -128,7 +128,7 @@ Este documento describe el mapa completo de procesos del sistema Angelow, una pl
 - **Ventas**: Ingresos por período, productos más vendidos
 - **Clientes**: Comportamiento, frecuencia de compra, valor promedio
 - **Productos**: Rendimiento por categoría, rotación de inventario
-- **Delivery**: Eficiencia de entregas, tiempos promedio
+- **Envíos**: Eficiencia del partner y tiempos promedio
 
 ### 7. Procesos Post-Entrega
 **Propósito:** Gestionar interacciones posteriores a la entrega.
@@ -156,7 +156,7 @@ Este documento describe el mapa completo de procesos del sistema Angelow, una pl
 
 ### Métricas de Rendimiento:
 - **Tasa de Conversión**: Porcentaje de visitantes que compran
-- **Tiempo Promedio de Compra**: Desde entrada hasta checkout
+- **Tiempo Promedio de Compra**: Desde entrada hasta pago
 - **Tasa de Abandono de Carrito**: Carritos no completados
 - **Tiempo de Entrega**: Desde pedido hasta entrega
 - **Satisfacción del Cliente**: Basado en calificaciones
@@ -167,7 +167,7 @@ Este documento describe el mapa completo de procesos del sistema Angelow, una pl
 1. **¿Usuario Registrado?**: Determina nivel de acceso
 2. **¿Stock Disponible?**: Bloquea compras si no hay inventario
 3. **¿Pago Válido?**: Determina si orden puede procesarse
-4. **¿Delivery Disponible?**: Afecta tiempos de entrega
+4. **¿Envío Disponible?**: Afecta tiempos de entrega
 
 ### Decisiones del Usuario:
 1. **¿Registrarse o Continuar como Invitado?**: Afecta funcionalidades disponibles
@@ -176,14 +176,14 @@ Este documento describe el mapa completo de procesos del sistema Angelow, una pl
 
 ### Decisiones Administrativas:
 1. **¿Aprobar Pago?**: Validación manual de comprobantes
-2. **¿Asignar Delivery?**: Selección de repartidor disponible
+2. **¿Asignar Envío?**: Selección de método/aliado disponible
 3. **¿Cancelar Orden?**: En casos de problemas
 
 ## Integración de Procesos
 
 ### Procesos Secuenciales:
 ```
-Exploración → Compra → Pago → Gestión de Pedidos → Delivery → Post-Entrega
+Exploración → Compra → Pago → Gestión de Pedidos → Envíos → Post-Entrega
 ```
 
 ### Procesos Paralelos:
@@ -202,7 +202,7 @@ Exploración → Compra → Pago → Gestión de Pedidos → Delivery → Post-E
 - **Pago Rechazado**: Reintentos o cambio de método
 - **Stock Insuficiente**: Cancelación automática o backorder
 - **Dirección Inválida**: Corrección por cliente
-- **Delivery No Disponible**: Reasignación automática
+- **Envío No Disponible**: Reasignación automática o replanificación
 
 ### Recuperación:
 - **Punto de Control**: Estados guardados permiten reanudar procesos
