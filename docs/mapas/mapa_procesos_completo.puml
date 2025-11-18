@@ -22,196 +22,131 @@ title Mapa de Procesos - Sistema Angelow
 
 start
 
-partition "Proceso de Exploración y Registro" as Exploration {
-    :Usuario accede a tienda;
-    :Explora página principal;
-    :Navega por categorías;
-    :Busca productos;
+partition "Descubrimiento y Registro" as Discovery {
+    :Usuario accede a index con sliders y anuncios;
+    :Explora colecciones y categorías destacadas;
+    :Utiliza buscador (guarda historial);
+    :Revisa alertas y wishlist pública;
 
-    if (¿Usuario registrado?) then (No)
-        :Muestra productos limitados;
-        :Ofrece registro/login;
-        if (¿Desea registrarse?) then (Sí)
-            :Ingresa datos personales;
-            :Valida email único;
-            :Crea cuenta nueva;
-            :Envía email confirmación;
-            :Usuario autenticado;
+    if (¿Sesion activa?) then (No)
+        :Limita funciones sensibles;
+        :Ofrece login/registro tradicional y Google;
+        if (¿Desea crear cuenta?) then (Sí)
+            :Completa formulario validado;
+            :Verifica email único e intenta reCAPTCHA;
+            :Envía correo de confirmación;
+            :Autentica sesión;
         else (No)
             :Continúa como invitado;
         endif
     else (Sí)
-        :Usuario ya autenticado;
-        :Acceso completo a funciones;
+        :Muestra panel mini con órdenes y alerts;
     endif
 }
 
-partition "Proceso de Compra" as Purchase {
-    :Selecciona producto;
-    :Ve detalles y variantes;
-    :Elige talla/color/cantidad;
-
-    if (¿Requiere autenticación?) then (Sí)
-        :Redirige a login;
-        :Usuario se autentica;
-    endif
-
-    :Agrega producto al carrito;
-    :Gestiona items del carrito;
-    :Aplica códigos descuento (opcional);
-    :Calcula costos de envío;
-
-    if (¿Proceder al pago?) then (Sí)
-        :Inicia checkout;
-        :Selecciona dirección envío;
-        :Elige método de pago;
+partition "Selección y Carrito" as Selection {
+    :Revisa detalle de producto con tabs, reseñas y preguntas;
+    :Gestiona tallas/variantes e inventario real-time;
+    :Añade a carrito o wishlist;
+    if (¿Producto disponible?) then (Sí)
+        :Carrito almacena en BD sesiones;
+        :Permite aplicar cupones y calculadora envío;
     else (No)
-        :Continúa comprando;
+        :Ofrece alerta de reposición;
         end
     endif
-}
 
-partition "Proceso de Pago" as Payment {
-    :Muestra datos bancarios;
-    :Usuario realiza transferencia externa;
-    :Sube comprobante de pago;
-    :Sistema recibe comprobante;
-
-    note right
-        Comprobante se almacena
-        para validación manual
-    end note
-
-    :Crea registro de orden;
-    :Asigna número de orden único;
-    :Guarda detalles de compra;
-    :Actualiza inventario;
-}
-
-partition "Proceso de Gestión de Pedidos" as OrderManagement {
-    :Orden creada en estado "Pendiente";
-    :Envía confirmación por email;
-    :Cliente puede ver en historial;
-
-    fork
-        :Proceso de validación de pago;
-        :Administrador revisa comprobante;
-        if (¿Pago válido?) then (Sí)
-            :Aprueba pago;
-            :Cambia estado a "Pagado";
-            :Envía notificación cliente;
-        else (No)
-            :Rechaza pago;
-            :Solicita nuevo comprobante;
-            :Notifica cliente;
-            end
-        endif
-    fork again
-        :Proceso de preparación;
-        :Verifica stock disponible;
-        if (¿Stock suficiente?) then (Sí)
-            :Prepara productos;
-            :Empaqueta orden;
-            :Cambia estado a "Preparando";
-        else (No)
-            :Notifica falta de stock;
-            :Cancela orden automáticamente;
-            end
-        endif
-    fork again
-        :Espera asignación de delivery;
-    join
-
-    :Administrador asigna delivery;
-    :Notifica repartidor;
-    :Cambia estado a "Enviando";
-}
-
-partition "Proceso de Delivery" as Delivery {
-    :Repartidor recibe notificación;
-    :Ve órdenes asignadas;
-    :Acepta orden de entrega;
-
-    if (¿Acepta orden?) then (Sí)
-        :Inicia navegación GPS;
-        :Calcula ruta óptima;
-        :Comienza seguimiento en tiempo real;
-
-        note right
-            GPS actualiza ubicación
-            cada 30 segundos
-        end note
-
-        :Cambia estado a "En camino";
-        :Cliente puede rastrear ubicación;
-
-        :Llega a dirección de entrega;
-        :Cambia estado a "En destino";
-
-        :Entrega productos;
-        :Cliente confirma recepción;
-        :Cambia estado a "Entregado";
-
-        note right
-            Sistema registra
-            fecha/hora entrega
-        end note
-
+    if (¿Desea finalizar compra?) then (Sí)
+        :Avanza a checkout Paso 1 (cart.php);
     else (No)
-        :Rechaza orden;
-        :Administrador reasigna;
+        :Sigue navegando;
     endif
 }
 
-partition "Procesos Administrativos" as Admin {
+partition "Checkout y Pago" as Checkout {
+    :Paso 1 - Confirma items y totales;
+    :Paso 2 - Selecciona dirección + geocoding;
+    :Paso 3 - Elige método envío y pago;
+    :Muestra instrucciones bancarias y formularios de comprobante;
+    if (¿Sesion válida?) then (No)
+        :Solicita autenticación previa;
+        stop
+    endif
+
+    :Genera orden en estado Pendiente;
+    :Bloquea stock reservado;
+    :Usuario sube comprobante y comentarios;
+    :Se envían notificaciones a admin y cliente;
+}
+
+partition "Validación y Gestión de Pedidos" as Orders {
+    :Orden visible en dashboard admin y usuario;
     fork
-        :Gestión de productos;
-        :CRUD productos/variantes;
-        :Control de inventario;
-        :Alertas stock bajo;
+        :Equipo de pagos revisa comprobante;
+        if (¿Comprobante válido?) then (Sí)
+            :Actualiza estado a Pagado;
+            :Registra histórico y badge de orden;
+        else (No)
+            :Rechaza pago y pide nuevo archivo;
+            :Notifica al cliente;
+            end
+        endif
     fork again
-        :Gestión de categorías;
-        :Crear/editar categorías;
-        :Asignar productos;
+        :Soporte verifica inventario final;
+        if (¿Stock suficiente?) then (Sí)
+            :Genera picking list;
+        else (No)
+            :Ejecuta cancelación o sustitución;
+            :Devuelve stock bloqueado;
+            end
+        endif
+    join
+
+    :Orden pasa a estado Preparando;
+    :Se imprimen facturas y etiquetas;
+}
+
+partition "Preparación y Envío" as Shipping {
+    :Empacado y control de calidad;
+    :Selecciona regla de envío (mensajería, retiro, externo);
+    :Registra método shipping_method_id;
+    :Genera guía y tracking (si aplica);
+    :Actualiza estado a Enviado;
+    :Dispara correos/SMS con tracking o instrucciones de retiro;
+    note right
+        El rol delivery fue removido.
+        El control se realiza desde
+        reglas de envío y aliados externos.
+    end note
+}
+
+partition "Procesos Administrativos" as AdminOps {
+    fork
+        :Catálogo y contenido (productos, colecciones, sliders, anuncios);
     fork again
-        :Gestión de pedidos;
-        :Ver todas las órdenes;
-        :Cambiar estados;
-        :Resolver problemas;
+        :Gestión de descuentos masivos y cupones;
     fork again
-        :Reportes y análisis;
-        :Generar reportes ventas;
-        :Análisis productos;
-        :Reportes clientes;
+        :Reglas de envío y costos dinámicos;
     fork again
-        :Gestión de usuarios;
-        :Administrar cuentas;
-        :Gestionar roles;
+        :Reportes (ventas, productos, clientes) y paneles en vivo;
     fork again
-        :Configuración sistema;
-        :Sliders y banners;
-        :Descuentos promociones;
-        :Reglas de envío;
+        :Gestión de usuarios/admins, perfiles y notificaciones internas;
+    fork again
+        :Monitoreo AJAX (badges, dashboards, alertas);
     join
 }
 
-partition "Procesos de Seguimiento Post-Entrega" as PostDelivery {
-    :Orden en estado "Entregado";
-    :Cliente puede calificar servicio;
-    :Cliente puede dejar reseña;
-
-    if (¿Cliente deja reseña?) then (Sí)
-        :Guarda reseña en base datos;
-        :Actualiza calificación producto;
-    endif
-
-    :Cliente puede reordenar productos;
-    :Historial completo disponible;
-
+partition "Postventa y Engagement" as PostSale {
+    :Cliente recibe notificación de entrega;
+    :Puede confirmar recepción desde panel;
+    :Accede a factura PDF y historial completo;
+    :Puede calificar servicio, dejar reseña o pregunta;
+    :Sistema actualiza rating y muestra en ficha producto;
+    :Activa alertas de wishlist o reordenar;
     note right
-        Sistema mantiene
-        registro completo
-        de la transacción
+        Se conservan logs y auditoría
+        para todo el ciclo, incluyendo
+        notificaciones y búsquedas.
     end note
 }
 
@@ -220,38 +155,37 @@ partition "Procesos de Seguimiento Post-Entrega" as PostDelivery {
 stop
 
 ' ===== CONEXIONES ENTRE PROCESOS =====
-Exploration --> Purchase : Usuario autenticado
-Purchase --> Payment : Checkout completado
-Payment --> OrderManagement : Orden creada
-OrderManagement --> Delivery : Delivery asignado
-Delivery --> PostDelivery : Entrega completada
-Admin --> OrderManagement : Gestión continua
-Admin --> Delivery : Asignación delivery
+Discovery --> Selection : Usuario autenticado o invitado
+Selection --> Checkout : Decide finalizar
+Checkout --> Orders : Orden generada
+Orders --> Shipping : Estado listo para enviar
+Shipping --> PostSale : Entrega confirmada
+AdminOps --> Orders : Validaciones y ajustes
+AdminOps --> Shipping : Define reglas/logística
 
 ' ===== NOTAS ADICIONALES =====
 note as N1
-    **Características del Sistema:**
-    - 85% completitud
-    - 80+ tablas en BD
-    - Sistema GPS avanzado
-    - Pagos por transferencia
-    - Arquitectura modular
+    **Características Clave 2025:**
+    - Checkout en 3 pasos con geocoding
+    - Validación manual de transferencias
+    - 80+ tablas con historial y auditoría
+    - Alertas de wishlist y anuncios dinámicos
 end note
 
 note as N2
     **Tiempos Estimados:**
-    - Exploración: Inmediato
-    - Pago: 1-2 días (transferencia)
-    - Preparación: 2-4 horas
-    - Entrega: 1-3 horas
+    - Descubrimiento: inmediato
+    - Validación de pago: 0-24h
+    - Preparación: 2-6h
+    - Envío courier: 1-72h según método
 end note
 
 note as N3
-    **Puntos de Decisión Críticos:**
-    - Autenticación requerida
-    - Validación de pagos
-    - Disponibilidad de stock
-    - Aceptación de delivery
+    **Decisiones Críticas:**
+    - Autenticación previa a checkout
+    - Verificación de stock antes de preparar
+    - Aprobación o rechazo de comprobante
+    - Selección de regla de envío disponible
 end note
 
 @enduml
