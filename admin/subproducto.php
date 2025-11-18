@@ -4,6 +4,7 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
 require_once __DIR__ . '/../auth/role_redirect.php';
 require_once __DIR__ . '/../alertas/alerta1.php';
+require_once __DIR__ . '/../layouts/functions.php';
 
 // Verificar que el usuario tenga rol de admin
 requireRole('admin');
@@ -347,6 +348,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $conn->commit();
+
+        // Si se definió precio de comparación, notificar a usuarios interesados
+        if ($compare_price !== null) {
+            $productName = $_POST['name'];
+            $displayPrice = number_format($price, 0, ',', '.');
+            $displayCompare = number_format($compare_price, 0, ',', '.');
+            // Porcentaje aproximado de ahorro
+            $discountPercent = (int) round((($compare_price - $price) / max($compare_price, 1)) * 100);
+            $title = "Nueva oferta: {$productName} - {$discountPercent}% OFF";
+            $message = "¡{$productName} ahora por $" . $displayPrice . " (antes $" . $displayCompare . ") — {$discountPercent}% de descuento!";
+
+            // Ejecutar notificación en segundo plano (sin bloquear) — aquí insertamos directamente
+            notifyUsersOfProductPromotion($conn, $product_id, $title, $message);
+        }
 
         $_SESSION['alert'] = ['type' => 'success', 'message' => 'Producto agregado exitosamente!'];
         header("Location: " . BASE_URL . "/admin/products.php");

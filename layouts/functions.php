@@ -150,5 +150,53 @@ if (!function_exists('getRefundStatusText')) {
     }
 }
 
+/**
+ * Notificar a usuarios interesados cuando un producto tiene una promoción (compare_price)
+ * Por defecto manda la notificación a usuarios que tengan el producto en su wishlist.
+ * Si no hay usuarios en wishlist, por defecto envía a todos los usuarios con rol 'user' o 'customer'.
+ */
+if (!function_exists('notifyUsersOfProductPromotion')) {
+    function notifyUsersOfProductPromotion($conn, $product_id, $title, $message)
+    {
+        try {
+            // Buscar usuarios que tengan el producto en su wishlist
+            $stmt = $conn->prepare("SELECT DISTINCT user_id FROM wishlist WHERE product_id = ?");
+            $stmt->execute([$product_id]);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $users = array_map(function ($r) {
+                return $r['user_id'];
+            }, $rows);
+
+            // Si no hay usuarios en wishlist, notificar a todos los clientes normales
+            if (empty($users)) {
+                $stmt = $conn->prepare("SELECT id FROM users WHERE role IN ('user','customer')");
+                $stmt->execute();
+                $users = array_map(function ($r) {
+                    return $r['id'];
+                }, $stmt->fetchAll(PDO::FETCH_ASSOC));
+            }
+
+            if (empty($users)) return false; // No hay usuarios registrados
+
+            $notifyStmt = $conn->prepare("INSERT INTO notifications (user_id, type_id, title, message, related_entity_type, related_entity_id, is_read) VALUES (?, 3, ?, ?, 'promotion', ?, 0)");
+
+            foreach ($users as $user_id) {
+                try {
+                    $notifyStmt->execute([$user_id, $title, $message, $product_id]);
+                } catch (PDOException $e) {
+                    // Ignorar errores individuales por usuario para no romper la operación
+                    error_log('Error notificando usuario ' . $user_id . ': ' . $e->getMessage());
+                }
+            }
+
+            return true;
+        } catch (PDOException $e) {
+            error_log('Error al notificar promociones: ' . $e->getMessage());
+            return false;
+        }
+    }
+}
+
  
     ?>

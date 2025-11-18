@@ -158,14 +158,7 @@ if (!empty($reviewsClientPayload['reviews'])) {
                 // Also hide review form if present
                 const reviewForm = document.getElementById('review-form-container');
                 if (reviewForm) reviewForm.style.display = 'none';
-                // Optionally add an info banner
-                const header = document.querySelector('.questions-header.reviews-header');
-                if (header && !header.querySelector('.info-banner')) {
-                    const info = document.createElement('div');
-                    info.className = 'info-banner';
-                    info.innerHTML = '<p>Ya has dejado una opinión para este producto. Solo puedes publicar una reseña.</p>';
-                    header.appendChild(info);
-                }
+                // Info banner removed (duplicate). UI only hides the write button.
             }
 
             const avgNode = document.querySelector('[data-average-rating]');

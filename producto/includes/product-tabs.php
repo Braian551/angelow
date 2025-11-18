@@ -78,16 +78,11 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                     <h3>Opiniones y calificaciones</h3>
                     <p>Las reseñas ayudan a otros compradores a decidirse por <?= htmlspecialchars($product['name']) ?>.</p>
                 </div>
-                <?php if ($canReview && empty($userHasReview)): ?>
+                <?php if (!$canReview): ?>
                     <button type="button" class="tab-action-btn review-btn locked-review-btn" data-review-action="locked" data-lock-reason="<?= isset($_SESSION['user_id']) ? 'purchase' : 'auth' ?>">
                         <i class="fas fa-lock"></i> Escribir una opinión
                     </button>
-                <?php elseif ($userHasReview): ?>
-                    <?php if (!empty($userHasReview)): ?>
-                        <div class="info-banner">Ya has dejado una opinión para este producto</div>
-                    <?php endif; ?>
-                    <button type="button" class="tab-action-btn review-btn" disabled title="Ya has dejado una opinión sobre este producto">Ya has dejado una opinión</button>
-                <?php else: ?>
+                <?php elseif (empty($userHasReview)): ?>
                     <button id="write-review-btn" class="tab-action-btn question-btn" data-review-action="open">
                         <i class="fas fa-pen"></i> Escribir una opinión
                     </button>
