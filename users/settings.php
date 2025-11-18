@@ -1,18 +1,36 @@
 <?php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../conexion.php';
-require_once __DIR__ . '/../layouts/headerproducts.php';
+require_once __DIR__ . '/../auth/role_redirect.php';
 require_once __DIR__ . '/../layouts/functions.php';
+
+// Helper para preferencias de notificaciones
+function upsertNotificationPreference(PDO $conn, string $userId, int $typeId, int $emailEnabled, int $pushEnabled): void {
+    $stmt = $conn->prepare("SELECT id FROM notification_preferences WHERE user_id = ? AND type_id = ? LIMIT 1");
+    $stmt->execute([$userId, $typeId]);
+    $existingId = $stmt->fetchColumn();
+
+    if ($existingId) {
+        $update = $conn->prepare("UPDATE notification_preferences SET email_enabled = ?, push_enabled = ?, updated_at = NOW() WHERE id = ?");
+        $update->execute([$emailEnabled, $pushEnabled, $existingId]);
+    } else {
+        $insert = $conn->prepare("INSERT INTO notification_preferences (user_id, type_id, email_enabled, sms_enabled, push_enabled) VALUES (?, ?, ?, 0, ?)");
+        $insert->execute([$userId, $typeId, $emailEnabled, $pushEnabled]);
+    }
+}
 
 // Función para mostrar datos de forma segura
 function safeDisplay($value) {
     return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
 }
-$userData = getUserData($conn, $_SESSION['user_id']);
+$userId = $_SESSION['user_id'] ?? null;
+// Verificar acceso del usuario antes de procesar peticiones POST y posibles redirect
+requireRole(['user', 'customer']);
+$userData = getUserData($conn, $userId);
 
 // Obtener datos del usuario
 $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
+$stmt->execute([$userId]);
 $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Asegurar que todos los campos existan
@@ -24,6 +42,59 @@ $userData = array_merge([
     'last_access' => null,
     'password' => ''
 ], $userData);
+
+// Preferencias de notificaciones
+$notificationTypeMap = [];
+$notificationPreferences = [];
+$emailNotificationsEnabled = 1;
+$productNotificationsEnabled = 1;
+$promotionNotificationsEnabled = 1;
+$cartReminderNotificationsEnabled = 1;
+
+try {
+    $typesStmt = $conn->query("SELECT id, name FROM notification_types WHERE is_active = 1");
+    while ($row = $typesStmt->fetch(PDO::FETCH_ASSOC)) {
+        $notificationTypeMap[$row['name']] = (int) $row['id'];
+    }
+} catch (PDOException $e) {
+    error_log('No se pudieron obtener los tipos de notificación: ' . $e->getMessage());
+}
+
+if ($notificationTypeMap) {
+    try {
+        $prefStmt = $conn->prepare("SELECT * FROM notification_preferences WHERE user_id = ?");
+        $prefStmt->execute([$userId]);
+        while ($pref = $prefStmt->fetch(PDO::FETCH_ASSOC)) {
+            $typeId = (int) $pref['type_id'];
+            $notificationPreferences[$typeId] = $pref;
+        }
+    } catch (PDOException $e) {
+        error_log('No se pudieron obtener las preferencias de notificación: ' . $e->getMessage());
+    }
+}
+
+if ($notificationPreferences) {
+    $emailValues = array_column($notificationPreferences, 'email_enabled');
+    if ($emailValues) {
+        $emailNotificationsEnabled = (int) min($emailValues);
+    }
+}
+
+$productTypeId = $notificationTypeMap['product'] ?? null;
+$promotionTypeId = $notificationTypeMap['promotion'] ?? null;
+$orderTypeId = $notificationTypeMap['order'] ?? null; // Usado para recordatorios de carrito
+
+if ($productTypeId && isset($notificationPreferences[$productTypeId])) {
+    $productNotificationsEnabled = (int) $notificationPreferences[$productTypeId]['push_enabled'];
+}
+
+if ($promotionTypeId && isset($notificationPreferences[$promotionTypeId])) {
+    $promotionNotificationsEnabled = (int) $notificationPreferences[$promotionTypeId]['push_enabled'];
+}
+
+if ($orderTypeId && isset($notificationPreferences[$orderTypeId])) {
+    $cartReminderNotificationsEnabled = (int) $notificationPreferences[$orderTypeId]['push_enabled'];
+}
 
 // Verificar si se envió el formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -58,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (password_verify($_POST['current_password'], $userData['password'])) {
                 $new_password = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
                 $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
-                $stmt->execute([$new_password, $_SESSION['user_id']]);
+                $stmt->execute([$new_password, $userId]);
                 
                 $_SESSION['success_message'] = "Contraseña actualizada correctamente";
                 header("Location: ".BASE_URL."/users/settings.php");
@@ -66,6 +137,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $_SESSION['error_message'] = "La contraseña actual es incorrecta";
             }
+        }
+        elseif (isset($_POST['update_notifications'])) {
+            $emailPref = isset($_POST['email_notifications']) ? 1 : 0;
+            $productPref = isset($_POST['product_notifications']) ? 1 : 0;
+            $promotionPref = isset($_POST['promotion_notifications']) ? 1 : 0;
+            $cartPref = isset($_POST['cart_reminders']) ? 1 : 0;
+
+            $conn->beginTransaction();
+
+            if ($productTypeId) {
+                upsertNotificationPreference($conn, $userId, $productTypeId, $emailPref, $productPref);
+            }
+            if ($promotionTypeId) {
+                upsertNotificationPreference($conn, $userId, $promotionTypeId, $emailPref, $promotionPref);
+            }
+            if ($orderTypeId) {
+                upsertNotificationPreference($conn, $userId, $orderTypeId, $emailPref, $cartPref);
+            }
+
+            $updateAll = $conn->prepare("UPDATE notification_preferences SET email_enabled = ?, updated_at = NOW() WHERE user_id = ?");
+            $updateAll->execute([$emailPref, $userId]);
+
+            $conn->commit();
+
+            $_SESSION['success_message'] = "Preferencias de notificación actualizadas";
+            header("Location: ".BASE_URL."/users/settings.php#notifications");
+            exit();
         }
         
     } catch (PDOException $e) {
@@ -88,6 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
+    <?php require_once __DIR__ . '/../layouts/headerproducts.php'; ?>
     <div class="user-dashboard-container">
         <?php require_once __DIR__ . '/../layouts/asideuser.php'; ?>
         
@@ -240,11 +339,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <section id="notifications" class="settings-section">
                         <h2><i class="fas fa-bell"></i> Preferencias de notificaciones</h2>
                         
-                        <form class="settings-form">
+                        <form method="POST" class="settings-form">
                             <div class="form-group toggle-group">
                                 <label>Notificaciones por correo electrónico</label>
                                 <label class="switch">
-                                    <input type="checkbox" checked>
+                                    <input type="checkbox" name="email_notifications" value="1" <?= $emailNotificationsEnabled ? 'checked' : '' ?>>
                                     <span class="slider round"></span>
                                 </label>
                             </div>
@@ -252,7 +351,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="form-group toggle-group">
                                 <label>Notificaciones de nuevos productos</label>
                                 <label class="switch">
-                                    <input type="checkbox" checked>
+                                    <input type="checkbox" name="product_notifications" value="1" <?= $productNotificationsEnabled ? 'checked' : '' ?> <?= $productTypeId ? '' : 'disabled' ?>>
                                     <span class="slider round"></span>
                                 </label>
                             </div>
@@ -260,7 +359,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="form-group toggle-group">
                                 <label>Notificaciones de ofertas especiales</label>
                                 <label class="switch">
-                                    <input type="checkbox">
+                                    <input type="checkbox" name="promotion_notifications" value="1" <?= $promotionNotificationsEnabled ? 'checked' : '' ?> <?= $promotionTypeId ? '' : 'disabled' ?>>
                                     <span class="slider round"></span>
                                 </label>
                             </div>
@@ -268,12 +367,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="form-group toggle-group">
                                 <label>Recordatorios de carrito abandonado</label>
                                 <label class="switch">
-                                    <input type="checkbox" checked>
+                                    <input type="checkbox" name="cart_reminders" value="1" <?= $cartReminderNotificationsEnabled ? 'checked' : '' ?> <?= $orderTypeId ? '' : 'disabled' ?>>
                                     <span class="slider round"></span>
                                 </label>
                             </div>
                             
-                            <button type="button" class="btn-save">Guardar preferencias</button>
+                            <input type="hidden" name="update_notifications" value="1">
+                            <button type="submit" class="btn-save">Guardar preferencias</button>
                         </form>
                     </section>
                 </div>

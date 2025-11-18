@@ -12,10 +12,33 @@ requireRole(['user', 'customer', 'admin']);
 $pdo = $conn;
 $user_id = $_SESSION['user_id'];
 
+// Preferencias para filtrar notificaciones
+$disabled_type_ids = [];
+try {
+    $prefs_stmt = $pdo->prepare("SELECT type_id, push_enabled FROM notification_preferences WHERE user_id = ?");
+    $prefs_stmt->execute([$user_id]);
+    while ($pref = $prefs_stmt->fetch(PDO::FETCH_ASSOC)) {
+        if ((int) ($pref['push_enabled'] ?? 1) === 0) {
+            $disabled_type_ids[] = (int) $pref['type_id'];
+        }
+    }
+} catch (PDOException $e) {
+    error_log('Error al obtener preferencias de notificación: ' . $e->getMessage());
+}
+
 // Obtener el total de notificaciones no leídas
 try {
-    $stmt_unread = $pdo->prepare("SELECT COUNT(*) as unread FROM notifications WHERE user_id = ? AND is_read = 0");
-    $stmt_unread->execute([$user_id]);
+    $unread_sql = "SELECT COUNT(*) as unread FROM notifications WHERE user_id = ? AND is_read = 0";
+    $unread_params = [$user_id];
+
+    if ($disabled_type_ids) {
+        $placeholders = implode(',', array_fill(0, count($disabled_type_ids), '?'));
+        $unread_sql .= " AND type_id NOT IN ($placeholders)";
+        $unread_params = array_merge($unread_params, $disabled_type_ids);
+    }
+
+    $stmt_unread = $pdo->prepare($unread_sql);
+    $stmt_unread->execute($unread_params);
     $unread_count = $stmt_unread->fetch(PDO::FETCH_ASSOC)['unread'];
 } catch (PDOException $e) {
     $unread_count = 0;
@@ -56,6 +79,12 @@ if ($filter === 'unread') {
 if ($type_filter !== 'all') {
     $sql .= " AND n.related_entity_type = ?";
     $params[] = $type_filter;
+}
+
+if ($disabled_type_ids) {
+    $placeholders = implode(',', array_fill(0, count($disabled_type_ids), '?'));
+    $sql .= " AND n.type_id NOT IN ($placeholders)";
+    $params = array_merge($params, $disabled_type_ids);
 }
 
 $sql .= " ORDER BY n.created_at DESC LIMIT 50";
@@ -117,7 +146,7 @@ try {
                 <div class="stat-card unread">
                     <i class="fas fa-envelope-open"></i>
                     <div class="stat-info">
-                        <span class="stat-number">0</span>
+                        <span class="stat-number"><?= $unread_count ?></span>
                         <span class="stat-label">Sin leer</span>
                     </div>
                 </div>
