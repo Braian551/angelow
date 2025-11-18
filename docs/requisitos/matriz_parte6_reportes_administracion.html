@@ -111,7 +111,7 @@
         <div class="info-bar">
             <div class="info-item"><strong>Módulos:</strong> Reportes, Dashboard Admin, Notificaciones, Exportación, Auditoría</div>
             <div class="info-item"><strong>Fecha:</strong> Noviembre 2025</div>
-            <div class="info-item"><strong>Requisitos:</strong> RF-095 a RF-110</div>
+            <div class="info-item"><strong>Requisitos:</strong> RF-101 a RF-116</div>
         </div>
         <div class="table-container">
             <table>
@@ -132,39 +132,39 @@
                     <tr>
                         <td class="module-cell" rowspan="3">Reportes e Informes</td>
                         <td class="subprocess-cell">Informe de clientes</td>
-                        <td class="code-cell">RF-095</td>
+                        <td class="code-cell">RF-101</td>
                         <td class="description-cell">
                             El sistema debe generar informes de clientes con estadísticas: total registrados, clientes con compras, clientes sin compras, cliente con mayor gasto.
                         </td>
-                        <td class="code-cell">RN-095</td>
+                        <td class="code-cell">RN-101</td>
                         <td class="description-cell">El informe de clientes muestra métricas del negocio: cuántos clientes están registrados, cuántos han comprado al menos una vez, cuántos nunca han comprado, quién es el cliente que más ha gastado y el valor promedio de compra por cliente. Puedes filtrar por período de tiempo.</td>
-                        <td class="code-cell">RI-095</td>
+                        <td class="code-cell">RI-101</td>
                         <td class="description-cell">
                             Total de clientes registrados, clientes con órdenes completadas, clientes sin compras, cliente con mayor gasto total (nombre y monto), valor promedio de compra, tasa de conversión (porcentaje que ha comprado) y gráfico de tendencia de registro.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Informe de productos</td>
-                        <td class="code-cell">RF-096</td>
+                        <td class="code-cell">RF-102</td>
                         <td class="description-cell">
                             El sistema debe generar informes de productos con: productos más vendidos, productos con stock bajo, productos sin ventas y valor total de inventario.
                         </td>
-                        <td class="code-cell">RN-096</td>
+                        <td class="code-cell">RN-102</td>
                         <td class="description-cell">El informe de productos ayuda a tomar decisiones de inventario: identifica top 10 productos más vendidos, productos con stock crítico (bajo el umbral), productos que no se han vendido nunca, valor total del inventario y productos próximos a agotarse. Incluye gráficos de barras para visualización clara.</td>
-                        <td class="code-cell">RI-096</td>
+                        <td class="code-cell">RI-102</td>
                         <td class="description-cell">
                             Top 10 productos más vendidos (nombre, cantidad vendida, ingresos generados), productos con stock crítico (nombre, stock actual, umbral), productos sin ventas, valor total del inventario (suma de precio×stock) y alertas de reabastecimiento.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Informe de ventas</td>
-                        <td class="code-cell">RF-097</td>
+                        <td class="code-cell">RF-103</td>
                         <td class="description-cell">
                             El sistema debe generar informes de ventas con: ingresos totales, cantidad de órdenes, ticket promedio, comparativa con período anterior y gráficos de tendencias.
                         </td>
-                        <td class="code-cell">RN-097</td>
+                        <td class="code-cell">RN-103</td>
                         <td class="description-cell">El informe de ventas muestra la salud financiera del negocio: ingresos totales del período, cantidad de pedidos, ticket promedio (valor promedio por orden), comparativa con mes/año anterior (porcentaje de crecimiento), ingresos por día/semana/mes y gráfico de líneas de tendencia.</td>
-                        <td class="code-cell">RI-097</td>
+                        <td class="code-cell">RI-103</td>
                         <td class="description-cell">
                             Ingresos totales del período, cantidad de órdenes completadas, ticket promedio, comparativa con período anterior (porcentaje de cambio), ingresos por día/semana/mes (gráfico), método de pago más usado y descuentos aplicados totales.
                         </td>
@@ -173,39 +173,39 @@
                     <tr>
                         <td class="module-cell" rowspan="3">Dashboard Admin</td>
                         <td class="subprocess-cell">Métricas principales</td>
-                        <td class="code-cell">RF-098</td>
+                        <td class="code-cell">RF-104</td>
                         <td class="description-cell">
                             El sistema debe mostrar en el dashboard principal las métricas clave del negocio: ventas del día/mes, órdenes pendientes, productos con stock bajo y nuevos clientes.
                         </td>
-                        <td class="code-cell">RN-098</td>
+                        <td class="code-cell">RN-104</td>
                         <td class="description-cell">El dashboard es la primera página que ve el administrador al iniciar sesión. Muestra tarjetas con números grandes para visualización rápida: ventas de hoy, ventas del mes, órdenes pendientes de procesar, alertas de inventario bajo, nuevos clientes del mes y comparativas con períodos anteriores.</td>
-                        <td class="code-cell">RI-098</td>
+                        <td class="code-cell">RI-104</td>
                         <td class="description-cell">
                             Ventas del día (monto y cantidad), ventas del mes (monto y cantidad), órdenes pendientes (cantidad), productos con stock crítico (cantidad), nuevos clientes del mes (cantidad) y porcentaje de cambio vs período anterior para cada métrica.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Alertas y notificaciones</td>
-                        <td class="code-cell">RF-099</td>
+                        <td class="code-cell">RF-105</td>
                         <td class="description-cell">
                             El sistema debe mostrar alertas importantes en el dashboard: órdenes nuevas sin ver, productos agotados, códigos de descuento próximos a vencer y pagos pendientes de verificar.
                         </td>
-                        <td class="code-cell">RN-099</td>
+                        <td class="code-cell">RN-105</td>
                         <td class="description-cell">Las alertas se destacan con colores según prioridad: rojo para críticas (pagos por verificar), amarillo para advertencias (stock bajo) y azul para información (nuevas órdenes). Cada alerta es clickeable y lleva directamente a la sección correspondiente para tomar acción.</td>
-                        <td class="code-cell">RI-099</td>
+                        <td class="code-cell">RI-105</td>
                         <td class="description-cell">
                             Contador de órdenes nuevas sin visualizar, cantidad de productos agotados, códigos de descuento que vencen en próximos 7 días (cantidad), pagos por transferencia pendientes de verificación (cantidad y monto) y alertas de stock bajo (cantidad de productos).
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Gráficos de tendencias</td>
-                        <td class="code-cell">RF-100</td>
+                        <td class="code-cell">RF-106</td>
                         <td class="description-cell">
                             El sistema debe mostrar gráficos interactivos de tendencias: ventas de últimos 30 días, productos más vendidos, categorías más populares y registros de clientes.
                         </td>
-                        <td class="code-cell">RN-100</td>
+                        <td class="code-cell">RN-106</td>
                         <td class="description-cell">Los gráficos son interactivos: puedes pasar el cursor sobre puntos específicos para ver valores exactos. Los períodos se pueden ajustar (7 días, 30 días, 3 meses, año). Los gráficos se actualizan en tiempo real al seleccionar diferentes períodos de tiempo.</td>
-                        <td class="code-cell">RI-100</td>
+                        <td class="code-cell">RI-106</td>
                         <td class="description-cell">
                             Datos para gráfico de líneas de ventas (fecha, monto), datos para gráfico de barras de productos más vendidos (producto, cantidad), datos para gráfico de torta de categorías (categoría, porcentaje) y datos de registro de clientes por período (fecha, cantidad).
                         </td>
@@ -214,39 +214,39 @@
                     <tr>
                         <td class="module-cell" rowspan="3">Notificaciones Email</td>
                         <td class="subprocess-cell">Correo de bienvenida</td>
-                        <td class="code-cell">RF-101</td>
+                        <td class="code-cell">RF-107</td>
                         <td class="description-cell">
                             El sistema debe enviar automáticamente un correo de bienvenida cuando un nuevo usuario se registra en la plataforma.
                         </td>
-                        <td class="code-cell">RN-101</td>
+                        <td class="code-cell">RN-107</td>
                         <td class="description-cell">Al registrarte recibes inmediatamente un correo de bienvenida con: saludo personalizado con tu nombre, mensaje de bienvenida a la tienda, enlaces rápidos a secciones principales (productos, colecciones) y datos de contacto para soporte. El correo usa diseño profesional con logo de la empresa.</td>
-                        <td class="code-cell">RI-101</td>
+                        <td class="code-cell">RI-107</td>
                         <td class="description-cell">
                             Plantilla de correo de bienvenida con: nombre del usuario, correo electrónico de destino, mensaje personalizado, enlaces a la tienda, logo de la empresa, datos de contacto y pie de página con redes sociales.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Correo de confirmación de orden</td>
-                        <td class="code-cell">RF-102</td>
+                        <td class="code-cell">RF-108</td>
                         <td class="description-cell">
                             El sistema debe enviar correo de confirmación inmediatamente después de completar una compra con PDF adjunto de la factura.
                         </td>
-                        <td class="code-cell">RN-102</td>
+                        <td class="code-cell">RN-108</td>
                         <td class="description-cell">Al completar tu compra recibes automáticamente un correo con: número de orden único, resumen de productos comprados, dirección de entrega, totales desglosados, instrucciones de pago (si aplica), enlace para rastrear tu pedido y PDF adjunto con factura completa. El correo es profesional con diseño corporativo.</td>
-                        <td class="code-cell">RI-102</td>
+                        <td class="code-cell">RI-108</td>
                         <td class="description-cell">
                             Plantilla de correo con: número de orden, datos del cliente, productos con imágenes, dirección de envío, subtotal, descuento, envío, total, método de pago, estado del pago, enlace de rastreo y documento PDF adjunto con factura.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Correo de cambio de estado</td>
-                        <td class="code-cell">RF-103</td>
+                        <td class="code-cell">RF-109</td>
                         <td class="description-cell">
                             El sistema debe enviar notificaciones automáticas por correo cuando el estado de una orden cambia (pagado, en preparación, enviado, entregado).
                         </td>
-                        <td class="code-cell">RN-103</td>
+                        <td class="code-cell">RN-109</td>
                         <td class="description-cell">Cada vez que tu pedido cambia de estado recibes un correo informativo: "Tu pago fue verificado", "Tu pedido está en preparación", "Tu pedido fue enviado", "Tu pedido fue entregado". Cada correo incluye el nuevo estado, fecha y hora del cambio, número de orden y enlace para ver detalles.</td>
-                        <td class="code-cell">RI-103</td>
+                        <td class="code-cell">RI-109</td>
                         <td class="description-cell">
                             Plantilla de correo con: número de orden, nombre del cliente, estado anterior, estado nuevo, fecha y hora del cambio, mensaje descriptivo del nuevo estado, próximos pasos esperados y enlace para rastrear la orden.
                         </td>
@@ -255,39 +255,39 @@
                     <tr>
                         <td class="module-cell" rowspan="3">Exportación Datos</td>
                         <td class="subprocess-cell">Exportar órdenes a PDF</td>
-                        <td class="code-cell">RF-104</td>
+                        <td class="code-cell">RF-110</td>
                         <td class="description-cell">
                             El sistema debe permitir generar documentos PDF profesionales de órdenes individuales o múltiples con formato de factura.
                         </td>
-                        <td class="code-cell">RN-104</td>
+                        <td class="code-cell">RN-110</td>
                         <td class="description-cell">Los PDF de órdenes se generan con diseño profesional: logo de la empresa, información corporativa (NIT, dirección), datos completos del cliente, productos con imágenes, totales desglosados, método de pago, código de verificación QR y términos y condiciones. Cumple con requisitos legales de facturación.</td>
-                        <td class="code-cell">RI-104</td>
+                        <td class="code-cell">RI-110</td>
                         <td class="description-cell">
                             Documento PDF con: encabezado corporativo (logo, datos empresa), número de orden, fecha, información del cliente, dirección de envío, tabla de productos con cantidades y precios, subtotal, descuentos, envío, total, método de pago, código QR y pie de página legal.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Exportar productos a CSV</td>
-                        <td class="code-cell">RF-105</td>
+                        <td class="code-cell">RF-111</td>
                         <td class="description-cell">
                             El sistema debe permitir exportar el catálogo completo de productos a formato CSV respetando filtros aplicados.
                         </td>
-                        <td class="code-cell">RN-105</td>
+                        <td class="code-cell">RN-111</td>
                         <td class="description-cell">El archivo CSV contiene toda la información del catálogo: identificador, nombre, descripción, categoría, género, precio, variantes de color, variantes de talla, stock total, estado y fecha de creación. Usa punto y coma como separador y encabezados en español. Compatible con Excel, Google Sheets y sistemas empresariales.</td>
-                        <td class="code-cell">RI-105</td>
+                        <td class="code-cell">RI-111</td>
                         <td class="description-cell">
                             Archivo CSV con columnas: ID, Nombre, Descripción, Categoría, Género, Precio, Colores Disponibles, Tallas Disponibles, Stock Total, Estado, Fecha Creación. Delimitador punto y coma, codificación UTF-8 con BOM para caracteres especiales.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Exportar clientes a Excel</td>
-                        <td class="code-cell">RF-106</td>
+                        <td class="code-cell">RF-112</td>
                         <td class="description-cell">
                             El sistema debe permitir exportar el listado de clientes a formato Excel con información de contacto y estadísticas de compras.
                         </td>
-                        <td class="code-cell">RN-106</td>
+                        <td class="code-cell">RN-112</td>
                         <td class="description-cell">El archivo Excel de clientes incluye: nombre, correo, teléfono, fecha de registro, cantidad de órdenes realizadas, total gastado, fecha de última compra y estado de la cuenta. Los datos personales están protegidos y solo administradores pueden exportarlos. Útil para campañas de marketing y análisis CRM.</td>
-                        <td class="code-cell">RI-106</td>
+                        <td class="code-cell">RI-112</td>
                         <td class="description-cell">
                             Archivo Excel con columnas: ID Cliente, Nombre Completo, Correo Electrónico, Teléfono, Fecha Registro, Total Órdenes, Total Gastado, Fecha Última Compra, Estado Cuenta. Formato XLSX compatible con Excel 2010 y posteriores.
                         </td>
@@ -296,26 +296,26 @@
                     <tr>
                         <td class="module-cell" rowspan="2">Auditoría Órdenes</td>
                         <td class="subprocess-cell">Registro automático de cambios</td>
-                        <td class="code-cell">RF-107</td>
+                        <td class="code-cell">RF-113</td>
                         <td class="description-cell">
                             El sistema debe registrar automáticamente todos los cambios en órdenes: creación, cambio de estado, actualización de pago y eliminación.
                         </td>
-                        <td class="code-cell">RN-107</td>
+                        <td class="code-cell">RN-113</td>
                         <td class="description-cell">Cada cambio en órdenes queda registrado permanentemente: qué cambió (estado, pago, dirección), valor anterior, valor nuevo, quién lo hizo (cliente o administrador), desde dónde (dirección IP) y cuándo (fecha y hora exacta). Estos registros no pueden modificarse ni eliminarse, garantizando trazabilidad completa.</td>
-                        <td class="code-cell">RI-107</td>
+                        <td class="code-cell">RI-113</td>
                         <td class="description-cell">
                             Registro de auditoría con: identificador de la orden, tipo de cambio (estado/pago/dirección/productos), campo modificado, valor anterior en formato JSON, valor nuevo en formato JSON, usuario ejecutor (ID y nombre), dirección IP, fecha y hora del cambio.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Consulta de auditoría</td>
-                        <td class="code-cell">RF-108</td>
+                        <td class="code-cell">RF-114</td>
                         <td class="description-cell">
                             El sistema debe permitir a los administradores consultar el historial completo de cambios de cualquier orden para resolución de disputas.
                         </td>
-                        <td class="code-cell">RN-108</td>
+                        <td class="code-cell">RN-114</td>
                         <td class="description-cell">Los reportes de auditoría de órdenes son filtrados por: número de orden específico, rango de fechas, tipo de cambio y usuario ejecutor. Sirven para resolver disputas con clientes, identificar errores operativos, análisis de tiempos de procesamiento y cumplimiento con auditorías contables y legales.</td>
-                        <td class="code-cell">RI-108</td>
+                        <td class="code-cell">RI-114</td>
                         <td class="description-cell">
                             Historial completo de cambios de la orden con: cronología temporal, tipo de cada acción, usuario responsable, valores antes/después, dirección IP y exportable a PDF para documentación legal o resolución de disputas.
                         </td>
@@ -324,26 +324,26 @@
                     <tr>
                         <td class="module-cell" rowspan="2">Órdenes No Vistas</td>
                         <td class="subprocess-cell">Marcar órdenes como vistas</td>
-                        <td class="code-cell">RF-109</td>
+                        <td class="code-cell">RF-115</td>
                         <td class="description-cell">
                             El sistema debe registrar automáticamente cuando un administrador visualiza una orden por primera vez para actualizar el contador de órdenes nuevas.
                         </td>
-                        <td class="code-cell">RN-109</td>
+                        <td class="code-cell">RN-115</td>
                         <td class="description-cell">Cuando entras a la sección de órdenes, todas las órdenes que aparecen en el listado se marcan automáticamente como vistas por ti. El contador de órdenes nuevas en el menú se actualiza inmediatamente. Cada administrador tiene su propio contador independiente de órdenes no vistas.</td>
-                        <td class="code-cell">RI-109</td>
+                        <td class="code-cell">RI-115</td>
                         <td class="description-cell">
                             Registro de visualización con: identificador de la orden, identificador del administrador, fecha y hora de primera visualización, marca de vista única (no se registra si ya fue vista por ese administrador) y actualización del contador del menú.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Mostrar contador de nuevas</td>
-                        <td class="code-cell">RF-110</td>
+                        <td class="code-cell">RF-116</td>
                         <td class="description-cell">
                             El sistema debe mostrar un contador en el menú de administración indicando cuántas órdenes nuevas aún no han sido visualizadas por el administrador actual.
                         </td>
-                        <td class="code-cell">RN-110</td>
+                        <td class="code-cell">RN-116</td>
                         <td class="description-cell">El contador de órdenes nuevas aparece como badge numérico rojo en el menú "Órdenes". Se actualiza en tiempo real cuando entran nuevos pedidos o cuando visualizas las órdenes. Si no hay órdenes nuevas, el badge no se muestra. Cada administrador ve solo su propio contador.</td>
-                        <td class="code-cell">RI-110</td>
+                        <td class="code-cell">RI-116</td>
                         <td class="description-cell">
                             Cantidad de órdenes nuevas sin visualizar por el administrador actual, identificador del administrador, actualización en tiempo real del contador, visualización en badge numérico rojo y eliminación del badge cuando el contador llega a cero.
                         </td>
@@ -353,12 +353,12 @@
         </div>
         <div class="footer">
             <p><strong>Proyecto Angelow - Parte 6 de 6 (FINAL)</strong></p>
-            <p>Reportes y Administración | Requisitos: RF-095 a RF-110</p>
+            <p>Reportes y Administración | Requisitos: RF-101 a RF-116</p>
             <p style="margin-top: 10px; font-size: 0.85em; color: #666;">
                 Módulos: Reportes, Dashboard Admin, Notificaciones Email, Exportación, Auditoría Órdenes, Contador Nuevas Órdenes
             </p>
-            <p style="margin-top: 10px; font-size: 0.9em; color: #28a745;">
-                <strong>TOTAL DE REQUISITOS FUNCIONALES: 110 RF | 110 RN | 110 RI</strong>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #28a745;">
+                <strong>TOTAL DE REQUISITOS FUNCIONALES: 116 RF | 116 RN | 116 RI</strong>
             </p>
             <p style="margin-top: 5px; font-size: 0.85em; color: #666;">
                 Todos los requisitos están basados en funcionalidades realmente implementadas en el sistema. No se incluyó el módulo de delivery interno ya que será una aplicación externa que consumirá APIs.

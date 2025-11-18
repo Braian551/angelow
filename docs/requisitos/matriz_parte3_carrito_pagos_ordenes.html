@@ -111,7 +111,7 @@
         <div class="info-bar">
             <div class="info-item"><strong>Módulos:</strong> Carrito de Compras, Proceso de Pago, Gestión de Órdenes</div>
             <div class="info-item"><strong>Fecha:</strong> Noviembre 2025</div>
-            <div class="info-item"><strong>Requisitos:</strong> RF-038 a RF-057</div>
+            <div class="info-item"><strong>Requisitos:</strong> RF-038 a RF-063</div>
         </div>
         <div class="table-container">
             <table>
@@ -130,7 +130,7 @@
                 <tbody>
                     <!-- CARRITO DE COMPRAS -->
                     <tr>
-                        <td class="module-cell" rowspan="4">Carrito de Compras</td>
+                        <td class="module-cell" rowspan="5">Carrito de Compras</td>
                         <td class="subprocess-cell">Agregar al carrito</td>
                         <td class="code-cell">RF-038</td>
                         <td class="description-cell">
@@ -182,175 +182,227 @@
                             Identificador del ítem a eliminar, producto eliminado (para confirmación), nuevo total del carrito sin ese ítem y fecha de eliminación.
                         </td>
                     </tr>
+                    <tr>
+                        <td class="subprocess-cell">Compra inmediata</td>
+                        <td class="code-cell">RF-042</td>
+                        <td class="description-cell">
+                            El sistema debe permitir iniciar una compra inmediata desde la ficha de producto, creando un carrito temporal que lleva al cliente directamente al paso de envío sin mezclar esos artículos con su carrito habitual.
+                        </td>
+                        <td class="code-cell">RN-042</td>
+                        <td class="description-cell">Al usar "Comprar ahora" se crea un carrito aislado asociado al usuario o a su sesión. El sistema valida que el carrito pertenezca al cliente antes de continuar, elimina la bandera de compra inmediata tras usarla y, si no coincide, redirige al carrito estándar para evitar compras duplicadas.</td>
+                        <td class="code-cell">RI-042</td>
+                        <td class="description-cell">
+                            Identificador del carrito temporal, indicador buy_now, usuario y/o session_id asociados, productos y cantidades incluidos, hora de creación, subtotal calculado y referencia al carrito principal si existe.
+                        </td>
+                    </tr>
                     <!-- PROCESO DE PAGO -->
                     <tr>
-                        <td class="module-cell" rowspan="7">Proceso de Pago</td>
+                        <td class="module-cell" rowspan="10">Proceso de Pago</td>
                         <td class="subprocess-cell">Paso 1: Revisar carrito</td>
-                        <td class="code-cell">RF-042</td>
+                        <td class="code-cell">RF-043</td>
                         <td class="description-cell">
                             El sistema debe mostrar el resumen completo del carrito en el primer paso del proceso de compra, con posibilidad de volver a modificar cantidades.
                         </td>
-                        <td class="code-cell">RN-042</td>
+                        <td class="code-cell">RN-043</td>
                         <td class="description-cell">Antes de proceder al pago, puedes revisar tu carrito completo. Todavía puedes modificar cantidades o eliminar productos. Solo los usuarios registrados e iniciados sesión pueden proceder a comprar.</td>
-                        <td class="code-cell">RI-042</td>
+                        <td class="code-cell">RI-043</td>
                         <td class="description-cell">
                             Resumen del carrito: listado de productos con cantidades, precios, subtotal, botón para continuar al siguiente paso y validación de usuario autenticado.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Paso 2: Seleccionar dirección</td>
-                        <td class="code-cell">RF-043</td>
+                        <td class="code-cell">RF-044</td>
                         <td class="description-cell">
                             El sistema debe permitir seleccionar o agregar una dirección de envío de las guardadas, mostrando cada una con mapa y datos completos.
                         </td>
-                        <td class="code-cell">RN-043</td>
+                        <td class="code-cell">RN-044</td>
                         <td class="description-cell">Puedes elegir cualquiera de tus direcciones guardadas o agregar una nueva dirección durante el proceso de compra. La dirección debe tener coordenadas GPS obligatorias para que el repartidor pueda ubicarte fácilmente.</td>
-                        <td class="code-cell">RI-043</td>
+                        <td class="code-cell">RI-044</td>
                         <td class="description-cell">
                             Listado de direcciones del usuario, dirección seleccionada con: dirección completa, coordenadas GPS, nombre y teléfono del receptor, instrucciones de entrega y visualización en mapa.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Paso 2: Calcular envío</td>
-                        <td class="code-cell">RF-044</td>
+                        <td class="code-cell">RF-045</td>
                         <td class="description-cell">
                             El sistema debe calcular automáticamente el costo de envío según el subtotal de la compra y las reglas de envío configuradas.
                         </td>
-                        <td class="code-cell">RN-044</td>
+                        <td class="code-cell">RN-045</td>
                         <td class="description-cell">El costo de envío varía según el total de tu compra. Compras pequeñas pagan más envío, compras medianas pagan menos, y compras grandes pueden tener envío gratis. El costo se calcula automáticamente al seleccionar la dirección.</td>
-                        <td class="code-cell">RI-044</td>
+                        <td class="code-cell">RI-045</td>
                         <td class="description-cell">
                             Subtotal de la compra, reglas de envío aplicables (monto mínimo, monto máximo, costo), costo de envío calculado, días estimados de entrega y total con envío incluido.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Paso 2: Aplicar descuento</td>
-                        <td class="code-cell">RF-045</td>
+                        <td class="code-cell">RF-046</td>
                         <td class="description-cell">
                             El sistema debe permitir aplicar códigos de descuento válidos, validando su vigencia, usos disponibles y aplicabilidad a los productos del carrito.
                         </td>
-                        <td class="code-cell">RN-045</td>
+                        <td class="code-cell">RN-046</td>
                         <td class="description-cell">Puedes ingresar un código de descuento en esta etapa. El sistema verificará que sea válido, que no haya vencido, que no haya alcanzado su límite de usos y que aplique a los productos en tu carrito. Si es válido, verás el descuento reflejado inmediatamente.</td>
-                        <td class="code-cell">RI-045</td>
+                        <td class="code-cell">RI-046</td>
                         <td class="description-cell">
                             Código ingresado, validación del código (vigencia, usos, productos), tipo de descuento (porcentaje/monto fijo/envío gratis), valor del descuento, descuento aplicado calculado y nuevo total con descuento.
                         </td>
                     </tr>
                     <tr>
+                        <td class="subprocess-cell">Paso 2: Tipo de entrega</td>
+                        <td class="code-cell">RF-047</td>
+                        <td class="description-cell">
+                            El sistema debe mostrar todas las opciones activas de entrega (domicilio, express o recogida en tienda) como tarjetas seleccionables y recalcular al instante el costo y el tiempo de envío según la opción elegida.
+                        </td>
+                        <td class="code-cell">RN-047</td>
+                        <td class="description-cell">Los métodos de entrega provienen de la configuración y siempre se marca uno como predeterminado. Si el nombre o la descripción incluyen "tienda" o "recogida", la orden se marca como retiro en tienda, se muestran los datos del punto físico y se genera un enlace directo con la ruta sugerida en Google Maps.</td>
+                        <td class="code-cell">RI-047</td>
+                        <td class="description-cell">
+                            Catálogo de métodos activos con: identificador, nombre, descripción, ícono, costo base, tiempo estimado, indicador de recogida en tienda, enlace sugerido, coordenadas del punto físico y dirección de envío seleccionada por el cliente.
+                        </td>
+                    </tr>
+                    <tr>
                         <td class="subprocess-cell">Paso 3: Ver resumen final</td>
-                        <td class="code-cell">RF-046</td>
+                        <td class="code-cell">RF-048</td>
                         <td class="description-cell">
                             El sistema debe mostrar el resumen completo de la compra antes del pago: productos, dirección, envío, descuentos y total final.
                         </td>
-                        <td class="code-cell">RN-046</td>
+                        <td class="code-cell">RN-048</td>
                         <td class="description-cell">El resumen final muestra todos los detalles de tu compra claramente desglosados: subtotal de productos, descuento (si aplica), costo de envío y total a pagar. También verás la dirección de entrega y tiempo estimado.</td>
-                        <td class="code-cell">RI-046</td>
+                        <td class="code-cell">RI-048</td>
                         <td class="description-cell">
                             Resumen completo: productos con cantidades y precios, dirección de envío, subtotal, descuento aplicado, costo de envío, total final, método de pago seleccionado y botón para confirmar compra.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Paso 3: Procesar pago por transferencia</td>
-                        <td class="code-cell">RF-047</td>
+                        <td class="code-cell">RF-049</td>
                         <td class="description-cell">
                             El sistema debe permitir realizar el pago mediante transferencia bancaria, mostrando los datos de la cuenta y permitiendo subir el comprobante de pago.
                         </td>
-                        <td class="code-cell">RN-047</td>
+                        <td class="code-cell">RN-049</td>
                         <td class="description-cell">Para pagar por transferencia, el sistema te muestra los datos bancarios de la empresa. Después de transferir, debes subir una foto del comprobante (JPG, PNG o PDF, máximo 5 MB). Tu pedido quedará pendiente de verificación hasta que confirmemos el pago.</td>
-                        <td class="code-cell">RI-047</td>
+                        <td class="code-cell">RI-049</td>
                         <td class="description-cell">
                             Información bancaria: banco, número de cuenta, tipo de cuenta, titular, identificación. Comprobante subido: archivo, ruta de almacenamiento, fecha de subida. Estado de la transacción: pendiente, verificado o rechazado.
                         </td>
                     </tr>
                     <tr>
+                        <td class="subprocess-cell">Paso 3: Validar comprobante y consentimiento</td>
+                        <td class="code-cell">RF-050</td>
+                        <td class="description-cell">
+                            El sistema debe exigir referencia bancaria, comprobante en formatos permitidos y aceptación de términos antes de crear la orden, registrar la transacción y limpiar el carrito.
+                        </td>
+                        <td class="code-cell">RN-050</td>
+                        <td class="description-cell">Solo se aceptan comprobantes JPG, PNG o PDF de máximo 5&nbsp;MB, que se guardan en la carpeta de comprobantes con un nombre único. También se verifica que exista una cuenta bancaria activa y que el cliente marque la casilla de términos; de lo contrario, la compra no continúa.</td>
+                        <td class="code-cell">RI-050</td>
+                        <td class="description-cell">
+                            Número de referencia del pago, ruta del comprobante, tipo y tamaño del archivo, marca de aceptación de términos, identificador de la transacción, estado inicial del pago, identificador del descuento utilizado y totales finales (subtotal, envío, total).
+                        </td>
+                    </tr>
+                    <tr>
                         <td class="subprocess-cell">Paso 4: Confirmar orden</td>
-                        <td class="code-cell">RF-048</td>
+                        <td class="code-cell">RF-051</td>
                         <td class="description-cell">
                             El sistema debe crear la orden de compra, enviar correo de confirmación con PDF adjunto, limpiar el carrito y mostrar página de confirmación con número de orden.
                         </td>
-                        <td class="code-cell">RN-048</td>
+                        <td class="code-cell">RN-051</td>
                         <td class="description-cell">Al completar tu compra recibirás: 1) Una página de confirmación con tu número de pedido único, 2) Un correo electrónico con todos los detalles y PDF adjunto, 3) Tu carrito se vaciará automáticamente. El stock de los productos se descuenta inmediatamente.</td>
-                        <td class="code-cell">RI-048</td>
+                        <td class="code-cell">RI-051</td>
                         <td class="description-cell">
                             Orden creada con: número único de orden (ORD-YYYYMMDD-XXXXXX), identificador del usuario, productos y cantidades, dirección de envío, total, descuento, envío, estado inicial (pendiente), comprobante de pago subido y fecha de creación.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Paso 4: Confirmación inteligente</td>
+                        <td class="code-cell">RF-052</td>
+                        <td class="description-cell">
+                            La vista de confirmación debe adaptarse según el tipo de entrega, mostrando instrucciones especiales para recogida en tienda, ofreciendo la descarga del PDF y manteniendo visible el número de pedido para futuras consultas.
+                        </td>
+                        <td class="code-cell">RN-052</td>
+                        <td class="description-cell">Si la orden es de recogida se muestra mapa con la ruta hacia la tienda, horarios y pasos "Listo para recoger". Para domicilios se despliega la línea de tiempo desde pago hasta entrega. En ambos casos se limpia el carrito, se mantienen descuentos consumidos como usados y solo se permite descargar el PDF si hay motor disponible.</td>
+                        <td class="code-cell">RI-052</td>
+                        <td class="description-cell">
+                            Número de orden, correo del cliente, dirección o punto de recogida, coordenadas guardadas, enlace a Google Maps, estados con fecha y hora, indicador `pdf_available`, bandera de limpieza de carrito/descuentos y registro del comprobante generado.
                         </td>
                     </tr>
                     <!-- GESTIÓN DE ÓRDENES - ADMIN -->
                     <tr>
                         <td class="module-cell" rowspan="6">Gestión de Órdenes Admin</td>
                         <td class="subprocess-cell">Listar todas las órdenes</td>
-                        <td class="code-cell">RF-049</td>
+                        <td class="code-cell">RF-053</td>
                         <td class="description-cell">
                             El sistema debe permitir a los administradores visualizar el listado completo de todas las órdenes con filtros por estado, fecha, cliente y método de pago.
                         </td>
-                        <td class="code-cell">RN-049</td>
+                        <td class="code-cell">RN-053</td>
                         <td class="description-cell">Los administradores ven todas las órdenes del sistema ordenadas por fecha (las más recientes primero). Puedes filtrar por: pendientes, pagadas, en preparación, enviadas, entregadas o canceladas. También puedes buscar por número de orden o cliente.</td>
-                        <td class="code-cell">RI-049</td>
+                        <td class="code-cell">RI-053</td>
                         <td class="description-cell">
                             Listado de órdenes con: número de orden, fecha, cliente, total, estado del pedido, estado del pago, método de pago y acciones disponibles (ver detalle, editar, cambiar estado, eliminar).
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Ver detalle de orden</td>
-                        <td class="code-cell">RF-050</td>
+                        <td class="code-cell">RF-054</td>
                         <td class="description-cell">
                             El sistema debe permitir ver el detalle completo de cada orden: cliente, productos, dirección, pagos, comprobante subido e historial de estados.
                         </td>
-                        <td class="code-cell">RN-050</td>
+                        <td class="code-cell">RN-054</td>
                         <td class="description-cell">El detalle de la orden muestra toda la información: datos del cliente, productos comprados con cantidades y precios, dirección completa con mapa, comprobante de pago (si aplica), historial de cambios de estado con fechas y quién los hizo.</td>
-                        <td class="code-cell">RI-050</td>
+                        <td class="code-cell">RI-054</td>
                         <td class="description-cell">
                             Detalle completo: número de orden, información del cliente, productos con variantes, totales desglosados, dirección con coordenadas GPS, comprobante de pago (visualización/descarga), historial de estados con fechas y usuarios responsables.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Cambiar estado de orden</td>
-                        <td class="code-cell">RF-051</td>
+                        <td class="code-cell">RF-055</td>
                         <td class="description-cell">
                             El sistema debe permitir a los administradores cambiar el estado de las órdenes (pendiente, pagado, en preparación, enviado, entregado, cancelado).
                         </td>
-                        <td class="code-cell">RN-051</td>
+                        <td class="code-cell">RN-055</td>
                         <td class="description-cell">Cada cambio de estado queda registrado automáticamente con quién lo hizo y cuándo. Si cambias el estado a "entregado", el sistema registra la fecha de entrega final. Si cancelas, debes indicar el motivo y el stock se reintegra automáticamente.</td>
-                        <td class="code-cell">RI-051</td>
+                        <td class="code-cell">RI-055</td>
                         <td class="description-cell">
                             Identificador de la orden, estado anterior, estado nuevo, motivo del cambio (opcional para cancelación), usuario administrador que realiza el cambio, fecha y hora del cambio y registro en historial de estados.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Actualizar estado de pago</td>
-                        <td class="code-cell">RF-052</td>
+                        <td class="code-cell">RF-056</td>
                         <td class="description-cell">
                             El sistema debe permitir actualizar el estado de pago de las órdenes después de verificar los comprobantes de transferencia.
                         </td>
-                        <td class="code-cell">RN-052</td>
+                        <td class="code-cell">RN-056</td>
                         <td class="description-cell">Para órdenes con transferencia bancaria, el administrador debe verificar el comprobante subido y marcar el pago como verificado, rechazado o pendiente. Si se rechaza, debe indicar el motivo para notificar al cliente.</td>
-                        <td class="code-cell">RI-052</td>
+                        <td class="code-cell">RI-056</td>
                         <td class="description-cell">
                             Identificador de la orden, estado de pago anterior, nuevo estado de pago (pendiente/verificado/rechazado), motivo (si es rechazo), administrador que verifica, fecha de verificación y notificación automática al cliente.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Eliminar orden</td>
-                        <td class="code-cell">RF-053</td>
+                        <td class="code-cell">RF-057</td>
                         <td class="description-cell">
                             El sistema debe permitir a los administradores eliminar órdenes individuales después de confirmar la acción.
                         </td>
-                        <td class="code-cell">RN-053</td>
+                        <td class="code-cell">RN-057</td>
                         <td class="description-cell">Solo se pueden eliminar órdenes que estén en estado cancelado o rechazado. No puedes eliminar órdenes activas. El sistema pedirá confirmación antes de eliminar. La eliminación queda registrada en auditoría con el motivo.</td>
-                        <td class="code-cell">RI-053</td>
+                        <td class="code-cell">RI-057</td>
                         <td class="description-cell">
                             Identificador de la orden, verificación de estado (solo canceladas/rechazadas), motivo de eliminación, usuario administrador que elimina, fecha de eliminación y registro en auditoría.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Eliminar órdenes masivamente</td>
-                        <td class="code-cell">RF-054</td>
+                        <td class="code-cell">RF-058</td>
                         <td class="description-cell">
                             El sistema debe permitir seleccionar múltiples órdenes y eliminarlas en una sola operación masiva.
                         </td>
-                        <td class="code-cell">RN-054</td>
+                        <td class="code-cell">RN-058</td>
                         <td class="description-cell">Puedes seleccionar múltiples órdenes (máximo 100 a la vez) y eliminarlas todas juntas. Solo se eliminarán las que cumplan con los criterios (canceladas/rechazadas). El sistema mostrará un resumen de cuántas se eliminaron exitosamente y cuántas no.</td>
-                        <td class="code-cell">RI-054</td>
+                        <td class="code-cell">RI-058</td>
                         <td class="description-cell">
                             Listado de identificadores de órdenes seleccionadas, validación individual de cada una, resultado de la operación (exitosas/fallidas), usuario administrador, motivo masivo y fecha de eliminación masiva.
                         </td>
@@ -359,41 +411,69 @@
                     <tr>
                         <td class="module-cell" rowspan="3">Mis Órdenes Usuario</td>
                         <td class="subprocess-cell">Ver mis órdenes</td>
-                        <td class="code-cell">RF-055</td>
+                        <td class="code-cell">RF-059</td>
                         <td class="description-cell">
                             El sistema debe permitir a los usuarios visualizar el historial completo de sus propias órdenes ordenadas por fecha.
                         </td>
-                        <td class="code-cell">RN-055</td>
+                        <td class="code-cell">RN-059</td>
                         <td class="description-cell">Puedes ver todas tus compras realizadas ordenadas de la más reciente a la más antigua. Cada orden muestra: número, fecha, productos (cantidad de artículos), total, estado actual y estado de pago. Solo ves tus propias órdenes, no las de otros clientes.</td>
-                        <td class="code-cell">RI-055</td>
+                        <td class="code-cell">RI-059</td>
                         <td class="description-cell">
                             Historial de órdenes del usuario con: número de orden, fecha de compra, resumen de productos (cantidad de ítems), total pagado, estado actual, estado de pago y botón para ver detalle.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Ver detalle de mi orden</td>
-                        <td class="code-cell">RF-056</td>
+                        <td class="code-cell">RF-060</td>
                         <td class="description-cell">
                             El sistema debe permitir a los usuarios ver el detalle completo de cada una de sus órdenes con productos, dirección, pagos y rastreo.
                         </td>
-                        <td class="code-cell">RN-056</td>
+                        <td class="code-cell">RN-060</td>
                         <td class="description-cell">En el detalle de tu orden puedes ver: productos comprados con fotos, color y talla, dirección de envío con mapa, totales desglosados (subtotal, descuento, envío, total), comprobante subido (si aplica) e historial de estados con fechas.</td>
-                        <td class="code-cell">RI-056</td>
+                        <td class="code-cell">RI-060</td>
                         <td class="description-cell">
                             Detalle de la orden del usuario: número, fecha, productos con imágenes y detalles, dirección completa con visualización en mapa, subtotal, descuento, envío, total, comprobante de pago, historial de estados con línea de tiempo visual.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Rastrear orden en tiempo real</td>
-                        <td class="code-cell">RF-057</td>
+                        <td class="code-cell">RF-061</td>
                         <td class="description-cell">
                             El sistema debe permitir a los usuarios rastrear el estado de sus órdenes en tiempo real mediante una línea de tiempo visual con cada etapa del proceso.
                         </td>
-                        <td class="code-cell">RN-057</td>
+                        <td class="code-cell">RN-061</td>
                         <td class="description-cell">Puedes rastrear tu pedido mediante una línea de tiempo que muestra cada estado con fecha y hora: recibido, pago verificado, en preparación, enviado y entregado. Los estados completados se muestran en verde, el estado actual en azul y los pendientes en gris.</td>
-                        <td class="code-cell">RI-057</td>
+                        <td class="code-cell">RI-061</td>
                         <td class="description-cell">
                             Estado actual de la orden, historial completo de estados con fechas y horas, representación visual en línea de tiempo, porcentaje de progreso y tiempo estimado de entrega (si aplica).
+                        </td>
+                    </tr>
+                    <!-- POSTVENTA Y COMUNICACIONES -->
+                    <tr>
+                        <td class="module-cell" rowspan="2">Postventa y Comunicaciones</td>
+                        <td class="subprocess-cell">Enviar factura tras entrega</td>
+                        <td class="code-cell">RF-062</td>
+                        <td class="description-cell">
+                            Cuando un administrador marca una orden como entregada, el sistema debe generar la factura en PDF, enviarla por correo electrónico y registrar una notificación para el cliente.
+                        </td>
+                        <td class="code-cell">RN-062</td>
+                        <td class="description-cell">El servicio arma la factura con los datos completos de la orden, adjunta el PDF desde facturacion@angelow.com y deja un registro en notificaciones para que el cliente vea que la entrega fue confirmada. Si el correo falla, se escribe en el log y el aviso interno igual se crea.</td>
+                        <td class="code-cell">RI-062</td>
+                        <td class="description-cell">
+                            Correo del cliente, nombre del destinatario, número de pedido/factura, lista de productos con imágenes, subtotal, descuentos, envío, total pagado, contenido del PDF, fecha de envío y registro de notificación (tipo, mensaje, entidad relacionada).
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subprocess-cell">Notificar cancelaciones y reembolsos</td>
+                        <td class="code-cell">RF-063</td>
+                        <td class="description-cell">
+                            Al cancelar un pedido o registrar un reembolso, el sistema debe avisar al cliente por correo, crear notificaciones en la plataforma y dejar trazabilidad del movimiento negativo en las transacciones.
+                        </td>
+                        <td class="code-cell">RN-063</td>
+                        <td class="description-cell">Las cancelaciones envían un correo con detalle del pedido, plazos del reembolso y crean una notificación informando el motivo. Los reembolsos generan un registro negativo en payment_transactions con la referencia correspondiente y disparan notificaciones de estado y de pago.</td>
+                        <td class="code-cell">RI-063</td>
+                        <td class="description-cell">
+                            Datos de la orden afectada, listado de productos, correo del cliente, monto devuelto, referencia bancaria o del gateway, identificador del administrador, registro negativo en `payment_transactions`, historial de estado actualizado y notificaciones creadas (tipo, mensaje, fecha).
                         </td>
                     </tr>
                 </tbody>
@@ -401,7 +481,7 @@
         </div>
         <div class="footer">
             <p><strong>Proyecto Angelow - Parte 3 de 6</strong></p>
-            <p>Carrito, Pagos y Órdenes | Requisitos: RF-038 a RF-057</p>
+            <p>Carrito, Pagos y Órdenes | Requisitos: RF-038 a RF-063</p>
             <p style="margin-top: 10px; font-size: 0.85em; color: #666;">
                 Módulos: Carrito de Compras, Proceso de Pago (3 pasos), Gestión de Órdenes Admin, Mis Órdenes Usuario
             </p>
