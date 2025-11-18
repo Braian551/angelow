@@ -220,9 +220,18 @@ function getProductReviews($conn, $productId, $currentUserId = null) {
         $reviewStats['two_star_percent'] = $reviewStats['total_reviews'] > 0 ? round(($reviewStats['two_star'] / $reviewStats['total_reviews'] * 100)) : 0;
         $reviewStats['one_star_percent'] = $reviewStats['total_reviews'] > 0 ? round(($reviewStats['one_star'] / $reviewStats['total_reviews'] * 100)) : 0;
         
+        // Check if current user already left a review
+        $userHasReview = false;
+        if ($currentUserId) {
+            $uStmt = $conn->prepare('SELECT 1 FROM product_reviews WHERE product_id = ? AND user_id = ? LIMIT 1');
+            $uStmt->execute([$productId, $currentUserId]);
+            $userHasReview = (bool)$uStmt->fetchColumn();
+        }
+
         return [
             'reviews' => $reviews,
             'stats' => $reviewStats
+            , 'user_has_review' => $userHasReview
         ];
     } catch (PDOException $e) {
         error_log("Error al obtener reseñas: " . $e->getMessage());
@@ -246,7 +255,7 @@ function getProductReviews($conn, $productId, $currentUserId = null) {
     }
 }
 
-function getProductQuestions($conn, $productId) {
+function getProductQuestions($conn, $productId, $currentUserId = null) {
     try {
         $stmt = $conn->prepare("
             SELECT pq.*, u.name as user_name, u.image as user_image,
@@ -257,7 +266,7 @@ function getProductQuestions($conn, $productId) {
             ORDER BY pq.created_at DESC
             LIMIT 5
         ");
-        $stmt->execute([$productId]);
+            $stmt->execute([$productId]);
         $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         // Obtener respuestas para cada pregunta
@@ -278,6 +287,18 @@ function getProductQuestions($conn, $productId) {
         error_log("Error al obtener preguntas: " . $e->getMessage());
         return [];
     }
+}
+
+function userHasQuestion($conn, $productId, $userId) {
+        if (empty($userId)) return false;
+        try {
+            $stmt = $conn->prepare('SELECT 1 FROM product_questions WHERE product_id = ? AND user_id = ? LIMIT 1');
+            $stmt->execute([$productId, $userId]);
+            return (bool) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log('Error checking user question: ' . $e->getMessage());
+            return false;
+        }
 }
 
 function getRelatedProducts($conn, $productId, $categoryId) {

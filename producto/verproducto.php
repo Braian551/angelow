@@ -20,7 +20,11 @@ if (!$product) {
 $variantsData = getProductVariants($conn, $product['id']);
 $additionalImages = getAdditionalImages($conn, $product['id']);
 $reviewsData = getProductReviews($conn, $product['id'], $_SESSION['user_id'] ?? null);
-$questionsData = getProductQuestions($conn, $product['id']);
+$questionsData = getProductQuestions($conn, $product['id'], $_SESSION['user_id'] ?? null);
+
+// Flags: check if the user already reviewed or asked a question
+$userHasReview = $reviewsData['user_has_review'] ?? false;
+$userHasQuestion = userHasQuestion($conn, $product['id'], $_SESSION['user_id'] ?? null);
 $relatedProducts = getRelatedProducts($conn, $product['id'], $product['category_id']);
 
 // Verificar si el usuario puede dejar reseña

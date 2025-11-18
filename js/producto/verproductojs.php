@@ -150,6 +150,24 @@ if (!empty($reviewsClientPayload['reviews'])) {
             const total = parseInt(stats.total_reviews || 0, 10);
             const avg = parseFloat(stats.average_rating || 0);
 
+            // If the server indicates the current user already left a review, remove/hide the 'write review' button
+            const userHasReview = payload.user_has_review || false;
+            const writeBtn = document.getElementById('write-review-btn');
+            if (userHasReview && writeBtn) {
+                writeBtn.remove();
+                // Also hide review form if present
+                const reviewForm = document.getElementById('review-form-container');
+                if (reviewForm) reviewForm.style.display = 'none';
+                // Optionally add an info banner
+                const header = document.querySelector('.questions-header.reviews-header');
+                if (header && !header.querySelector('.info-banner')) {
+                    const info = document.createElement('div');
+                    info.className = 'info-banner';
+                    info.innerHTML = '<p>Ya has dejado una opinión para este producto. Solo puedes publicar una reseña.</p>';
+                    header.appendChild(info);
+                }
+            }
+
             const avgNode = document.querySelector('[data-average-rating]');
             if (avgNode) avgNode.textContent = avg.toFixed(1);
 
@@ -890,7 +908,7 @@ if (!empty($reviewsClientPayload['reviews'])) {
                 body: JSON.stringify(payload)
             })
             .then(resp => resp.json())
-            .then(data => {
+                    .then(data => {
                 if (data.success) {
                     showNotification(data.message || 'Pregunta enviada correctamente', 'success');
 
@@ -898,19 +916,8 @@ if (!empty($reviewsClientPayload['reviews'])) {
                     $('#question-text').val('');
                     $('#question-form-container').slideUp();
 
-                    // Optionally: añadir la pregunta recibida a la lista (si vino en la respuesta)
-                    // Refresh questions list from server to ensure up-to-date display
-                    fetch('<?= BASE_URL ?>/api/get_questions.php?product_id=' + productId)
-                        .then(r => r.json())
-                        .then(newRes => {
-                            if (newRes.success) {
-                                renderQuestions(newRes.data || []);
-                            } else {
-                                console.error('Could not fetch updated questions', newRes.error);
-                            }
-                        }).finally(() => {
-                                // No rating field to reset: questions don't accept ratings
-                        }).catch(err => console.error(err));
+                    // Recargar la página completa para mostrar la nueva pregunta y mantener contexto #questions
+                    window.location.href = window.location.pathname + window.location.search + '#questions';
                 } else {
                     showNotification(data.message || data.error || 'Error al enviar la pregunta', 'error');
                 }
@@ -927,6 +934,96 @@ if (!empty($reviewsClientPayload['reviews'])) {
         // Botón responder pregunta
         $(document).on('click', '.answer-btn', function() {
             $(this).siblings('.answer-form-container').slideToggle();
+        });
+
+        // === Editar reseña (autor) ===
+        $(document).on('click', '.edit-review', function() {
+            const card = $(this).closest('.review-card');
+            if (card.find('.edit-review-form').length) return; // ya existe
+
+            const reviewId = $(this).data('review-id');
+            const title = card.find('.review-title').text().trim();
+            const comment = card.find('.review-comment').text().trim();
+            const currentRating = parseInt(card.data('review-rating') || 0, 10);
+
+            // Construir el formulario de edición
+            const ratingStars = [1,2,3,4,5].map(r => `<i class="${r <= currentRating ? 'fas' : 'far'} fa-star" data-rating="${r}"></i>`).join('');
+
+            const formHtml = `
+                <form class="edit-review-form" data-review-id="${reviewId}">
+                    <div class="form-group">
+                        <label>Título</label>
+                        <input type="text" name="title" value="${escapeHtml(title)}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Calificación</label>
+                        <div class="rating-input edit-review-rating">${ratingStars}<input type="hidden" name="rating" class="edit-review-rating-value" value="${currentRating}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Comentario</label>
+                        <textarea name="comment" rows="4" required>${escapeHtml(comment)}</textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="cancel-edit-review btn small">Cancelar</button>
+                        <button type="submit" class="btn small save-edit-review">Guardar</button>
+                    </div>
+                </form>
+            `;
+
+            card.find('.review-body').append(formHtml);
+            // For accessibility and UX, scroll to form
+            card.find('.edit-review-form')[0]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
+        // Cancelar edición
+        $(document).on('click', '.cancel-edit-review', function() {
+            $(this).closest('.edit-review-form').remove();
+        });
+
+        // Guardar edición de reseña
+        $(document).on('submit', '.edit-review-form', function(e) {
+            e.preventDefault();
+            const form = $(this);
+            const reviewId = form.data('review-id');
+            const title = form.find('input[name="title"]').val().trim();
+            const rating = parseInt(form.find('.edit-review-rating-value').val() || 0, 10);
+            const comment = form.find('textarea[name="comment"]').val().trim();
+
+            if (title.length < 3 || comment.length < 10) {
+                showNotification('El título debe tener al menos 3 caracteres y el comentario al menos 10.', 'error');
+                return;
+            }
+
+            const payload = { review_id: reviewId, title, rating, comment };
+            const submitBtn = form.find('button[type="submit"]');
+            submitBtn.prop('disabled', true);
+
+            fetch('<?= BASE_URL ?>/api/edit_review.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    showNotification('Reseña actualizada', 'success');
+                    // Actualizar DOM
+                    const card = $(`.review-card[data-review-id="${reviewId}"]`);
+                    card.find('.review-title').text(title);
+                    card.find('.review-comment').html(escapeHtml(comment).replace(/\n/g, '<br>'));
+                    card.attr('data-review-rating', rating);
+                    // actualizar estrellas
+                    card.find('.review-stars').html(function() {
+                        let out = '';
+                        for (let i=1;i<=5;i++) out += (i <= rating) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+                        return out;
+                    });
+                    form.remove();
+                } else {
+                    showNotification(data.message || 'Error al actualizar reseña', 'error');
+                }
+            }).catch(err => {
+                console.error('Edit review error:', err);
+                showNotification('Error de conexión. Intenta de nuevo.', 'error');
+            }).finally(() => submitBtn.prop('disabled', false));
         });
 
         // Editar pregunta (sólo para autor) - muestra editor inline y usa alertas del usuario para feedback

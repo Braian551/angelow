@@ -38,7 +38,15 @@ try {
         $q['answers'] = $ansStmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    echo json_encode(['success' => true, 'data' => $questions]);
+    // Also include whether the current user already asked a question for this product
+    $userHasQuestion = false;
+    if (isset($_SESSION['user_id'])) {
+        $check = $conn->prepare('SELECT 1 FROM product_questions WHERE product_id = ? AND user_id = ? LIMIT 1');
+        $check->execute([$productId, $_SESSION['user_id']]);
+        $userHasQuestion = (bool)$check->fetchColumn();
+    }
+
+    echo json_encode(['success' => true, 'data' => $questions, 'user_has_question' => $userHasQuestion]);
 } catch (PDOException $e) {
     error_log('Error get_questions.php: ' . $e->getMessage());
     http_response_code(500);

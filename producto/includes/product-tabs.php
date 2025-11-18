@@ -78,13 +78,18 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                     <h3>Opiniones y calificaciones</h3>
                     <p>Las reseñas ayudan a otros compradores a decidirse por <?= htmlspecialchars($product['name']) ?>.</p>
                 </div>
-                <?php if ($canReview): ?>
-                    <button id="write-review-btn" class="tab-action-btn question-btn" data-review-action="open">
-                        <i class="fas fa-pen"></i> Escribir una opinión
-                    </button>
-                <?php else: ?>
+                <?php if ($canReview && empty($userHasReview)): ?>
                     <button type="button" class="tab-action-btn review-btn locked-review-btn" data-review-action="locked" data-lock-reason="<?= isset($_SESSION['user_id']) ? 'purchase' : 'auth' ?>">
                         <i class="fas fa-lock"></i> Escribir una opinión
+                    </button>
+                <?php elseif ($userHasReview): ?>
+                    <?php if (!empty($userHasReview)): ?>
+                        <div class="info-banner">Ya has dejado una opinión para este producto</div>
+                    <?php endif; ?>
+                    <button type="button" class="tab-action-btn review-btn" disabled title="Ya has dejado una opinión sobre este producto">Ya has dejado una opinión</button>
+                <?php else: ?>
+                    <button id="write-review-btn" class="tab-action-btn question-btn" data-review-action="open">
+                        <i class="fas fa-pen"></i> Escribir una opinión
                     </button>
                 <?php endif; ?>
             </div>
@@ -193,8 +198,8 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                         <p>Este producto aún no tiene opiniones. Sé el primero en opinar.</p>
                     </div>
                 <?php else: ?>
-                    <?php foreach ($reviewsData['reviews'] as $review): ?>
-                            <div class="review-card" data-review-id="<?= $review['id'] ?>">
+                        <?php foreach ($reviewsData['reviews'] as $review): ?>
+                            <div class="review-card" data-review-id="<?= $review['id'] ?>" data-review-rating="<?= (int)$review['rating'] ?>">
                             <div class="review-meta">
                                 <div class="user-avatar">
                                     <img src="<?= BASE_URL ?>/<?= htmlspecialchars($review['user_image'] ?? 'images/default-avatar.png') ?>" alt="<?= htmlspecialchars($review['user_name'] ?? 'Usuario') ?>">
@@ -234,6 +239,9 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
                                     <?php $userHasVoted = !empty($review['user_has_voted']) ? (int)$review['user_has_voted'] : 0; ?>
                                     <?php $isAuthor = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $review['user_id']; ?>
                                     <button class="btn small helpful-btn <?= $userHasVoted ? 'active' : '' ?>" aria-pressed="<?= $userHasVoted ? 'true' : 'false' ?>" data-review-id="<?= $review['id'] ?>" <?= $isAuthor ? 'disabled title="No puedes marcar como útil tu propia reseña"' : '' ?>>Útil (<?= intval($review['helpful_count']) ?>)</button>
+                                    <?php if ($isAuthor): ?>
+                                        <button class="btn small edit-review" data-review-id="<?= $review['id'] ?>">Editar</button>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -252,9 +260,13 @@ $reviewsCount = $reviewsData['stats']['total_reviews'];
         <div id="questions" class="tab-pane">
             <div class="questions-header">
                 <h3>Preguntas y respuestas</h3>
-                <button id="ask-question-btn" class="tab-action-btn question-btn">
-                    <i class="fas fa-question-circle"></i> Hacer una pregunta
-                </button>
+                <?php if (!isset($_SESSION['user_id']) || !$userHasQuestion): ?>
+                    <button id="ask-question-btn" class="tab-action-btn question-btn">
+                        <i class="fas fa-question-circle"></i> Hacer una pregunta
+                    </button>
+                <?php else: ?>
+                    <button class="tab-action-btn question-btn" disabled title="Ya has realizado una pregunta sobre este producto">Ya preguntaste</button>
+                <?php endif; ?>
             </div>
             
             <!-- Formulario de pregunta (oculto inicialmente) -->

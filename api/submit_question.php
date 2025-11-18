@@ -65,6 +65,17 @@ try {
         exit;
     }
 
+    // Prevent users from submitting multiple questions for same product
+    if (isset($_SESSION['user_id'])) {
+        $checkQ = $conn->prepare('SELECT 1 FROM product_questions WHERE product_id = ? AND user_id = ? LIMIT 1');
+        $checkQ->execute([$productId, $_SESSION['user_id']]);
+        if ($checkQ->fetch()) {
+            http_response_code(409);
+            echo json_encode(['success' => false, 'message' => 'Ya has realizado una pregunta sobre este producto']);
+            exit;
+        }
+    }
+
     // Insertar pregunta - la columna id debería ser AUTO_INCREMENT, pero puede faltar en algunas instalaciones.
     try {
             try {

@@ -79,6 +79,15 @@ try {
         exit;
     }
 
+    // Prevent duplicate reviews from same user
+    $stmt = $conn->prepare('SELECT id FROM product_reviews WHERE product_id = ? AND user_id = ? LIMIT 1');
+    $stmt->execute([$productId, $_SESSION['user_id']]);
+    if ($stmt->fetch()) {
+        http_response_code(409);
+        echo json_encode(['success' => false, 'message' => 'Ya has publicado una reseña para este producto']);
+        exit;
+    }
+
     // Detect order_id used for verifying purchase (optional)
     $orderId = null;
     $stmt = $conn->prepare("SELECT o.id FROM orders o JOIN order_items oi ON o.id = oi.order_id WHERE o.user_id = ? AND oi.product_id = ? AND o.status = 'delivered' LIMIT 1");
