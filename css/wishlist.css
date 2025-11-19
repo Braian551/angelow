@@ -396,7 +396,6 @@
 }
 
 .product-badge:not(.sale) {
-  background: linear-gradient(135deg, #06d6a0, #05a677);
   color: white;
 }
 
@@ -615,7 +614,7 @@
 .current-price {
   font-size: 2.6rem;
   font-weight: 800;
-  background: var(--wishlist-gradient-secondary);
+  background: var(--primary-dark);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -648,7 +647,7 @@
   justify-content: center;
   gap: 0.8rem;
   padding: 1.3rem 2rem;
-  background: var(--wishlist-gradient-secondary);
+  background: var(--dashboard-primary);
   color: white;
   text-align: center;
   text-decoration: none;
