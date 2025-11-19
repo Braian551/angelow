@@ -44,8 +44,6 @@ try {
         u.name AS user_name,
         u.email AS user_email,
         u.phone AS user_phone,
-        u.identification_number,
-        u.identification_type,
         ua.id AS address_id,
         ua.address AS address_current,
         ua.complement AS address_complement,
@@ -378,10 +376,7 @@ function translateValue($value, $field = '') {
                                     <label>Teléfono:</label>
                                     <span><?= $order['user_phone'] ?: 'N/A' ?></span>
                                 </div>
-                                <div class="info-group">
-                                    <label>Número de identificación:</label>
-                                        <span><?= $order['identification_number'] ? getIdentificationType($order['identification_type']) . ': ' . $order['identification_number'] : 'N/A' ?></span>
-                                </div>
+                                <!-- Identification removed: not requested by business. -->
                                 <div class="info-group">
                                     <label>Estado:</label>
                                     <span><?= getStatusBadge($order['status']) ?></span>

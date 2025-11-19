@@ -301,8 +301,6 @@ try {
         u.name AS user_name,
         u.email AS user_email,
         u.phone AS user_phone,
-        u.identification_number,
-        u.identification_type,
         ua.id AS current_address_id,
         ua.address AS current_address,
         ua.complement AS current_complement,
@@ -1004,13 +1002,7 @@ try {
                                     </span>
                                     <span class="info-value"><?= htmlspecialchars($order['user_phone'] ?: 'N/A') ?></span>
                                 </div>
-                                <div class="info-item">
-                                    <span class="info-label">
-                                        <i class="fas fa-id-card"></i>
-                                        Número de identificación
-                                    </span>
-                                    <span class="info-value"><?= htmlspecialchars($order['identification_number'] ?: 'N/A') ?></span>
-                                </div>
+                                <!-- Identification removed from profile. No longer requested. -->
                             </div>
                         </div>
                     </div>

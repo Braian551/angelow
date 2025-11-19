@@ -39,8 +39,8 @@ Usuario (abstracta)
 - `name: String` - Nombre completo
 - `email: String` - Correo electrónico (único)
 - `phone: String` - Teléfono de contacto
-- `identification_type: String` - Tipo de documento (CC, TI, CE, etc.)
-- `identification_number: String` - Número de documento
+<!-- identification fields removed from `users` -->
+<!-- identification_type and identification_number are deprecated and not stored on users table since Nov 2025. Use order snapshots or user profiles if needed. -->
 - `password: String` - Contraseña hasheada
 - `image: String` - Ruta de imagen de perfil
 - `role: Enum('customer', 'admin')` - Rol del usuario

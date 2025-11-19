@@ -49,8 +49,7 @@ SELECT o.*,
        u.name as client_name, 
        u.email as client_email, 
        u.phone as client_phone,
-       u.identification_type, 
-       u.identification_number,
+      -- Identification removed from `users`; omitted from exports and PDFs. If required, store it in `orders` or `user_profiles`.
        pt.reference_number,
        pt.payment_proof,
        pt.status as transaction_status,
@@ -70,8 +69,7 @@ ORDER BY o.created_at DESC
 - ✅ `client_name` → `u.name`
 - ✅ `client_email` → `u.email`
 - ✅ `client_phone` → `u.phone`
-- ✅ `identification_type` → `u.identification_type`
-- ✅ `identification_number` → `u.identification_number`
+> Nota: `identification_type` y `identification_number` ya no están en la tabla `users` — se eliminaron en una migración por diseño. Si necesitas identificaciones en PDFs, añádelas como snapshot en `orders` o en `user_profiles`.
 
 ### Información de la Orden (tabla `orders`)
 - ✅ `order_number` → `o.order_number`

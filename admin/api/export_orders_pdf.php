@@ -149,8 +149,9 @@ try {
                u.name as client_name, 
                u.email as client_email, 
                u.phone as client_phone,
-               u.identification_type, 
-               u.identification_number,
+               /* identification fields removed - stored outside users table / migrated
+                * If you need to include them, add to orders or user_profile table and join here.
+                */
                pt.reference_number,
                pt.payment_proof,
                pt.status as transaction_status,
@@ -672,7 +673,7 @@ try {
                         <span class="info-label">Nombre:</span>
                         <span class="info-value">' . htmlspecialchars($order['client_name'] ?? 'N/A') . '</span>
                     </div>
-                                        ' . (!empty($order['identification_number']) ? '<div class="info-item"><span class="info-label">Número de identificación:</span><span class="info-value">' . htmlspecialchars($order['identification_number']) . ' (' . htmlspecialchars($order['identification_type'] ?? 'CC') . ')</span></div>' : '') . '
+                                        <!-- Número de identificación omitido: el campo ya no se solicita ni se almacena en users -->
                     <div class="info-item">
                         <span class="info-label">Teléfono:</span>
                         <span class="info-value">' . htmlspecialchars($order['client_phone'] ?? 'N/A') . '</span>
