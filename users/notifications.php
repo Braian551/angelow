@@ -45,7 +45,10 @@ try {
     error_log("Error al obtener notificaciones no leídas: " . $e->getMessage());
 }
 
-// Marcar todas las notificaciones como leídas al entrar a la página
+// Opcional: marcar todas como leídas al entrar. Se deja deshabilitado para que
+// el usuario decida manualmente (botón "Marcar todas como leídas").
+// Si quieres volver al comportamiento anterior, descomenta el siguiente bloque.
+/*
 if ($unread_count > 0) {
     try {
         $stmt_mark_read = $pdo->prepare("UPDATE notifications SET is_read = 1, read_at = NOW() WHERE user_id = ? AND is_read = 0");
@@ -55,6 +58,7 @@ if ($unread_count > 0) {
         error_log("Error al marcar notificaciones como leídas: " . $e->getMessage());
     }
 }
+*/
 
 // Filtros
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
@@ -128,7 +132,7 @@ try {
         <?php require_once __DIR__ . '/../layouts/asideuser.php'; ?>
 
         <!-- Contenido principal -->
-        <main class="user-main-content">
+        <main class="user-main-content notifications-page">
             <div class="notifications-header">
                 <h1><i class="fas fa-bell"></i> Mis Notificaciones</h1>
                 <p>Mantente al día con tus pedidos y actualizaciones</p>
@@ -179,7 +183,10 @@ try {
                 </div>
 
                 <div class="actions">
-                    <!-- Todas las notificaciones se marcan automáticamente como leídas al cargar la página -->
+                    <button id="btn-mark-all" class="btn-action" onclick="markAllAsRead()" title="Marcar todas como leídas" aria-label="Marcar todas como leídas">
+                        <i class="fas fa-check-double"></i>
+                        Marcar todas como leídas
+                    </button>
                 </div>
             </div>
 
@@ -187,7 +194,7 @@ try {
             <div class="notifications-list">
                 <?php if (count($notifications) > 0): ?>
                     <?php foreach ($notifications as $notification): ?>
-                        <div class="notification-item read" data-id="<?= $notification['id'] ?>">
+                        <div class="notification-item <?= ((int) ($notification['is_read'] ?? 0) === 1) ? 'read' : 'unread' ?>" data-id="<?= $notification['id'] ?>" data-type="<?= htmlspecialchars($notification['related_entity_type'] ?? '') ?>">
                             <div class="notification-icon <?= $notification['related_entity_type'] ?? 'system' ?>">
                                 <?php
                                 $icon = 'fa-bell';
@@ -214,7 +221,12 @@ try {
 
                             <div class="notification-content" onclick="viewNotification(<?= $notification['id'] ?>, '<?= $notification['related_entity_type'] ?>', <?= $notification['related_entity_id'] ?? 'null' ?>)">
                                 <div class="notification-header">
-                                    <h3><?= htmlspecialchars($notification['title']) ?></h3>
+                                    <h3>
+                                        <?= htmlspecialchars($notification['title']) ?>
+                                        <?php if (!empty($notification['type_name']) || !empty($notification['related_entity_type'])): ?>
+                                            <span class="notification-type"><?= htmlspecialchars($notification['type_name'] ?? ucfirst($notification['related_entity_type'])) ?></span>
+                                        <?php endif; ?>
+                                    </h3>
                                     <span class="notification-time">
                                         <i class="far fa-clock"></i>
                                         <?= formatTimeAgo($notification['created_at']) ?>
@@ -229,8 +241,8 @@ try {
                                 <?php endif; ?>
                             </div>
 
-                            <div class="notification-actions">
-                                <button class="btn-delete" onclick="deleteNotification(<?= $notification['id'] ?>)" title="Eliminar">
+                                <div class="notification-actions">
+                                <button class="btn-delete" onclick="deleteNotification(<?= $notification['id'] ?>)" title="Eliminar" aria-label="Eliminar notificación">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -315,6 +327,30 @@ try {
             const totalItems = document.querySelectorAll('.notification-item').length;
             document.querySelector('.stat-card.unread .stat-number').textContent = '0';
             document.querySelector('.stat-card.read .stat-number').textContent = totalItems;
+        }
+
+        function markAllAsRead() {
+            if (!confirm('¿Marcar todas las notificaciones como leídas?')) return;
+
+            fetch('<?= BASE_URL ?>/users/api/mark_all_read.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelectorAll('.notification-item.unread').forEach(item => {
+                        item.classList.remove('unread');
+                        item.classList.add('read');
+                    });
+                    updateUnreadCount();
+                    alert('Todas las notificaciones fueron marcadas como leídas.');
+                } else {
+                    alert(data.message || 'No se pudieron marcar todas como leídas');
+                }
+            })
+            .catch(err => console.error('Error:', err));
         }
     </script>
 </body>
