@@ -312,7 +312,7 @@
 /* ===== INDICADOR VISUAL DE SELECCIÓN MASIVA ===== */
 .bulk-header.has-selection {
     border-left: 4px solid var(--primary-color);
-    background: linear-gradient(135deg, var(--glass-bg), var(--primary-lightest));
+    background: var(--bg-light);
 }
 
 .bulk-header.has-selection .bulk-title i {

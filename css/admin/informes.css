@@ -120,21 +120,13 @@
     color: white;
 }
 
-.summary-card.blue .card-icon {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
+.summary-card.blue .card-icon { background: var(--primary-color); }
 
-.summary-card.green .card-icon {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-}
+.summary-card.green .card-icon { background: var(--success-color); }
 
-.summary-card.purple .card-icon {
-    background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
-}
+.summary-card.purple .card-icon { background: var(--accent-color); }
 
-.summary-card.orange .card-icon {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
+.summary-card.orange .card-icon { background: var(--warning-color); }
 
 .summary-card .card-content {
     flex: 1;

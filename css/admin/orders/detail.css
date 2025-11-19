@@ -73,9 +73,8 @@
   padding: var(--space-xl);
   background-color: var(--bg-dark);
   min-height: calc(100vh - 80px);
-  background-image:
-    radial-gradient(at 80% 0%, var(--primary-lightest) 0px, transparent 50%),
-    radial-gradient(at 0% 50%, var(--primary-lightest) 0px, transparent 50%);
+  /* Remove radial ornaments; use solid background color */
+  background-color: var(--bg-dark);
   background-attachment: fixed;
   animation: fadeIn 0.5s ease-out;
 }
@@ -1543,10 +1542,7 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: linear-gradient(180deg,
-      rgba(0, 119, 182, 0.4) 0%,
-      rgba(0, 119, 182, 0.2) 50%,
-      rgba(0, 119, 182, 0.05) 100%);
+  background: rgba(0, 119, 182, 0.2);
   border-radius: var(--radius-full);
   box-shadow: 0 0 10px rgba(0, 119, 182, 0.1);
 }
@@ -1980,7 +1976,7 @@
 
 /* Colores específicos por tipo de cambio con iconos blancos */
 .timeline-item[data-change-type="created"] .timeline-point {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(22, 163, 74, 0.95) 100%);
+  background: var(--success-color);
   border-color: rgba(34, 197, 94, 0.3);
   box-shadow:
     0 4px 12px rgba(34, 197, 94, 0.25),
@@ -1992,7 +1988,7 @@
 }
 
 .timeline-item[data-change-type="created"]:hover .timeline-point {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 1) 0%, rgba(22, 163, 74, 1) 100%);
+  background: var(--success-color);
   border-color: rgba(34, 197, 94, 0.5);
   box-shadow:
     0 6px 20px rgba(34, 197, 94, 0.35),
@@ -2000,7 +1996,7 @@
 }
 
 .timeline-item[data-change-type="status"] .timeline-point {
-  background: linear-gradient(135deg, rgba(0, 119, 182, 0.9) 0%, rgba(0, 150, 199, 0.95) 100%);
+  background: var(--primary-color);
   border-color: rgba(0, 119, 182, 0.3);
   box-shadow:
     0 4px 12px rgba(0, 119, 182, 0.25),
@@ -2012,7 +2008,7 @@
 }
 
 .timeline-item[data-change-type="status"]:hover .timeline-point {
-  background: linear-gradient(135deg, rgba(0, 119, 182, 1) 0%, rgba(0, 150, 199, 1) 100%);
+  background: var(--primary-color);
   border-color: rgba(0, 119, 182, 0.5);
   box-shadow:
     0 6px 20px rgba(0, 119, 182, 0.35),
@@ -2020,7 +2016,7 @@
 }
 
 .timeline-item[data-change-type="payment_status"] .timeline-point {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.95) 100%);
+  background: var(--success-color);
   border-color: rgba(16, 185, 129, 0.3);
   box-shadow:
     0 4px 12px rgba(16, 185, 129, 0.25),
@@ -2032,7 +2028,7 @@
 }
 
 .timeline-item[data-change-type="payment_status"]:hover .timeline-point {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 1) 0%, rgba(5, 150, 105, 1) 100%);
+  background: var(--success-color);
   border-color: rgba(16, 185, 129, 0.5);
   box-shadow:
     0 6px 20px rgba(16, 185, 129, 0.35),
@@ -2040,7 +2036,7 @@
 }
 
 .timeline-item[data-change-type="shipping"] .timeline-point {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.9) 0%, rgba(217, 119, 6, 0.95) 100%);
+  background: var(--warning-color);
   border-color: rgba(245, 158, 11, 0.3);
   box-shadow:
     0 4px 12px rgba(245, 158, 11, 0.25),
@@ -2052,7 +2048,7 @@
 }
 
 .timeline-item[data-change-type="shipping"]:hover .timeline-point {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 1) 0%, rgba(217, 119, 6, 1) 100%);
+  background: var(--warning-color);
   border-color: rgba(245, 158, 11, 0.5);
   box-shadow:
     0 6px 20px rgba(245, 158, 11, 0.35),
@@ -2060,7 +2056,7 @@
 }
 
 .timeline-item[data-change-type="address"] .timeline-point {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(124, 58, 237, 0.95) 100%);
+  background: var(--accent-color);
   border-color: rgba(139, 92, 246, 0.3);
   box-shadow:
     0 4px 12px rgba(139, 92, 246, 0.25),
@@ -2072,7 +2068,7 @@
 }
 
 .timeline-item[data-change-type="address"]:hover .timeline-point {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 1) 0%, rgba(124, 58, 237, 1) 100%);
+  background: var(--accent-color);
   border-color: rgba(139, 92, 246, 0.5);
   box-shadow:
     0 6px 20px rgba(139, 92, 246, 0.35),
@@ -2080,7 +2076,7 @@
 }
 
 .timeline-item[data-change-type="notes"] .timeline-point {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(79, 70, 229, 0.95) 100%);
+  background: var(--accent-color);
   border-color: rgba(99, 102, 241, 0.3);
   box-shadow:
     0 4px 12px rgba(99, 102, 241, 0.25),
@@ -2092,7 +2088,7 @@
 }
 
 .timeline-item[data-change-type="notes"]:hover .timeline-point {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 1) 0%, rgba(79, 70, 229, 1) 100%);
+  background: var(--accent-color);
   border-color: rgba(99, 102, 241, 0.5);
   box-shadow:
     0 6px 20px rgba(99, 102, 241, 0.35),
@@ -2100,7 +2096,7 @@
 }
 
 .timeline-item[data-change-type="cancelled"] .timeline-point {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.95) 100%);
+  background: var(--error-color);
   border-color: rgba(239, 68, 68, 0.3);
   box-shadow:
     0 4px 12px rgba(239, 68, 68, 0.25),
@@ -2112,7 +2108,7 @@
 }
 
 .timeline-item[data-change-type="cancelled"]:hover .timeline-point {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 1) 0%, rgba(220, 38, 38, 1) 100%);
+  background: var(--error-color);
   border-color: rgba(239, 68, 68, 0.5);
   box-shadow:
     0 6px 20px rgba(239, 68, 68, 0.35),
@@ -2120,7 +2116,7 @@
 }
 
 .timeline-item[data-change-type="refunded"] .timeline-point {
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.9) 0%, rgba(234, 88, 12, 0.95) 100%);
+  background: var(--warning-color);
   border-color: rgba(249, 115, 22, 0.3);
   box-shadow:
     0 4px 12px rgba(249, 115, 22, 0.25),
@@ -2132,7 +2128,7 @@
 }
 
 .timeline-item[data-change-type="refunded"]:hover .timeline-point {
-  background: linear-gradient(135deg, rgba(249, 115, 22, 1) 0%, rgba(234, 88, 12, 1) 100%);
+  background: var(--warning-color);
   border-color: rgba(249, 115, 22, 0.5);
   box-shadow:
     0 6px 20px rgba(249, 115, 22, 0.35),
@@ -2140,7 +2136,7 @@
 }
 
 .timeline-item[data-change-type="items"] .timeline-point {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.9) 0%, rgba(219, 39, 119, 0.95) 100%);
+  background: var(--error-color);
   border-color: rgba(236, 72, 153, 0.3);
   box-shadow:
     0 4px 12px rgba(236, 72, 153, 0.25),
@@ -2152,7 +2148,7 @@
 }
 
 .timeline-item[data-change-type="items"]:hover .timeline-point {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 1) 0%, rgba(219, 39, 119, 1) 100%);
+  background: var(--error-color);
   border-color: rgba(236, 72, 153, 0.5);
   box-shadow:
     0 6px 20px rgba(236, 72, 153, 0.35),
@@ -2160,7 +2156,7 @@
 }
 
 .timeline-item[data-change-type="other"] .timeline-point {
-  background: linear-gradient(135deg, rgba(100, 116, 139, 0.9) 0%, rgba(71, 85, 105, 0.95) 100%);
+  background: var(--bg-light);
   border-color: rgba(100, 116, 139, 0.3);
   box-shadow:
     0 4px 12px rgba(100, 116, 139, 0.25),
@@ -2172,7 +2168,7 @@
 }
 
 .timeline-item[data-change-type="other"]:hover .timeline-point {
-  background: linear-gradient(135deg, rgba(100, 116, 139, 1) 0%, rgba(71, 85, 105, 1) 100%);
+  background: var(--bg-light);
   border-color: rgba(100, 116, 139, 0.5);
   box-shadow:
     0 6px 20px rgba(100, 116, 139, 0.35),

@@ -74,9 +74,8 @@
   padding: var(--space-xl);
   background-color: var(--bg-dark);
   min-height: calc(100vh - 80px);
-  background-image: 
-    radial-gradient(at 80% 0%, var(--primary-lightest) 0px, transparent 50%),
-    radial-gradient(at 0% 50%, var(--primary-lightest) 0px, transparent 50%);
+  /* Remove gradient ornaments; keep single background color */
+  background-color: var(--bg-dark);
   background-attachment: fixed;
 }
 
@@ -184,7 +183,7 @@
 
 /* ===== TARJETA DE FILTROS ===== */
 .filters-card {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
+  background: var(--bg-light);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 24px;
@@ -207,7 +206,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(0, 119, 182, 0.03) 0%, transparent 50%);
+  background: rgba(0, 119, 182, 0.02);
   pointer-events: none;
 }
 
@@ -242,7 +241,7 @@
 .filters-title i {
   font-size: 1.3rem;
   color: #0077b6;
-  background: linear-gradient(145deg, rgba(0, 119, 182, 0.12), rgba(0, 119, 182, 0.08));
+  background: rgba(0, 119, 182, 0.06);
   padding: 0.75rem;
   border-radius: 14px;
   backdrop-filter: blur(10px);
@@ -254,7 +253,7 @@
 
 .filters-title:hover i {
   transform: rotate(15deg) scale(1.1);
-  background: linear-gradient(145deg, rgba(0, 119, 182, 0.18), rgba(0, 119, 182, 0.12));
+  background: rgba(0, 119, 182, 0.12);
 }
 
 .filters-title h3 {
@@ -839,7 +838,7 @@
   padding: 1.25rem;
   flex-wrap: wrap;
   align-items: center;
-  background: linear-gradient(to right, #ffffff, #f8fafc);
+  background: var(--bg-light);
 }
 
 .filter-group {
@@ -1032,13 +1031,13 @@ input[type="date"].form-control {
 }
 
 .filcen .btn-primary {
-  background: linear-gradient(to right, #0284c7, #0369a1);
+  background: var(--primary-color);
   color: white;
   border: none;
 }
 
 .filcen .btn-primary:hover {
-  background: linear-gradient(to right, #0369a1, #075985);
+  background: var(--primary-dark);
   transform: translateY(-1px);
 }
 
@@ -1469,7 +1468,7 @@ button:focus {
 .loading-row {
   text-align: center;
   padding: 0 !important;
-  background: linear-gradient(145deg, rgba(248, 250, 252, 0.6), rgba(241, 245, 249, 0.4)) !important;
+  background: var(--bg-light) !important;
   backdrop-filter: blur(8px);
   border: none !important;
 }
@@ -1567,10 +1566,7 @@ button:focus {
 
 .loading-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, 
-    rgba(0, 119, 182, 0.8) 0%, 
-    rgba(0, 119, 182, 1) 50%, 
-    rgba(0, 119, 182, 0.8) 100%);
+  background: var(--primary-color);
   border-radius: 10px;
   animation: progressSlide 1.5s ease-in-out infinite;
   box-shadow: 0 0 10px rgba(0, 119, 182, 0.4);
@@ -2006,7 +2002,7 @@ button:focus {
   left: 0;
   width: 100%;
   height: 50%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
+  background: rgba(255,255,255,0.6);
   border-radius: 12px 12px 0 0;
 }
 
@@ -2257,7 +2253,8 @@ button:focus {
   height: 100%;
   top: 0;
   left: 0;
-  background-image: radial-gradient(circle, rgba(0, 119, 182, 0.2) 1%, transparent 1%);
+  /* Emulate ripple with semi-transparent background color (no gradient) */
+  background-color: rgba(0, 119, 182, 0.08);
   background-position: center;
   background-size: 15000%;
   opacity: 0;
@@ -2335,7 +2332,7 @@ button:focus {
   top: 0;
   left: 0;
   pointer-events: none;
-  background-image: radial-gradient(circle, rgba(0, 119, 182, 0.1) 10%, transparent 60%);
+  background-color: rgba(0, 119, 182, 0.06);
   background-position: center;
   background-size: 15000%;
   opacity: 0;
@@ -2865,7 +2862,7 @@ button:focus,
 }
 
 .modal-content {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
+  background: var(--bg-light);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 24px;
@@ -2890,7 +2887,7 @@ button:focus,
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(0, 119, 182, 0.03) 0%, transparent 50%);
+  background: rgba(0, 119, 182, 0.02);
   pointer-events: none;
   border-radius: 24px;
 }
@@ -3374,7 +3371,7 @@ button:focus,
 
 /* Estilos para los botones del modal de eliminación */
 #delete-order-modal .btn-danger {
-  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  background: var(--error-color);
   color: white;
   border: none;
   padding: 1.2rem 2rem;
@@ -3393,7 +3390,7 @@ button:focus,
 }
 
 #delete-order-modal .btn-danger:hover:not(:disabled) {
-  background: linear-gradient(135deg, #B91C1C 0%, #991B1B 100%);
+  background: var(--error-color);
   transform: translateY(-2px);
   box-shadow: 
     0 6px 16px rgba(220, 38, 38, 0.35),
@@ -3436,7 +3433,7 @@ button:focus,
 .empty-row {
   text-align: center;
   padding: 0 !important;
-  background: linear-gradient(145deg, rgba(248, 250, 252, 0.6), rgba(241, 245, 249, 0.4)) !important;
+  background: rgba(248, 250, 252, 0.6) !important;
   backdrop-filter: blur(8px);
   border: none !important;
 }
@@ -3465,7 +3462,7 @@ button:focus,
 }
 
 .error-icon {
-  background: linear-gradient(145deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05));
+  background: rgba(239, 68, 68, 0.08);
   border: 3px solid rgba(239, 68, 68, 0.3);
   box-shadow: 
     0 8px 24px rgba(239, 68, 68, 0.15),
@@ -3473,7 +3470,7 @@ button:focus,
 }
 
 .empty-icon {
-  background: linear-gradient(145deg, rgba(148, 163, 184, 0.1), rgba(100, 116, 139, 0.05));
+  background: rgba(148, 163, 184, 0.08);
   border: 3px solid rgba(148, 163, 184, 0.3);
   box-shadow: 
     0 8px 24px rgba(100, 116, 139, 0.15),
@@ -3543,23 +3540,23 @@ button:focus,
 }
 
 .btn-retry {
-  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  background: var(--error-color);
   color: white;
 }
 
 .btn-retry:hover {
-  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  background: var(--error-color);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
 }
 
 .btn-clear-search {
-  background: linear-gradient(135deg, #0077b6 0%, #0369a1 100%);
+  background: var(--primary-color);
   color: white;
 }
 
 .btn-clear-search:hover {
-  background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+  background: var(--primary-dark);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 119, 182, 0.25);
 }

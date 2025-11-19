@@ -26,6 +26,8 @@ if (isset($_SESSION['alert'])) {
     <link rel="icon" href="<?= BASE_URL ?>/images/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
+    <!-- Dashboard split for faster maintenance and focused overrides -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboard.css">
 </head>
 
 <body>

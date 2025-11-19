@@ -22,10 +22,11 @@
   --glass-muted: rgba(255, 255, 255, 0.78);
   --glass-border: rgba(255, 255, 255, 0.45);
   --glass-blur: 22px;
-  --gradient-sky: linear-gradient(135deg, #0077b6, #48cae4);
-  --gradient-mint: linear-gradient(135deg, #42e695, #3bb2b8);
-  --gradient-warning: linear-gradient(135deg, #ffd86f, #fc6262);
-  --gradient-dark: linear-gradient(135deg, #1e3c72, #2a5298);
+  /* Replace gradients with single solid colors (project restriction) */
+  --gradient-sky: var(--primary-color); /* used as color placeholder */
+  --gradient-mint: var(--secondary-color);
+  --gradient-warning: var(--warning-color);
+  --gradient-dark: var(--primary-dark);
   --panel-bg: #eef2f7;
   --panel-dark: #0f172a;
   --panel-muted: #1e293b;
@@ -48,9 +49,8 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   color: var(--text-color);
-  background: radial-gradient(circle at 15% 20%, rgba(0, 119, 182, 0.18), transparent 45%),
-              radial-gradient(circle at 80% 0%, rgba(72, 202, 228, 0.22), transparent 50%),
-              var(--panel-bg);
+  /* Remove decorative gradients: use single panel background color */
+  background: var(--panel-bg);
   font-size: 1.6rem;
   overflow-x: hidden;
 }
@@ -2078,7 +2078,7 @@ button {
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: linear-gradient(110deg, rgba(255,255,255,0) 25%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 75%);
+    background: rgba(255,255,255,0.5);
     animation: shimmer 1.5s linear infinite;
   }
 
@@ -2441,7 +2441,7 @@ button {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 45%, rgba(255,255,255,0) 100%);
+    background: rgba(255,255,255,0.6);
     animation: shimmer 1.3s infinite;
   }
 
@@ -2507,7 +2507,8 @@ button {
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.87) 100%);
+  /* Single color overlay instead of subtle gradient */
+  background-color: rgba(255, 255, 255, 0.96);
 }
 
 .page-header {
@@ -2541,14 +2542,14 @@ button {
 }
 
 .btn-primary {
-  background-image: var(--gradient-sky);
+  background-color: var(--gradient-sky);
   color: #fff;
   box-shadow: 0 15px 30px rgba(0, 119, 182, 0.2);
 }
 
 .btn-primary:focus-visible,
 .btn-primary:hover {
-  background-image: linear-gradient(135deg, #00639b, #2aa7c5);
+  background-color: var(--primary-dark);
 }
 
 .btn-secondary {
@@ -2703,7 +2704,7 @@ button {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, rgba(0, 119, 182, 0.12), transparent 55%);
+  background: rgba(0, 119, 182, 0.12);
   opacity: 0.6;
 }
 
