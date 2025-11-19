@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Casos de Prueba - Módulo de Autenticación</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Módulo de Autenticación</h1>
+    <p>Escenarios sencillos para registrar, iniciar sesión y controlar accesos en las pantallas de registro, inicio de sesión, panel de usuario y administración.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nombre/Identificador</th>
+                <th>Descripción</th>
+                <th>Pre condiciones</th>
+                <th>Entradas</th>
+                <th>Pasos</th>
+                <th>Resultados Esperados</th>
+                <th>Pos condición</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>CP-AUTH-001</td>
+                <td>Registrar un usuario nuevo con datos completos</td>
+                    <td>Pantalla de registro disponible y el correo aún no existe</td>
+                <td>Nombre "Laura Pérez", correo "laura.perez@example.com", clave "Laura2025@", celular "3205559988"</td>
+                <td>1. Abrir la pantalla de registro<br>2. Llenar todos los campos<br>3. Aceptar términos<br>4. Pulsar "Registrarme"</td>
+                <td>Aparece mensaje de bienvenida y el sistema redirige al panel correspondiente</td>
+                <td>Se crea la cuenta y la sesión queda iniciada</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>CP-AUTH-002</td>
+                <td>Intentar registrar un correo repetido</td>
+                <td>Usuario "braianoquendurango@gmail.com" ya figura en la lista de clientes</td>
+                <td>Correo repetido y cualquier otra información</td>
+                <td>1. Abrir la pantalla de registro<br>2. Escribir el correo existente<br>3. Enviar el formulario</td>
+                <td>La página muestra "Correo ya registrado" sin avanzar</td>
+                <td>No se crean cuentas nuevas</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>CP-AUTH-003</td>
+                <td>Recordar campos obligatorios en registro</td>
+                <td>Formulario visible en la pantalla de registro</td>
+                <td>Campos vacíos</td>
+                <td>1. Abrir la página<br>2. Omitir nombre, correo y contraseña<br>3. Presionar "Registrarme"</td>
+                <td>Se muestran avisos junto a cada campo faltante</td>
+                <td>Continúa en la misma pantalla</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>CP-AUTH-004</td>
+                <td>Revisar formato de correo</td>
+                <td>Formulario activo</td>
+                <td>Correo sin arroba, ej. "usuarioinvalido"</td>
+                <td>1. Llenar los demás datos<br>2. Escribir correo sin formato<br>3. Enviar</td>
+                <td>La pantalla indica que el correo no es válido</td>
+                <td>No se crea la cuenta</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>CP-AUTH-005</td>
+                <td>Avisar cuando la clave es muy corta</td>
+                <td>Pantalla de registro abierta</td>
+                <td>Contraseña de 3 caracteres</td>
+                <td>1. Completar todo<br>2. Escribir la clave corta<br>3. Enviar</td>
+                <td>Texto en rojo indica que la clave debe tener al menos 6 caracteres</td>
+                <td>Formulario sigue abierto para corregir</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>CP-AUTH-006</td>
+                <td>Ingresar como administrador</td>
+                <td>Cuenta admin "braianoquen@gmail.com" activa</td>
+                <td>Correo y clave correctos</td>
+                <td>Email="braianoquen@gmail.com", Contraseña="Braian8052@"</td>
+                <td>1. Abrir la pantalla de inicio de sesión (Login)<br>2. Ingresar Email y Contraseña del admin<br>3. Presionar "Iniciar sesión"</td>
+                <td>El sistema lleva al panel de administración (Dashboard)</td>
+                <td>Queda activa la sesión de administrador</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>CP-AUTH-007</td>
+                <td>Detectar claves incorrectas</td>
+                <td>Pantalla de inicio de sesión cargada</td>
+                <td>Correo válido y clave errada</td>
+                <td>1. Escribir el correo del cliente<br>2. Ingresar una clave distinta<br>3. Presionar "Iniciar sesión"</td>
+                <td>Mensaje "Credenciales incorrectas" y no redirige</td>
+                <td>El usuario sigue sin iniciar sesión</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>CP-AUTH-008</td>
+                <td>Redirigir según el rol del usuario</td>
+                <td>Existen cuentas admin y cliente</td>
+                <td>Datos de ambas cuentas</td>
+                <td>1. Entrar como admin<br>2. Cerrar sesión desde la opción "Cerrar sesión"<br>3. Entrar como cliente</td>
+                <td>El administrador llega a su panel (Dashboard) y el cliente a su panel personal (Mi cuenta / Panel de usuario)</td>
+                <td>Sesiones previas se cierran antes de la siguiente prueba</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>CP-AUTH-009</td>
+                <td>Probar acceso directo sin iniciar sesión</td>
+                <td>Navegador limpio sin cookies</td>
+                <td>Ruta protegida: panel de usuario (requiere iniciar sesión)</td>
+                <td>1. Escribir la ruta en la barra del navegador</td>
+                <td>La aplicación redirige a la pantalla de inicio de sesión con el aviso "Inicia sesión"</td>
+                <td>No se muestra la página privada</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>CP-AUTH-010</td>
+                <td>Cerrar sesión desde cualquier vista</td>
+                <td>Usuario autenticado</td>
+                <td>Botón "Cerrar sesión" del menú principal</td>
+                <td>1. Pulsar el botón<br>2. Confirmar si aparece aviso</td>
+                <td>Se vuelve a la página principal (Inicio)</td>
+                <td>No quedan sesiones abiertas</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>CP-AUTH-011</td>
+                <td>Usar la opción "Recordar mi cuenta"</td>
+                <td>Casilla "Recordar mi cuenta" visible en la pantalla de inicio de sesión</td>
+                <td>Correo válido con la casilla activada</td>
+                <td>1. Escribir correo y clave<br>2. Marcar "Recordarme"<br>3. Iniciar sesión</td>
+                <td>La próxima vez el usuario entra sin volver a escribir la clave</td>
+                <td>Se guarda un identificador para recordar al usuario</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td>CP-AUTH-012</td>
+                <td>Ingresar con el botón de Google</td>
+                <td>Botón "Continuar con Google" presente en la pantalla de inicio de sesión</td>
+                <td>Cuenta de Google permitida</td>
+                <td>1. Pulsar el botón<br>2. Aceptar permisos en Google<br>3. Volver al sitio</td>
+                <td>El sistema crea o actualiza la cuenta y lleva al panel que corresponda</td>
+                <td>El usuario queda autenticado</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td>CP-AUTH-013</td>
+                <td>Confirmar que las contraseñas no se guardan en texto plano</td>
+                <td>Acceso al listado de usuarios (solo para QA)</td>
+                <td>Usuario recién creado</td>
+                <td>1. Registrar un usuario de prueba<br>2. Revisar el listado de usuarios</td>
+                <td>El campo de contraseña aparece cifrado y no se muestra en texto plano</td>
+                <td>Se valida la política de seguridad</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td>CP-AUTH-014</td>
+                <td>Denegar acceso a un usuario bloqueado</td>
+                <td>Cuenta "braianoquen2@gmail.com" marcada como bloqueada</td>
+                <td>Correo bloqueado y clave correcta</td>
+                <td>1. Abrir la pantalla de inicio de sesión<br>2. Intentar ingresar con esa cuenta</td>
+                <td>Mensaje "Cuenta bloqueada" y no avanza</td>
+                <td>Se registra el intento</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td>CP-AUTH-015</td>
+                <td>Evitar inyecciones de texto en el login</td>
+                <td>Pantalla de inicio de sesión abierta</td>
+                <td>Correo con texto "admin' OR '1'='1" y cualquier clave</td>
+                <td>1. Escribir los valores<br>2. Presionar "Iniciar sesión"</td>
+                <td>El sistema responde igual que con credenciales erradas y no muestra información sensible</td>
+                <td>No se abre ninguna sesión</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

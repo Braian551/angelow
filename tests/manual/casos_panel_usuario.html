@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Casos de Prueba - Panel de Usuario</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Panel del Usuario</h1>
+    <p>Casos para las pantallas del panel de usuario (pedidos, direcciones, lista de deseos y notificaciones) descritos sin términos técnicos.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nombre/Identificador</th>
+                <th>Descripción</th>
+                <th>Pre condiciones</th>
+                <th>Entradas</th>
+                <th>Pasos</th>
+                <th>Resultados Esperados</th>
+                <th>Pos condición</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>CP-USER-001</td>
+                <td>Ver métricas al entrar al panel</td>
+                <td>Usuario con historial completo</td>
+                <td>Sesión iniciada</td>
+                <td>1. Abrir el panel de usuario (Mi cuenta)</td>
+                <td>Tarjetas muestran números reales (8 órdenes, al menos 1 dirección, 1 favorito)</td>
+                <td>La vista se muestra sin errores visibles</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>CP-USER-002</td>
+                <td>Mostrar pedidos recientes en el panel</td>
+                <td>Usuario con pedidos registrados</td>
+                <td>Ninguna</td>
+                <td>1. Estar en el panel de usuario (Mi cuenta)<br>2. Mirar el bloque "Órdenes recientes"</td>
+                <td>Se ven hasta 3 pedidos con número, fecha y estado y cada fila tiene enlace</td>
+                <td>Los enlaces llevan al detalle del pedido</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>CP-USER-003</td>
+                <td>Abrir el detalle de la orden desde el panel</td>
+                <td>Pedido de ejemplo registrado</td>
+                <td>Botón "Ver detalle"</td>
+                <td>1. Abrir la sección "Mis pedidos" en tu panel<br>2. Pulsar "Ver detalle"</td>
+                <td>La pantalla muestra productos, totales, estado actual y opciones como "Subir comprobante" o "Descargar factura"</td>
+                <td>Se puede continuar con las acciones del pedido</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>CP-USER-004</td>
+                <td>Agregar una dirección nueva</td>
+                <td>El usuario desea guardar otra dirección</td>
+                <td>Nombre "Casa Principal", ciudad "Medellín" y datos completos</td>
+                <td>1. Abrir la sección "Direcciones" en tu panel<br>2. Pulsar "Agregar"<br>3. Completar el formulario<br>4. Guardar</td>
+                <td>La dirección aparece en la lista marcada como activa</td>
+                <td>Desde el checkout ya se puede seleccionar</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>CP-USER-005</td>
+                <td>Definir cuál dirección será la principal</td>
+                <td>Cuenta con dos o más direcciones</td>
+                <td>Botón "Establecer como principal"</td>
+                <td>1. En la sección "Direcciones" pulsa el botón en la nueva dirección<br>2. Confirmar</td>
+                <td>La etiqueta "Principal" se mueve y la otra queda como secundaria</td>
+                <td>El checkout selecciona esta dirección por defecto</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>CP-USER-006</td>
+                <td>Editar la información personal</td>
+                <td>Sesión activa</td>
+                <td>Nuevo teléfono "3010000000"</td>
+                <td>1. Abrir "Perfil" en tu panel<br>2. Cambiar el teléfono<br>3. Guardar</td>
+                <td>Mensaje "Perfil actualizado" y aparece una notificación dentro del panel</td>
+                <td>Los datos nuevos se usan en próximos pedidos</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>CP-USER-007</td>
+                <td>Ver los productos guardados en favoritos</td>
+                <td>La cuenta tiene un producto en la lista</td>
+                <td>Ninguna</td>
+                <td>1. Abrir "Lista de deseos" o "Favoritos" en tu panel</td>
+                <td>Se muestran los productos con botones para llevarlos al carrito o quitarlos</td>
+                <td>El estado coincide con el corazón del catálogo</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>CP-USER-008</td>
+                <td>Quitar un producto de favoritos</td>
+                <td>Existe al menos un favorito</td>
+                <td>Ninguna</td>
+                <td>1. En "Lista de deseos" pulsa el corazón activo<br>2. Confirmar</td>
+                <td>Un mensaje indica que se eliminó y el producto desaparece de la lista</td>
+                <td>El catálogo muestra el corazón apagado</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>CP-USER-009</td>
+                <td>Revisar las notificaciones dentro del panel</td>
+                <td>Usuario con mensajes pendientes</td>
+                <td>Ninguna</td>
+                <td>1. Abrir "Notificaciones" en tu panel<br>2. Usar el botón "Marcar como leídas"</td>
+                <td>Las tarjetas cambian de estado y el contador del menú baja</td>
+                <td>Las notificaciones quedan registradas como leídas</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>CP-USER-010</td>
+                <td>Cancelar un pedido desde la misma orden</td>
+                <td>Orden en estado "Pendiente" y dentro del tiempo permitido</td>
+                <td>Motivo "Error en dirección"</td>
+                <td>1. Abrir el detalle del pedido<br>2. Pulsar "Cancelar"<br>3. Escribir el motivo y confirmar</td>
+                <td>La orden queda en estado "Cancelado" y se envía aviso al administrador</td>
+                <td>La línea de tiempo muestra el nuevo evento</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

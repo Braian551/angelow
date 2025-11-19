@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Casos de Prueba - Wishlist, Alertas y Notificaciones</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Wishlist y Alertas</h1>
+    <p>Casos basados en las correcciones descritas en <code>CORRECCIONES_ALERTAS_WISHLIST.md</code> y en las secciones reales como "Lista de deseos" del usuario y la zona de notificaciones.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nombre/Identificador</th>
+                <th>Descripción</th>
+                <th>Pre condiciones</th>
+                <th>Entradas</th>
+                <th>Pasos</th>
+                <th>Resultados Esperados</th>
+                <th>Pos condición</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>CP-WISH-001</td>
+                <td>Ver la alerta flotante al agregar un favorito</td>
+                <td>Usuario con sesión activa y el sistema de alertas cargado</td>
+                <td>Producto de prueba (ej.: "Ropa Deportiva")</td>
+                <td>1. Abrir el detalle del producto<br>2. Pulsar el corazón</td>
+                <td>Aparece una ventana flotante con título, mensaje y botones estilados</td>
+                <td>El artículo queda guardado en la lista</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>CP-WISH-002</td>
+                <td>Ver mensajes de diagnóstico en la consola</td>
+                <td>El sistema de alertas y mensajes está activo en la página</td>
+                <td>Ninguna</td>
+                <td>1. Abrir la consola con F12<br>2. Recargar la sección "Lista de deseos" del usuario</td>
+                <td>Se muestran los mensajes de inicio (🎯, 📍, 🔧, ❤️, ✅) indicando que todo cargó bien</td>
+                <td>Si faltan mensajes se reporta el problema</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>CP-WISH-003</td>
+                <td>Confirmar que al pulsar "Agregar a favoritos" el producto queda marcado como favorito</td>
+                <td>La función de agregar a favoritos responde desde la interfaz</td>
+                <td>Enviar el identificador del producto de prueba</td>
+                <td>1. Usar el botón de la web o ejecutar la llamada manualmente<br>2. Asegurarse de estar autenticado</td>
+                <td>La respuesta llega con éxito y el mensaje "Producto agregado"</td>
+                <td>Si no hay sesión responde que falta iniciar sesión</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>CP-WISH-004</td>
+                <td>Confirmar la eliminación de un favorito</td>
+                <td>Producto ya guardado en la lista</td>
+                <td>Identificador del producto de prueba</td>
+                <td>1. Pulsar el corazón encendido en la "Lista de deseos"<br>2. Confirmar la acción</td>
+                <td>El sistema muestra un mensaje tipo advertencia y responde con éxito</td>
+                <td>El producto ya no aparece en la lista</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>CP-WISH-005</td>
+                <td>Vaciar toda la lista de deseos</td>
+                <td>El usuario tiene al menos dos productos guardados</td>
+                <td>Ninguna</td>
+                <td>1. Abrir la "Lista de deseos"<br>2. Pulsar "Vaciar lista"</td>
+                <td>Se muestra un mensaje de confirmación y, al aceptar, la lista queda vacía</td>
+                <td>Aparece un aviso flotante indicando que se vació</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>CP-WISH-006</td>
+                <td>Enviar aviso cuando el producto vuelve a estar disponible</td>
+                <td>Existe la notificación 12 asociada al producto "Vestido Rosa Princesa"</td>
+                <td>Ninguna</td>
+                <td>1. Cambiar el stock del producto a disponible<br>2. Ejecutar el flujo que envía mensajes</td>
+                <td>El usuario ve "Producto disponible" en la sección "Notificaciones" del panel y recibe correo si lo permitió</td>
+                <td>El aviso queda como no leído hasta que lo abra</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>CP-WISH-007</td>
+                <td>Ejecutar el proceso que genera notificaciones automáticas</td>
+                <td>La función de generar notificaciones de usuario está habilitada</td>
+                <td>Parámetro: usuario de prueba</td>
+                <td>1. Ejecutar el procedimiento desde la consola o la tarea programada<br>2. Revisar el mensaje retornado</td>
+                <td>Se arma el texto con las notificaciones y termina sin errores</td>
+                <td>Queda registro de la ejecución para auditoría</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>CP-WISH-008</td>
+                <td>Configurar cómo quiere recibir sus mensajes</td>
+                <td>Preferencias disponibles para el usuario</td>
+                <td>Desactivar SMS de promociones</td>
+                <td>1. Abrir la sección "Notificaciones"<br>2. Ajustar los interruptores de Email/SMS/Push</td>
+                <td>Al guardar se respeta la preferencia elegida para próximos avisos</td>
+                <td>La configuración queda guardada para ese usuario</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>CP-WISH-009</td>
+                <td>Usar el archivo de pruebas para validar alertas</td>
+                <td>Archivo de pruebas para alertas (página de pruebas incluida en el proyecto)</td>
+                <td>Ninguna</td>
+                <td>1. Abrir el archivo en el navegador<br>2. Pulsar los botones Éxito, Error y Advertencia</td>
+                <td>Cada botón muestra la alerta que le corresponde y deja un registro visible</td>
+                <td>Sirve para revisar problemas visuales sin depender del backend</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>CP-WISH-010</td>
+                <td>Cerrar un aviso administrativo para que no vuelva a salir</td>
+                <td>Administrador logueado (Email="braianoquen@gmail.com", Contraseña="Braian8052@")</td>
+                <td>Ninguna</td>
+                <td>1. Haz clic en "Dashboard" en el menú lateral<br>2. Cerrar uno de los avisos superiores</td>
+                <td>Ese aviso deja de mostrarse al mismo administrador</td>
+                <td>Queda constancia de quién lo cerró y cuándo</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

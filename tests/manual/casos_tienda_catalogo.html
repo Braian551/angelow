@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Casos de Prueba - Tienda y Catálogo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Pantallas de Tienda y Catálogo</h1>
+    <p>Casos pensados para las pantallas públicas como la página principal, la tienda y la ficha de producto, usando lenguaje simple y orientado al usuario.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nombre/Identificador</th>
+                <th>Descripción</th>
+                <th>Pre condiciones</th>
+                <th>Entradas</th>
+                <th>Pasos</th>
+                <th>Resultados Esperados</th>
+                <th>Pos condición</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>CP-TIENDA-001</td>
+                <td>La página principal muestra los banners activos</td>
+                <td>Registros de sliders activos (IDs 1-3)</td>
+                <td>Abrir la página principal</td>
+                <td>1. Abrir la página principal<br>2. Mirar el carrusel principal</td>
+                <td>Aparecen los 3 banners "Bienvenido a Angelow", "Nueva Colección Verano" y "Ofertas Especiales" en el mismo orden</td>
+                <td>No se observan errores en la consola del navegador</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>CP-TIENDA-002</td>
+                <td>Filtrar por categoría "Ropa Deportiva" en la tienda</td>
+                <td>Categoría ID 4 activa y productos asociados</td>
+                <td>Abrir la tienda y seleccionar la categoría "Ropa Deportiva"</td>
+                <td>1. Abrir la tienda<br>2. Elegir "Ropa Deportiva" en el filtro lateral<br>3. Aplicar el filtro</td>
+                <td>Solo se ven artículos de esa categoría y el filtro queda resaltado</td>
+                <td>El filtro queda aplicado y visible para el usuario</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>CP-TIENDA-003</td>
+                <td>Filtrar por género en la vista principal</td>
+                <td>Productos con género registrado (ej. un producto de prueba marcado como "niño")</td>
+                <td>Seleccionar opción "Niño"</td>
+                <td>1. En la tienda activar el filtro "Niño"<br>2. Mirar las tarjetas</td>
+                <td>Todas las tarjetas muestran etiquetas acordes y el filtro sigue activo aunque se refresque</td>
+                <td>Si cambio de página mantiene el criterio</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>CP-TIENDA-004</td>
+                <td>Aplicar filtro de precio desde los controles deslizables</td>
+                <td>Existen productos entre $35.000 y $60.000</td>
+                <td>Indicar mínimo 30.000 y máximo 40.000</td>
+                <td>1. Ajustar los sliders de precio<br>2. Hacer clic en "Aplicar"</td>
+                <td>Solo se muestran productos dentro del rango y el contador indica cuántos quedan</td>
+                <td>Los valores se ven en pesos colombianos</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>CP-TIENDA-005</td>
+                <td>Ordenar la lista del más barato al más caro</td>
+                <td>Hay varios productos visibles</td>
+                <td>Elegir "Precio: menor a mayor"</td>
+                <td>1. Ubicar el selector de orden<br>2. Seleccionar la opción indicada<br>3. Revisar la parrilla</td>
+                <td>La lista respeta el orden y, si hay precio anterior, aparece tachado</td>
+                <td>Si se cambia de página mantiene la selección</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>CP-TIENDA-006</td>
+                <td>Cambiar a la página 2 del catálogo</td>
+                <td>Hay más de 12 productos activos</td>
+                <td>Botón de paginación</td>
+                <td>1. Ir al final de la tienda<br>2. Presionar el número 2</td>
+                <td>Se ven nuevos productos y el número 2 queda resaltado</td>
+                <td>Se muestra la página 2 del catálogo</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>CP-TIENDA-007</td>
+                <td>Ver información completa del producto "Ropa Deportiva"</td>
+                <td>Producto de prueba activo con fotos</td>
+                <td>Abrir la ficha del producto "Ropa Deportiva"</td>
+                <td>1. Abrir el enlace<br>2. Revisar la galería y la ficha</td>
+                <td>Se muestran nombre, precio $35.000, precio anterior $45.000, descripción, colores y tallas</td>
+                <td>Los botones "Agregar al carrito" y "Agregar a favoritos" funcionan</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>CP-TIENDA-008</td>
+                <td>Usar la barra de búsqueda superior</td>
+                <td>Usuario autenticado con historial previo</td>
+                <td>Palabra "deportiva"</td>
+                <td>1. Desde cualquier página pulsar el ícono de lupa<br>2. Escribir "deportiva"</td>
+                <td>Aparecen sugerencias con hasta 5 productos y los últimos términos del usuario</td>
+                <td>Queda guardado para futuras búsquedas</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>CP-TIENDA-009</td>
+                <td>Ver mensajes promocionales en la parte superior</td>
+                <td>Registros activos en la tabla de anuncios</td>
+                <td>Abrir cualquier vista pública</td>
+                <td>1. Entrar a la página principal o a la tienda<br>2. Observar la franja superior y el banner destacado</td>
+                <td>Se muestran "Envío Gratis" y "¡Oferta 3x2!" con los colores guardados</td>
+                <td>El mensaje con prioridad mayor aparece primero</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>CP-TIENDA-010</td>
+                <td>Mostrar corazón activo para productos guardados</td>
+                <td>Usuario con producto en favoritos</td>
+                <td>Botón de corazón en cada tarjeta</td>
+                <td>1. Iniciar sesión y abrir la tienda<br>2. Ubicar el producto ya guardado</td>
+                <td>El corazón aparece encendido y al pasar el mouse se lee "En tu lista"</td>
+                <td>Solo cambia si el usuario hace clic</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>CP-TIENDA-011</td>
+                <td>Enviar una pregunta desde la ficha del producto</td>
+                <td>La sección de preguntas está visible en la parte baja</td>
+                <td>Texto "¿Tiene talla L?"</td>
+                <td>1. En la ficha de producto ir a Preguntas<br>2. Escribir la duda<br>3. Pulsar "Enviar"</td>
+                <td>La página confirma "Recibimos tu pregunta" y queda listada debajo</td>
+                <td>El admin puede verla en su panel</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td>CP-TIENDA-012</td>
+                <td>Ocultar productos desactivados en la tienda</td>
+                <td>Producto de prueba con estado inactivo</td>
+                <td>Ninguna</td>
+                <td>Precondición: administrador conectado (Email="braianoquen@gmail.com", Contraseña="Braian8052@")<br>1. Haz clic en "Productos" → "Todos los productos" desde el menú lateral y desactiva un producto<br>2. Volver a la tienda (Productos)</td>
+                <td>Ese producto ya no aparece en la tienda ni en el buscador</td>
+                <td>Solo se puede ver desde el panel de administración</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

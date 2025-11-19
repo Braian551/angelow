@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Casos de Prueba - APIs y Contenido Dinámico</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>APIs y Solicitudes AJAX</h1>
+    <p>Casos para las funcionalidades que exponen datos al sitio (por ejemplo preguntas y reseñas), explicados con lenguaje amable para quien prueba desde el navegador o herramientas como Postman.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nombre/Identificador</th>
+                <th>Descripción</th>
+                <th>Pre condiciones</th>
+                <th>Entradas</th>
+                <th>Pasos</th>
+                <th>Resultados Esperados</th>
+                <th>Pos condición</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>CP-API-001</td>
+                <td>Obtener la lista de preguntas de un producto</td>
+                <td>El endpoint que devuelve preguntas del producto está accesible</td>
+                <td>Parámetro: identificador del producto de prueba</td>
+                <td>1. Abrir la URL en el navegador o Postman</td>
+                <td>Devuelve un JSON con cada pregunta, autor y fecha</td>
+                <td>La respuesta llega con código 200</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>CP-API-002</td>
+                <td>Enviar una pregunta desde la sección del producto</td>
+                <td>Usuario con sesión iniciada</td>
+                <td>product_id: identificador del producto de prueba, question="¿Tiene envío gratis?"</td>
+                <td>1. Llamar al endpoint de preguntas desde la interfaz o Postman<br>2. Revisar la respuesta</td>
+                <td>Responde con success=true (éxito) y mensaje "Recibimos tu pregunta"</td>
+                <td>La pregunta aparece como pendiente en la ficha</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>CP-API-003</td>
+                <td>Responder una pregunta como tienda</td>
+                <td>Administrador con acceso (Email="braianoquen@gmail.com", Contraseña="Braian8052@")</td>
+                <td>question_id reciente y answer="Sí, aplica"</td>
+                <td>1. Llamar al endpoint que guarda la respuesta del vendedor</td>
+                <td>El JSON confirma que se guardó y la respuesta queda marcada como del vendedor</td>
+                <td>El comprador recibe un aviso</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>CP-API-004</td>
+                <td>Modificar una pregunta antes de que la respondan</td>
+                <td>El autor es el mismo usuario que edita</td>
+                <td>question_id y texto corregido</td>
+                <td>1. Llamar al endpoint que permite editar la pregunta</td>
+                <td>Responde con éxito y la pregunta cambia si todavía no había respuesta</td>
+                <td>Queda registro del cambio</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>CP-API-005</td>
+                <td>Quitar una pregunta que todavía no tiene respuesta</td>
+                <td>Pregunta sin respuestas</td>
+                <td>question_id a eliminar</td>
+                <td>1. Llamar al endpoint que borra la pregunta</td>
+                <td>La respuesta indica éxito y la pregunta desaparece del listado</td>
+                <td>La acción queda documentada</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>CP-API-006</td>
+                <td>Listar las reseñas visibles de un producto</td>
+                <td>Existen reseñas aprobadas</td>
+                <td>product_id: identificador del producto de prueba</td>
+                <td>1. Llamar al endpoint para listar reseñas de un producto de prueba</td>
+                <td>El JSON incluye calificación, comentario y votos útiles</td>
+                <td>La ficha del producto consume este resultado</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>CP-API-007</td>
+                <td>Crear una reseña después de comprar</td>
+                <td>Usuario ya compró el producto</td>
+                <td>product_id: identificador del producto de prueba, rating=5, comment="Excelente"</td>
+                <td>1. Llamar al endpoint para enviar una reseña</td>
+                <td>Responde con éxito y la reseña queda en revisión</td>
+                <td>Se avisa al administrador para aprobarla</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>CP-API-008</td>
+                <td>Indicar que una reseña ayudó</td>
+                <td>Reseña existente</td>
+                <td>review_id y is_helpful=1</td>
+                <td>1. Llamar al endpoint que marca una reseña como útil</td>
+                <td>El contador sube y el JSON confirma la acción</td>
+                <td>No permite repetir el voto</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>CP-API-009</td>
+                <td>Buscar productos mientras se escribe en la barra</td>
+                <td>La búsqueda instantánea del sitio está activa</td>
+                <td>Parámetro term="vestido"</td>
+                <td>1. Consultar el archivo vía navegador o desde la barra real</td>
+                <td>Devuelve productos con nombre, enlace y precio listos para el autocompletado</td>
+                <td>El buscador usa esta respuesta al instante</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>CP-API-010</td>
+                <td>Obtener detalles rápidos para el modal del carrito</td>
+                <td>La llamada que devuelve detalles rápidos del producto está disponible</td>
+                <td>product_id: identificador del producto de prueba</td>
+                <td>1. Abrir la URL con el parámetro indicado</td>
+                <td>Responde con nombre, precios y disponibilidad por color/talla</td>
+                <td>Si no existe muestra un mensaje de error</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>CP-API-011</td>
+                <td>Actualizar el estado de pago desde una llamada AJAX</td>
+                <td>La función para actualizar el estado de pago está disponible solo en el panel administrativo</td>
+                <td>order_id: identificador de una orden de ejemplo, status="pagado"</td>
+                <td>1. Llamar al archivo estando logueado como administrador</td>
+                <td>El JSON confirma que el pago pasó a "paid" (ej. para una orden de ejemplo)</td>
+                <td>La orden registra el cambio en su historial</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td>CP-API-012</td>
+                <td>Usar los archivos de prueba rápida</td>
+                <td>Archivos de diagnóstico incluidos en el proyecto para pruebas rápidas</td>
+                <td>Ninguna</td>
+                <td>1. Abrir cada archivo en el navegador<br>2. Leer la salida</td>
+                <td>Se ve claramente si la conexión o la sesión están funcionando</td>
+                <td>Sirven para diagnosticar sin tocar la aplicación completa</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

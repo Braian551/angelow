@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Casos de Prueba - Carrito y Checkout</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Carrito y Proceso de Compra</h1>
+    <p>Escenarios descritos con lenguaje sencillo para las pantallas del Carrito, Checkout y formularios relacionados.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nombre/Identificador</th>
+                <th>Descripción</th>
+                <th>Pre condiciones</th>
+                <th>Entradas</th>
+                <th>Pasos</th>
+                <th>Resultados Esperados</th>
+                <th>Pos condición</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>CP-CART-001</td>
+                <td>Agregar "Ropa deportiva" al carrito con la sesión iniciada</td>
+                <td>Usuario con sesión activa y un producto de prueba disponible</td>
+                <td>Cantidad 1, color Azul, talla XS</td>
+                <td>1. Abrir la ficha del producto "Ropa Deportiva"<br>2. Escoger color y talla<br>3. Pulsar "Agregar al carrito"</td>
+                <td>Aparece un aviso de éxito y el contador del carrito aumenta en la cabecera</td>
+                <td>Al abrir la pantalla del Carrito se ve el producto agregado</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>CP-CART-002</td>
+                <td>Agregar al carrito sin iniciar sesión</td>
+                <td>Navegador sin sesión activa</td>
+                <td>Ninguna, solo navegar</td>
+                <td>1. Abrir cualquier producto<br>2. Pulsar "Agregar al carrito"</td>
+                <td>El sitio guarda el carrito usando la cookie de la sesión y muestra un mensaje invitando a registrarse</td>
+                <td>El identificador permanece hasta que se cierre el navegador</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>CP-CART-003</td>
+                <td>Evitar que se agregue más unidades que el inventario</td>
+                <td>Variante XS (ID 34) tiene 35 unidades</td>
+                <td>Cantidad 40</td>
+                <td>1. En el detalle del producto, escribir 40<br>2. Intentar agregarlo</td>
+                <td>Mensaje "Stock insuficiente" y el producto no se suma</td>
+                <td>El inventario no cambia</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>CP-CART-004</td>
+                <td>Actualizar la cantidad directamente desde el carrito</td>
+                <td>El carrito ya contiene el producto de prueba</td>
+                <td>Elegir cantidad 2</td>
+                <td>1. Abrir la pantalla del Carrito<br>2. Usar los botones + y -<br>3. Guardar cambios</td>
+                <td>El subtotal cambia a $70.000 y se muestra el nuevo total</td>
+                <td>El cambio queda guardado y visible al refrescar</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>CP-CART-005</td>
+                <td>Quitar un producto del carrito</td>
+                <td>El carrito tiene al menos un ítem</td>
+                <td>Icono de basurero</td>
+                <td>1. Desde la pantalla del Carrito pulsar el icono de eliminar<br>2. Confirmar la acción</td>
+                <td>El producto deja de verse y el total se actualiza</td>
+                <td>Si no quedan productos se muestra el carrito vacío</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>CP-CART-006</td>
+                <td>Conservar el carrito creado como invitado al iniciar sesión</td>
+                <td>El usuario agregó productos antes de autenticarse</td>
+                <td>Luego inicia sesión</td>
+                <td>1. Agregar un producto sin estar logueado<br>2. Iniciar sesión en la pantalla de inicio de sesión<br>3. Revisar el carrito</td>
+                <td>Los mismos productos siguen presentes ahora asociados a la cuenta</td>
+                <td>Los ítems no se duplican</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>CP-CART-007</td>
+                <td>Usar un cupón en la página del carrito</td>
+                <td>Existe el cupón "VERANO2025" vigente</td>
+                <td>Código "VERANO2025"</td>
+                <td>1. Abrir la pantalla del Carrito<br>2. Mostrar la caja "¿Tienes un cupón?"<br>3. Escribir el código y aplicar</td>
+                <td>El resumen resta el valor del cupón y aparece un mensaje de confirmación</td>
+                <td>El cupón queda registrado como usado si así se define</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>CP-CART-008</td>
+                <td>Calcular el costo de envío en el checkout</td>
+                <td>Usuario con dirección guardada en Medellín</td>
+                <td>Seleccionar "Medellín"</td>
+                <td>1. Continuar al Checkout (pantalla de pago)<br>2. Elegir la dirección registrada</td>
+                <td>El resumen muestra el envío por $8.000 y actualiza el total</td>
+                <td>El valor queda guardado para el paso final</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>CP-CART-009</td>
+                <td>Mostrar mensajes cuando faltan datos en el checkout</td>
+                <td>Pantalla de pago (Checkout) abierta</td>
+                <td>Dejar campos vacíos</td>
+                <td>1. Dejar sin llenar los campos obligatorios<br>2. Pulsar "Continuar"</td>
+                <td>Aparecen mensajes debajo de cada campo y el botón "Confirmar pedido" sigue bloqueado</td>
+                <td>No se genera ninguna orden</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>CP-CART-010</td>
+                <td>Confirmar la compra desde el resumen final</td>
+                <td>Carrito listo con subtotal $35.000 y envío $8.000</td>
+                <td>Método "Transferencia"</td>
+                <td>1. Revisar el detalle del pedido<br>2. Marcar "Acepto los términos"<br>3. Pulsar "Confirmar pedido"</td>
+                <td>La página muestra un número de orden tipo ORD… y queda en estado "Pendiente"</td>
+                <td>El carrito se limpia y aparece la pantalla con instrucciones de pago</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>CP-CART-011</td>
+                <td>Adjuntar el comprobante de pago manual</td>
+                <td>Orden pendiente con método transferencia</td>
+                <td>Foto JPG menor a 2 MB</td>
+                <td>1. Desde la pantalla final pulsar "Subir comprobante"<br>2. Elegir el archivo<br>3. Enviar</td>
+                <td>La página confirma la carga y muestra que el pago queda "En revisión"</td>
+                <td>El archivo se guarda en la carpeta de pagos</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td>CP-CART-012</td>
+                <td>Recordar al cliente que dejó el carrito a medias</td>
+                <td>Carrito con más de 24 horas sin movimiento</td>
+                <td>Ninguna</td>
+                <td>1. Volver a iniciar sesión<br>2. Abrir la página del carrito</td>
+                <td>La página muestra un aviso para retomar la compra y, si hay stock, mantiene los productos</td>
+                <td>Si algún producto ya no tiene stock se indica en la misma pantalla</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

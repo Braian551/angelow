@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Casos de Prueba - Panel Administrativo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Panel Administrativo</h1>
+    <p>Casos prácticos para las pantallas del panel administrativo (por ejemplo: "Dashboard", "Órdenes", "Productos"), descritos con lenguaje cotidiano y sin rutas técnicas.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nombre/Identificador</th>
+                <th>Descripción</th>
+                <th>Pre condiciones</th>
+                <th>Entradas</th>
+                <th>Pasos</th>
+                <th>Resultados Esperados</th>
+                <th>Pos condición</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>CP-ADMIN-001</td>
+                <td>Entrar al panel exclusivo para administradores</td>
+                <td>Usuario con role='admin' activo</td>
+                <td>Email="braianoquen@gmail.com", Contraseña="Braian8052@"</td>
+                <td>1. Iniciar sesión como admin<br>2. Haz clic en "Dashboard" desde el menú lateral<br>3. Verificar que se cargue el panel</td>
+                <td>El panel principal muestra tarjetas, gráficos y accesos sin errores</td>
+                <td>Si inicia sesión un cliente lo envía a su propio panel</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>CP-ADMIN-002</td>
+                <td>Ver cómo se cargan los datos del panel principal</td>
+                <td>Las métricas del panel se muestran correctamente y sin errores visibles</td>
+                <td>Ninguna</td>
+                <td>1. Haz clic en "Dashboard" desde el menú lateral<br>2. Esperar a que termine el indicador de carga</td>
+                <td>Las tarjetas muestran datos reales como órdenes del día e ingresos</td>
+                <td>La consola no muestra errores de conexión</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>CP-ADMIN-003</td>
+                <td>Filtrar órdenes por estado desde la tabla</td>
+                <td>Existen órdenes en distintos estados</td>
+                <td>Elegir estado "Pendiente" en el selector</td>
+                <td>1. Haz clic en "Órdenes" desde el menú lateral<br>2. Seleccionar "Pendiente" en el filtro</td>
+                <td>Solo se ven las órdenes con ese estado y el contador lo indica</td>
+                <td>Si se exporta respeta el mismo filtro</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>CP-ADMIN-004</td>
+                <td>Cambiar el estado de una orden desde su detalle</td>
+                <td>Una orden de ejemplo aparece marcada como "Enviado"</td>
+                <td>Seleccionar "Entregado"</td>
+                <td>1. Haz clic en "Órdenes" desde el menú lateral y abre la orden<br>2. Cambiar el estado a "Entregado"<br>3. Guardar</td>
+                <td>El nuevo estado se guarda y aparece en la línea de tiempo</td>
+                <td>El cliente recibe la notificación del cambio</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>CP-ADMIN-005</td>
+                <td>Crear un producto nuevo desde el panel</td>
+                <td>Catálogos de colores y tallas listos</td>
+                <td>Nombre "Vestido Fiesta", precio 45.000, stock 25</td>
+                <td>1. Haz clic en "Productos" → "Todos los productos" desde el menú lateral<br>2. Pulsar "Agregar"<br>3. Completar el formulario y subir foto<br>4. Guardar</td>
+                <td>El producto aparece en la tabla y se generan las variantes</td>
+                <td>Al activarlo se muestra en la tienda</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>CP-ADMIN-006</td>
+                <td>Editar un producto ya creado</td>
+                <td>Producto de prueba listo para edición</td>
+                <td>Nuevo precio $38.000</td>
+                <td>1. Haz clic en "Productos" → "Todos los productos" desde el menú lateral<br>2. Pulsar "Editar" en el producto<br>3. Actualizar el precio<br>4. Guardar</td>
+                <td>El listado muestra el nuevo precio</td>
+                <td>Desde la tienda se refleja tras refrescar</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>CP-ADMIN-007</td>
+                <td>Encender o apagar la visibilidad de un producto</td>
+                <td>Producto visible actualmente</td>
+                <td>Interruptor de estado</td>
+                <td>1. En la lista de productos mover el interruptor<br>2. Confirmar el mensaje</td>
+                <td>El producto queda escondido o visible según la elección</td>
+                <td>El catálogo responde al cambio</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>CP-ADMIN-008</td>
+                <td>Subir varias imágenes según el color</td>
+                <td>Producto con opciones de color activas</td>
+                <td>Dos fotos JPG</td>
+                <td>1. Haz clic en "Productos" → "Todos los productos" desde el menú lateral<br>2. Entrar al modal de galería y subir las fotos para el color Azul</td>
+                <td>Las imágenes quedan asociadas al color y se guardan en uploads/productos</td>
+                <td>En la tienda se ven las miniaturas nuevas</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>CP-ADMIN-009</td>
+                <td>Agregar una categoría al catálogo</td>
+                <td>Panel de categorías activo</td>
+                <td>Nombre "Ropa de Invierno" y enlace amigable "ropa-invierno"</td>
+                <td>1. Haz clic en "Productos" → "Categorías" desde el menú lateral<br>2. Pulsar "Nueva"<br>3. Completar los campos</td>
+                <td>La nueva categoría aparece en la tabla</td>
+                <td>Luego se puede usar en la tienda</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>CP-ADMIN-010</td>
+                <td>Actualizar el nombre de una categoría</td>
+                <td>Categoría ID 1 "Vestidos"</td>
+                <td>Nuevo nombre "Vestidos Elegantes"</td>
+                <td>1. Haz clic en "Productos" → "Categorías" desde el menú lateral<br>2. Pulsar "Editar", cambiar el nombre y guardar</td>
+                <td>El listado muestra el nombre nuevo</td>
+                <td>La tienda usa el texto actualizado</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>CP-ADMIN-011</td>
+                <td>Aplicar un ajuste manual de inventario</td>
+                <td>Variante 34 con stock 35</td>
+                <td>Restar 5 unidades</td>
+                <td>1. Haz clic en "Productos" → "Inventario" desde el menú lateral<br>2. Seleccionar la variante<br>3. Registrar la resta</td>
+                <td>El stock baja a 30 y se muestra un mensaje de éxito</td>
+                <td>Si queda bajo, el panel principal mostrará alerta</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td>CP-ADMIN-012</td>
+                <td>Mostrar alerta cuando el stock está bajo</td>
+                <td>Producto con stock menor al mínimo</td>
+                <td>Ninguna</td>
+                <td>1. Reducir el stock por debajo del umbral<br>2. Haz clic en "Dashboard" en el menú lateral</td>
+                <td>La tarjeta de inventario indica cuántos productos están bajos y ofrece un enlace directo</td>
+                <td>Desde allí se puede ir directo al producto</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td>CP-ADMIN-013</td>
+                <td>Crear un cupón de descuento</td>
+                <td>Módulo de descuentos habilitado</td>
+                <td>Código "VERANO2025", 15%</td>
+                <td>1. Haz clic en "Descuentos" desde el menú lateral<br>2. Pulsar "Nuevo"<br>3. Guardar</td>
+                <td>El cupón aparece activo en la tabla con su porcentaje</td>
+                <td>Listo para usarse en el checkout</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td>CP-ADMIN-014</td>
+                <td>Desactivar un cupón que ya no aplica</td>
+                <td>El cupón existe y está activo</td>
+                <td>Interruptor de estado</td>
+                <td>1. Haz clic en "Descuentos" desde el menú lateral<br>2. Mover el interruptor a inactivo</td>
+                <td>La fila muestra la etiqueta "Inactivo" y no se ofrece en el checkout</td>
+                <td>Los pedidos nuevos ya no lo aceptan</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td>CP-ADMIN-015</td>
+                <td>Agregar un banner al carrusel principal</td>
+                <td>Acceso a "Sliders" desde el menú de "Configuración" del panel administrativo</td>
+                <td>Título y imagen 1920x600</td>
+                <td>1. Crear un nuevo slider<br>2. Asignar la posición deseada en la lista</td>
+                <td>El banner queda en el listado y se ve en la página principal</td>
+                <td>El archivo se guarda en uploads/sliders</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+            <tr>
+                <td>16</td>
+                <td>CP-ADMIN-016</td>
+                <td>Generar el reporte de ventas mensual</td>
+                <td>Hay órdenes completadas en octubre</td>
+                <td>Fechas del 01/10/2025 al 31/10/2025</td>
+                <td>1. Haz clic en "Informes" desde el menú lateral<br>2. Elegir "Ventas" o reporte deseado<br>3. Seleccionar fechas<br>4. Generar</td>
+                <td>Se descarga un PDF o CSV con totales y listado de pedidos</td>
+                <td>El sistema deja constancia de la descarga</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>17</td>
+                <td>CP-ADMIN-017</td>
+                <td>Revisar el historial de cambios en órdenes</td>
+                <td>Tabla de auditoría llena</td>
+                <td>Ninguna</td>
+                <td>1. Haz clic en "Órdenes" desde el menú lateral y luego en "Auditoría" o consulta similar<br>2. Filtrar por acción UPDATE</td>
+                <td>Se ven los registros con usuario y fecha</td>
+                <td>Se puede exportar si se necesita</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>18</td>
+                <td>CP-ADMIN-018</td>
+                <td>Ver el número de órdenes nuevas en el menú lateral</td>
+                <td>El contador de órdenes en el menú se actualiza automáticamente cuando llegan nuevas órdenes</td>
+                <td>Ninguna</td>
+                <td>1. Haz clic en "Dashboard" desde el menú lateral<br>2. Esperar unos segundos o crear una orden nueva</td>
+                <td>El menú "Órdenes" muestra un número rojo con las pendientes y desaparece al visitar la vista</td>
+                <td>La fecha de última visita se actualiza para ese admin</td>
+                <td>Pendiente</td>
+                <td>Baja</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

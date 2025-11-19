@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Casos de Prueba - Pagos y Envíos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Pagos y Envíos</h1>
+    <p>Escenarios descritos para las vistas públicas y administrativas como la pantalla de pago (Checkout), la sección "Mis pedidos" del usuario y la sección "Pagos" del panel administrativo, explicados sin tecnicismos.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nombre/Identificador</th>
+                <th>Descripción</th>
+                <th>Pre condiciones</th>
+                <th>Entradas</th>
+                <th>Pasos</th>
+                <th>Resultados Esperados</th>
+                <th>Pos condición</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>CP-PAY-001</td>
+                <td>Subir el comprobante de una transferencia</td>
+                <td>Orden de ejemplo recientemente creada y pendiente</td>
+                <td>Foto JPG de 1 MB</td>
+                <td>1. En la pantalla de pago elegir "Subir comprobante"<br>2. Seleccionar la imagen<br>3. Guardar</td>
+                <td>La página confirma que el archivo quedó guardado y la orden continúa "Pendiente"</td>
+                <td>El archivo queda disponible para el equipo de pagos</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>CP-PAY-002</td>
+                <td>Aprobar un comprobante desde el panel de pagos</td>
+                <td>Administrador conectado (Email="braianoquen@gmail.com", Contraseña="Braian8052@") y una orden de ejemplo con archivo cargado</td>
+                <td>Botón "Aprobar"</td>
+                <td>1. Haz clic en "Pagos" desde el menú lateral<br>2. Abrir el pago<br>3. Pulsar "Aprobar"</td>
+                <td>El estado de pago pasa a "Pagado", la orden queda "En proceso" y se avisa al cliente por correo</td>
+                <td>El movimiento queda registrado en el historial de la orden</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>CP-PAY-003</td>
+                <td>Rechazar un pago cuando la evidencia no coincide</td>
+                <td>Orden de ejemplo esperando revisión</td>
+                <td>Comentario con el motivo</td>
+                <td>1. Haz clic en "Pagos" desde el menú lateral, abrir el registro<br>2. Pulsar "Rechazar" y escribir la razón</td>
+                <td>La pantalla muestra "Pago rechazado" y el cliente recibe un aviso con la explicación</td>
+                <td>La orden queda pendiente hasta que carguen un nuevo comprobante</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>CP-PAY-004</td>
+                <td>Descargar la factura desde el panel del cliente</td>
+                <td>Orden de ejemplo ya enviada y pagada</td>
+                <td>Botón "Descargar factura"</td>
+                <td>1. Abrir "Mis pedidos" desde tu panel<br>2. Abrir la orden<br>3. Pulsar "Descargar factura"</td>
+                <td>Se descarga un PDF con los datos del pedido y el número de factura</td>
+                <td>El archivo también queda guardado en la carpeta de facturas</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>CP-PAY-005</td>
+                <td>Marcar un reembolso desde el panel de órdenes</td>
+                <td>Orden de ejemplo lista para devolución</td>
+                <td>Botón "Reembolsar"</td>
+                <td>1. Haz clic en "Órdenes" desde el menú lateral y abre la orden cancelada<br>2. Pulsar "Marcar como reembolsada"</td>
+                <td>El estado cambia a "Reembolsado" y el cliente recibe un aviso</td>
+                <td>Queda constancia en el historial</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>CP-PAY-006</td>
+                <td>Actualizar el estado del envío a "Entregado"</td>
+                <td>Orden de ejemplo actualmente "Enviado"</td>
+                <td>Seleccionar "Entregado"</td>
+                <td>1. Haz clic en "Órdenes" desde el menú lateral y abre la orden<br>2. Cambiar el estado a "Entregado"<br>3. Guardar</td>
+                <td>La orden aparece como "Entregada" y se envía un mensaje al comprador</td>
+                <td>En el panel del cliente se muestra la fecha de entrega</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>CP-PAY-007</td>
+                <td>Aplicar la tarifa de envío de Medellín</td>
+                <td>Regla activa para Medellín</td>
+                <td>Elegir ciudad Medellín</td>
+                <td>1. En la pantalla de pago seleccionar Medellín en la dirección<br>2. Continuar con el proceso</td>
+                <td>El resumen suma $8.000 por envío y se guarda con la orden</td>
+                <td>Se usará esa tarifa al generar la factura</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>CP-PAY-008</td>
+                <td>Pedir una dirección antes de confirmar el pedido</td>
+                <td>Cuenta sin direcciones guardadas</td>
+                <td>Ninguna</td>
+                <td>1. Intentar terminar la compra en la pantalla de pago sin elegir dirección</td>
+                <td>El sitio muestra "Agrega una dirección" y no deja continuar</td>
+                <td>Se invita a completar el formulario de direcciones</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>CP-PAY-009</td>
+                <td>Buscar un pago específico en la tabla de administración</td>
+                <td>Listado de la sección "Pagos" del panel administrativo con varios registros</td>
+                <td>Texto con número de orden de ejemplo</td>
+                <td>1. Abrir el módulo de pagos<br>2. Escribir el número de orden en el buscador</td>
+                <td>Solo queda visible el pago de esa orden con sus botones de acción</td>
+                <td>El filtro se mantiene hasta limpiar la caja</td>
+                <td>Pendiente</td>
+                <td>Media</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>CP-PAY-010</td>
+                <td>Enviar un correo cuando cambia el estado del pedido</td>
+                <td>Servidor de correo listo</td>
+                <td>Elegir estado "En proceso"</td>
+                <td>1. Haz clic en "Órdenes" desde el menú lateral y cambiar el estado<br>2. Revisar el correo del cliente</td>
+                <td>El cliente recibe un mensaje (ej. "Tu envío está en camino") y aparece también en su panel</td>
+                <td>La notificación queda listada en la sección "Notificaciones" del panel del usuario</td>
+                <td>Pendiente</td>
+                <td>Alta</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
