@@ -167,7 +167,7 @@ button {
 
 .content-logo2 img {
   width: 50px;
-    margin: 6px;
+  margin: 6px;
 }
 
 .logo img {
@@ -181,166 +181,168 @@ button {
 
 
 .search-bar {
-    flex: 1;
-    max-width: 600px;
-    margin: 0 2rem;
-    position: relative;
-    z-index: 1000;
+  flex: 1;
+  max-width: 600px;
+  margin: 0 2rem;
+  position: relative;
+  z-index: 1000;
 }
 
 .search-form {
-    position: relative;
-    width: 100%;
+  position: relative;
+  width: 100%;
 }
 
 .search-bar input {
-    width: 100%;
-    padding: 1.2rem 5rem 1.2rem 2rem;
-    border: 2px solid var(--border-color);
-    border-radius: 50px;
-    font-size: 1.5rem;
-    transition: var(--transition);
-    background-color: var(--bg-light);
-    box-shadow: var(--shadow-sm);
-    color: var(--text-dark);
+  width: 100%;
+  padding: 1.2rem 5rem 1.2rem 2rem;
+  border: 2px solid var(--border-color);
+  border-radius: 50px;
+  font-size: 1.5rem;
+  transition: var(--transition);
+  background-color: var(--bg-light);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-dark);
 }
 
 .search-bar input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.1);
-    background-color: white;
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.1);
+  background-color: white;
 }
 
 .search-bar button {
-    position: absolute;
-    right: 2rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-light);
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.6rem;
-    transition: var(--transition);
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-light);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.6rem;
+  transition: var(--transition);
 }
 
 .search-bar button:hover {
-    color: var(--primary-color);
-    transform: translateY(-50%) scale(1.1);
+  color: var(--primary-color);
+  transform: translateY(-50%) scale(1.1);
 }
 
 .search-results {
-    position: absolute;
-    top: calc(100% + 5px);
-    left: 0;
-    right: 0;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: var(--shadow-lg);
-    z-index: 1000;
-    display: none;
-    max-height: 500px;
-    overflow-y: auto;
-    border: 1px solid var(--border-color);
-    padding: 1rem 0;
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  display: none;
+  max-height: 500px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  padding: 1rem 0;
 }
 
 /* Resultados de productos */
 .product-item {
-    display: flex;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    transition: var(--transition);
-    border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  transition: var(--transition);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .product-item:hover {
-    background-color: rgba(0, 180, 216, 0.05);
+  background-color: rgba(0, 180, 216, 0.05);
 }
 
 .product-item img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 6px;
-    margin-right: 1.5rem;
-    border: 1px solid var(--border-color);
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-right: 1.5rem;
+  border: 1px solid var(--border-color);
 }
 
 .product-info2 {
-    flex: 1;
+  flex: 1;
 }
 
 .product-info2 div {
-    font-size: 1.4rem;
-    color: var(--text-dark);
-    font-weight: 500;
+  font-size: 1.4rem;
+  color: var(--text-dark);
+  font-weight: 500;
 }
 
 .product-info2 div:first-child {
-    margin-bottom: 0.3rem;
+  margin-bottom: 0.3rem;
 }
 
 .product-info2 div:last-child {
-    color: var(--primary-dark);
-    font-weight: 600;
+  color: var(--primary-dark);
+  font-weight: 600;
 }
 
 /* Sugerencias de búsqueda */
 .suggestion-item {
-    display: flex;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    cursor: pointer;
-    transition: var(--transition);
-    font-size: 1.4rem;
-    color: var(--text-color);
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 1.4rem;
+  color: var(--text-color);
 }
 
 .suggestion-item:hover {
-    background-color: rgba(0, 180, 216, 0.05);
-    color: var(--primary-color);
+  background-color: rgba(0, 180, 216, 0.05);
+  color: var(--primary-color);
 }
 
 .suggestion-item i {
-    margin-right: 1.2rem;
-    width: 20px;
-    text-align: center;
-    color: var(--text-light);
+  margin-right: 1.2rem;
+  width: 20px;
+  text-align: center;
+  color: var(--text-light);
 }
 
 .suggestion-item:hover i {
-    color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 /* Mensaje cuando no hay resultados */
 .no-results {
-    padding: 1.5rem;
-    text-align: center;
-    color: var(--text-light);
-    font-size: 1.4rem;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-light);
+  font-size: 1.4rem;
 }
 
 /* Efecto de carga */
 .search-loading {
-    padding: 1rem;
-    text-align: center;
+  padding: 1rem;
+  text-align: center;
 }
 
 .search-loading::after {
-    content: "";
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--border-color);
-    border-top-color: var(--primary-color);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 
@@ -487,7 +489,12 @@ button {
 
 .hero-content {
   position: absolute;
+  padding: 20px;
+  border-radius: 24px;
+  backdrop-filter: blur(2px);
   top: 50%;
+  border: 1px solid;
+  background: #00000057;
   left: 10%;
   transform: translateY(-50%);
   max-width: 500px;
@@ -498,7 +505,6 @@ button {
 
 .hero-content h1 {
   font-size: 4rem;
-  margin-bottom: 1.5rem;
   animation: slideInLeft 0.8s ease;
 }
 
@@ -549,8 +555,9 @@ button {
   transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
-  font-size: 2rem;
-  padding: 1rem 1.5rem;
+  border-radius: 50%;
+  font-size: 2.5rem;
+  padding: 1.5rem 2rem;
   cursor: pointer;
   border: none;
   z-index: 3;
@@ -790,8 +797,8 @@ button {
 
 /* ===== BANNER PROMOCIONAL ===== */
 .promo-banner {
-  background-color: var(--primary-light);
-  padding: 4rem 0;
+  background-color: var(--primary-dark);
+  padding: 2rem 0;
   text-align: center;
   margin: 4rem 0;
   position: relative;
@@ -815,21 +822,26 @@ button {
   z-index: 1;
 }
 
+.promo-content .fas {
+  color: var(--text-white);
+
+}
+
 .promo-content h2 {
   font-size: 2.8rem;
-  color: var(--primary-dark);
+  color: var(--text-white);
   margin-bottom: 1.5rem;
   animation: fadeIn 1s ease;
 }
 
 .promo-content p {
   font-size: 1.6rem;
-  color: var(--text-dark);
+  color: var(--text-white);
   margin-bottom: 2rem;
 }
 
 .promo-content .btn {
-  background-color: var(--primary-dark);
+  background-color: var(--primary-color);
   padding: 1.2rem 3rem;
   font-size: 1.6rem;
 }
@@ -1171,19 +1183,20 @@ button {
   html {
     font-size: 58%;
   }
-    .search-bar {
-        order: 3;
-        width: 100%;
-        margin: 1.5rem 0 0;
-    }
-    
-    .search-bar input {
-        padding: 1rem 4rem 1rem 1.5rem;
-    }
-    
-    .search-bar button {
-        right: 1.5rem;
-    }
+
+  .search-bar {
+    order: 3;
+    width: 100%;
+    margin: 1.5rem 0 0;
+  }
+
+  .search-bar input {
+    padding: 1rem 4rem 1rem 1.5rem;
+  }
+
+  .search-bar button {
+    right: 1.5rem;
+  }
 
   .hero-banner {
     height: 50vh;
