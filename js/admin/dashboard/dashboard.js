@@ -357,9 +357,10 @@ class AdminDashboard {
             this.charts.status.destroy();
         }
 
-        const labels = breakdown.map((item) => item.label);
-        const values = breakdown.map((item) => item.count);
-        const colors = breakdown.map((item) => item.color);
+        const normalized = this.normalizeStatusBreakdown(breakdown);
+        const labels = normalized.map((item) => item.label);
+        const values = normalized.map((item) => item.count);
+        const colors = normalized.map((item) => item.color);
 
         this.charts.status = new Chart(ctx, {
             type: 'doughnut',
@@ -385,7 +386,7 @@ class AdminDashboard {
         });
 
         this.toggleChartSkeleton(this.elements.statusCard, true);
-        this.renderStatusList(breakdown);
+        this.renderStatusList(normalized);
     }
 
     renderStatusList(breakdown) {
@@ -414,6 +415,13 @@ class AdminDashboard {
                 </div>
             `;
         }).join('');
+    }
+
+    normalizeStatusBreakdown(breakdown = []) {
+        return breakdown.map((item) => ({
+            ...item,
+            count: Number(item.count) || 0
+        }));
     }
 
     renderRecentOrders(orders) {

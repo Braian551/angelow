@@ -1069,8 +1069,8 @@ button {
 
 .orders-table th {
   font-weight: 600;
-  color: var(--text-dark);
-  background-color: var(--bg-dark);
+  color: var(--text-white);
+  background-color: var(--primary-color);
 }
 
 .orders-table tr:hover td {
