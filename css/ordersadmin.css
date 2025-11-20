@@ -339,6 +339,8 @@
   font-weight: 600;
   text-transform: capitalize;
   letter-spacing: 0.5px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background-color: #fff;
 }
 
 .status-badge.pending {

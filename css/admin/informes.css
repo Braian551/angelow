@@ -244,6 +244,24 @@
     height: 400px;
 }
 
+/* Enhanced chart-card for informes to match dashboard */
+.chart-card.chart-card-large,
+.chart-card.large {
+    padding: 2rem;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.97));
+    box-shadow: 0 8px 20px rgba(2,6,23,0.05);
+    transition: transform 140ms var(--transition), box-shadow 140ms var(--transition);
+}
+
+.chart-card.chart-card-large:hover,
+.chart-card.large:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 38px rgba(2,6,23,0.06);
+}
+
+.chart-body canvas { max-width:100%; height:auto; max-height:420px; border-radius:10px; display:block; }
+
 .chart-body canvas {
     max-width: 100%;
     max-height: 100%;

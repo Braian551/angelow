@@ -28,6 +28,7 @@ if (isset($_SESSION['alert'])) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <!-- Dashboard split for faster maintenance and focused overrides -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboard.css">
+        <!-- Recent-orders CSS is in css/dashboard.css now; inline overrides removed. -->
 </head>
 
 <body>

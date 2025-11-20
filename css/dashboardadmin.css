@@ -937,6 +937,20 @@ button {
   padding: 2rem;
 }
 
+/* Large chart card: visual upgrade for important charts */
+.chart-card.chart-card-large {
+  padding: 2.2rem;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.97));
+  box-shadow: 0 12px 30px rgba(2,6,23,0.06);
+  transition: transform 180ms var(--transition), box-shadow 180ms var(--transition);
+}
+
+.chart-card.chart-card-large:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(2,6,23,0.08);
+}
+
 .chart-header {
   display: flex;
   justify-content: space-between;
@@ -947,6 +961,17 @@ button {
 .chart-header h3 {
   font-size: 1.8rem;
   color: var(--text-dark);
+}
+
+.chart-header h3 i {
+  color: var(--primary-color);
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(0,119,182,0.06);
 }
 
 .chart-period {
@@ -1048,28 +1073,33 @@ button {
 }
 
 .status-badge.pending {
-  background-color: #fff3cd;
-  color: #856404;
+  background-color: #fff6df;
+  color: #8a6d00;
+  border: 1px solid rgba(138,109,0,0.06);
 }
 
 .status-badge.processing {
-  background-color: #cce5ff;
-  color: #004085;
+  background-color: #e7f2ff;
+  color: #1b6fb2;
+  border: 1px solid rgba(0,102,204,0.06);
 }
 
 .status-badge.shipped {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: #eaf7ec;
+  color: #18662a;
+  border: 1px solid rgba(24,102,42,0.06);
 }
 
 .status-badge.delivered {
-  background-color: #e2e3e5;
-  color: #383d41;
+  background-color: #f2f4f5;
+  color: #606873;
+  border: 1px solid rgba(0,0,0,0.06);
 }
 
 .status-badge.cancelled {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: #fff2f2;
+  color: #9e2a2a;
+  border: 1px solid rgba(158,42,42,0.06);
 }
 
 /* Botones de acción específicos del dashboard principal */
@@ -2191,6 +2221,19 @@ button {
     color: #fff;
   }
 
+  .chart-range:not(.active) {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: background .12s ease, color .12s ease, border-color .12s ease;
+  }
+
+  .chart-range:not(.active):hover {
+    background: rgba(0,119,182,0.06);
+    color: var(--primary-color);
+    border-color: rgba(0,119,182,0.1);
+  }
+
   .chart-body {
     position: relative;
     min-height: 320px;
@@ -2200,11 +2243,26 @@ button {
     min-height: 280px;
   }
 
+  /* Responsive and polished canvas */
+  .chart-body canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 420px;
+    border-radius: 12px;
+    display: block;
+  }
+
   .chart-skeleton {
     position: absolute;
     inset: 0;
     border-radius: 12px;
-    background: rgba(0, 0, 0, 0.04);
+    background: linear-gradient(90deg, rgba(0,0,0,0.03), rgba(255,255,255,0.02));
+  }
+
+  .chart-skeleton.shimmer::after {
+    height: 100%;
+    left: -30%;
+    width: 48%;
   }
 
   .status-list {
@@ -2272,6 +2330,30 @@ button {
     text-align: left;
   }
 
+  /* Modernize the dashboard table headers to match new card style */
+  .dashboard-table thead th {
+    background: #f4f6f8;
+    color: #7b8794;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    border-bottom: none;
+  }
+
+  .dashboard-table thead th:first-child { border-top-left-radius: 10px; }
+  .dashboard-table thead th:last-child { border-top-right-radius: 10px; }
+
+  .dashboard-table tbody tr td { padding: 1.4rem 1rem; }
+
+  .dashboard-table tbody tr:hover td { background: rgba(0,0,0,0.03); }
+
+  /* ensure responsive container respects rounded table header */
+  .recent-orders-card .table-responsive {
+    overflow: visible; /* allow hover shadows and gradients */
+    border-radius: 10px;
+    margin-top: 1.4rem;
+  }
+
   .dashboard-table th {
     font-size: 1.3rem;
     color: var(--text-light);
@@ -2283,6 +2365,17 @@ button {
     background: rgba(0, 119, 182, 0.03);
   }
 
+  /* Responsive adjustments for chart cards on smaller screens */
+  @media (max-width: 800px) {
+    .chart-card.chart-card-large { padding: 1.6rem; border-radius: 12px; }
+    .chart-body { min-height: 220px; }
+    .chart-body canvas { max-height: 300px; }
+    .chart-header h3 { font-size: 1.5rem; }
+    .chart-controls { gap: .35rem; }
+    .chart-range { padding: .3rem .8rem; font-size: 1rem; }
+    .main-charts { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  }
+
   .inventory-summary {
     display: flex;
     gap: 1rem;
@@ -2291,9 +2384,12 @@ button {
 
   .inventory-pill {
     flex: 1;
-    padding: 1rem;
+    padding: 1rem 1.2rem;
     border-radius: 12px;
-    background: rgba(0, 119, 182, 0.08);
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,252,255,0.98));
+    border: 1px solid rgba(0,0,0,0.04);
+    box-shadow: 0 10px 36px rgba(2,6,23,0.04);
+    transition: transform .12s ease, box-shadow .12s ease;
   }
 
   .inventory-pill p {
@@ -2302,8 +2398,13 @@ button {
   }
 
   .inventory-pill strong {
-    font-size: 2.1rem;
+    font-size: 2.4rem;
+    color: var(--text-dark);
   }
+
+  .inventory-pill strong[data-inventory] { display: block; font-size: 2.2rem; font-weight: 700; color: var(--text-dark); }
+
+.inventory-pill:hover { transform: translateY(-4px); box-shadow: 0 18px 42px rgba(2,6,23,0.06); }
 
   .low-stock-list {
     display: flex;

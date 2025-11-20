@@ -46,6 +46,7 @@ class AdminDashboard {
     init() {
         this.bindEvents();
         this.loadData();
+        this.applyDataLabels();
         this.state.autoRefreshId = setInterval(() => this.loadData(false), this.state.autoRefreshMs);
     }
 
@@ -401,15 +402,43 @@ class AdminDashboard {
             const orderLabel = order.order_number || order.id;
             return `
                 <tr>
-                    <td>#${orderLabel}</td>
-                    <td>${order.customer_name || 'Sin cliente'}</td>
-                    <td>${this.formatDate(order.created_at)}</td>
-                    <td>${this.formatCurrency(order.total)}</td>
-                    <td><span class="${statusClass}">${this.getStatusLabel(order.status)}</span></td>
-                    <td>${this.getPaymentLabel(order.payment_status)}</td>
+                    <td data-label="Orden">#${orderLabel}</td>
+                    <td data-label="Cliente">${order.customer_name || 'Sin cliente'}</td>
+                    <td data-label="Fecha">${this.formatDate(order.created_at)}</td>
+                    <td data-label="Total">${this.formatCurrency(order.total)}</td>
+                    <td data-label="Estado"><span class="${statusClass}">${this.getStatusIcon(order.status)} ${this.getStatusLabel(order.status)}</span></td>
+                    <td data-label="Pago">${this.getPaymentLabel(order.payment_status)}</td>
                 </tr>
             `;
         }).join('');
+        // ensure data-label attributes exist for accessibility and responsive layout
+        this.applyDataLabels();
+    }
+
+    applyDataLabels() {
+        const headerCells = document.querySelectorAll('.recent-orders-card .dashboard-table thead th');
+        const labels = Array.from(headerCells).map(h => h.textContent.trim());
+        const rows = document.querySelectorAll('.recent-orders-card .dashboard-table tbody tr');
+        rows.forEach(row => {
+            Array.from(row.querySelectorAll('td')).forEach((td, idx) => {
+                // Skip skeleton rows or cells spanning multiple columns
+                const colspan = parseInt(td.getAttribute('colspan') || td.colSpan || '1', 10);
+                if (colspan > 1) return;
+                if (!td.hasAttribute('data-label')) td.setAttribute('data-label', labels[idx] || '');
+            });
+        });
+    }
+
+    getStatusIcon(status) {
+        const icons = {
+            pending: '<i class="fas fa-clock"></i>',
+            processing: '<i class="fas fa-cog"></i>',
+            shipped: '<i class="fas fa-truck"></i>',
+            delivered: '<i class="fas fa-check"></i>',
+            cancelled: '<i class="fas fa-ban"></i>',
+            refunded: '<i class="fas fa-undo"></i>'
+        };
+        return icons[status] || '';
     }
 
     renderInventory(summary, lowStock) {

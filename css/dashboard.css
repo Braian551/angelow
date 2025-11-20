@@ -29,6 +29,47 @@
   overflow: hidden; /* allow table to respect radius */
 }
 
+/* Responsiveness: stack less important columns on small screens */
+@media (max-width: 720px) {
+  /* Hide the header visually but keep it for screen readers */
+  .recent-orders-card .dashboard-table thead { position: absolute; left: -9999px; top: -9999px; }
+
+  /* Grid-based stacked rows: two columns per grid (main + meta) */
+  .recent-orders-card .dashboard-table tbody tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-auto-rows: minmax(28px, auto);
+    gap: .4rem .6rem;
+    padding: .6rem;
+    border-radius: 10px;
+    margin-bottom: .8rem;
+    background: rgba(255,255,255,0.98);
+    border: 1px solid rgba(0,0,0,0.03);
+  }
+
+  /* Make cells behave as blocks inside grid; we'll position them via nth-child */
+  .recent-orders-card .dashboard-table tbody td { display: block; padding: .35rem 0; border-bottom: none; }
+  .recent-orders-card .dashboard-table tbody td::before { content: attr(data-label); color: var(--muted); font-weight: 700; display: block; margin-bottom: .25rem; font-size: 1rem; }
+
+  /* First row: Order (left) + Total (right) */
+  .recent-orders-card .dashboard-table tbody td:first-child { grid-column: 1 / 2; grid-row: 1; }
+  .recent-orders-card .dashboard-table tbody td:nth-child(4) { grid-column: 2 / 3; grid-row: 1; justify-self: end; }
+
+  /* Second row: Client (left) + Fecha (right) */
+  .recent-orders-card .dashboard-table tbody td:nth-child(2) { grid-column: 1 / 2; grid-row: 2; }
+  .recent-orders-card .dashboard-table tbody td:nth-child(3) { grid-column: 2 / 3; grid-row: 2; justify-self: end; color: var(--text-light); }
+
+  /* Third row: Estado (left) + Pago (right) */
+  .recent-orders-card .dashboard-table tbody td:nth-child(5) { grid-column: 1 / 2; grid-row: 3; }
+  .recent-orders-card .dashboard-table tbody td:nth-child(6) { grid-column: 2 / 3; grid-row: 3; justify-self: end; color: var(--text-light); }
+
+  /* Cells that span entire row (skeleton/empty) should span both columns */
+  .recent-orders-card .dashboard-table tbody tr.skeleton-row td[colspan],
+  .recent-orders-card .dashboard-table tbody tr.skeleton-row td { grid-column: 1 / -1; }
+
+  /* Make badges smaller on mobile */
+  .recent-orders-card .status-badge { padding: .2rem .6rem; font-size: 1rem; }
+}
 .orders-table table {
   border-collapse: separate;
   border-spacing: 0;
@@ -43,10 +84,10 @@
 }
 
 .orders-table thead th {
-  background: rgba(9,30,66,0.03);
-  color: var(--text-light);
-  font-weight: 600;
-  border-bottom: 1px solid rgba(0,0,0,0.04);
+  background: #f4f6f8; /* softer grey */
+  color: #7b8794; /* muted title */
+  font-weight: 700;
+  border-bottom: none;
 }
 
 /* Rounded header corners for the table to match screenshot */
@@ -59,6 +100,17 @@
 
 .orders-table tbody tr:hover td {
   background-color: rgba(0,119,182,0.03);
+}
+
+/* Make table rows slightly taller and cleaner */
+.orders-table tbody td { padding: 1.6rem 1.6rem; }
+
+/* Customize status badge colors with border look */
+.orders-table .status-badge {
+  padding: .35rem .9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background-color: #fff; /* default white, color shown by class */
 }
 
 .status-badge {
@@ -94,6 +146,15 @@
   font-style: italic;
 }
 
+/* Styling for the 'healthy inventory' message */
+.inventory-card .empty-state {
+  color: #9aa4ad;
+  font-style: italic;
+  text-align: center;
+  padding: 3.4rem 1.2rem;
+  font-size: 1.3rem;
+}
+
 /* Specific header improvements for Orders & Inventory cards */
 .recent-orders-card .section-header h3,
 .inventory-card .section-header h3 {
@@ -105,6 +166,20 @@
   color: var(--text-dark);
 }
 
+/* Subtle card spacing for the recent-orders area */
+.recent-orders-card { padding-bottom: 0; }
+.recent-orders-card .section-header { gap: 1rem; }
+
+.recent-orders-card .section-header .btn-link {
+  color: var(--primary-color); /* brand color */
+  font-weight: 700;
+  padding: .45rem .75rem;
+  border-radius: 10px;
+  background-color: var(--bg-light);
+  border: 1px solid rgba(15,23,42,0.04);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
 .recent-orders-card .section-header p,
 .inventory-card .section-header p {
   color: var(--text-light);
@@ -112,10 +187,175 @@
   font-size: 1.3rem;
 }
 
+.recent-orders-card .section-header .btn-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(18,20,29,.06);
+}
+
+/* Additional polish for recent orders table columns */
+.recent-orders-card .dashboard-table tbody td:first-child {
+  font-weight: 600;
+  color: var(--text-dark);
+  white-space: nowrap;
+  max-width: 24ch;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.recent-orders-card .dashboard-table tbody td:nth-child(3) {
+  color: var(--text-light);
+  font-size: 1.2rem;
+}
+
+.recent-orders-card .dashboard-table tbody td:nth-child(4) {
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.recent-orders-card .dashboard-table tbody td:nth-child(5) {
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Make payment column a bit muted so status stands out */
+.recent-orders-card .dashboard-table tbody td:nth-child(6) {
+  color: var(--text-light);
+}
+
+/* Tighter badge styling that matches screenshot: pill, subtle shadow */
+.recent-orders-card .status-badge {
+  border-radius: 999px;
+  padding: .35rem .8rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(8,18,34,0.03);
+  border: 1px solid rgba(0,0,0,0.06);
+  white-space: nowrap; line-height: 1.2;
+}
+
+/* Specific color tweaks for small neutral palette in this card */
+.recent-orders-card .status-badge.delivered { background: rgba(39,174,96,0.12); color: #1e8449; border: 1px solid rgba(39,174,96,0.18); }
+.recent-orders-card .status-badge.shipped    { background: rgba(33,150,243,0.08); color: #0b79d0; border: 1px solid rgba(33,150,243,0.12); }
+.recent-orders-card .status-badge.pending    { background: rgba(255,152,0,0.08); color: #9a6b26; border: 1px solid rgba(255,152,0,0.10); }
+.recent-orders-card .status-badge.refunded   { background: rgba(255,82,82,0.08); color: #d32f2f; border: 1px solid rgba(255,82,82,0.10); }
+
+/* Improve capitalization and spacing on the header link */
+.recent-orders-card .section-header .btn-link { text-transform: none; font-size: 1.3rem; }
+
+/* Table responsiveness: allow horizontal scroll with clean padding */
+@media (max-width: 768px) {
+  .recent-orders-card .dashboard-table th,
+  .recent-orders-card .dashboard-table td { padding: .9rem .8rem; font-size: 1.2rem; }
+  .recent-orders-card .section-header h3 { font-size: 1.5rem; }
+}
+
+/* ===== Glass look & smooth transitions for recent orders ===== */
+.recent-orders-card {
+  background: rgba(255,255,255,0.72); /* translucent panel */
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.45);
+  box-shadow: 0 10px 30px rgba(2,6,23,0.04);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.recent-orders-card:hover { transform: translateY(-4px); box-shadow: 0 22px 46px rgba(2,6,23,0.06); }
+
+/* soft row glass highlight - keeps the table readable */
+.recent-orders-card .dashboard-table tbody tr td { background: rgba(255,255,255,0.0); transition: background .18s ease; }
+.recent-orders-card .dashboard-table tbody tr:hover td { background: rgba(255,255,255,0.06); }
+
+/* Icon pill for the header (colorful and interactive) */
+.recent-orders-card .section-header h3 i {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--primary-color);
+  margin-right: .8rem;
+  font-size: 1.15rem;
+  background: rgba(0,119,182,0.06);
+  transition: transform .2s ease, filter .18s ease, background .18s ease;
+}
+.recent-orders-card .section-header h3:hover i { transform: rotate(8deg); filter: brightness(1.05); }
+
+/* Status badges - solid colors and smooth hover */
+.recent-orders-card .status-badge {
+  border-radius: 999px;
+  padding: .35rem .9rem;
+  font-size: 1.12rem;
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(8,18,34,0.03);
+  border: none;
+  transition: background .18s ease, color .18s ease, transform .14s ease, box-shadow .18s ease;
+}
+.recent-orders-card .status-badge:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(8,18,34,0.06); }
+
+/* Solid flat colors for clarity */
+.recent-orders-card .status-badge.cancelled { background: rgba(239,154,154,0.08); color: #b71c1c; border: 1px solid rgba(239,154,154,0.10); }
+
+/* Offer subtle colored icon inside badges if icon supplied */
+.recent-orders-card .status-badge i { margin-right: .5rem; opacity: 0.95; transition: color .12s ease, transform .12s ease; color: rgba(0,0,0,0.62); }
+
+/* Use the same primary color for subtle accent items in this card */
+.recent-orders-card .section-header .btn-link,
+.recent-orders-card .section-header p { color: var(--text-light); }
+.recent-orders-card .section-header .btn-link { color: var(--primary-color); }
+
+/* Make badge icons slightly tinted by status to match their color family */
+.recent-orders-card .status-badge i { color: rgba(0,0,0,0.62); }
+.recent-orders-card .status-badge.delivered i { color: #165f3d; }
+.recent-orders-card .status-badge.shipped i { color: #065fa3; }
+.recent-orders-card .status-badge.pending i { color: #8a5a1a; }
+.recent-orders-card .status-badge.refunded i { color: #c62828; }
+.recent-orders-card .status-badge.cancelled i { color: #a12a2a; }
+
+/* Stronger 'Ver todas' appearance */
+.recent-orders-card .section-header .btn-link { background: rgba(255,255,255,0.9); border: none; color: var(--primary-color); box-shadow: 0 8px 20px rgba(2,6,23,0.03);} 
+.recent-orders-card .section-header .btn-link:hover { transform: translateY(-2px); filter: brightness(0.98); }
+
+.recent-orders-card table thead th {
+  background-color: var(--bg-light);
+  color: var(--muted);
+  font-weight: 700;
+  font-size: .95rem;
+  border-bottom: none;
+}
+  .recent-orders-card .dashboard-table thead th { position: sticky; top: 0; z-index: 5; position: relative; }
+  .recent-orders-card .dashboard-table thead th::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 6px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0));
+  }
+.recent-orders-card .dashboard-table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* desktop hover accent & lift handled by breakpoint styles below */
+
+@media (min-width: 721px) {
+  .recent-orders-card .dashboard-table tbody tr { transition: transform .12s ease; }
+  .recent-orders-card .dashboard-table tbody tr:hover { transform: translateY(-1px); }
+  .recent-orders-card .dashboard-table tbody tr:hover td:first-child { border-left-color: rgba(0,119,182,0.12); padding-left: 1rem; }
+}
+
+.recent-orders-card .table-responsive { overflow: visible; }
+
+.recent-orders-card .table tbody tr:hover { background: linear-gradient(90deg, rgba(250,250,255,0.9), rgba(245,245,246,0.9)); }
+/* Right link in inventory header */
+.inventory-card .section-header .btn-link {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
 /* Make inventory summary pills use a single-color background and subtle border */
 .inventory-pill { 
   background-color: #f6fbff; /* very light azure */
   border: 1px solid rgba(0,119,182,0.06);
+  transition: transform .12s ease, box-shadow .12s ease;
 }
 
 .inventory-pill strong {
@@ -144,6 +384,7 @@
   font-size: 2.4rem;
   color: var(--text-dark);
 }
+.inventory-pill:hover { transform: translateY(-4px); box-shadow: 0 18px 42px rgba(2,6,23,0.06); }
 
 /* Right panel empty state */
 .inventory-card .low-stock-list {
