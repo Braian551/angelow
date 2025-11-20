@@ -22,6 +22,19 @@
   --glass-muted: rgba(255, 255, 255, 0.78);
   --glass-border: rgba(255, 255, 255, 0.45);
   --glass-blur: 22px;
+  --admin-navy: #0d1b2a;
+  --admin-navy-strong: #081124;
+  --admin-cyan: #1ab4ff;
+  --admin-purple: #5c6ac4;
+  --surface-veil: rgba(13, 27, 42, 0.4);
+  --surface-tint: rgba(0, 119, 182, 0.12);
+  --surface-highlight: rgba(255, 255, 255, 0.75);
+  --card-radius: 22px;
+  --card-padding: 2.4rem;
+  --card-shadow: 0 24px 50px rgba(10, 24, 44, 0.18);
+  --card-hover-shadow: 0 32px 66px rgba(10, 24, 44, 0.2);
+  --float-duration: 0.8s;
+  --soft-curve: cubic-bezier(0.4, 0.0, 0.2, 1);
   /* Replace gradients with single solid colors (project restriction) */
   --gradient-sky: var(--primary-color); /* used as color placeholder */
   --gradient-mint: var(--secondary-color);
@@ -1330,6 +1343,7 @@ button {
 
 .modal-overlay.active .modal-content {
   transform: translateY(0);
+  background-color: white;
 }
 
 .modal-header {
@@ -3030,5 +3044,356 @@ button {
   .chart-card,
   .dashboard-card {
     border-radius: 16px;
+  }
+}
+
+/* ===== DASHBOARD COLOR LAYER 2025 Q4 ===== */
+#dashboard-root {
+  position: relative;
+  isolation: isolate;
+  z-index: 0;
+}
+
+#dashboard-root::before,
+#dashboard-root::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  border-radius: 55%;
+  filter: blur(120px);
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 0.8s var(--soft-curve);
+  animation: haloPulse 12s ease-in-out infinite;
+}
+
+#dashboard-root::before {
+  width: clamp(240px, 45vw, 520px);
+  height: clamp(240px, 45vw, 520px);
+  bottom: -18%;
+  left: -10%;
+  background: rgba(0, 119, 182, 0.28);
+}
+
+#dashboard-root::after {
+  width: clamp(220px, 35vw, 420px);
+  height: clamp(220px, 35vw, 420px);
+  top: -12%;
+  right: -14%;
+  background: rgba(92, 106, 196, 0.25);
+  animation-duration: 14s;
+  animation-direction: reverse;
+}
+
+.page-header,
+.stats-summary .stat-card,
+.metrics-grid .metric-card,
+.main-charts .chart-card,
+.dashboard-grid .dashboard-card {
+  animation: fadeUpSoft 0.65s var(--soft-curve) both;
+}
+
+.stats-summary .stat-card:nth-child(2) { animation-delay: 0.06s; }
+.stats-summary .stat-card:nth-child(3) { animation-delay: 0.12s; }
+.stats-summary .stat-card:nth-child(4) { animation-delay: 0.18s; }
+.metrics-grid .metric-card:nth-child(2) { animation-delay: 0.08s; }
+.metrics-grid .metric-card:nth-child(3) { animation-delay: 0.16s; }
+.main-charts .chart-card:nth-child(2) { animation-delay: 0.05s; }
+.dashboard-grid:nth-of-type(2) .dashboard-card:nth-child(2) { animation-delay: 0.08s; }
+.dashboard-grid:nth-of-type(3) .dashboard-card:nth-child(2) { animation-delay: 0.08s; }
+
+.page-header {
+  border-radius: 24px;
+  padding: 2rem 2.6rem;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  box-shadow: var(--card-shadow);
+}
+
+.page-header h1 {
+  color: var(--admin-navy-strong);
+}
+
+.page-actions .btn {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  transition: transform 0.35s var(--soft-curve), box-shadow 0.35s var(--soft-curve), border-color 0.35s ease;
+}
+
+.page-actions .btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.16);
+  opacity: 0;
+  transition: opacity 0.35s var(--soft-curve);
+}
+
+.page-actions .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.12);
+}
+
+.page-actions .btn:hover::after {
+  opacity: 1;
+}
+
+.stats-summary,
+.metrics-grid,
+.main-charts,
+.dashboard-grid {
+  gap: clamp(1.6rem, 2vw, 2.6rem);
+}
+
+.stat-card,
+.metric-card,
+.chart-card,
+.dashboard-card {
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  background: var(--surface-highlight);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: var(--card-shadow);
+  transition: transform 0.4s var(--soft-curve), box-shadow 0.4s var(--soft-curve), border-color 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before,
+.metric-card::before,
+.chart-card::before,
+.dashboard-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--card-overlay, var(--surface-tint));
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.stat-card > *,
+.metric-card > *,
+.chart-card > *,
+.dashboard-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.stat-card:hover,
+.metric-card:hover,
+.chart-card:hover,
+.dashboard-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--card-hover-shadow);
+  border-color: rgba(0, 119, 182, 0.2);
+}
+
+.stat-card {
+  --card-overlay: rgba(0, 119, 182, 0.08);
+}
+
+.metric-card {
+  --card-overlay: rgba(92, 106, 196, 0.08);
+}
+
+.chart-card {
+  --card-overlay: rgba(15, 23, 42, 0.04);
+}
+
+.dashboard-card {
+  --card-overlay: rgba(15, 23, 42, 0.03);
+}
+
+.stat-card[data-stat-card="orders"] { --card-overlay: rgba(0, 119, 182, 0.12); }
+.stat-card[data-stat-card="revenue"] { --card-overlay: rgba(16, 185, 129, 0.12); }
+.stat-card[data-stat-card="customers"] { --card-overlay: rgba(255, 193, 7, 0.16); }
+.stat-card[data-stat-card="inventory"] { --card-overlay: rgba(92, 106, 196, 0.12); }
+
+.stat-card .stat-icon {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.metric-value,
+.stat-value {
+  color: var(--admin-navy-strong);
+}
+
+.metric-change::before,
+.stat-change::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.chart-header {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  padding-bottom: 1.4rem;
+  margin-bottom: 1.6rem;
+}
+
+.chart-body {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  border-radius: 18px;
+  padding: 1.2rem;
+}
+
+.status-list {
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 0;
+  gap: 1rem;
+}
+
+.status-info {
+  gap: 0.8rem;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.03);
+}
+
+.status-progress {
+  flex: 1;
+  margin-top: 0;
+  margin-left: 1.6rem;
+}
+
+.inventory-pill {
+  --card-overlay: rgba(0, 119, 182, 0.1);
+  border-radius: 18px;
+  min-height: 112px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.low-stock-item {
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(255, 255, 255, 0.9);
+  transition: transform 0.3s var(--soft-curve), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.low-stock-item:hover {
+  transform: translateX(6px);
+  border-color: rgba(0, 119, 182, 0.25);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+}
+
+.low-stock-meta {
+  align-items: flex-end;
+}
+
+.stock-pill {
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.top-product-item {
+  padding: 1.2rem 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.top-product-item strong {
+  color: var(--admin-navy);
+}
+
+.top-product-metrics span {
+  color: var(--primary-dark);
+}
+
+.activity-feed .activity-item {
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.06);
+}
+
+.activity-feed .activity-item:hover {
+  border-color: rgba(0, 119, 182, 0.2);
+}
+
+.activity-item .skeleton-icon,
+.low-stock-image {
+  background: rgba(0, 119, 182, 0.08);
+}
+
+.dashboard-table tbody tr {
+  transition: transform 0.25s var(--soft-curve), box-shadow 0.25s var(--soft-curve);
+}
+
+.dashboard-table tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 28px rgba(15, 23, 42, 0.06);
+}
+
+.dashboard-error {
+  border-width: 2px;
+  background: rgba(255, 71, 87, 0.12);
+  box-shadow: 0 12px 30px rgba(255, 71, 87, 0.18);
+}
+
+.stat-card.is-loading::after,
+.metric-card.is-loading::after,
+.chart-card.is-loading::after {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+@keyframes fadeUpSoft {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes haloPulse {
+  0% {
+    opacity: 0.28;
+    transform: scale(0.92) translate3d(0, 0, 0);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05) translate3d(0, -12px, 0);
+  }
+  100% {
+    opacity: 0.28;
+    transform: scale(0.92) translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboard-root::before,
+  #dashboard-root::after,
+  .page-header,
+  .stat-card,
+  .metric-card,
+  .chart-card,
+  .dashboard-card {
+    animation: none !important;
+    transition: none !important;
   }
 }

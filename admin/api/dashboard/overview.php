@@ -242,7 +242,20 @@ function fetchTopProducts(PDO $conn): array {
             p.name,
             c.name AS category,
             SUM(oi.quantity) AS total_quantity,
-            COALESCE(SUM(oi.total), 0) AS total_revenue
+            COALESCE(SUM(oi.total), 0) AS total_revenue,
+            (SELECT image_path FROM product_images WHERE product_id = p.id ORDER BY is_primary DESC, `order` ASC LIMIT 1) AS image,
+            COALESCE((SELECT SUM(psv.quantity)
+                FROM product_color_variants pcv2
+                LEFT JOIN product_size_variants psv ON psv.color_variant_id = pcv2.id
+                WHERE pcv2.product_id = p.id), 0) AS total_stock,
+            COALESCE((SELECT MIN(psv.price)
+                FROM product_color_variants pcv3
+                LEFT JOIN product_size_variants psv ON psv.color_variant_id = pcv3.id
+                WHERE pcv3.product_id = p.id), p.price, 0) AS min_price,
+            COALESCE((SELECT MAX(psv.price)
+                FROM product_color_variants pcv4
+                LEFT JOIN product_size_variants psv ON psv.color_variant_id = pcv4.id
+                WHERE pcv4.product_id = p.id), p.price, 0) AS max_price
         FROM order_items oi
         INNER JOIN orders o ON oi.order_id = o.id AND o.status != 'cancelled'
         INNER JOIN products p ON oi.product_id = p.id
@@ -253,12 +266,18 @@ function fetchTopProducts(PDO $conn): array {
         LIMIT 5");
 
     return array_map(function ($row) {
+        $minPrice = $row['min_price'] !== null ? (float) $row['min_price'] : null;
+        $maxPrice = $row['max_price'] !== null ? (float) $row['max_price'] : null;
         return [
             'id' => (int) $row['id'],
             'name' => $row['name'],
             'category' => $row['category'] ?? 'Sin categoría',
             'total_quantity' => (int) $row['total_quantity'],
-            'total_revenue' => round((float) $row['total_revenue'], 2)
+            'total_revenue' => round((float) $row['total_revenue'], 2),
+            'image' => $row['image'],
+            'total_stock' => isset($row['total_stock']) ? (int) $row['total_stock'] : 0,
+            'min_price' => $minPrice,
+            'max_price' => $maxPrice
         ];
     }, $stmt->fetchAll(PDO::FETCH_ASSOC));
 }

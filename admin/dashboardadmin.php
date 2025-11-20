@@ -28,6 +28,7 @@ if (isset($_SESSION['alert'])) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <!-- Dashboard split for faster maintenance and focused overrides -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboard.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/products-grid.css">
         <!-- Recent-orders CSS is in css/dashboard.css now; inline overrides removed. -->
 </head>
 
@@ -179,7 +180,7 @@ if (isset($_SESSION['alert'])) {
                     </article>
                 </section>
 
-                <section class="dashboard-grid">
+                <section class="dashboard-row dashboard-row-full">
                     <article class="dashboard-card recent-orders-card">
                         <div class="section-header">
                             <div>
@@ -217,7 +218,9 @@ if (isset($_SESSION['alert'])) {
                             </table>
                         </div>
                     </article>
+                </section>
 
+                <section class="dashboard-row dashboard-row-single">
                     <article class="dashboard-card inventory-card">
                         <div class="section-header">
                             <div>
@@ -261,7 +264,7 @@ if (isset($_SESSION['alert'])) {
                     </article>
                 </section>
 
-                <section class="dashboard-grid">
+                <section class="dashboard-row dashboard-row-single">
                     <article class="dashboard-card top-products-card">
                         <div class="section-header">
                             <div>
@@ -285,7 +288,9 @@ if (isset($_SESSION['alert'])) {
                             </div>
                         </div>
                     </article>
+                </section>
 
+                <section class="dashboard-row dashboard-row-single">
                     <article class="dashboard-card activity-card">
                         <div class="section-header">
                             <div>
@@ -313,6 +318,36 @@ if (isset($_SESSION['alert'])) {
                 </section>
             </div>
         </main>
+    </div>
+
+    <!-- Modal para vista rápida -->
+    <div class="modal-overlay quick-view-modal" id="quick-view-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalles del Producto</h3>
+                <button class="modal-close" type="button">&times;</button>
+            </div>
+            <div class="modal-body" id="quick-view-content"></div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-primary" id="edit-product-btn">
+                    <i class="fas fa-edit"></i> Editar Producto
+                </a>
+                <button class="btn btn-secondary modal-close" type="button">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para zoom de imagen -->
+    <div class="modal-overlay image-zoom-modal" id="image-zoom-modal">
+        <div class="modal-content zoom-content">
+            <div class="modal-header">
+                <h3 id="zoom-title">Imagen del Producto</h3>
+                <button class="modal-close" type="button">&times;</button>
+            </div>
+            <div class="modal-body zoom-body">
+                <img id="zoom-image" src="" alt="Zoomed image">
+            </div>
+        </div>
     </div>
 
     <script src="<?= BASE_URL ?>/js/dashboardadmin.js"></script>

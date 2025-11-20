@@ -26,6 +26,16 @@ class AdminDashboard {
             salesChartCard: document.getElementById('sales-chart-card')
         };
 
+        this.quickView = {
+            modal: document.getElementById('quick-view-modal'),
+            content: document.getElementById('quick-view-content'),
+            editBtn: document.getElementById('edit-product-btn'),
+            zoomModal: document.getElementById('image-zoom-modal'),
+            zoomImage: document.getElementById('zoom-image'),
+            zoomTitle: document.getElementById('zoom-title')
+        };
+        this.quickViewImages = [];
+
         this.charts = {
             sales: null,
             status: null
@@ -45,6 +55,7 @@ class AdminDashboard {
 
     init() {
         this.bindEvents();
+        this.setupModalEvents();
         this.loadData();
         this.applyDataLabels();
         this.state.autoRefreshId = setInterval(() => this.loadData(false), this.state.autoRefreshMs);
@@ -66,6 +77,21 @@ class AdminDashboard {
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) return;
             this.loadData(false);
+        });
+    }
+
+    setupModalEvents() {
+        const modals = [this.quickView.modal, this.quickView.zoomModal];
+        modals.forEach((modal) => {
+            if (!modal) return;
+            modal.querySelectorAll('.modal-close').forEach((btn) => {
+                btn.addEventListener('click', () => this.closeModal(modal));
+            });
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    this.closeModal(modal);
+                }
+            });
         });
     }
 
@@ -474,24 +500,355 @@ class AdminDashboard {
     }
 
     renderTopProducts(products) {
-        if (!this.elements.topProductsList) return;
+        const container = this.elements.topProductsList;
+        if (!container) return;
         if (!products.length) {
-            this.elements.topProductsList.innerHTML = '<div class="empty-state">Aún no hay ventas registradas.</div>';
+            container.innerHTML = '<div class="empty-state">Aún no hay ventas registradas.</div>';
             return;
         }
 
-        this.elements.topProductsList.innerHTML = products.map((product) => `
-            <div class="top-product-item">
-                <div>
-                    <h4>${product.name}</h4>
-                    <span>${product.category || 'Sin categoría'}</span>
+        const cardsHtml = products.map((product, index) => this.buildTopProductCard(product, index)).join('');
+        container.innerHTML = `<div class="products-admin-grid top-products-grid">${cardsHtml}</div>`;
+        this.bindTopProductActions();
+    }
+
+    buildTopProductCard(product, index) {
+        const priceRange = this.formatPriceRange(product.min_price, product.max_price);
+        const stockLabel = typeof product.total_stock === 'number'
+            ? `${this.formatNumber(product.total_stock)} uds.`
+            : 'Sin stock';
+        const soldLabel = `${this.formatNumber(product.total_quantity)} uds.`;
+        const revenueLabel = this.formatCurrency(product.total_revenue);
+        const imageUrl = this.resolveImage(product.image);
+        const rankLabel = `Top ${index + 1}`;
+
+        return `
+            <div class="product-admin-card top-product-card" data-product-id="${product.id}">
+                <div class="product-admin-status">
+                    <span class="status-badge status-active">${rankLabel}</span>
                 </div>
-                <div class="top-product-metrics">
-                    <span>${this.formatNumber(product.total_quantity)} uds.</span>
-                    <strong>${this.formatCurrency(product.total_revenue)}</strong>
+                <div class="product-admin-image">
+                    <img src="${imageUrl}" alt="${product.name}">
+                    <div class="product-admin-overlay">
+                        <button class="btn-overlay btn-quick-view" type="button" data-id="${product.id}" title="Vista rápida">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="product-admin-body">
+                    <div class="product-admin-header">
+                        <h3 class="product-admin-title">${product.name}</h3>
+                        <span class="product-admin-id">${product.category || 'Sin categoría'}</span>
+                    </div>
+                    <div class="product-admin-meta product-meta-compact">
+                        <div class="meta-item">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>${priceRange}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>${revenueLabel}</span>
+                        </div>
+                    </div>
+                    <div class="product-admin-info compact">
+                        <div class="info-item">
+                            <label>Vendidos</label>
+                            <span>${soldLabel}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Stock activo</label>
+                            <span>${stockLabel}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-admin-actions compact-actions">
+                    <a href="${this.baseUrl}/admin/editproducto.php?id=${product.id}" class="btn-action btn-edit" title="Editar">
+                        <i class="fas fa-edit"></i>
+                        <span>Editar</span>
+                    </a>
+                    <button class="btn-action btn-secondary btn-quick-view" type="button" data-id="${product.id}" title="Vista rápida">
+                        <i class="fas fa-eye"></i>
+                        <span>Ver</span>
+                    </button>
                 </div>
             </div>
+        `;
+    }
+
+    bindTopProductActions() {
+        const container = this.elements.topProductsList;
+        if (!container) return;
+        container.querySelectorAll('.top-products-grid .btn-quick-view').forEach((button) => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-id');
+                this.openQuickView(productId);
+            });
+        });
+    }
+
+    async openQuickView(productId) {
+        if (!productId) return;
+        try {
+            const response = await fetch(`${this.baseUrl}/admin/api/productos/get_product_details.php?id=${productId}`);
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.message || 'No se pudo cargar el producto');
+            }
+            this.renderQuickView(data);
+            this.openModal(this.quickView.modal);
+        } catch (error) {
+            console.error('Quick view error:', error);
+            alert('No se pudo abrir la vista rápida.');
+        }
+    }
+
+    renderQuickView(data) {
+        const product = data.product;
+        const images = data.images || [];
+        const variants = data.variants || [];
+
+        this.quickViewImages = images;
+
+        let imagesHtml = '<div class="quick-view-gallery empty-state">Sin imágenes disponibles</div>';
+        if (images.length > 0) {
+            const imagesByColor = this.groupImagesByColor(images);
+            const primaryImage = images.find((img) => Number(img.is_primary) === 1) || images[0];
+            imagesHtml = this.buildGalleryHTML(imagesByColor, primaryImage, product.name);
+        }
+
+        let variantsHtml = '';
+        if (variants.length > 0) {
+            variantsHtml = this.buildVariantsHTML(variants);
+        }
+
+        const minPrice = data.min_price !== null && data.min_price !== undefined ? Number(data.min_price) : null;
+        const maxPrice = data.max_price !== null && data.max_price !== undefined ? Number(data.max_price) : null;
+        const priceRange = this.formatPriceRange(minPrice, maxPrice);
+        const html = `
+            <div class="quick-view-content">
+                ${imagesHtml}
+                <div class="quick-view-info">
+                    <div class="product-header">
+                        <h2>${product.name}</h2>
+                        <span class="product-id">ID: ${product.id}</span>
+                    </div>
+
+                    <div class="product-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span>Categoría: ${product.category_name || 'Sin categoría'}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-palette"></i>
+                            <span>${variants.length} variante${variants.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-boxes"></i>
+                            <span>Stock total: ${data.total_stock} unidades</span>
+                        </div>
+                    </div>
+
+                    <div class="product-description">
+                        <h4>Descripción</h4>
+                        <p>${product.description || 'Sin descripción'}</p>
+                    </div>
+
+                    <div class="product-pricing">
+                        <h4>Precios</h4>
+                        <p>${priceRange}</p>
+                    </div>
+
+                    ${variantsHtml}
+                </div>
+            </div>
+        `;
+
+        if (this.quickView.content) {
+            this.quickView.content.innerHTML = html;
+        }
+        if (this.quickView.editBtn) {
+            this.quickView.editBtn.href = `${this.baseUrl}/admin/editproducto.php?id=${product.id}`;
+        }
+
+        this.setupImageGallery();
+    }
+
+    groupImagesByColor(images) {
+        return images.reduce((acc, image) => {
+            const colorKey = image.color_name || 'General';
+            if (!acc[colorKey]) {
+                acc[colorKey] = [];
+            }
+            acc[colorKey].push(image);
+            return acc;
+        }, {});
+    }
+
+    buildGalleryHTML(imagesByColor, primaryImage, productName) {
+        const colorButtons = [`<button class="color-filter-btn active" data-color="General"><span class="color-text">Principal</span></button>`];
+        Object.keys(imagesByColor).forEach((color) => {
+            if (color === 'General') return;
+            const firstImage = imagesByColor[color][0];
+            const hexCode = firstImage.hex_code || '#CCCCCC';
+            colorButtons.push(`
+                <button class="color-filter-btn" data-color="${color}" title="${color}">
+                    <span class="color-circle" style="background-color: ${hexCode};"></span>
+                    <span class="color-text">${color}</span>
+                </button>
+            `);
+        });
+
+        const thumbnailsHTML = this.quickViewImages.map((img, index) => `
+            <img src="${img.url}" 
+                 alt="${img.alt_text || 'Imagen ' + (index + 1)}" 
+                 class="thumbnail ${img.id === primaryImage.id ? 'active' : ''}" 
+                 data-index="${img.id}" 
+                 data-color="${img.color_name || 'General'}" 
+                 style="${img.color_name && img.color_name !== 'General' ? 'display:none;' : ''}">
         `).join('');
+
+        return `
+            <div class="quick-view-gallery">
+                <div class="gallery-filters">${colorButtons.join('')}</div>
+                <div class="main-image">
+                    <img src="${primaryImage.url}" alt="${primaryImage.alt_text || productName}" id="main-product-image">
+                    <button class="image-zoom-btn" data-image="${primaryImage.url}" data-alt="${primaryImage.alt_text || productName}">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+                <div class="thumbnail-gallery-container">
+                    <button class="gallery-arrow left" type="button" id="gallery-left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="thumbnail-gallery" id="thumbnail-gallery">${thumbnailsHTML}</div>
+                    <button class="gallery-arrow right" type="button" id="gallery-right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        `;
+    }
+
+    buildVariantsHTML(variants) {
+        const colors = [...new Set(variants.map((variant) => variant.color_name))];
+        const sizes = [...new Set(variants.map((variant) => variant.size_name))];
+
+        return `
+            <div class="variants-section">
+                <h4>Variantes</h4>
+                ${colors.length ? `
+                    <div class="variant-group">
+                        <label>Colores:</label>
+                        <div class="color-options">${colors.map((color) => `<span class="color-tag">${color}</span>`).join('')}</div>
+                    </div>
+                ` : ''}
+                ${sizes.length ? `
+                    <div class="variant-group">
+                        <label>Tallas:</label>
+                        <div class="size-options">${sizes.map((size) => `<span class="size-tag">${size}</span>`).join('')}</div>
+                    </div>
+                ` : ''}
+                <div class="variant-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Color</th>
+                                <th>Talla</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${variants.map((variant) => `
+                                <tr>
+                                    <td data-label="Color">${variant.color_name}</td>
+                                    <td data-label="Talla">${variant.size_name}</td>
+                                    <td data-label="Precio">${this.formatCurrency(Number(variant.price))}</td>
+                                    <td data-label="Stock">${variant.quantity}</td>
+                                    <td data-label="Estado"><span class="status ${variant.is_active ? 'active' : 'inactive'}">${variant.is_active ? 'Activo' : 'Inactivo'}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    setupImageGallery() {
+        const modal = this.quickView.modal;
+        if (!modal) return;
+        const thumbnails = modal.querySelectorAll('.thumbnail');
+        const mainImage = modal.querySelector('#main-product-image');
+        const zoomBtn = modal.querySelector('.image-zoom-btn');
+        const thumbnailsContainer = modal.querySelector('#thumbnail-gallery');
+        const scrollLeftBtn = modal.querySelector('#gallery-left');
+        const scrollRightBtn = modal.querySelector('#gallery-right');
+
+        thumbnails.forEach((thumb) => {
+            thumb.addEventListener('click', () => {
+                const imgId = thumb.getAttribute('data-index');
+                const image = this.quickViewImages.find((img) => img.id == imgId);
+                if (!image) return;
+                if (mainImage) {
+                    mainImage.src = image.url;
+                    mainImage.alt = image.alt_text || '';
+                }
+                if (zoomBtn) {
+                    zoomBtn.setAttribute('data-image', image.url);
+                    zoomBtn.setAttribute('data-alt', image.alt_text || '');
+                }
+                thumbnails.forEach((node) => node.classList.remove('active'));
+                thumb.classList.add('active');
+            });
+        });
+
+        if (zoomBtn) {
+            zoomBtn.addEventListener('click', () => {
+                const imageUrl = zoomBtn.getAttribute('data-image');
+                const altText = zoomBtn.getAttribute('data-alt');
+                this.openImageZoom(imageUrl, altText);
+            });
+        }
+
+        modal.querySelectorAll('.color-filter-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const selectedColor = btn.getAttribute('data-color');
+                modal.querySelectorAll('.color-filter-btn').forEach((button) => button.classList.remove('active'));
+                btn.classList.add('active');
+
+                thumbnails.forEach((thumb) => {
+                    const thumbColor = thumb.getAttribute('data-color');
+                    const shouldShow = (selectedColor === 'General' && (!thumbColor || thumbColor === 'General')) || thumbColor === selectedColor;
+                    thumb.style.display = shouldShow ? 'block' : 'none';
+                });
+
+                const selector = selectedColor === 'General' ? '.thumbnail[data-color="General"]' : `.thumbnail[data-color="${selectedColor}"]`;
+                const firstVisible = modal.querySelector(selector);
+                if (firstVisible) {
+                    firstVisible.click();
+                }
+            });
+        });
+
+        const scrollAmount = 160;
+        if (scrollLeftBtn && thumbnailsContainer) {
+            scrollLeftBtn.addEventListener('click', () => {
+                thumbnailsContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            });
+        }
+        if (scrollRightBtn && thumbnailsContainer) {
+            scrollRightBtn.addEventListener('click', () => {
+                thumbnailsContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            });
+        }
+    }
+
+    openImageZoom(imageUrl, altText) {
+        if (!this.quickView.zoomModal || !this.quickView.zoomImage) return;
+        this.quickView.zoomImage.src = imageUrl;
+        this.quickView.zoomImage.alt = altText || '';
+        if (this.quickView.zoomTitle) {
+            this.quickView.zoomTitle.textContent = altText || 'Imagen del producto';
+        }
+        this.openModal(this.quickView.zoomModal);
     }
 
     renderActivity(entries) {
@@ -600,6 +957,22 @@ class AdminDashboard {
         return this.formatters.chartDate.format(date);
     }
 
+    formatPriceRange(min, max) {
+        const hasMin = typeof min === 'number' && !Number.isNaN(min);
+        const hasMax = typeof max === 'number' && !Number.isNaN(max);
+        if (!hasMin && !hasMax) {
+            return 'Sin precio';
+        }
+        if (hasMin && hasMax) {
+            if (min === max) {
+                return this.formatCurrency(min);
+            }
+            return `${this.formatCurrency(min)} - ${this.formatCurrency(max)}`;
+        }
+        const value = hasMin ? min : max;
+        return this.formatCurrency(value);
+    }
+
     resolveImage(path) {
         if (!path) {
             return `${this.baseUrl}/images/default-product.jpg`;
@@ -612,6 +985,16 @@ class AdminDashboard {
             return `/${sanitized}`;
         }
         return `${this.baseUrl}/${sanitized}`;
+    }
+
+    openModal(modal) {
+        if (!modal) return;
+        modal.classList.add('active');
+    }
+
+    closeModal(modal) {
+        if (!modal) return;
+        modal.classList.remove('active');
     }
 }
 
