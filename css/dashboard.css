@@ -1205,11 +1205,13 @@
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
   transition: border-color 0.25s ease, transform 0.25s ease;
+  box-sizing: border-box; /* make sure padding/border don't increase width */
 }
 
 .activity-feed .activity-item:hover {
   border-color: rgba(0, 119, 182, 0.25);
-  transform: translateX(6px);
+  /* avoid horizontal translation to prevent horizontal overflow/scrollbar */
+  transform: translateY(-6px);
 }
 
 .activity-feed .activity-icon {
@@ -1269,7 +1271,9 @@
 .activity-card .activity-feed {
   max-height: 420px;
   overflow-y: auto;
+  overflow-x: hidden; /* prevent horizontal scrollbars when items shift slightly */
   padding-right: 0.4rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 .activity-card .activity-feed::-webkit-scrollbar {
