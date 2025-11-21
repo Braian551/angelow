@@ -11,7 +11,7 @@ if (!function_exists('site_settings_definitions')) {
             'store_name' => ['type' => 'string', 'category' => 'brand', 'default' => 'Angelow', 'max_length' => 140],
             'store_tagline' => ['type' => 'string', 'category' => 'brand', 'default' => 'Moda con proposito', 'max_length' => 180],
             'brand_logo' => ['type' => 'string', 'category' => 'brand', 'default' => '', 'max_length' => 255],
-            'primary_color' => ['type' => 'string', 'category' => 'brand', 'default' => '#1d4ed8', 'pattern' => '/^#([A-Fa-f0-9]{6})$/'],
+            'primary_color' => ['type' => 'string', 'category' => 'brand', 'default' => '#0077b6', 'pattern' => '/^#([A-Fa-f0-9]{6})$/'],
             'secondary_color' => ['type' => 'string', 'category' => 'brand', 'default' => '#0f172a', 'pattern' => '/^#([A-Fa-f0-9]{6})$/'],
             'support_email' => ['type' => 'string', 'category' => 'support', 'default' => 'soporte@angelow.com', 'max_length' => 180],
             'support_phone' => ['type' => 'string', 'category' => 'support', 'default' => '+57 300 000 0000', 'max_length' => 40],

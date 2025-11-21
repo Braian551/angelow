@@ -9,8 +9,9 @@
 	--hub-muted: #64748b;
 	--hub-muted-strong: #475569;
 	--hub-text: #0f172a;
-	--hub-primary: #1d4ed8;
-	--hub-primary-soft: rgba(29, 78, 216, 0.12);
+	/* Use the admin primary color for consistent UI across modules */
+	--hub-primary: var(--primary-color, #0077b6);
+	--hub-primary-soft: rgba(0, 119, 182, 0.12);
 	--hub-success: #0f9d58;
 	--hub-warning: #f59e0b;
 	--hub-danger: #dc2626;

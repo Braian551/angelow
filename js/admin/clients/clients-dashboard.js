@@ -325,7 +325,7 @@ class ClientsDashboard {
             return;
         }
         const labels = segments.map((segment) => segment.label);
-        const colors = this.theme.palette?.length ? this.theme.palette : ['#1d4ed8', '#48cae4', '#5c6ac4', '#f59e0b', '#059669', '#dc2626'];
+        const colors = this.theme.palette?.length ? this.theme.palette : ['#0077b6', '#48cae4', '#5c6ac4', '#f59e0b', '#059669', '#dc2626'];
         this.destroyChart('segments');
         this.charts.segments = new Chart(this.segmentsCanvas, {
             type: 'doughnut',
@@ -399,10 +399,10 @@ class ClientsDashboard {
     captureTheme() {
         if (typeof window === 'undefined' || !window.getComputedStyle) {
             return {
-                primary: '#1d4ed8',
-                primarySoft: 'rgba(29,78,216,0.18)',
+                primary: '#0077b6',
+                primarySoft: 'rgba(0,119,182,0.18)',
                 textMuted: '#64748b',
-                palette: ['#1d4ed8', '#48cae4', '#5c6ac4', '#f59e0b', '#059669', '#dc2626']
+                palette: ['#0077b6', '#48cae4', '#5c6ac4', '#f59e0b', '#059669', '#dc2626']
             };
         }
         const styles = getComputedStyle(document.documentElement);
@@ -411,11 +411,12 @@ class ClientsDashboard {
             return value ? value.trim() : fallback;
         };
         return {
-            primary: read('--hub-primary', '#1d4ed8'),
-            primarySoft: read('--hub-primary-soft', 'rgba(29,78,216,0.18)'),
+            /* Prefer explicit dashboard root primary color if present */
+            primary: read('--primary-color', read('--hub-primary', '#0077b6')),
+            primarySoft: read('--primary-color', read('--hub-primary-soft', 'rgba(0,119,182,0.18)')),
             textMuted: read('--hub-muted', '#64748b'),
             palette: [
-                read('--hub-primary', '#1d4ed8'),
+                read('--primary-color', read('--hub-primary', '#0077b6')),
                 read('--secondary-color', read('--primary-light', '#48cae4')),
                 read('--hub-success', '#059669'),
                 read('--hub-warning', '#f59e0b'),
