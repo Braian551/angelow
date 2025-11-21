@@ -21,16 +21,6 @@
     box-shadow: var(--shadow-sm);
 }
 
-.collections-page .page-header::after {
-    content: '';
-    position: absolute;
-    left: var(--space-lg);
-    bottom: var(--space-sm);
-    width: 80px;
-    height: 3px;
-    border-radius: var(--radius-full);
-    background: var(--primary-color);
-}
 
 .collections-page .title-section {
     display: flex;
