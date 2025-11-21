@@ -142,6 +142,204 @@
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 }
 
+/* Additional improvements and compatibility with admin dashboard */
+.surface-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Nice subtle elevation for cards */
+.stat-card, .surface-card, .table-card, .detail-panel, .timeline-card, .form-card {
+    border-radius: 12px;
+    padding: 1.6rem;
+    box-shadow: 0 8px 24px rgba(10, 24, 44, 0.06);
+}
+
+/* Filter bar improvements */
+.filter-bar {
+    gap: 1rem;
+    align-items: center;
+}
+
+.filter-group input#clients-search, .filter-group select {
+    width: 100%;
+    min-width: 160px;
+    padding: 0.6rem 0.85rem;
+    border-radius: 10px;
+    border: 1px solid var(--hub-border);
+    font-size: 0.95rem;
+}
+
+/* Table header style similar to dashboard */
+.table-card thead th {
+    background: var(--hub-primary);
+    color: white;
+    padding: 0.9rem 1rem;
+    font-size: 0.95rem;
+    border-bottom: none;
+    text-align: left;
+}
+
+.table-card table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-card tbody td {
+    padding: 0.85rem 1rem;
+    border-top: 1px solid var(--hub-border);
+}
+
+/* Row interactions */
+.table-card tbody tr:hover td {
+    background: rgba(29,78,216,0.03);
+}
+
+/* Pagination panel */
+#clients-pagination {
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#clients-pagination .actions button {
+    padding: 0.5rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--hub-border);
+    background: white;
+}
+
+/* Detail panel layout */
+.detail-panel {
+    width: 100%;
+}
+
+/* On wide screens the detail panel becomes a right-side aside */
+@media (min-width: 1100px) {
+    .split-grid {
+        grid-template-columns: 1fr 360px;
+        align-items: start;
+    }
+
+    .detail-panel {
+        position: sticky;
+        top: 1.5rem;
+        margin-left: 1rem;
+        min-width: 320px;
+    }
+}
+
+/* Smaller screens: stack detail panel under table */
+@media (max-width: 1100px) {
+    .split-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-panel {
+        width: 100%;
+        position: static;
+    }
+}
+
+/* Buttons */
+.btn-soft {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--hub-border);
+    background: #fff;
+    color: #0f172a;
+    font-weight: 600;
+    transition: all 0.18s var(--transition);
+}
+
+.btn-soft.primary {
+    background: var(--hub-primary);
+    color: #fff;
+    border-color: transparent;
+}
+
+/* Client items & timeline */
+.timeline li {
+    padding-left: 0.9rem;
+}
+
+.timeline li::before {
+    width: 0.56rem;
+    height: 0.56rem;
+}
+
+/* Specific actions for clients page */
+#clients-refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--hub-border);
+    background: #fff;
+    color: var(--hub-primary);
+}
+
+#clients-refresh-btn:hover {
+    background: var(--hub-primary);
+    color: #fff;
+}
+
+#clients-table-body td {
+    word-break: break-word;
+}
+
+/* Segment cards hover */
+.segment-tile:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 34px rgba(10, 24, 44, 0.06);
+}
+
+/* Detail header */
+.detail-body header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.detail-body .detail-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.detail-panel .badge-ghost[data-role="segment"] {
+    margin-left: 0.5rem;
+}
+
+/* Empty state */
+.empty-state[data-state="empty"] h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+    color: #0f172a;
+}
+
+/* Make sure table column widths are readable */
+.table-card th:nth-child(1) { width: 40%; }
+.table-card th:nth-child(2) { width: 12%; text-align: center; }
+.table-card th:nth-child(3) { width: 18%; }
+.table-card th:nth-child(4) { width: 18%; }
+.table-card th:nth-child(5) { width: 12%; text-align: center; }
+
+/* Small screens adjustments */
+@media (max-width: 768px) {
+    .management-hub { padding: 1rem; }
+    .table-card thead th { font-size: 0.85rem; }
+    .table-card td { font-size: 0.9rem; }
+    .filter-group { flex: 1 1 100%; }
+}
+
 .segment-tile {
     border: 1px solid var(--hub-border);
     border-radius: 14px;
