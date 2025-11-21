@@ -23,7 +23,8 @@
 .management-hub {
 	min-height: 100vh;
 	padding: clamp(1.6rem, 2vw, 2.4rem);
-	background: radial-gradient(circle at top, rgba(255, 255, 255, 0.92), var(--hub-bg));
+	/* Use a single solid background to keep the UI minimal and clean */
+	background: var(--hub-bg);
 	display: flex;
 	flex-direction: column;
 	gap: 1.8rem;
@@ -140,7 +141,7 @@
 	position: relative;
 	overflow: hidden;
 	backdrop-filter: blur(var(--hub-blur));
-	transition: transform var(--hub-transition), box-shadow var(--hub-transition);
+	transition: transform var(--hub-transition), box-shadow var(--hub-transition), opacity 0.25s ease;
 }
 
 .stat-card::after,
@@ -246,6 +247,113 @@
 }
 
 .segment-tile:hover { transform: translateY(-4px); }
+
+/* ======== SHIMMER / SKELETON PLACEHOLDERS ======== */
+/* Soft neutral palette for skeletons */
+:root {
+	--skeleton-bg: rgba(8, 18, 34, 0.04);
+	--skeleton-shine: rgba(255, 255, 255, 0.6);
+}
+
+.skeleton-line {
+	display: inline-block;
+	height: 12px;
+	background: var(--skeleton-bg);
+	border-radius: 8px;
+	position: relative;
+	overflow: hidden;
+}
+
+.skeleton-rect {
+	display: block;
+	width: 100%;
+	height: 12px;
+	background: var(--skeleton-bg);
+	border-radius: 8px;
+}
+
+.skeleton-line.stat-placeholder {
+	display: block;
+	width: 40%;
+	height: 18px;
+	margin-top: 0.6rem;
+}
+
+.chart-body .skeleton-line.chart-placeholder {
+	position: absolute;
+	left: 1.5rem;
+	top: 1.5rem;
+	width: 60%;
+	height: 12px;
+	border-radius: 8px;
+}
+
+.skeleton-avatar {
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	background: var(--skeleton-bg);
+}
+
+.shimmer {
+	background-image: linear-gradient(90deg, var(--skeleton-bg) 0%, rgba(255,255,255,0.08) 40%, var(--skeleton-bg) 80%);
+	background-size: 220% 100%;
+	animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes shimmer {
+	0% { background-position: -120% 0; }
+	100% { background-position: 120% 0; }
+}
+
+/* ======== LOADING STATES ======== */
+.is-loading { opacity: 0.95; }
+
+/* Chart card shimmer overlay */
+.chart-card.is-loading::before,
+.stat-card.is-loading::before,
+.table-card.is-loading::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,255,255,0.06), rgba(255,255,255,0));
+	pointer-events: none;
+}
+
+/* Small element-specific skeletons inside cards */
+.stat-card.is-loading strong,
+.stat-card.is-loading h2,
+.chart-card.is-loading .chart-body,
+.table-card.is-loading .table-wrapper {
+	opacity: 0.15;
+}
+
+.stat-card.is-loading .skeleton-line,
+.chart-card.is-loading .skeleton-line,
+.table-card.is-loading .skeleton-line {
+	opacity: 1;
+}
+
+/* Table skeleton row */
+.skeleton-row td { padding: 0.75rem 1.1rem; }
+.skeleton-row .shimmer { height: 12px; border-radius: 8px; }
+
+/* ======== SUBTLE MOTIONS ======== */
+@keyframes fadeInUp {
+	from { transform: translateY(8px); opacity: 0; }
+	to { transform: translateY(0); opacity: 1; }
+}
+
+.card-appear { animation: fadeInUp 0.4s ease-out both; }
+
+/* Respect user's reduce-motion setting */
+@media (prefers-reduced-motion: reduce) {
+	.shimmer { animation: none; }
+	.card-appear { animation: none; }
+	.btn-soft:hover { transform: none; }
+	.stat-card:hover, .chart-card:hover { transform: none; }
+}
 
 .segment-tile h3 { font-size: 1.05rem; color: var(--hub-text); }
 .segment-tile p { color: var(--hub-muted); font-size: 0.9rem; margin: 0.35rem 0 0.65rem; }
@@ -504,6 +612,14 @@ tbody tr:hover {
 
 .chart-legend-item strong { font-size: 0.95rem; }
 .chart-legend-item small { color: var(--hub-muted); }
+
+/* Inline simple progress bar used by trend timeline entries */
+.progress-bar { display: block; height: 6px; background: rgba(15,23,42,0.04); border-radius: 6px; overflow: hidden; }
+.progress-bar > div { height: 100%; border-radius: 6px; }
+.progress-bar > div { transition: width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1); background: var(--hub-primary); }
+
+/* Highlighted name cell in tables */
+.table-primary { font-weight: 700; color: var(--hub-text); }
 
 /* ======== RESPONSIVE ======== */
 @media (max-width: 768px) {

@@ -18,6 +18,16 @@ class ClientsDashboard {
         this.bindEvents();
         this.loadOverview();
         this.loadList();
+        this.runEntranceAnimation();
+    }
+
+    runEntranceAnimation() {
+        const nodes = [ ...(this.statCards || []), ...(this.chartCards || []), this.tableCard].filter(Boolean);
+        nodes.forEach((el, i) => {
+            setTimeout(() => {
+                el.classList.add('card-appear');
+            }, i * 60);
+        });
     }
 
     cacheDom() {
@@ -42,6 +52,8 @@ class ClientsDashboard {
             acquisition: document.querySelector('[data-empty="acquisition"]'),
             segments: document.querySelector('[data-empty="segments"]')
         };
+        this.chartCards = this.hub?.querySelectorAll('.chart-card') || [];
+        this.tableCard = this.hub?.querySelector('.table-card');
     }
 
     bindEvents() {
@@ -96,7 +108,58 @@ class ClientsDashboard {
         });
     }
 
+    setOverviewLoading(isLoading) {
+        this.statCards?.forEach((card) => {
+            card.classList.toggle('is-loading', !!isLoading);
+            const placeholderClass = 'stat-placeholder';
+            const existing = card.querySelector(`.skeleton-line.${placeholderClass}`);
+            if (isLoading && !existing) {
+                const el = document.createElement('div');
+                el.className = `skeleton-line shimmer ${placeholderClass}`;
+                el.style.width = '40%';
+                el.style.height = '18px';
+                el.style.marginTop = '8px';
+                card.appendChild(el);
+            } else if (!isLoading && existing) {
+                existing.remove();
+            }
+        });
+        this.chartCards?.forEach((card) => {
+            card.classList.toggle('is-loading', !!isLoading);
+            const chartBody = card.querySelector('.chart-body');
+            if (!chartBody) return;
+            const existing = chartBody.querySelector('.skeleton-line.chart-placeholder');
+            if (isLoading && !existing) {
+                const el = document.createElement('div');
+                el.className = 'skeleton-line shimmer chart-placeholder';
+                el.style.height = '12px';
+                el.style.width = '70%';
+                el.style.position = 'absolute';
+                el.style.left = '1.6rem';
+                el.style.top = '1.6rem';
+                chartBody.appendChild(el);
+            } else if (!isLoading && existing) {
+                existing.remove();
+            }
+        });
+    }
+
+    setListLoading(isLoading) {
+        if (!this.tableBody) return;
+        this.tableCard?.classList.toggle('is-loading', !!isLoading);
+        if (isLoading) {
+            const rows = Math.min(8, Math.max(3, this.state.perPage || 4));
+            let placeholder = '';
+            for (let i = 0; i < rows; i++) {
+                const width = 100 - (i * (40 / rows));
+                placeholder += `<tr class="skeleton-row"><td colspan="5"><div class="skeleton-line shimmer" style="height:12px;border-radius:8px;width:${width}%"></div></td></tr>`;
+            }
+            this.tableBody.innerHTML = placeholder;
+        }
+    }
+
     async loadOverview() {
+        this.setOverviewLoading(true);
         try {
             const response = await fetch(`${this.config.endpoints.overview}?range=${this.state.range}`, { credentials: 'same-origin' });
             if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -110,11 +173,14 @@ class ClientsDashboard {
         } catch (error) {
             console.error('clients overview', error);
         }
+        finally {
+            this.setOverviewLoading(false);
+        }
     }
 
     async loadList() {
         if (!this.tableBody) return;
-        this.tableBody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
+        this.setListLoading(true);
         const query = new URLSearchParams({
             page: this.state.page,
             per_page: this.state.perPage,
@@ -132,6 +198,9 @@ class ClientsDashboard {
         } catch (error) {
             console.error('clients list', error);
             this.tableBody.innerHTML = '<tr><td colspan="5">No se pudo cargar la informacion</td></tr>';
+        }
+        finally {
+            this.setListLoading(false);
         }
     }
 

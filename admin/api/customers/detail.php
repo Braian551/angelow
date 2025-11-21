@@ -48,7 +48,7 @@ try {
 }
 
 function fetchCustomerMetrics(PDO $conn, string $customerId): array {
-    $stmt = $conn->prepare("SELECT COUNT(*) AS orders_count, COALESCE(SUM(total), 0) AS total_spent, COALESCE(AVG(total), 0) AS avg_ticket, MIN(created_at) AS first_order, MAX(created_at) AS last_order FROM orders WHERE user_id = ? AND status != 'cancelled'");
+    $stmt = $conn->prepare("SELECT COUNT(*) AS orders_count, COALESCE(SUM(total), 0) AS total_spent, COALESCE(AVG(total), 0) AS avg_ticket, MIN(created_at) AS first_order, MAX(created_at) AS last_order, SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 120 DAY) THEN 1 ELSE 0 END) AS orders_last_120d FROM orders WHERE user_id = ? AND status != 'cancelled'");
     $stmt->execute([$customerId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: ['orders_count' => 0, 'total_spent' => 0, 'avg_ticket' => 0, 'first_order' => null, 'last_order' => null];
 
@@ -57,15 +57,15 @@ function fetchCustomerMetrics(PDO $conn, string $customerId): array {
     $totalSpent = (float) $row['total_spent'];
     $lastOrder = $row['last_order'] ? strtotime($row['last_order']) : null;
 
-    if ($totalSpent >= 600000) {
-        $segments[] = 'VIP';
+    if ($totalSpent >= 200000) {
+        $segments[] = 'Alta contribución';
     }
-    if ($orders >= 3) {
-        $segments[] = 'Leal';
+    if ((int)$row['orders_last_120d'] >= 2) {
+        $segments[] = 'Compradores frecuentes';
     }
     if ($orders === 0) {
-        $segments[] = 'Sin compras';
-    } elseif ($lastOrder && $lastOrder < strtotime('-90 day')) {
+        $segments[] = 'Sin pedidos';
+    } elseif ($lastOrder && $lastOrder < strtotime('-60 day')) {
         $segments[] = 'Inactivo';
     }
 
