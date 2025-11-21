@@ -12,8 +12,10 @@ requireRole('admin');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clientes | Panel Angelow</title>
+    <meta name="base-url" content="<?= BASE_URL ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/management-hub.css">
 </head>
 
@@ -69,44 +71,78 @@ requireRole('admin');
                 </article>
             </section>
 
+            <section class="client-charts" id="clients-charts">
+                <article class="chart-card chart-card-large" id="clients-growth-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3><i class="fas fa-chart-line"></i> Ritmo de adquisición</h3>
+                            <p class="chart-subtitle">Clientes nuevos por periodo seleccionado.</p>
+                        </div>
+                        <div class="chart-controls" role="group" aria-label="Intervalo de tiempo">
+                            <button type="button" class="chart-range active" data-range="30">30d</button>
+                            <button type="button" class="chart-range" data-range="90">90d</button>
+                            <button type="button" class="chart-range" data-range="180">180d</button>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="clients-acquisition-chart" height="320"></canvas>
+                        <div class="chart-empty" data-empty="acquisition" hidden>Sin datos para graficar</div>
+                    </div>
+                </article>
+
+                <article class="chart-card" id="clients-segments-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3><i class="fas fa-chart-pie"></i> Composición de segmentos</h3>
+                            <p class="chart-subtitle">Distribución actual de la base de clientes.</p>
+                        </div>
+                    </div>
+                    <div class="chart-body doughnut">
+                        <canvas id="clients-segments-chart" height="280"></canvas>
+                        <div class="chart-empty" data-empty="segments" hidden>Sin datos suficientes</div>
+                    </div>
+                    <div class="chart-legend" id="clients-segments-legend"></div>
+                </article>
+            </section>
+
             <section class="split-grid">
                 <article class="surface-card">
-                    <header class="filter-bar">
+                    <div class="section-header surface-header">
                         <div>
-                            <h2>Segmentos accionables</h2>
-                            <p class="text-muted">Prioriza acciones de contacto según la salud del cliente (ej. recuperar inactivos, fidelizar clientes leales).</p>
+                            <h3><i class="fas fa-filter-circle-dollar"></i> Segmentos accionables</h3>
+                            <p class="text-muted">Prioriza contactos según salud real del cliente (ej. recuperar inactivos, fidelizar recurrentes).</p>
                         </div>
-                    </header>
+                    </div>
                     <div class="segment-grid" id="client-segments"></div>
                 </article>
                 <article class="surface-card">
-                    <header class="filter-bar">
+                    <div class="section-header surface-header">
                         <div>
-                            <h2>Adquisicion semanal</h2>
-                            <p class="text-muted">Comparativo ultimas 8 semanas.</p>
+                            <h3><i class="fas fa-calendar-week"></i> Adquisición semanal</h3>
+                            <p class="text-muted">Comparativo últimas 8 semanas.</p>
                         </div>
-                    </header>
+                    </div>
                     <ul class="timeline" id="acquisition-trend"></ul>
                 </article>
             </section>
 
             <section class="split-grid">
                 <article class="surface-card">
-                    <header class="filter-bar">
+                    <div class="section-header surface-header">
                         <div>
-                            <h2>Matriz de interacción</h2>
-                            <p class="text-muted">Cruce de frecuencia vs recencia (visitas/pedidos vs. tiempo desde último pedido).</p>
+                            <h3><i class="fas fa-grid-2"></i> Matriz de interacción</h3>
+                            <p class="text-muted">Cruce de frecuencia vs recencia (pedidos totales vs tiempo desde último pedido).</p>
                         </div>
-                    </header>
+                    </div>
                     <div class="segment-grid" id="engagement-matrix"></div>
                 </article>
                 <article class="surface-card">
-                    <header class="filter-bar">
+                    <div class="section-header surface-header">
                         <div>
-                            <h2>Top clientes</h2>
-                            <p class="text-muted">Valor acumulado ultimos 30 dias.</p>
+                            <h3><i class="fas fa-trophy"></i> Top clientes</h3>
+                            <p class="text-muted">Valor acumulado últimos 30 días.</p>
                         </div>
-                    </header>
+                    </div>
                     <ul class="timeline" id="top-customers"></ul>
                 </article>
             </section>
@@ -121,12 +157,11 @@ requireRole('admin');
                         <div class="filter-group">
                             <select id="clients-segment">
                                 <option value="all">Todos los segmentos</option>
-                                <option value="vip">VIP</option>
-                                <option value="loyal">Leales</option>
-                                <option value="new">Nuevos</option>
+                                <option value="value">Alta contribución</option>
+                                <option value="repeat">Frecuentes 120d</option>
+                                <option value="recent">Nuevos 30d</option>
+                                <option value="inactive">Inactivos 60d</option>
                                 <option value="no_orders">Sin pedidos</option>
-                                <option value="at_risk">Inactivos 90d</option>
-                                <option value="active">Activos 60d</option>
                             </select>
                         </div>
                         <div class="filter-group">
@@ -196,6 +231,7 @@ window.CLIENTS_DASHBOARD_CONFIG = {
     }
 };
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="<?= BASE_URL ?>/js/admin/clients/clients-dashboard.js"></script>
 </body>
 </html>

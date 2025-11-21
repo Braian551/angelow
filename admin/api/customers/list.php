@@ -64,7 +64,8 @@ function buildCustomerQuery(string $search, string $segment, string $sort): arra
 
     $select = 'SELECT u.id, COALESCE(u.name, u.email) AS name, u.email, u.phone, u.created_at, u.image, u.is_blocked, ' .
         'COUNT(DISTINCT o.id) AS orders_count, COALESCE(SUM(o.total), 0) AS total_spent, ' .
-        'MAX(o.created_at) AS last_order, CASE WHEN COUNT(DISTINCT o.id) > 0 THEN COALESCE(SUM(o.total), 0) / COUNT(DISTINCT o.id) ELSE 0 END AS avg_ticket';
+        'MAX(o.created_at) AS last_order, CASE WHEN COUNT(DISTINCT o.id) > 0 THEN COALESCE(SUM(o.total), 0) / COUNT(DISTINCT o.id) ELSE 0 END AS avg_ticket, ' .
+        'SUM(CASE WHEN o.created_at >= DATE_SUB(NOW(), INTERVAL 120 DAY) THEN 1 ELSE 0 END) AS orders_last_120d';
 
     $selectId = 'SELECT u.id';
     // In strict SQL modes (ONLY_FULL_GROUP_BY) MySQL requires
@@ -75,23 +76,20 @@ function buildCustomerQuery(string $search, string $segment, string $sort): arra
 
     $havingParts = [];
     switch ($segment) {
-        case 'vip':
-            $havingParts[] = 'COALESCE(SUM(o.total), 0) >= 600000';
+        case 'value':
+            $havingParts[] = 'COALESCE(SUM(o.total), 0) >= 200000';
             break;
-        case 'loyal':
-            $havingParts[] = 'COUNT(DISTINCT o.id) >= 3';
+        case 'repeat':
+            $havingParts[] = 'SUM(CASE WHEN o.created_at >= DATE_SUB(NOW(), INTERVAL 120 DAY) THEN 1 ELSE 0 END) >= 2';
             break;
-        case 'at_risk':
-            $havingParts[] = 'COUNT(DISTINCT o.id) > 0 AND (MAX(o.created_at) IS NULL OR MAX(o.created_at) < DATE_SUB(NOW(), INTERVAL 90 DAY))';
-            break;
-        case 'new':
+        case 'recent':
             $havingParts[] = 'MIN(u.created_at) >= DATE_SUB(NOW(), INTERVAL 30 DAY)';
+            break;
+        case 'inactive':
+            $havingParts[] = 'COUNT(DISTINCT o.id) > 0 AND (MAX(o.created_at) IS NULL OR MAX(o.created_at) < DATE_SUB(NOW(), INTERVAL 60 DAY))';
             break;
         case 'no_orders':
             $havingParts[] = 'COUNT(DISTINCT o.id) = 0';
-            break;
-        case 'active':
-            $havingParts[] = 'MAX(o.created_at) >= DATE_SUB(NOW(), INTERVAL 60 DAY)';
             break;
         default:
             break;

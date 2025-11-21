@@ -55,25 +55,49 @@ function getCustomerStats(PDO $conn, int $rangeDays): array {
 
 function getCustomerSegments(PDO $conn): array {
     $segments = [
-        'vip' => [
-            'label' => 'Clientes VIP',
-            'description' => 'Gasto acumulado mayor a 600.000 COP',
-            'query' => "SELECT COUNT(*) FROM (SELECT u.id FROM users u LEFT JOIN orders o ON o.user_id = u.id AND o.status != 'cancelled' WHERE u.role IN ('customer','user') GROUP BY u.id HAVING COALESCE(SUM(o.total),0) >= 600000) AS vip"
+        'value' => [
+            'label' => 'Alta contribución',
+            'description' => '≥ 200.000 COP en compras históricas',
+            'query' => "SELECT COUNT(*) FROM (SELECT u.id, COALESCE(SUM(o.total), 0) AS total_spent
+                FROM users u
+                LEFT JOIN orders o ON o.user_id = u.id AND o.status != 'cancelled'
+                WHERE u.role IN ('customer','user')
+                GROUP BY u.id
+                HAVING total_spent >= 200000
+            ) AS high_value"
         ],
-        'at_risk' => [
-                    'label' => 'Inactivos 90+ días',
-                    'description' => 'Clientes con historial de compra, sin compras en los últimos 90 días',
-            'query' => "SELECT COUNT(*) FROM (SELECT u.id, MAX(o.created_at) AS last_order FROM users u LEFT JOIN orders o ON o.user_id = u.id AND o.status != 'cancelled' WHERE u.role IN ('customer','user') GROUP BY u.id HAVING last_order IS NOT NULL AND last_order < DATE_SUB(NOW(), INTERVAL 90 DAY)) AS risk"
+        'repeat' => [
+            'label' => 'Compradores frecuentes',
+            'description' => '2+ pedidos en los últimos 120 días',
+            'query' => "SELECT COUNT(*) FROM (SELECT u.id
+                FROM users u
+                JOIN orders o ON o.user_id = u.id AND o.status != 'cancelled'
+                WHERE u.role IN ('customer','user') AND o.created_at >= DATE_SUB(NOW(), INTERVAL 120 DAY)
+                GROUP BY u.id
+                HAVING COUNT(o.id) >= 2
+            ) AS repeaters"
         ],
-        'new' => [
-            'label' => 'Nuevos 30d',
-            'description' => 'Clientes registrados en los últimos 30 días',
+        'recent' => [
+            'label' => 'Nuevos 30 días',
+            'description' => 'Registrados en el último mes',
             'query' => "SELECT COUNT(*) FROM users WHERE role IN ('customer','user') AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)"
+        ],
+        'inactive' => [
+            'label' => 'Inactivos 60+ días',
+            'description' => 'Con historial, sin pedidos recientes',
+            'query' => "SELECT COUNT(*) FROM (SELECT u.id, MAX(o.created_at) AS last_order
+                FROM users u
+                LEFT JOIN orders o ON o.user_id = u.id AND o.status != 'cancelled'
+                WHERE u.role IN ('customer','user')
+                GROUP BY u.id
+                HAVING last_order IS NOT NULL AND last_order < DATE_SUB(NOW(), INTERVAL 60 DAY)
+            ) AS inactive_clients"
         ],
         'no_orders' => [
             'label' => 'Sin pedidos',
-            'description' => 'Clientes sin ninguna orden registrada',
-            'query' => "SELECT COUNT(*) FROM users u WHERE u.role IN ('customer','user') AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.status != 'cancelled')"
+            'description' => 'Clientes aún sin conversiones',
+            'query' => "SELECT COUNT(*) FROM users u WHERE u.role IN ('customer','user')
+                AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.status != 'cancelled')"
         ]
     ];
 
