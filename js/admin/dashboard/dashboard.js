@@ -403,10 +403,10 @@ class AdminDashboard {
                 <div class="status-row">
                     <div class="status-info">
                         <span class="status-dot" style="background:${item.color}"></span>
+                         <strong>${this.formatNumber(item.count)}</strong>
                         <span>${item.label}</span>
                     </div>
                     <div class="status-values">
-                        <strong>${this.formatNumber(item.count)}</strong>
                         <span>${percentage}%</span>
                     </div>
                     <div class="status-progress">
