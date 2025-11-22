@@ -527,7 +527,7 @@ class ClientsDashboard {
             const human = this.humanizeLabel(label);
             const v = Number(value || 0);
             const pct = total ? Math.round((v / total) * 100) : 0;
-            return `<li role="button" tabindex="0" data-bucket="${label}" data-type="${type}" data-count="${v}"><span>${human}</span><strong>${v.toLocaleString('es-CO')} <small>${pct}%</small></strong></li>`;
+            return `<li role="button" tabindex="0" data-bucket="${label}" data-type="${type}" data-count="${v}"><svg class="mini-dot" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="6" fill="var(--hub-primary)"/></svg><span>${human}</span><strong>${v.toLocaleString('es-CO')} <small>${pct}%</small></strong></li>`;
         }).join('')}</ul>`;
     }
 
@@ -589,12 +589,14 @@ class ClientsDashboard {
         // Insert or update summary in the article containing the top customers list
         const topContainer = this.topCustomersList?.closest('article');
         if (topContainer) {
+            const headerEl = topContainer.querySelector('.section-header') || topContainer.querySelector('.surface-header');
             const existing = topContainer.querySelector('.trend-summary');
             if (existing) existing.outerHTML = summaryHtml;
+            else if (headerEl) headerEl.insertAdjacentHTML('afterend', summaryHtml);
             else topContainer.insertAdjacentHTML('afterbegin', summaryHtml);
         }
         this.topCustomersList.innerHTML = list.map((item) => `
-            <li role="button" tabindex="0" data-id="${item.id}">
+            <li role="button" tabindex="0" data-id="${item.id}"><svg class="mini-dot" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="6" fill="var(--hub-primary)"/></svg>
                 <strong>${item.name || item.email}</strong>
                 <span>${this.formatCurrency(item.total_spent)} • ${item.orders_count} pedidos</span>
             </li>

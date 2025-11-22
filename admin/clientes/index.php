@@ -132,7 +132,7 @@ requireRole('admin');
                 <article class="surface-card">
                     <div class="section-header surface-header">
                         <div>
-                            <h3><i class="fas fa-grid-2"></i> Matriz de interacción</h3>
+                            <h3><span class="section-icon" aria-hidden="true"><svg class="icon-grid" viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="8" height="8" rx="1" fill="currentColor"/><rect x="14" y="2" width="8" height="8" rx="1" fill="currentColor"/><rect x="2" y="14" width="8" height="8" rx="1" fill="currentColor"/><rect x="14" y="14" width="8" height="8" rx="1" fill="currentColor"/></svg></span> Matriz de interacción</h3>
                             <p class="text-muted">Cruce de frecuencia vs recencia (pedidos totales vs tiempo desde último pedido).</p>
                         </div>
                     </div>
