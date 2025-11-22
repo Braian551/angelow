@@ -635,6 +635,7 @@ tbody tr.selected td { padding-left: 0.75rem; }
 	padding: 0.35rem 0.9rem;
 	font-size: 0.85rem;
 	font-weight: 600;
+	justify-content: center;
 	display: inline-flex;
 	align-items: center;
 	gap: 0.35rem;
