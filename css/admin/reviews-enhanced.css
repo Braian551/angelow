@@ -246,8 +246,11 @@
     place-items: center;
     box-shadow: 0 6px 18px rgba(8,18,34,0.06);
     position: relative; /* for pseudo-layer behind icon */
+    background: #ffffff; /* white square inside halo */
+    color: var(--hub-muted); /* default icon color - overridden per metric */
 }
 
+/* base halo - neutral (in case metric-specific is absent) */
 #reviews-insights .stat-card .stat-icon::before {
     /* subtle pseudo background behind each stat icon for balanced look */
     content: '';
@@ -323,9 +326,23 @@
 }
 
 /* Metric-specific colors for review hub (match client card color mapping) */
-#reviews-insights .stat-card[data-metric="pending"] .stat-icon { background: rgba(2, 132, 199, 0.06); color: #0284c7; }
-#reviews-insights .stat-card[data-metric="approved"] .stat-icon { background: rgba(16,185,129,0.06); color: #10b981; }
-#reviews-insights .stat-card[data-metric="average"] .stat-icon { background: rgba(245, 158, 11, 0.08); color: #f59e0b; }
+/* Metric-specific halo colors (pseudo behind icon) and icon color on the glyph itself */
+#reviews-insights .stat-card[data-metric="pending"] .stat-icon::before { background: rgba(2, 132, 199, 0.12); }
+#reviews-insights .stat-card[data-metric="pending"] .stat-icon i,
+#reviews-insights .stat-card[data-metric="pending"] .stat-icon svg { color: #0284c7; fill: #0284c7; }
+#reviews-insights .stat-card[data-metric="approved"] .stat-icon::before { background: rgba(16,185,129,0.12); }
+#reviews-insights .stat-card[data-metric="approved"] .stat-icon i,
+#reviews-insights .stat-card[data-metric="approved"] .stat-icon svg { color: #059669; fill: #059669; }
+#reviews-insights .stat-card[data-metric="average"] .stat-icon::before { background: rgba(245, 158, 11, 0.12); }
+#reviews-insights .stat-card[data-metric="average"] .stat-icon i,
+#reviews-insights .stat-card[data-metric="average"] .stat-icon svg { color: #f59e0b; fill: #f59e0b; }
+#reviews-insights .stat-card[data-metric="verified"] .stat-icon::before { background: rgba(16,185,129,0.12); }
+#reviews-insights .stat-card[data-metric="verified"] .stat-icon i,
+#reviews-insights .stat-card[data-metric="verified"] .stat-icon svg { color: #10b981; fill: #10b981; }
+
+/* smaller icon size for consistency */
+#reviews-insights .stat-card .stat-icon i, #reviews-insights .stat-card .stat-icon svg { font-size: 18px; }
+
 #reviews-insights .stat-card[data-metric="pending"] .stat-value { color: #0284c7; }
 #reviews-insights .stat-card[data-metric="approved"] .stat-value { color: #059669; }
 #reviews-insights .stat-card[data-metric="average"] .stat-value { color: #f59e0b; }
