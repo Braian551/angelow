@@ -376,7 +376,7 @@ class ReviewsInbox {
                     <td class="actions">
                         <button class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar"><i class="fas fa-check"></i></button>
                         <button class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar"><i class="fas fa-ban"></i></button>
-                        <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Verificar"><i class="fas fa-shield"></i></button>
+                        <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada"><i class="fas fa-badge-check"></i></button>
                     </td>
                 </tr>
             `;
@@ -406,7 +406,7 @@ class ReviewsInbox {
         const map = {
             approve: { bg: 'rgba(16,185,129,0.08)', color: '#059669', border: 'rgba(16,185,129,0.12)' },
             reject: { bg: 'rgba(220,38,38,0.06)', color: '#dc2626', border: 'rgba(220,38,38,0.12)' },
-            verify: { bg: 'rgba(0,119,182,0.06)', color: '#0077b6', border: 'rgba(0,119,182,0.12)' }
+            verify: { bg: 'rgba(16,185,129,0.08)', color: '#059669', border: 'rgba(16,185,129,0.12)' }
         };
         // Table buttons
         this.tableBody?.querySelectorAll('td.actions button[data-action]')?.forEach((btn) => {

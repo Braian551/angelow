@@ -224,6 +224,31 @@
     }
 }
 
+/* ======== REVIEWS HUB: STAT CARD ENHANCEMENTS ======== */
+/* Make verified purchases stat card stylized and clearly visible (matches client palette) */
+#reviews-insights .stat-card[data-metric="verified"] .stat-icon {
+    background: rgba(16, 185, 129, 0.06);
+    color: #059669;
+    box-shadow: 0 6px 18px rgba(5, 150, 105, 0.06);
+}
+
+#reviews-insights .stat-card[data-metric="verified"] .stat-value {
+    color: #059669;
+}
+
+/* Slightly larger icon for better balance in the hub like clients cards */
+#reviews-insights .stat-card .stat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+    border-radius: 12px;
+}
+
+/* Improve the visual contrast of the rating card and verified, so the numbers stand out */
+#reviews-insights .stat-card .stat-value { color: var(--hub-text); }
+/* Subtle card background for reviews hub to feel lighter like clients page */
+#reviews-insights .stat-card { background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,251,255,0.98)); }
+
 /* ======== DETAIL PANEL - REORGANIZED ======== */
 
 .detail-panel .empty-state i {
@@ -692,8 +717,8 @@
 }
 .btn-verify {
     background: #fff !important;
-    color: #0077b6 !important;
-    border-color: rgba(0,119,182,0.12) !important;
+    color: #059669 !important;
+    border-color: rgba(16,185,129,0.12) !important;
 }
 
 /* Ensure icon colors are explicit and more specific than global rules */
@@ -782,12 +807,12 @@
 }
 
 #reviews-hub .btn-verify {
-    background-color: rgba(0, 119, 182, 0.08) !important;
-    color: #0077b6 !important;
-    border: 1px solid rgba(0, 119, 182, 0.12) !important;
+    background-color: rgba(16, 185, 129, 0.08) !important;
+    color: #059669 !important;
+    border: 1px solid rgba(16, 185, 129, 0.12) !important;
 }
 #reviews-hub .btn-verify:hover {
-    background-color: rgba(0, 119, 182, 0.14) !important;
+    background-color: rgba(16, 185, 129, 0.16) !important;
     transform: translateY(-2px) scale(1.05) !important;
 }
 
