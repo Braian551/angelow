@@ -214,7 +214,7 @@ class ReviewsInbox {
         if (!avg) return '';
         const fullStars = Math.floor(avg);
         const half = (avg - fullStars) >= 0.5;
-        const stars = Array.from({length: 5}).map((_, i) => {
+        const stars = Array.from({ length: 5 }).map((_, i) => {
             if (i < fullStars) return '<i class="fas fa-star" style="color:#f59e0b"></i>';
             if (i === fullStars && half) return '<i class="fas fa-star-half-stroke" style="color:#f59e0b"></i>';
             return '<i class="far fa-star" style="color:#d1d5db"></i>';
@@ -239,7 +239,7 @@ class ReviewsInbox {
         // Render Chart.js donut for rating distribution
         if (!this.ratingCanvas || typeof Chart === 'undefined') return;
         // ensure descending order (5 -> 1)
-        const ordered = [...distribution].sort((a,b) => (b.rating ?? 0) - (a.rating ?? 0));
+        const ordered = [...distribution].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
         const labels = ordered.map(d => `${d.rating} ★`);
         const counts = ordered.map(d => d.count);
         // Destroy existing chart if present
@@ -254,7 +254,7 @@ class ReviewsInbox {
             type: 'doughnut',
             data: {
                 labels,
-                datasets: [{ data: counts, backgroundColor: ['#22c55e','#10b981','#06b6d4','#3b82f6','#6366f1'] }]
+                datasets: [{ data: counts, backgroundColor: ['#22c55e', '#10b981', '#06b6d4', '#3b82f6', '#6366f1'] }]
             },
             options: {
                 plugins: { legend: { display: false } },
@@ -281,7 +281,7 @@ class ReviewsInbox {
         if (this.ratingLegend) {
             this.ratingLegend.innerHTML = labels.map((l, idx) => `
                 <span class="chart-legend-item">
-                    <span class="chart-legend-swatch" style="background:${['#22c55e','#10b981','#06b6d4','#3b82f6','#6366f1'][idx % 5]}"></span>
+                    <span class="chart-legend-swatch" style="background:${['#22c55e', '#10b981', '#06b6d4', '#3b82f6', '#6366f1'][idx % 5]}"></span>
                     <strong>${l}</strong>
                     <small>${counts[idx]} reseñas</small>
                 </span>
@@ -295,18 +295,36 @@ class ReviewsInbox {
             this.highlightsList.innerHTML = '<li class="text-muted">Sin actividad reciente</li>';
             return;
         }
-        this.highlightsList.innerHTML = highlights.map((item) => `
-            <li role="button" tabindex="0" data-id="${item.id}">
-                <span class="mini-dot" aria-hidden="true"><i class="fas fa-comments" aria-hidden="true"></i></span>
+
+        // Helper function to get initials from name
+        const getInitials = (name) => {
+            if (!name) return '?';
+            const parts = name.trim().split(' ');
+            if (parts.length >= 2) {
+                return (parts[0][0] + parts[1][0]).toUpperCase();
+            }
+            return parts[0].substring(0, 2).toUpperCase();
+        };
+
+        this.highlightsList.innerHTML = highlights.map((item) => {
+            const customerName = item.customer_name || 'Cliente anónimo';
+            const initials = getInitials(customerName);
+            const isVerified = item.is_verified || item.is_verified_purchase || false;
+            const verifiedAttr = isVerified ? ' data-verified="true"' : '';
+
+            return `
+            <li role="button" tabindex="0" data-id="${item.id}"${verifiedAttr}>
+                <span class="mini-dot" aria-hidden="true">${initials}</span>
                 <div class="event-content">
-                    <strong class="event-title">${item.customer_name || 'Cliente anónimo'}</strong>
+                    <strong class="event-title">${customerName}</strong>
                     <small class="event-desc">${item.product_name || 'Producto'}</small>
                     <div class="mt-1"><span class="badge-ghost small">${item.rating} ★</span></div>
                     <p class="text-muted mt-2">${(item.comment || '').slice(0, 160)}${(item.comment || '').length > 160 ? '...' : ''}</p>
                 </div>
                 <div class="event-meta">${this.formatDate(item.created_at)}</div>
             </li>
-        `).join('');
+        `;
+        }).join('');
 
         // Attach interactions to timeline items for keyboard and pointer accessibility
         this.highlightsList.querySelectorAll('li[tabindex]')?.forEach((li) => {
