@@ -138,7 +138,7 @@ function getCustomerAcquisitionTrend(PDO $conn, int $weeks): array {
 function getCustomerEngagementMatrix(PDO $conn): array {
     $orderGroups = $conn->query("SELECT bucket, COUNT(*) AS customers FROM (
         SELECT CASE
-            WHEN order_count = 0 THEN 'sin_pedidos'
+            WHEN order_count = 0 THEN 'Sin pedidos'
             WHEN order_count = 1 THEN '1 pedido'
             WHEN order_count BETWEEN 2 AND 4 THEN '2-4 pedidos'
             ELSE '5+ pedidos'
@@ -154,7 +154,7 @@ function getCustomerEngagementMatrix(PDO $conn): array {
 
     $recencyGroups = $conn->query("SELECT bucket, COUNT(*) AS customers FROM (
         SELECT CASE
-            WHEN last_order IS NULL THEN 'sin_historial'
+            WHEN last_order IS NULL THEN 'Sin historial'
             WHEN last_order >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN '0-30 dias'
             WHEN last_order >= DATE_SUB(NOW(), INTERVAL 60 DAY) THEN '31-60 dias'
             WHEN last_order >= DATE_SUB(NOW(), INTERVAL 90 DAY) THEN '61-90 dias'

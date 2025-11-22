@@ -112,6 +112,14 @@ class ClientsDashboard {
             this.loadList();
         });
 
+        // When segment select changes programmatically, keep tiles highlighted
+        this.segmentSelect?.addEventListener('change', (evt) => {
+            const val = evt.target.value;
+            this.segmentContainer?.querySelectorAll('.segment-tile')?.forEach((tile) => {
+                tile.classList.toggle('selected', tile.getAttribute('data-segment') === val);
+            });
+        });
+
         this.sortSelect?.addEventListener('change', (evt) => {
             this.state.sort = evt.target.value;
             this.state.page = 1;
@@ -334,6 +342,11 @@ class ClientsDashboard {
             const p = tile.querySelector('p');
             if (p && p.textContent) tile.setAttribute('title', p.textContent.trim());
         });
+        // highlight selected segment if any
+        const selectVal = this.segmentSelect?.value || this.state.segment || 'all';
+        Array.from(this.segmentContainer.querySelectorAll('.segment-tile')).forEach((tile) => {
+            tile.classList.toggle('selected', tile.getAttribute('data-segment') === selectVal);
+        });
     }
 
     renderTrend(trend = []) {
@@ -441,22 +454,117 @@ class ClientsDashboard {
         if (!this.engagementContainer) return;
         const orders = matrix.orders || {};
         const recency = matrix.recency || {};
+        const totalOrders = Object.values(orders).reduce((s, v) => s + (v || 0), 0);
+        const totalRecency = Object.values(recency).reduce((s, v) => s + (v || 0), 0);
         this.engagementContainer.innerHTML = `
-            <article class="segment-tile">
-                <h3>Por pedidos</h3>
-                ${this.renderMiniList(orders)}
+            <article class="segment-tile" data-type="orders">
+                <div class="tile-head">
+                    <h3>Por pedidos</h3>
+                    <div class="count-badge"><strong>${totalOrders.toLocaleString('es-CO')}</strong><small>clientes</small></div>
+                </div>
+                ${this.renderMiniList(orders, 'orders', totalOrders)}
             </article>
-            <article class="segment-tile">
-                <h3>Por recencia</h3>
-                ${this.renderMiniList(recency)}
+            <article class="segment-tile" data-type="recency">
+                <div class="tile-head">
+                    <h3>Por recencia</h3>
+                    <div class="count-badge"><strong>${totalRecency.toLocaleString('es-CO')}</strong><small>clientes</small></div>
+                </div>
+                ${this.renderMiniList(recency, 'recency', totalRecency)}
             </article>
         `;
+
+        // Add click handlers for mini-list items to apply filters when possible
+        const items = this.engagementContainer.querySelectorAll('.mini-list li');
+        // tile selection for engagement containers
+        this.engagementContainer.querySelectorAll('.segment-tile').forEach((tile) => {
+            tile.addEventListener('click', (evt) => {
+                // prevent tile click from clashing with item click (only target tile itself)
+                if (evt.target.closest('.mini-list')) return;
+                this.engagementContainer.querySelectorAll('.segment-tile').forEach(t => t.classList.remove('selected'));
+                tile.classList.add('selected');
+            });
+        });
+        items.forEach((li) => {
+            li.addEventListener('click', () => {
+                const bucket = li.getAttribute('data-bucket');
+                const type = li.getAttribute('data-type');
+                const seg = this.bucketToSegment(type, bucket);
+                if (seg) {
+                    if (this.segmentSelect) {
+                        this.segmentSelect.value = seg;
+                        this.segmentSelect.dispatchEvent(new Event('change'));
+                    } else {
+                        this.state.segment = seg;
+                        this.loadList();
+                    }
+                } else {
+                    // If no segment mapping, highlight selection only
+                    items.forEach((s) => s.classList.remove('active'));
+                    li.classList.add('active');
+                }
+            });
+            // keyboard support for accessibility: Enter / Space triggers click
+            li.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    li.click();
+                }
+            });
+            // Tooltip from text already handled on segment tiles; fallback to title attr
+            if (!li.getAttribute('title')) li.setAttribute('title', li.querySelector('span')?.textContent || '');
+        });
     }
 
     renderMiniList(bucket) {
-        const entries = Object.entries(bucket);
-        if (!entries.length) return '<p>Sin datos</p>';
-        return `<ul class="text-muted">${entries.map(([label, value]) => `<li>${label}: <strong>${value}</strong></li>`).join('')}</ul>`;
+        // versions: renderMiniList(bucket, type, total)
+        const args = Array.from(arguments);
+        const mapBucket = args[0] || {};
+        const type = args[1] || null;
+        const total = Number(args[2] || Object.values(mapBucket).reduce((s, v) => s + (v || 0), 0)) || 1;
+        const entries = Object.entries(mapBucket);
+        if (!entries.length) return '<p class="text-muted">Sin datos</p>';
+        return `<ul class="text-muted mini-list">${entries.map(([label, value]) => {
+            const human = this.humanizeLabel(label);
+            const v = Number(value || 0);
+            const pct = total ? Math.round((v / total) * 100) : 0;
+            return `<li role="button" tabindex="0" data-bucket="${label}" data-type="${type}" data-count="${v}"><span>${human}</span><strong>${v.toLocaleString('es-CO')} <small>${pct}%</small></strong></li>`;
+        }).join('')}</ul>`;
+    }
+
+    humanizeLabel(s) {
+        if (!s) return '';
+        // map known tokens to friendly labels
+        const mapping = {
+            'sin_historial': 'Sin historial',
+            'sin_pedidos': 'Sin pedidos',
+            'sin historial': 'Sin historial',
+            'sin pedidos': 'Sin pedidos'
+        };
+        const key = s.toLowerCase();
+        if (mapping[key]) return mapping[key];
+        // Replace underscores with spaces, keep ranges and dashes
+        const cleaned = s.replace(/_/g, ' ');
+        // Capitalize first letter
+        return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+    }
+
+    bucketToSegment(type, label) {
+        if (!label) return null;
+        // normalize
+        const l = label.toLowerCase();
+        if (type === 'orders') {
+            if (l.includes('sin_pedidos') || l.includes('sin pedidos')) return 'no_orders';
+            if (l.includes('2-4') || l.includes('5+') || l.includes('2-4 pedidos') || l.includes('5+ pedidos')) return 'repeat';
+            // fallback: 1 pedido -> keep as is, no mapping
+        }
+        if (type === 'recency') {
+            if (l.includes('sin_historial') || l.includes('sin historial')) return null;
+            // older than 60 days -> 'inactive'
+            if (l.match(/\b(61|90|90\+|90)\b/) || l.includes('61-90') || l.includes('90+')) return 'inactive';
+            // For 0-30 we could show 'recent' but it's not equivalent to registrations
+            if (l.includes('0-30')) return 'recent';
+        }
+        return null;
     }
 
     renderTopCustomers(list = []) {
@@ -465,12 +573,62 @@ class ClientsDashboard {
             this.topCustomersList.innerHTML = '<li>Sin clientes destacados</li>';
             return;
         }
+        const total = list.reduce((s, it) => s + (Number(it.total_spent) || 0), 0) || 0;
+        const avg = list.length ? Math.round(total / list.length) : 0;
+        const summaryHtml = `
+            <div class="trend-summary" role="status">
+                <div>
+                    <strong>${list.length} clientes</strong>
+                    <small>Top promedio ${this.formatCurrency(avg)}</small>
+                </div>
+                <div class="trend-controls">
+                    <button class="btn-soft btn-mini" aria-expanded="false">Ver todos</button>
+                </div>
+            </div>
+        `;
+        // Insert or update summary in the article containing the top customers list
+        const topContainer = this.topCustomersList?.closest('article');
+        if (topContainer) {
+            const existing = topContainer.querySelector('.trend-summary');
+            if (existing) existing.outerHTML = summaryHtml;
+            else topContainer.insertAdjacentHTML('afterbegin', summaryHtml);
+        }
         this.topCustomersList.innerHTML = list.map((item) => `
-            <li>
+            <li role="button" tabindex="0" data-id="${item.id}">
                 <strong>${item.name || item.email}</strong>
                 <span>${this.formatCurrency(item.total_spent)} • ${item.orders_count} pedidos</span>
             </li>
         `).join('');
+        // Add click/keyboard interactions to open detail from top customers
+        this.topCustomersList.querySelectorAll('li[data-id]').forEach((li) => {
+            li.addEventListener('click', () => {
+                const id = li.getAttribute('data-id');
+                if (id) this.openDetail(id);
+            });
+            li.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    li.click();
+                }
+            });
+        });
+        // collapse after a limit for readability
+        const COLLAPSE_LIMIT = 6;
+        if (list.length > COLLAPSE_LIMIT) {
+            this.topCustomersList.classList.add('collapsed');
+            const btn = topContainer ? topContainer.querySelector('.trend-summary button') : this.topCustomersList.querySelector('.trend-summary button');
+            if (btn) {
+                btn.textContent = 'Ver todas';
+                btn.addEventListener('click', () => {
+                    const expanded = btn.getAttribute('aria-expanded') === 'true';
+                    btn.setAttribute('aria-expanded', String(!expanded));
+                    btn.textContent = expanded ? 'Ver todas' : 'Ver menos';
+                    this.topCustomersList.classList.toggle('collapsed');
+                });
+            }
+        } else {
+            this.topCustomersList.classList.remove('collapsed');
+        }
     }
 
     renderAcquisitionChart(trend = []) {
