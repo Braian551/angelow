@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matriz de Requisitos - Parte 5: Contenido y Configuración</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
             line-height: 1.6;
         }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -20,14 +27,24 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
+
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px;
             text-align: center;
         }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .header p { font-size: 1.1em; opacity: 0.9; }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
         .info-bar {
             background: #f8f9fa;
             padding: 15px 30px;
@@ -38,15 +55,29 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-        .info-item { display: flex; align-items: center; gap: 8px; }
-        .info-item strong { color: #667eea; }
-        .table-container { padding: 30px; overflow-x: auto; }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-item strong {
+            color: #667eea;
+        }
+
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.9em;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
         thead {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -54,6 +85,7 @@
             top: 0;
             z-index: 10;
         }
+
         thead th {
             padding: 15px 12px;
             text-align: left;
@@ -64,35 +96,63 @@
             border-right: 1px solid rgba(255, 255, 255, 0.2);
             vertical-align: middle;
         }
-        thead th:last-child { border-right: none; }
+
+        thead th:last-child {
+            border-right: none;
+        }
+
         tbody tr {
             border-bottom: 1px solid #e0e0e0;
             transition: background-color 0.3s;
         }
-        tbody tr:hover { background-color: #f5f5f5; }
-        tbody tr:nth-child(even) { background-color: #fafafa; }
-        tbody tr:nth-child(even):hover { background-color: #f0f0f0; }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        tbody tr:nth-child(even):hover {
+            background-color: #f0f0f0;
+        }
+
         td {
             padding: 14px 12px;
             vertical-align: top;
             border-right: 1px solid #e8e8e8;
             word-wrap: break-word;
         }
-        td:last-child { border-right: none; }
+
+        td:last-child {
+            border-right: none;
+        }
+
         .module-cell {
             font-weight: 600;
             color: #667eea;
             background-color: #f0f4ff !important;
             border-left: 4px solid #667eea;
         }
-        .subprocess-cell { font-weight: 500; color: #555; }
+
+        .subprocess-cell {
+            font-weight: 500;
+            color: #555;
+        }
+
         .code-cell {
             font-family: 'Courier New', monospace;
             font-weight: bold;
             color: #764ba2;
             background-color: #faf5ff;
         }
-        .description-cell { color: #333; line-height: 1.5; }
+
+        .description-cell {
+            color: #333;
+            line-height: 1.5;
+        }
+
         .footer {
             background: #f8f9fa;
             padding: 20px 30px;
@@ -102,6 +162,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -109,7 +170,8 @@
             <p>Contenido y Configuración - Sistema Angelow</p>
         </div>
         <div class="info-bar">
-            <div class="info-item"><strong>Módulos:</strong> Colecciones, Noticias, Sliders, Envíos, Pagos, Lista de Deseos</div>
+            <div class="info-item"><strong>Módulos:</strong> Colecciones, Noticias, Sliders, Envíos, Pagos, Lista de
+                Deseos</div>
             <div class="info-item"><strong>Fecha:</strong> Noviembre 2025</div>
             <div class="info-item"><strong>Requisitos:</strong> RF-078 a RF-100</div>
         </div>
@@ -121,65 +183,76 @@
                         <th style="width: 10%;">Subproceso</th>
                         <th style="width: 5%;">Nro.<br>RF</th>
                         <th style="width: 25%;">Requisito Funcional</th>
-                        <th style="width: 5%;">Nro.<br>RN</th>
-                        <th style="width: 20%;">Reglas del Negocio</th>
-                        <th style="width: 5%;">Nro.<br>RI</th>
-                        <th style="width: 20%;">Requisitos de Información</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- COLECCIONES -->
-                    <tr>
-                        <td class="module-cell" rowspan="4">Colecciones</td>
-                        <td class="subprocess-cell">Crear colección</td>
-                        <td class="code-cell">RF-078</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los administradores crear colecciones temáticas de productos con nombre, descripción, imagen destacada y fecha de lanzamiento.
+                            El sistema debe permitir a los administradores crear colecciones temáticas de productos con
+                            nombre, descripción, imagen destacada y fecha de lanzamiento.
                         </td>
                         <td class="code-cell">RN-078</td>
-                        <td class="description-cell">Las colecciones son agrupaciones temáticas de productos para campañas de marketing (como "Verano 2025", "Línea Premium", "Vuelta al Cole"). Cada colección tiene URL amigable generada automáticamente. Un producto puede estar en varias colecciones simultáneamente.</td>
+                        <td class="description-cell">Las colecciones son agrupaciones temáticas de productos para
+                            campañas de marketing (como "Verano 2025", "Línea Premium", "Vuelta al Cole"). Cada
+                            colección tiene URL amigable generada automáticamente. Un producto puede estar en varias
+                            colecciones simultáneamente.</td>
                         <td class="code-cell">RI-078</td>
                         <td class="description-cell">
-                            Nombre de la colección, identificador de URL amigable (slug) generado automáticamente, descripción de la colección, imagen destacada (JPG/PNG máximo 2MB), fecha de lanzamiento, estado (activa/inactiva) y fecha de creación.
+                            Nombre de la colección, identificador de URL amigable (slug) generado automáticamente,
+                            descripción de la colección, imagen destacada (JPG/PNG máximo 2MB), fecha de lanzamiento,
+                            estado (activa/inactiva) y fecha de creación.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Mostrar colecciones</td>
                         <td class="code-cell">RF-079</td>
                         <td class="description-cell">
-                            El sistema debe permitir visualizar el listado completo de colecciones con cantidad de productos asociados y estado de cada una.
+                            El sistema debe permitir visualizar el listado completo de colecciones con cantidad de
+                            productos asociados y estado de cada una.
                         </td>
                         <td class="code-cell">RN-079</td>
-                        <td class="description-cell">El listado muestra todas las colecciones con su imagen, nombre, descripción resumida, fecha de lanzamiento, cantidad de productos asociados y estado. Puedes ver, editar o eliminar cada colección. Las colecciones activas aparecen en la tienda.</td>
+                        <td class="description-cell">El listado muestra todas las colecciones con su imagen, nombre,
+                            descripción resumida, fecha de lanzamiento, cantidad de productos asociados y estado. Puedes
+                            ver, editar o eliminar cada colección. Las colecciones activas aparecen en la tienda.</td>
                         <td class="code-cell">RI-079</td>
                         <td class="description-cell">
-                            Listado de colecciones con: identificador, nombre, imagen miniatura, cantidad de productos asociados, fecha de lanzamiento, estado (activa/próximamente/inactiva) y opciones de acciones (editar, gestionar productos, eliminar).
+                            Listado de colecciones con: identificador, nombre, imagen miniatura, cantidad de productos
+                            asociados, fecha de lanzamiento, estado (activa/próximamente/inactiva) y opciones de
+                            acciones (editar, gestionar productos, eliminar).
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Actualizar colección</td>
                         <td class="code-cell">RF-080</td>
                         <td class="description-cell">
-                            El sistema debe permitir modificar cualquier información de colecciones existentes: nombre, descripción, imagen, fecha de lanzamiento o agregar/quitar productos.
+                            El sistema debe permitir modificar cualquier información de colecciones existentes: nombre,
+                            descripción, imagen, fecha de lanzamiento o agregar/quitar productos.
                         </td>
                         <td class="code-cell">RN-080</td>
-                        <td class="description-cell">Al editar una colección puedes cambiar su información básica y gestionar qué productos la integran. Los productos se agregan desde una lista donde puedes buscar y seleccionar múltiples productos a la vez. Los cambios se reflejan inmediatamente en la tienda.</td>
+                        <td class="description-cell">Al editar una colección puedes cambiar su información básica y
+                            gestionar qué productos la integran. Los productos se agregan desde una lista donde puedes
+                            buscar y seleccionar múltiples productos a la vez. Los cambios se reflejan inmediatamente en
+                            la tienda.</td>
                         <td class="code-cell">RI-080</td>
                         <td class="description-cell">
-                            Identificador de la colección, nuevos valores para: nombre, descripción, imagen, fecha de lanzamiento, estado, productos asociados (agregar/eliminar), usuario administrador que modifica y fecha de última actualización.
+                            Identificador de la colección, nuevos valores para: nombre, descripción, imagen, fecha de
+                            lanzamiento, estado, productos asociados (agregar/eliminar), usuario administrador que
+                            modifica y fecha de última actualización.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Eliminar colección</td>
                         <td class="code-cell">RF-081</td>
                         <td class="description-cell">
-                            El sistema debe permitir eliminar colecciones que ya no se utilizan, liberando espacio y simplificando el catálogo.
+                            El sistema debe permitir eliminar colecciones que ya no se utilizan, liberando espacio y
+                            simplificando el catálogo.
                         </td>
                         <td class="code-cell">RN-081</td>
-                        <td class="description-cell">Al eliminar una colección se borran solo las relaciones con productos, no los productos en sí. Los productos quedan disponibles normalmente en el catálogo. El sistema pedirá confirmación antes de eliminar. La eliminación queda registrada en auditoría.</td>
+                        <td class="description-cell">Al eliminar una colección se borran solo las relaciones con
+                            productos, no los productos en sí. Los productos quedan disponibles normalmente en el
+                            catálogo. El sistema pedirá confirmación antes de eliminar. La eliminación queda registrada
+                            en auditoría.</td>
                         <td class="code-cell">RI-081</td>
                         <td class="description-cell">
-                            Identificador de la colección a eliminar, cantidad de productos asociados, confirmación de eliminación, imagen eliminada, usuario administrador que elimina y fecha de eliminación para auditoría.
+                            Identificador de la colección a eliminar, cantidad de productos asociados, confirmación de
+                            eliminación, imagen eliminada, usuario administrador que elimina y fecha de eliminación para
+                            auditoría.
                         </td>
                     </tr>
                     <!-- NOTICIAS Y BLOG -->
@@ -188,106 +261,130 @@
                         <td class="subprocess-cell">Crear noticia</td>
                         <td class="code-cell">RF-082</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los administradores crear artículos de noticias o blog con título, contenido, imagen destacada y fecha de publicación.
+                            El sistema debe permitir a los administradores crear artículos de noticias o blog con
+                            título, contenido, imagen destacada y fecha de publicación.
                         </td>
                         <td class="code-cell">RN-082</td>
-                        <td class="description-cell">Las noticias pueden programarse para publicarse automáticamente en fecha futura. Puedes marcarlas como destacadas para aparecer en posición preferencial. El contenido admite formato enriquecido (negritas, cursivas, listas, enlaces). Cada noticia tiene URL amigable generada del título.</td>
+                        <td class="description-cell">Las noticias pueden programarse para publicarse automáticamente en
+                            fecha futura. Puedes marcarlas como destacadas para aparecer en posición preferencial. El
+                            contenido admite formato enriquecido (negritas, cursivas, listas, enlaces). Cada noticia
+                            tiene URL amigable generada del título.</td>
                         <td class="code-cell">RI-082</td>
                         <td class="description-cell">
-                            Título de la noticia, identificador de URL (slug) generado automáticamente, contenido completo en formato enriquecido, imagen destacada, fecha de publicación, indicador de noticia destacada, estado (publicada/borrador) y autor (administrador).
+                            Título de la noticia, identificador de URL (slug) generado automáticamente, contenido
+                            completo en formato enriquecido, imagen destacada, fecha de publicación, indicador de
+                            noticia destacada, estado (publicada/borrador) y autor (administrador).
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Mostrar noticias</td>
                         <td class="code-cell">RF-083</td>
                         <td class="description-cell">
-                            El sistema debe permitir visualizar el listado completo de noticias publicadas ordenadas por fecha, con filtros por estado y búsqueda por título.
+                            El sistema debe permitir visualizar el listado completo de noticias publicadas ordenadas por
+                            fecha, con filtros por estado y búsqueda por título.
                         </td>
                         <td class="code-cell">RN-083</td>
-                        <td class="description-cell">El listado muestra todas las noticias con imagen, título, extracto, fecha de publicación, autor, estado y indicador de destacada. Puedes filtrar por publicadas, borradores o todas. Las noticias destacadas aparecen con icono especial.</td>
+                        <td class="description-cell">El listado muestra todas las noticias con imagen, título, extracto,
+                            fecha de publicación, autor, estado y indicador de destacada. Puedes filtrar por publicadas,
+                            borradores o todas. Las noticias destacadas aparecen con icono especial.</td>
                         <td class="code-cell">RI-083</td>
                         <td class="description-cell">
-                            Listado de noticias con: imagen miniatura, título, extracto del contenido (primeros 150 caracteres), autor, fecha de publicación, estado (publicada/borrador), indicador de destacada y opciones de acciones (ver, editar, eliminar).
+                            Listado de noticias con: imagen miniatura, título, extracto del contenido (primeros 150
+                            caracteres), autor, fecha de publicación, estado (publicada/borrador), indicador de
+                            destacada y opciones de acciones (ver, editar, eliminar).
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Actualizar noticia</td>
                         <td class="code-cell">RF-084</td>
                         <td class="description-cell">
-                            El sistema debe permitir modificar cualquier información de noticias existentes: título, contenido, imagen, fecha de publicación, estado destacado.
+                            El sistema debe permitir modificar cualquier información de noticias existentes: título,
+                            contenido, imagen, fecha de publicación, estado destacado.
                         </td>
                         <td class="code-cell">RN-084</td>
-                        <td class="description-cell">Al editar una noticia puedes cambiar todo su contenido y configuración. Si cambias el título, la URL amigable se regenera automáticamente. Puedes convertir borradores en publicadas y viceversa. Los cambios son inmediatos en la sección de noticias de la tienda.</td>
+                        <td class="description-cell">Al editar una noticia puedes cambiar todo su contenido y
+                            configuración. Si cambias el título, la URL amigable se regenera automáticamente. Puedes
+                            convertir borradores en publicadas y viceversa. Los cambios son inmediatos en la sección de
+                            noticias de la tienda.</td>
                         <td class="code-cell">RI-084</td>
                         <td class="description-cell">
-                            Identificador de la noticia, nuevos valores para: título, contenido, imagen, fecha de publicación, estado destacado, estado de publicación, usuario que modifica y fecha de última actualización.
+                            Identificador de la noticia, nuevos valores para: título, contenido, imagen, fecha de
+                            publicación, estado destacado, estado de publicación, usuario que modifica y fecha de última
+                            actualización.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Eliminar noticia</td>
                         <td class="code-cell">RF-085</td>
-                        <td class="description-cell">
-                            El sistema debe permitir eliminar noticias obsoletas o que contienen información incorrecta, con confirmación previa.
-                        </td>
-                        <td class="code-cell">RN-085</td>
-                        <td class="description-cell">Al eliminar una noticia se borra completamente su contenido e imagen asociada. El sistema pedirá confirmación antes de eliminar. La eliminación queda registrada en auditoría con quién la eliminó y cuándo.</td>
-                        <td class="code-cell">RI-085</td>
-                        <td class="description-cell">
-                            Identificador de la noticia a eliminar, título y fecha de publicación (para confirmación), imagen eliminada, usuario administrador que elimina, motivo de eliminación (opcional) y fecha de eliminación.
-                        </td>
-                    </tr>
-                    <!-- SLIDERS HERO BANNER -->
-                    <tr>
-                        <td class="module-cell" rowspan="4">Sliders Hero Banner</td>
-                        <td class="subprocess-cell">Crear slider</td>
                         <td class="code-cell">RF-086</td>
                         <td class="description-cell">
-                            El sistema debe permitir crear banners deslizantes para la página principal con imagen, título, subtítulo, enlace de redirección y orden de visualización.
+                            El sistema debe permitir crear banners deslizantes para la página principal con imagen,
+                            título, subtítulo, enlace de redirección y orden de visualización.
                         </td>
                         <td class="code-cell">RN-086</td>
-                        <td class="description-cell">Los sliders son banners promocionales grandes que aparecen rotativamente en la página de inicio. Cada uno puede enlazar a una categoría, colección, producto o URL externa. El orden determina la secuencia de rotación. Las imágenes deben ser de alta calidad (1920x600px recomendado).</td>
+                        <td class="description-cell">Los sliders son banners promocionales grandes que aparecen
+                            rotativamente en la página de inicio. Cada uno puede enlazar a una categoría, colección,
+                            producto o URL externa. El orden determina la secuencia de rotación. Las imágenes deben ser
+                            de alta calidad (1920x600px recomendado).</td>
                         <td class="code-cell">RI-086</td>
                         <td class="description-cell">
-                            Título del banner, subtítulo descriptivo, imagen de fondo (JPG/PNG máximo 3MB), URL de redirección al hacer clic, orden de visualización numérico, estado (activo/inactivo) y fecha de creación.
+                            Título del banner, subtítulo descriptivo, imagen de fondo (JPG/PNG máximo 3MB), URL de
+                            redirección al hacer clic, orden de visualización numérico, estado (activo/inactivo) y fecha
+                            de creación.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Mostrar sliders</td>
                         <td class="code-cell">RF-087</td>
                         <td class="description-cell">
-                            El sistema debe permitir visualizar el listado completo de sliders con su imagen, texto, enlace, orden y estado.
+                            El sistema debe permitir visualizar el listado completo de sliders con su imagen, texto,
+                            enlace, orden y estado.
                         </td>
                         <td class="code-cell">RN-087</td>
-                        <td class="description-cell">El listado muestra todos los sliders ordenados según su número de orden. Los activos se destacan visualmente. Puedes reordenarlos arrastrando, editar su contenido o activar/desactivar individualmente. Solo los sliders activos aparecen en la página principal.</td>
+                        <td class="description-cell">El listado muestra todos los sliders ordenados según su número de
+                            orden. Los activos se destacan visualmente. Puedes reordenarlos arrastrando, editar su
+                            contenido o activar/desactivar individualmente. Solo los sliders activos aparecen en la
+                            página principal.</td>
                         <td class="code-cell">RI-087</td>
                         <td class="description-cell">
-                            Listado de sliders con: imagen miniatura, título, subtítulo, enlace de redirección, orden de visualización, estado (activo/inactivo), indicador de slider actualmente visible y opciones de acciones (ver preview, editar, cambiar orden, eliminar).
+                            Listado de sliders con: imagen miniatura, título, subtítulo, enlace de redirección, orden de
+                            visualización, estado (activo/inactivo), indicador de slider actualmente visible y opciones
+                            de acciones (ver preview, editar, cambiar orden, eliminar).
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Actualizar slider</td>
                         <td class="code-cell">RF-088</td>
                         <td class="description-cell">
-                            El sistema debe permitir modificar cualquier información de sliders existentes: imagen, títulos, enlace, orden o estado.
+                            El sistema debe permitir modificar cualquier información de sliders existentes: imagen,
+                            títulos, enlace, orden o estado.
                         </td>
                         <td class="code-cell">RN-088</td>
-                        <td class="description-cell">Al editar un slider puedes cambiar su imagen, textos, enlace de destino, orden de aparición y activarlo o desactivarlo. Los cambios son inmediatos en la página principal. Puedes previsualizar cómo se verá antes de guardar los cambios.</td>
+                        <td class="description-cell">Al editar un slider puedes cambiar su imagen, textos, enlace de
+                            destino, orden de aparición y activarlo o desactivarlo. Los cambios son inmediatos en la
+                            página principal. Puedes previsualizar cómo se verá antes de guardar los cambios.</td>
                         <td class="code-cell">RI-088</td>
                         <td class="description-cell">
-                            Identificador del slider, nuevos valores para: título, subtítulo, imagen, URL de redirección, orden, estado, usuario administrador que modifica y fecha de última actualización.
+                            Identificador del slider, nuevos valores para: título, subtítulo, imagen, URL de
+                            redirección, orden, estado, usuario administrador que modifica y fecha de última
+                            actualización.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Eliminar slider</td>
                         <td class="code-cell">RF-089</td>
                         <td class="description-cell">
-                            El sistema debe permitir eliminar sliders que ya no se utilizan en las campañas promocionales actuales.
+                            El sistema debe permitir eliminar sliders que ya no se utilizan en las campañas
+                            promocionales actuales.
                         </td>
                         <td class="code-cell">RN-089</td>
-                        <td class="description-cell">Al eliminar un slider se borra su imagen y configuración completamente. El sistema reordena automáticamente los sliders restantes para evitar huecos en la numeración. Pedirá confirmación antes de eliminar permanentemente.</td>
+                        <td class="description-cell">Al eliminar un slider se borra su imagen y configuración
+                            completamente. El sistema reordena automáticamente los sliders restantes para evitar huecos
+                            en la numeración. Pedirá confirmación antes de eliminar permanentemente.</td>
                         <td class="code-cell">RI-089</td>
                         <td class="description-cell">
-                            Identificador del slider a eliminar, imagen eliminada, orden liberado, reordenamiento automático de sliders restantes, usuario que elimina y fecha de eliminación.
+                            Identificador del slider a eliminar, imagen eliminada, orden liberado, reordenamiento
+                            automático de sliders restantes, usuario que elimina y fecha de eliminación.
                         </td>
                     </tr>
                     <!-- CONFIGURACIÓN DE ENVÍOS -->
@@ -296,26 +393,37 @@
                         <td class="subprocess-cell">Configurar métodos de envío</td>
                         <td class="code-cell">RF-096</td>
                         <td class="description-cell">
-                            El sistema debe permitir configurar métodos de envío disponibles con nombre, días estimados de entrega y estado activo/inactivo.
+                            El sistema debe permitir configurar métodos de envío disponibles con nombre, días estimados
+                            de entrega y estado activo/inactivo.
                         </td>
                         <td class="code-cell">RN-096</td>
-                        <td class="description-cell">Los métodos de envío definen las opciones que verán los clientes al comprar (Envío Estándar 3-5 días, Envío Express 1-2 días). Solo los métodos activos aparecen durante el proceso de compra. Cada método tiene días estimados que se muestran al cliente.</td>
+                        <td class="description-cell">Los métodos de envío definen las opciones que verán los clientes al
+                            comprar (Envío Estándar 3-5 días, Envío Express 1-2 días). Solo los métodos activos aparecen
+                            durante el proceso de compra. Cada método tiene días estimados que se muestran al cliente.
+                        </td>
                         <td class="code-cell">RI-096</td>
                         <td class="description-cell">
-                            Nombre del método de envío, descripción breve, días estimados de entrega mínimos, días estimados de entrega máximos, estado (activo/inactivo) y orden de visualización en el pago.
+                            Nombre del método de envío, descripción breve, días estimados de entrega mínimos, días
+                            estimados de entrega máximos, estado (activo/inactivo) y orden de visualización en el pago.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Configurar reglas de precio de envío</td>
                         <td class="code-cell">RF-097</td>
                         <td class="description-cell">
-                            El sistema debe permitir configurar reglas dinámicas de costo de envío basadas en rangos de precio del subtotal de la compra.
+                            El sistema debe permitir configurar reglas dinámicas de costo de envío basadas en rangos de
+                            precio del subtotal de la compra.
                         </td>
                         <td class="code-cell">RN-097</td>
-                        <td class="description-cell">Las reglas definen cuánto se cobra de envío según el monto de compra. Por ejemplo: $0-$50,000 = $8,000 envío | $50,001-$100,000 = $5,000 envío | Más de $100,000 = Envío gratis. El sistema aplica automáticamente la regla correspondiente al calcular totales.</td>
+                        <td class="description-cell">Las reglas definen cuánto se cobra de envío según el monto de
+                            compra. Por ejemplo: $0-$50,000 = $8,000 envío | $50,001-$100,000 = $5,000 envío | Más de
+                            $100,000 = Envío gratis. El sistema aplica automáticamente la regla correspondiente al
+                            calcular totales.</td>
                         <td class="code-cell">RI-097</td>
                         <td class="description-cell">
-                            Precio mínimo del rango, precio máximo del rango (NULL para rango abierto), costo de envío para ese rango, ciudad aplicable (Medellín), método de envío asociado y estado (activa/inactiva).
+                            Precio mínimo del rango, precio máximo del rango (NULL para rango abierto), costo de envío
+                            para ese rango, ciudad aplicable (Medellín), método de envío asociado y estado
+                            (activa/inactiva).
                         </td>
                     </tr>
                     <!-- CONFIGURACIÓN DE PAGOS -->
@@ -324,39 +432,57 @@
                         <td class="subprocess-cell">Registrar cuenta bancaria</td>
                         <td class="code-cell">RF-098</td>
                         <td class="description-cell">
-                            El sistema debe permitir registrar cuentas bancarias de la empresa para recibir transferencias, con información completa del banco y titular.
+                            El sistema debe permitir registrar cuentas bancarias de la empresa para recibir
+                            transferencias, con información completa del banco y titular.
                         </td>
                         <td class="code-cell">RN-098</td>
-                        <td class="description-cell">Solo los administradores pueden gestionar las cuentas bancarias. Los datos se almacenan de forma segura y cifrada. Los clientes ven solo las cuentas activas durante el proceso de pago. Siempre debe haber al menos una cuenta activa para recibir pagos.</td>
+                        <td class="description-cell">Solo los administradores pueden gestionar las cuentas bancarias.
+                            Los datos se almacenan de forma segura y cifrada. Los clientes ven solo las cuentas activas
+                            durante el proceso de pago. Siempre debe haber al menos una cuenta activa para recibir
+                            pagos.</td>
                         <td class="code-cell">RI-098</td>
                         <td class="description-cell">
-                            Código del banco (seleccionado de lista de bancos colombianos), número de cuenta (cifrado), tipo de cuenta (ahorros/corriente), titular de la cuenta, tipo de identificación, número de identificación, correo de contacto, teléfono y estado (activa/inactiva).
+                            Código del banco (seleccionado de lista de bancos colombianos), número de cuenta (cifrado),
+                            tipo de cuenta (ahorros/corriente), titular de la cuenta, tipo de identificación, número de
+                            identificación, correo de contacto, teléfono y estado (activa/inactiva).
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Mostrar cuentas bancarias</td>
                         <td class="code-cell">RF-099</td>
                         <td class="description-cell">
-                            El sistema debe permitir visualizar el listado completo de cuentas bancarias configuradas con su información y estado.
+                            El sistema debe permitir visualizar el listado completo de cuentas bancarias configuradas
+                            con su información y estado.
                         </td>
                         <td class="code-cell">RN-099</td>
-                        <td class="description-cell">El listado muestra todas las cuentas bancarias con banco, número de cuenta parcialmente oculto (por seguridad), tipo de cuenta, titular, estado y opciones de edición. Las cuentas activas se destacan visualmente. Mínimo debe existir una cuenta activa siempre.</td>
+                        <td class="description-cell">El listado muestra todas las cuentas bancarias con banco, número de
+                            cuenta parcialmente oculto (por seguridad), tipo de cuenta, titular, estado y opciones de
+                            edición. Las cuentas activas se destacan visualmente. Mínimo debe existir una cuenta activa
+                            siempre.</td>
                         <td class="code-cell">RI-099</td>
                         <td class="description-cell">
-                            Listado de cuentas con: logo del banco, nombre del banco, número de cuenta parcialmente oculto (XXXX-XXXX-1234), tipo de cuenta, titular, estado (activa/inactiva) y opciones de acciones (editar, activar/desactivar).
+                            Listado de cuentas con: logo del banco, nombre del banco, número de cuenta parcialmente
+                            oculto (XXXX-XXXX-1234), tipo de cuenta, titular, estado (activa/inactiva) y opciones de
+                            acciones (editar, activar/desactivar).
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Actualizar cuenta bancaria</td>
                         <td class="code-cell">RF-100</td>
                         <td class="description-cell">
-                            El sistema debe permitir modificar información de cuentas bancarias existentes o activar/desactivar según necesidades operativas.
+                            El sistema debe permitir modificar información de cuentas bancarias existentes o
+                            activar/desactivar según necesidades operativas.
                         </td>
                         <td class="code-cell">RN-100</td>
-                        <td class="description-cell">Puedes actualizar datos de contacto, cambiar el estado de la cuenta o incluso cambiar el número de cuenta. No puedes desactivar la última cuenta activa (debe haber mínimo una). Los cambios en cuentas activas se reflejan inmediatamente en el proceso de pago.</td>
+                        <td class="description-cell">Puedes actualizar datos de contacto, cambiar el estado de la cuenta
+                            o incluso cambiar el número de cuenta. No puedes desactivar la última cuenta activa (debe
+                            haber mínimo una). Los cambios en cuentas activas se reflejan inmediatamente en el proceso
+                            de pago.</td>
                         <td class="code-cell">RI-100</td>
                         <td class="description-cell">
-                            Identificador de la cuenta, nuevos valores para: número de cuenta, tipo de cuenta, titular, identificación, contacto, estado, verificación de mínimo una cuenta activa, usuario que modifica y fecha de actualización.
+                            Identificador de la cuenta, nuevos valores para: número de cuenta, tipo de cuenta, titular,
+                            identificación, contacto, estado, verificación de mínimo una cuenta activa, usuario que
+                            modifica y fecha de actualización.
                         </td>
                     </tr>
                     <!-- LISTA DE DESEOS -->
@@ -365,39 +491,55 @@
                         <td class="subprocess-cell">Agregar a Lista de Deseos</td>
                         <td class="code-cell">RF-101</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los usuarios agregar productos a su lista de favoritos haciendo clic en el icono de corazón.
+                            El sistema debe permitir a los usuarios agregar productos a su lista de favoritos haciendo
+                            clic en el icono de corazón.
                         </td>
                         <td class="code-cell">RN-101</td>
-                        <td class="description-cell">Solo usuarios registrados pueden agregar productos a favoritos. El corazón cambia de color inmediatamente al agregarse. No puedes agregar el mismo producto dos veces. Tu lista se mantiene sincronizada en todas las páginas que tengas abiertas simultáneamente.</td>
+                        <td class="description-cell">Solo usuarios registrados pueden agregar productos a favoritos. El
+                            corazón cambia de color inmediatamente al agregarse. No puedes agregar el mismo producto dos
+                            veces. Tu lista se mantiene sincronizada en todas las páginas que tengas abiertas
+                            simultáneamente.</td>
                         <td class="code-cell">RI-101</td>
                         <td class="description-cell">
-                            Identificador del usuario, identificador del producto, fecha de agregado a favoritos. Relación única usuario-producto (sin duplicados).
+                            Identificador del usuario, identificador del producto, fecha de agregado a favoritos.
+                            Relación única usuario-producto (sin duplicados).
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Ver mi Lista de Deseos</td>
                         <td class="code-cell">RF-102</td>
                         <td class="description-cell">
-                            El sistema debe permitir visualizar la lista completa de productos favoritos con imagen, nombre, precio actualizado y disponibilidad.
+                            El sistema debe permitir visualizar la lista completa de productos favoritos con imagen,
+                            nombre, precio actualizado y disponibilidad.
                         </td>
                         <td class="code-cell">RN-102</td>
-                        <td class="description-cell">Tu lista de favoritos es personal y privada. Para cada producto verás su imagen, nombre, precio actual (actualizado en tiempo real), disponibilidad de stock y botón para agregar al carrito. Un contador en el menú muestra cuántos favoritos tienes.</td>
+                        <td class="description-cell">Tu lista de favoritos es personal y privada. Para cada producto
+                            verás su imagen, nombre, precio actual (actualizado en tiempo real), disponibilidad de stock
+                            y botón para agregar al carrito. Un contador en el menú muestra cuántos favoritos tienes.
+                        </td>
                         <td class="code-cell">RI-102</td>
                         <td class="description-cell">
-                            Listado de productos en wishlist con: imagen del producto, nombre, precio actualizado, indicador de disponibilidad (en stock/agotado), fecha de agregado a favoritos y opciones (eliminar de favoritos, agregar al carrito).
+                            Listado de productos en wishlist con: imagen del producto, nombre, precio actualizado,
+                            indicador de disponibilidad (en stock/agotado), fecha de agregado a favoritos y opciones
+                            (eliminar de favoritos, agregar al carrito).
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Eliminar de Lista de Deseos</td>
                         <td class="code-cell">RF-103</td>
                         <td class="description-cell">
-                            El sistema debe permitir eliminar productos individuales de la lista de favoritos de forma instantánea.
+                            El sistema debe permitir eliminar productos individuales de la lista de favoritos de forma
+                            instantánea.
                         </td>
                         <td class="code-cell">RN-103</td>
-                        <td class="description-cell">Puedes eliminar productos de tu lista de favoritos haciendo clic nuevamente en el corazón o desde la página de favoritos. El cambio es inmediato. El contador de favoritos se actualiza automáticamente. No hay confirmación para evitar pasos innecesarios.</td>
+                        <td class="description-cell">Puedes eliminar productos de tu lista de favoritos haciendo clic
+                            nuevamente en el corazón o desde la página de favoritos. El cambio es inmediato. El contador
+                            de favoritos se actualiza automáticamente. No hay confirmación para evitar pasos
+                            innecesarios.</td>
                         <td class="code-cell">RI-103</td>
                         <td class="description-cell">
-                            Identificador del usuario, identificador del producto a eliminar, fecha de eliminación y actualización del contador de favoritos del usuario.
+                            Identificador del usuario, identificador del producto a eliminar, fecha de eliminación y
+                            actualización del contador de favoritos del usuario.
                         </td>
                     </tr>
                     <!-- PREGUNTAS Y RESPUESTAS -->
@@ -406,53 +548,44 @@
                         <td class="subprocess-cell">Hacer pregunta sobre producto</td>
                         <td class="code-cell">RF-104</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los usuarios hacer preguntas sobre productos directamente desde la página del producto.
+                            El sistema debe permitir a los usuarios hacer preguntas sobre productos directamente desde
+                            la página del producto.
                         </td>
                         <td class="code-cell">RN-104</td>
-                        <td class="description-cell">Solo usuarios registrados pueden hacer preguntas. Las preguntas tienen máximo 500 caracteres. Quedan pendientes de respuesta hasta que un administrador las responda. Una vez respondidas, se publican automáticamente para ayudar a otros clientes con dudas similares.</td>
+                        <td class="description-cell">Solo usuarios registrados pueden hacer preguntas. Las preguntas
+                            tienen máximo 500 caracteres. Quedan pendientes de respuesta hasta que un administrador las
+                            responda. Una vez respondidas, se publican automáticamente para ayudar a otros clientes con
+                            dudas similares.</td>
                         <td class="code-cell">RI-104</td>
                         <td class="description-cell">
-                            Identificador del producto, identificador del usuario que pregunta, texto de la pregunta (máximo 500 caracteres), fecha de la pregunta, estado de respuesta (pendiente/respondida) y fecha de respuesta.
+                            Identificador del producto, identificador del usuario que pregunta, texto de la pregunta
+                            (máximo 500 caracteres), fecha de la pregunta, estado de respuesta (pendiente/respondida) y
+                            fecha de respuesta.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Responder preguntas (Admin)</td>
                         <td class="code-cell">RF-093</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los administradores o vendedores responder las preguntas pendientes de los clientes sobre productos.
+                            El sistema debe permitir a los administradores o vendedores responder las preguntas
+                            pendientes de los clientes sobre productos.
                         </td>
                         <td class="code-cell">RN-093</td>
-                        <td class="description-cell">Los administradores ven todas las preguntas pendientes en un listado. Al responder, la pregunta y respuesta se publican automáticamente en la página del producto. Los clientes que hicieron la pregunta reciben notificación por correo cuando su pregunta es respondida.</td>
+                        <td class="description-cell">Los administradores ven todas las preguntas pendientes en un
+                            listado. Al responder, la pregunta y respuesta se publican automáticamente en la página del
+                            producto. Los clientes que hicieron la pregunta reciben notificación por correo cuando su
+                            pregunta es respondida.</td>
                         <td class="code-cell">RI-093</td>
                         <td class="description-cell">
-                            Identificador de la pregunta, texto de la respuesta (máximo 1000 caracteres), identificador del administrador que responde, fecha de la respuesta, notificación enviada al usuario y publicación automática en página del producto.
-                        </td>
-                    </tr>
-                    <!-- RESEÑAS Y CALIFICACIONES -->
-                    <tr>
-                        <td class="module-cell" rowspan="1">Reseñas Productos</td>
-                        <td class="subprocess-cell">Ver reseñas de producto</td>
-                        <td class="code-cell">RF-094</td>
-                        <td class="description-cell">
-                            El sistema debe permitir visualizar las reseñas y calificaciones de cada producto con estadísticas, promedio y distribución de estrellas.
-                        </td>
-                        <td class="code-cell">RN-094</td>
-                        <td class="description-cell">Las reseñas se muestran con estadísticas completas: calificación promedio (1-5 estrellas), total de reseñas y gráfico de distribución. Las reseñas de compras verificadas aparecen primero. Se muestran máximo 10 reseñas por página ordenadas por fecha (más recientes primero) o por utilidad (más votadas primero).</td>
-                        <td class="code-cell">RI-094</td>
-                        <td class="description-cell">
-                            Estadísticas de reseñas: calificación promedio, total de reseñas, distribución por estrellas (cuántas de 5★, 4★, 3★, 2★, 1★). Listado de reseñas con: usuario, calificación, título, comentario, fecha, indicador de compra verificada y cantidad de votos útiles.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="footer">
-            <p><strong>Proyecto Angelow - Parte 5 de 6</strong></p>
-            <p>Contenido y Configuración | Requisitos: RF-078 a RF-100</p>
-                <p style="margin-top: 10px; font-size: 0.85em; color: #666;">
-                Módulos: Colecciones, Noticias, Sliders, Configuración Envíos, Configuración Pagos, Lista de Deseos, Q&A, Reseñas
-            </p>
+                            Identificador de la pregunta, texto de la respuesta (máximo 1000 caracteres), identificador
+                            <p>Contenido y Configuración | Requisitos: RF-078 a RF-100</p>
+                            <p style="margin-top: 10px; font-size: 0.85em; color: #666;">
+                                Módulos: Colecciones, Noticias, Sliders, Configuración Envíos, Configuración Pagos,
+                                Lista de Deseos,
+                                Q&A, Reseñas
+                            </p>
         </div>
     </div>
 </body>
+
 </html>

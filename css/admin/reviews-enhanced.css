@@ -249,7 +249,19 @@
 }
 
 #reviews-insights .stat-card .stat-icon::before {
-
+    /* subtle pseudo background behind each stat icon for balanced look */
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    background: rgba(248,250,252,0.8);
+    box-shadow: 0 8px 20px rgba(8,18,34,0.04);
+    transform: rotate(0deg);
+    z-index: -1;
+}
 /* Inline SVG fallback sizing and color so injected SVG inherits the stat color */
 #reviews-insights .stat-card .inline-icon.inline-icon-fallback {
     width: 18px;
@@ -269,21 +281,39 @@
     fill: currentColor;
     color: inherit;
 }
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    width: 64px;
-    height: 64px;
-    border-radius: 14px;
-    background: rgba(248,250,252,0.8);
-    box-shadow: 0 8px 20px rgba(8,18,34,0.04);
-    transform: rotate(0deg);
-    z-index: -1;
+
+/* FontAwesome icon sizing for stat cards and action buttons to keep consistent look */
+#reviews-insights .stat-card .stat-icon i,
+#reviews-insights .stat-card .stat-icon .fa {
+    font-size: 20px;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#reviews-hub .btn-soft .fa-badge-check,
+#reviews-hub .btn-soft .fa-check-circle {
+    font-size: 14px;
+    margin-right: 0.5rem;
 }
 
 #reviews-insights .stat-card[data-metric="verified"] .stat-icon::before {
     background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.03));
+}
+
+/* Force verified purchase stat icon to be visible regardless of cascade order
+   and ensure inline SVG fallback fills correctly (helps when FA CDN or
+   font renders badly). This mirrors the `insights-grid` metric-specific
+   color used in the main `management-hub` styles. */
+#reviews-insights .stat-card[data-metric="verified"] .stat-icon {
+    background: rgba(16,185,129,0.06) !important;
+    color: #10b981 !important;
+}
+
+#reviews-insights .stat-card[data-metric="verified"] .stat-icon svg,
+#reviews-insights .stat-card[data-metric="verified"] .stat-icon .inline-icon {
+    fill: currentColor !important; /* ensures inline SVG picks up color */
+    color: inherit !important;
 }
 
 /* Slightly lighter card background so it reads close to clients page */
@@ -292,8 +322,28 @@
     border-radius: 14px;
 }
 
+/* Metric-specific colors for review hub (match client card color mapping) */
+#reviews-insights .stat-card[data-metric="pending"] .stat-icon { background: rgba(2, 132, 199, 0.06); color: #0284c7; }
+#reviews-insights .stat-card[data-metric="approved"] .stat-icon { background: rgba(16,185,129,0.06); color: #10b981; }
+#reviews-insights .stat-card[data-metric="average"] .stat-icon { background: rgba(245, 158, 11, 0.08); color: #f59e0b; }
+#reviews-insights .stat-card[data-metric="pending"] .stat-value { color: #0284c7; }
+#reviews-insights .stat-card[data-metric="approved"] .stat-value { color: #059669; }
+#reviews-insights .stat-card[data-metric="average"] .stat-value { color: #f59e0b; }
+
+/* Improve stat value sizing and spacing closer to client look */
+#reviews-insights .stat-card .stat-value { font-size: clamp(1.6rem, 2.2vw, 3rem); font-weight: 900; color: var(--hub-text); }
+
+/* Align stat-top left on wide screens for better alignment with icon */
+@media (min-width: 1160px) {
+    #reviews-insights .stat-card { align-items: flex-start; text-align: left; }
+    #reviews-insights .stat-card .stat-top { justify-content: flex-start; }
+}
+
 /* Make stat title uppercase and align colors like clients */
 #reviews-insights .stat-card .stat-top h2 { text-transform: uppercase; font-weight: 700; color: var(--hub-muted); }
+
+/* subtext color and spacing consistent with client */
+#reviews-insights .stat-card .stat-subtext { color: var(--hub-muted); font-size: 0.95rem; margin-top: 0.25rem; }
 
 /* ======== DETAIL PANEL - REORGANIZED ======== */
 
@@ -318,7 +368,11 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 1rem;
+    position: relative; /* allow absolute positioning of the header controls */
 }
+
+/* Give room for the floating close control so header content doesn't underlap it */
+.detail-panel .detail-body header { padding-right: 72px; }
 
 .detail-panel .detail-title,
 .detail-panel .detail-body header .detail-name {
@@ -339,17 +393,82 @@
     background: white;
     display: flex;
     align-items: center;
-    justify-content: center;
+    position: relative; /* enable absolute positioning for corner controls */
     cursor: pointer;
     transition: all 0.2s ease;
     flex-shrink: 0;
-    margin-left: 1rem;
+    margin-left: 0; /* Avoid duplication of spacing in the header's controls area */
 }
 
 .detail-panel .btn-icon-close:hover {
     background: rgba(220, 38, 38, 0.08);
     border-color: rgba(220, 38, 38, 0.2);
     color: #dc2626;
+}
+
+/* Position the review detail toggle X in the top-right corner of the detail panel */
+/* anchor specifically to the aside container to avoid unexpected ancestor positioning */
+#review-detail #review-detail-toggle,
+#review-detail-toggle {
+    position: absolute !important; /* override flow positioning */
+    top: 10px !important;
+    right: 10px !important;
+    z-index: 20 !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.06) !important;
+    box-shadow: 0 6px 20px rgba(8, 18, 34, 0.06) !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    transform: translate(0, 0) !important; /* ensure no centering via transform */
+    margin: 0 !important; /* reset any margins */
+}
+
+/* Light hover state for the corner X */
+#review-detail-toggle:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 26px rgba(8, 18, 34, 0.09) !important;
+}
+
+/* If the X is inside the header: position it relative to the header */
+#review-detail .detail-body header #review-detail-toggle {
+    top: 8px !important;
+    right: 8px !important;
+}
+
+#review-detail-toggle { z-index: 40 !important; }
+
+/* Ensure toggles inside headers don't reserve space when we absolutely position them */
+.detail-panel .detail-body header .detail-controls {
+    margin-left: 0;
+    position: relative; /* keep controls in flow (right-aligned via header flexbox) */
+}
+
+/* Ensure the section icon sits left and doesn't affect layout centering */
+.detail-panel .detail-body header .section-icon {
+    flex: 0 0 56px; /* reserve space to avoid interfering with centered title */
+    width: 56px;
+    height: 56px;
+    margin-right: 0.9rem;
+    z-index: 2;
+    display: inline-grid;
+    place-items: center;
+}
+
+/* center the title and allow it to truncate if necessary */
+.detail-panel .detail-body header .detail-name {
+    flex: 1 1 auto;
+    text-align: center;
+    padding-left: 0.2rem; /* slight offset from icon */
+}
+
+/* Smaller screens: reduce offset and sizing for the icon */
+@media (max-width: 768px) {
+    #review-detail-toggle { top: 8px !important; right: 8px !important; width: 40px !important; height: 40px !important; }
+    .detail-panel .detail-body header { padding-right: 56px; }
+    .detail-panel .detail-body header .section-icon { flex: 0 0 44px; width: 44px; height: 44px; }
 }
 
 /* Rating badge - NO EMOJI */

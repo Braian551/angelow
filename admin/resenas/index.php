@@ -15,18 +15,37 @@ requireRole('admin');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/management-hub.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/size/size.css?v=<?= filemtime(__DIR__ . '/../../css/admin/size/size.css') ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/reviews-enhanced.css?v=<?= filemtime(__DIR__ . '/../../css/admin/reviews-enhanced.css') ?>">
+    <!-- Reuse client review-card styles to make admin review list match product UI -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/producto/css/product-tabs.css?v=<?= filemtime(__DIR__ . '/../../producto/css/product-tabs.css') ?>">
+    <!-- Inline CSS overrides to guarantee color/application for review action buttons -->
+    <style>
+        /* Strongly enforce colors on review action icons and buttons */
+        #reviews-hub .btn-approve, #reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="approve"] { background: rgba(16,185,129,0.08) !important; color: var(--hub-success) !important; border-color: rgba(16,185,129,0.12) !important; }
+        #reviews-hub .btn-reject, #reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="reject"] { background: rgba(220,38,38,0.06) !important; color: #dc2626 !important; border-color: rgba(220,38,38,0.12) !important; }
+        #reviews-hub .btn-verify, #reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="verify"] { background: rgba(16,185,129,0.08) !important; color: var(--hub-success) !important; border-color: rgba(16,185,129,0.12) !important; }
+        #reviews-hub .btn-approve i, #reviews-hub button[data-action="approve"] i, #reviews-hub button[data-action="approve"] svg, #reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="approve"] i { color: var(--hub-success) !important; fill: var(--hub-success) !important; }
+        #reviews-hub .btn-reject i, #reviews-hub button[data-action="reject"] i, #reviews-hub button[data-action="reject"] svg, #reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="reject"] i { color: #dc2626 !important; fill: #dc2626 !important; }
+        #reviews-hub .btn-verify i, #reviews-hub button[data-action="verify"] i, #reviews-hub button[data-action="verify"] svg, #reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="verify"] i { color: var(--hub-success) !important; fill: var(--hub-success) !important; }
+        /* small fallback: ensure btn-soft white background overridden for table cell buttons */
+        .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-soft.btn-sm[data-action] { background: transparent !important; }
+        /* Show card list by default inside admin and hide the old table fallback */
+        .management-hub#reviews-hub .table-wrapper .reviews-list { display: grid; grid-template-columns: 1fr; gap: 0.9rem; padding: 0.75rem; }
+        .management-hub#reviews-hub .table-wrapper table { display: none; }
+    </style>
 </head>
-
 <body>
-<div class="admin-container">
-    <?php require_once __DIR__ . '/../../layouts/headeradmin2.php'; ?>
-    <main class="admin-content">
-        <?php require_once __DIR__ . '/../../layouts/headeradmin1.php'; ?>
+    <div class="admin-container">
+        <?php require_once __DIR__ . '/../../layouts/headeradmin2.php'; ?>
 
-        <div class="management-hub" id="reviews-hub">
-            <div class="page-header">
-                <div>
-                    <h1><i class="fas fa-star"></i> Reseñas</h1>
+        <main class="admin-content">
+            <?php require_once __DIR__ . '/../../layouts/headeradmin1.php'; ?>
+
+            <div class="management-hub" id="reviews-hub">
+                <div class="page-header">
+                    <div>
+                        <h1><i class="fas fa-star"></i> Reseñas</h1>
                     <div class="breadcrumb">
                         <a href="<?= BASE_URL ?>/admin">Dashboard</a> / <span>reseñas</span>
                     </div>
@@ -65,7 +84,12 @@ requireRole('admin');
                 </article>
                 <article class="stat-card" data-metric="verified" role="status" aria-live="polite">
                     <div class="stat-top">
-                        <span class="stat-icon" aria-hidden="true"><i class="fas fa-shield-check"></i></span>
+                        <!-- Use a more widely supported icon for verified purchases and improve semantics -->
+                        <!-- Preferred icon: `fa-badge-check` (better semantics). If not available in the CDN version, a JS fallback will replace it with `fa-check-circle`. -->
+                        <span class="stat-icon" aria-hidden="true">
+                            <!-- Prefer the FontAwesome badge-check icon with a fallback handler in the header layout. -->
+                            <i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i>
+                        </span>
                         <h2>Compras verificadas</h2>
                     </div>
                     <strong class="stat-value">--</strong>
@@ -133,6 +157,9 @@ requireRole('admin');
                         </div>
                     </header>
                     <div class="table-wrapper">
+                        <!-- Admin updated to render cards similar to product `review-card` layout. -->
+                        <!-- Rendered by js/admin/reviews/reviews-dashboard.js into #reviews-list -->
+                        <div id="reviews-list" class="reviews-list"></div>
                         <table>
                             <thead>
                                 <tr>
@@ -179,10 +206,14 @@ requireRole('admin');
                         <div class="meta-line"><span>Fecha</span><strong data-role="date"></strong></div>
                         <hr>
                         <p data-role="comment" class="text-muted"></p>
-                        <div class="actions" data-role="detail-actions">
-                            <button class="btn-soft primary" data-action="approve"><i class="fas fa-check"></i> Aprobar</button>
-                            <button class="btn-soft" data-action="reject"><i class="fas fa-ban"></i> Rechazar</button>
-                            <button class="btn-soft" data-action="verify"><i class="fas fa-shield-check"></i> Marcar verificada</button>
+                                <div class="actions" data-role="detail-actions">
+                            <button class="btn-soft primary btn-approve" data-action="approve"><i class="fas fa-check"></i> Aprobar</button>
+                            <button class="btn-soft btn-reject btn-delete" data-action="reject"><i class="fas fa-ban"></i> Rechazar</button>
+                            <!-- Use same icon as stat and clearer label for the action -->
+                            <button class="btn-soft btn-verify btn-status" data-action="verify">
+                                <i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i>
+                                Marcar como verificada
+                            </button>
                         </div>
                     </div>
                 </aside>
@@ -202,6 +233,9 @@ window.REVIEWS_INBOX_CONFIG = {
 };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="<?= BASE_URL ?>/js/admin/reviews/reviews-dashboard.js"></script>
+<script src="<?= BASE_URL ?>/js/admin/reviews/reviews-dashboard.js?v=<?= filemtime(__DIR__ . '/../../js/admin/reviews/reviews-dashboard.js') ?>"></script>
+        </div>
+    </main>
+    </div>
 </body>
 </html>

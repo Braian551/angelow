@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matriz de Requisitos - Parte 4: Descuentos y Búsqueda</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
             line-height: 1.6;
         }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -20,14 +27,24 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
+
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px;
             text-align: center;
         }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .header p { font-size: 1.1em; opacity: 0.9; }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
         .info-bar {
             background: #f8f9fa;
             padding: 15px 30px;
@@ -38,15 +55,29 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-        .info-item { display: flex; align-items: center; gap: 8px; }
-        .info-item strong { color: #667eea; }
-        .table-container { padding: 30px; overflow-x: auto; }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-item strong {
+            color: #667eea;
+        }
+
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.9em;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
         thead {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -54,6 +85,7 @@
             top: 0;
             z-index: 10;
         }
+
         thead th {
             padding: 15px 12px;
             text-align: left;
@@ -64,35 +96,63 @@
             border-right: 1px solid rgba(255, 255, 255, 0.2);
             vertical-align: middle;
         }
-        thead th:last-child { border-right: none; }
+
+        thead th:last-child {
+            border-right: none;
+        }
+
         tbody tr {
             border-bottom: 1px solid #e0e0e0;
             transition: background-color 0.3s;
         }
-        tbody tr:hover { background-color: #f5f5f5; }
-        tbody tr:nth-child(even) { background-color: #fafafa; }
-        tbody tr:nth-child(even):hover { background-color: #f0f0f0; }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        tbody tr:nth-child(even):hover {
+            background-color: #f0f0f0;
+        }
+
         td {
             padding: 14px 12px;
             vertical-align: top;
             border-right: 1px solid #e8e8e8;
             word-wrap: break-word;
         }
-        td:last-child { border-right: none; }
+
+        td:last-child {
+            border-right: none;
+        }
+
         .module-cell {
             font-weight: 600;
             color: #667eea;
             background-color: #f0f4ff !important;
             border-left: 4px solid #667eea;
         }
-        .subprocess-cell { font-weight: 500; color: #555; }
+
+        .subprocess-cell {
+            font-weight: 500;
+            color: #555;
+        }
+
         .code-cell {
             font-family: 'Courier New', monospace;
             font-weight: bold;
             color: #764ba2;
             background-color: #faf5ff;
         }
-        .description-cell { color: #333; line-height: 1.5; }
+
+        .description-cell {
+            color: #333;
+            line-height: 1.5;
+        }
+
         .footer {
             background: #f8f9fa;
             padding: 20px 30px;
@@ -102,6 +162,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -109,7 +170,8 @@
             <p>Descuentos y Búsqueda - Sistema Angelow</p>
         </div>
         <div class="info-bar">
-            <div class="info-item"><strong>Módulos:</strong> Códigos Descuento, Descuentos Masivos, Búsqueda Inteligente</div>
+            <div class="info-item"><strong>Módulos:</strong> Códigos Descuento, Descuentos Masivos, Búsqueda Inteligente
+            </div>
             <div class="info-item"><strong>Fecha:</strong> Noviembre 2025</div>
             <div class="info-item"><strong>Requisitos:</strong> RF-064 a RF-077</div>
         </div>
@@ -124,62 +186,16 @@
                         <th style="width: 5%;">Nro.<br>RN</th>
                         <th style="width: 20%;">Reglas del Negocio</th>
                         <th style="width: 5%;">Nro.<br>RI</th>
-                        <th style="width: 20%;">Requisitos de Información</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- CÓDIGOS DE DESCUENTO -->
-                    <tr>
-                        <td class="module-cell" rowspan="4">Códigos de Descuento</td>
-                        <td class="subprocess-cell">Crear código de descuento</td>
-                        <td class="code-cell">RF-064</td>
-                        <td class="description-cell">
-                            El sistema debe permitir a los administradores crear códigos de descuento personalizados con tipo (porcentaje, monto fijo, envío gratis), valor, vigencia y límite de usos.
-                        </td>
-                        <td class="code-cell">RN-064</td>
-                        <td class="description-cell">Los códigos de descuento deben tener fecha de inicio y fin. Puedes configurar cuántas veces se puede usar en total y si es de un solo uso por cliente. Los códigos se pueden aplicar a todos los productos o solo a categorías/productos específicos.</td>
-                        <td class="code-cell">RI-064</td>
-                        <td class="description-cell">
-                            Código único alfanumérico, tipo de descuento (porcentaje/monto fijo/envío gratis), valor del descuento, fecha de inicio de vigencia, fecha de fin de vigencia, límite total de usos, indicador de un solo uso por cliente, productos o categorías aplicables y estado activo/inactivo.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="subprocess-cell">Mostrar códigos de descuento</td>
-                        <td class="code-cell">RF-065</td>
-                        <td class="description-cell">
-                            El sistema debe permitir visualizar el listado completo de códigos de descuento con su información, usos restantes y estado de vigencia.
-                        </td>
-                        <td class="code-cell">RN-065</td>
-                        <td class="description-cell">El listado muestra todos los códigos: activos, próximos a vencer (en los próximos 7 días con alerta amarilla), vencidos y agotados. Puedes ver cuántas veces se ha usado cada código y cuántos usos quedan disponibles.</td>
-                        <td class="code-cell">RI-065</td>
-                        <td class="description-cell">
-                            Listado de códigos con: código, tipo de descuento, valor, fecha de inicio y fin de vigencia, total de usos permitidos, usos realizados, usos restantes, indicadores visuales (próximo a vencer, vencido, agotado) y opciones de acciones (editar, activar/desactivar, eliminar).
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="subprocess-cell">Generar códigos masivamente</td>
-                        <td class="code-cell">RF-066</td>
-                        <td class="description-cell">
-                            El sistema debe permitir generar múltiples códigos de descuento únicos en una sola operación con un prefijo común y numeración automática.
-                        </td>
-                        <td class="code-cell">RN-066</td>
-                        <td class="description-cell">Puedes generar hasta 1000 códigos a la vez con un formato como "VERANO2025-001", "VERANO2025-002", etc. Todos los códigos generados comparten el mismo tipo de descuento, valor, vigencia y límite de usos. Es útil para campañas masivas.</td>
-                        <td class="code-cell">RI-066</td>
-                        <td class="description-cell">
-                            Prefijo común para los códigos, cantidad de códigos a generar (1-1000), numeración inicial, tipo de descuento, valor, fecha de vigencia, límite de usos, estado inicial y resultado de la generación (códigos creados exitosamente).
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="subprocess-cell">Asignar código a usuario</td>
-                        <td class="code-cell">RF-067</td>
-                        <td class="description-cell">
-                            El sistema debe permitir asignar códigos de descuento personalizados a usuarios específicos, enviándoles automáticamente un correo con el código.
                         </td>
                         <td class="code-cell">RN-067</td>
-                        <td class="description-cell">Cuando asignas un código personalizado a un cliente, este recibe automáticamente un correo profesional con el código destacado, explicación del beneficio, fecha de vencimiento, instrucciones de uso y botón directo para ir a la tienda.</td>
+                        <td class="description-cell">Cuando asignas un código personalizado a un cliente, este recibe
+                            automáticamente un correo profesional con el código destacado, explicación del beneficio,
+                            fecha de vencimiento, instrucciones de uso y botón directo para ir a la tienda.</td>
                         <td class="code-cell">RI-067</td>
                         <td class="description-cell">
-                            Identificador del código de descuento, identificador del usuario destinatario, fecha de asignación, correo electrónico de notificación enviado (asunto, cuerpo, estado de envío) y fecha de expiración del código asignado.
+                            Identificador del código de descuento, identificador del usuario destinatario, fecha de
+                            asignación, correo electrónico de notificación enviado (asunto, cuerpo, estado de envío) y
+                            fecha de expiración del código asignado.
                         </td>
                     </tr>
                     <!-- DESCUENTOS MASIVOS (BULK) -->
@@ -188,39 +204,55 @@
                         <td class="subprocess-cell">Crear regla de descuento bulk</td>
                         <td class="code-cell">RF-068</td>
                         <td class="description-cell">
-                            El sistema debe permitir crear reglas de descuento automático basadas en cantidad de productos comprados (por ejemplo: 10% al comprar 5 o más unidades).
+                            El sistema debe permitir crear reglas de descuento automático basadas en cantidad de
+                            productos comprados (por ejemplo: 10% al comprar 5 o más unidades).
                         </td>
                         <td class="code-cell">RN-068</td>
-                        <td class="description-cell">Las reglas de descuento por cantidad se aplican automáticamente al carrito cuando se cumple el mínimo de productos. Puedes configurar rangos como "5-9 unidades: 10% descuento" y "10+ unidades: 15% descuento". No se combinan con códigos promocionales.</td>
+                        <td class="description-cell">Las reglas de descuento por cantidad se aplican automáticamente al
+                            carrito cuando se cumple el mínimo de productos. Puedes configurar rangos como "5-9
+                            unidades: 10% descuento" y "10+ unidades: 15% descuento". No se combinan con códigos
+                            promocionales.</td>
                         <td class="code-cell">RI-068</td>
                         <td class="description-cell">
-                            Cantidad mínima de productos, cantidad máxima (opcional para rango abierto), porcentaje de descuento a aplicar, categorías o productos aplicables, fechas de vigencia de la regla y estado activo/inactivo.
+                            Cantidad mínima de productos, cantidad máxima (opcional para rango abierto), porcentaje de
+                            descuento a aplicar, categorías o productos aplicables, fechas de vigencia de la regla y
+                            estado activo/inactivo.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Mostrar reglas bulk</td>
                         <td class="code-cell">RF-069</td>
                         <td class="description-cell">
-                            El sistema debe permitir visualizar todas las reglas de descuento por cantidad configuradas con su información de aplicabilidad y estado.
+                            El sistema debe permitir visualizar todas las reglas de descuento por cantidad configuradas
+                            con su información de aplicabilidad y estado.
                         </td>
                         <td class="code-cell">RN-069</td>
-                        <td class="description-cell">El listado muestra cada regla con su rango de cantidad, porcentaje de descuento, productos/categorías donde aplica, vigencia y estado. Las reglas activas se destacan y se muestran primero en el listado.</td>
+                        <td class="description-cell">El listado muestra cada regla con su rango de cantidad, porcentaje
+                            de descuento, productos/categorías donde aplica, vigencia y estado. Las reglas activas se
+                            destacan y se muestran primero en el listado.</td>
                         <td class="code-cell">RI-069</td>
                         <td class="description-cell">
-                            Listado de reglas con: rango de cantidad (mínimo-máximo), porcentaje de descuento, aplicabilidad (todos los productos, categoría específica, productos específicos), fecha de vigencia, estado activo/inactivo y opciones de editar/eliminar.
+                            Listado de reglas con: rango de cantidad (mínimo-máximo), porcentaje de descuento,
+                            aplicabilidad (todos los productos, categoría específica, productos específicos), fecha de
+                            vigencia, estado activo/inactivo y opciones de editar/eliminar.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Aplicación automática en carrito</td>
                         <td class="code-cell">RF-070</td>
                         <td class="description-cell">
-                            El sistema debe aplicar automáticamente el descuento por cantidad cuando el carrito cumple con las condiciones de alguna regla activa.
+                            El sistema debe aplicar automáticamente el descuento por cantidad cuando el carrito cumple
+                            con las condiciones de alguna regla activa.
                         </td>
                         <td class="code-cell">RN-070</td>
-                        <td class="description-cell">Cuando agregas suficientes productos al carrito para calificar a un descuento por cantidad, este se aplica automáticamente sin necesidad de código. Si calificas para varios descuentos (código + bulk), se aplica el que te genere mayor ahorro.</td>
+                        <td class="description-cell">Cuando agregas suficientes productos al carrito para calificar a un
+                            descuento por cantidad, este se aplica automáticamente sin necesidad de código. Si calificas
+                            para varios descuentos (código + bulk), se aplica el que te genere mayor ahorro.</td>
                         <td class="code-cell">RI-070</td>
                         <td class="description-cell">
-                            Cantidad total de productos en el carrito, reglas aplicables evaluadas, mejor descuento identificado, cálculo del descuento aplicado, nuevo subtotal con descuento y mensaje informativo al usuario sobre el descuento aplicado.
+                            Cantidad total de productos en el carrito, reglas aplicables evaluadas, mejor descuento
+                            identificado, cálculo del descuento aplicado, nuevo subtotal con descuento y mensaje
+                            informativo al usuario sobre el descuento aplicado.
                         </td>
                     </tr>
                     <!-- BÚSQUEDA INTELIGENTE -->
@@ -229,52 +261,73 @@
                         <td class="subprocess-cell">Buscar productos</td>
                         <td class="code-cell">RF-071</td>
                         <td class="description-cell">
-                            El sistema debe permitir buscar productos por nombre, descripción o categoría de forma instantánea con sugerencias mientras escribes.
+                            El sistema debe permitir buscar productos por nombre, descripción o categoría de forma
+                            instantánea con sugerencias mientras escribes.
                         </td>
                         <td class="code-cell">RN-071</td>
-                        <td class="description-cell">La búsqueda es case-insensitive (no diferencia mayúsculas/minúsculas) y tolerante a errores. Prioriza productos cuyo nombre comienza con lo que escribiste. Muestra sugerencias después de escribir 3 caracteres. La búsqueda es instantánea sin necesidad de presionar Enter.</td>
+                        <td class="description-cell">La búsqueda es case-insensitive (no diferencia
+                            mayúsculas/minúsculas) y tolerante a errores. Prioriza productos cuyo nombre comienza con lo
+                            que escribiste. Muestra sugerencias después de escribir 3 caracteres. La búsqueda es
+                            instantánea sin necesidad de presionar Enter.</td>
                         <td class="code-cell">RI-071</td>
                         <td class="description-cell">
-                            Término de búsqueda ingresado, resultados encontrados (productos con: nombre, imagen, precio, categoría), cantidad total de resultados, tiempo de respuesta de la búsqueda y ordenamiento de resultados por relevancia.
+                            Término de búsqueda ingresado, resultados encontrados (productos con: nombre, imagen,
+                            precio, categoría), cantidad total de resultados, tiempo de respuesta de la búsqueda y
+                            ordenamiento de resultados por relevancia.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Guardar historial de búsquedas</td>
                         <td class="code-cell">RF-072</td>
                         <td class="description-cell">
-                            El sistema debe registrar automáticamente cada búsqueda realizada con el término buscado, cantidad de resultados y fecha para análisis posteriores.
+                            El sistema debe registrar automáticamente cada búsqueda realizada con el término buscado,
+                            cantidad de resultados y fecha para análisis posteriores.
                         </td>
                         <td class="code-cell">RN-072</td>
-                        <td class="description-cell">Cada búsqueda queda registrada para análisis de tendencias y mejora del catálogo. Se identifica qué términos generan más búsquedas, cuáles no encuentran resultados (productos faltantes) y patrones de búsqueda de los clientes.</td>
+                        <td class="description-cell">Cada búsqueda queda registrada para análisis de tendencias y mejora
+                            del catálogo. Se identifica qué términos generan más búsquedas, cuáles no encuentran
+                            resultados (productos faltantes) y patrones de búsqueda de los clientes.</td>
                         <td class="code-cell">RI-072</td>
                         <td class="description-cell">
-                            Término buscado, identificador del usuario (opcional para usuarios no registrados), cantidad de resultados encontrados, producto clickeado (si aplica), fecha y hora de la búsqueda y dispositivo utilizado (móvil/escritorio).
+                            Término buscado, identificador del usuario (opcional para usuarios no registrados), cantidad
+                            de resultados encontrados, producto clickeado (si aplica), fecha y hora de la búsqueda y
+                            dispositivo utilizado (móvil/escritorio).
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Mostrar búsquedas populares</td>
                         <td class="code-cell">RF-073</td>
                         <td class="description-cell">
-                            El sistema debe mostrar las búsquedas más populares como sugerencias rápidas para facilitar la navegación de los clientes.
+                            El sistema debe mostrar las búsquedas más populares como sugerencias rápidas para facilitar
+                            la navegación de los clientes.
                         </td>
                         <td class="code-cell">RN-073</td>
-                        <td class="description-cell">Las búsquedas populares se calculan contando cuántas veces se ha buscado cada término en los últimos 30 días. Se muestran máximo las 10 búsquedas más frecuentes. Se actualizan diariamente para reflejar tendencias actuales.</td>
+                        <td class="description-cell">Las búsquedas populares se calculan contando cuántas veces se ha
+                            buscado cada término en los últimos 30 días. Se muestran máximo las 10 búsquedas más
+                            frecuentes. Se actualizan diariamente para reflejar tendencias actuales.</td>
                         <td class="code-cell">RI-073</td>
                         <td class="description-cell">
-                            Listado de términos de búsqueda más populares con: término, cantidad de veces buscado en período de tiempo, cantidad promedio de resultados y enlace directo a los resultados de esa búsqueda.
+                            Listado de términos de búsqueda más populares con: término, cantidad de veces buscado en
+                            período de tiempo, cantidad promedio de resultados y enlace directo a los resultados de esa
+                            búsqueda.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Búsquedas sin resultados</td>
                         <td class="code-cell">RF-074</td>
                         <td class="description-cell">
-                            El sistema debe registrar las búsquedas que no encuentran productos para identificar oportunidades de ampliar el catálogo.
+                            El sistema debe registrar las búsquedas que no encuentran productos para identificar
+                            oportunidades de ampliar el catálogo.
                         </td>
                         <td class="code-cell">RN-074</td>
-                        <td class="description-cell">Los administradores pueden ver un reporte de términos buscados que no devolvieron resultados, ordenados por frecuencia. Esto identifica qué productos o categorías están buscando los clientes pero no están disponibles en el catálogo.</td>
+                        <td class="description-cell">Los administradores pueden ver un reporte de términos buscados que
+                            no devolvieron resultados, ordenados por frecuencia. Esto identifica qué productos o
+                            categorías están buscando los clientes pero no están disponibles en el catálogo.</td>
                         <td class="code-cell">RI-074</td>
                         <td class="description-cell">
-                            Reporte de búsquedas sin resultados con: término buscado, cantidad de veces buscado sin resultados, fechas de las búsquedas y sugerencias automáticas de productos similares para agregar al catálogo.
+                            Reporte de búsquedas sin resultados con: término buscado, cantidad de veces buscado sin
+                            resultados, fechas de las búsquedas y sugerencias automáticas de productos similares para
+                            agregar al catálogo.
                         </td>
                     </tr>
                     <!-- FILTROS DE PRODUCTOS -->
@@ -283,42 +336,57 @@
                         <td class="subprocess-cell">Filtrar por categoría</td>
                         <td class="code-cell">RF-075</td>
                         <td class="description-cell">
-                            El sistema debe permitir filtrar productos por categoría específica mostrando solo los productos que pertenecen a esa categoría.
+                            El sistema debe permitir filtrar productos por categoría específica mostrando solo los
+                            productos que pertenecen a esa categoría.
                         </td>
                         <td class="code-cell">RN-075</td>
-                        <td class="description-cell">Al seleccionar una categoría (vestidos, camisetas, pantalones, etc.), se muestran solo productos de esa categoría. El contador muestra cuántos productos tiene cada categoría. Las categorías sin productos no se muestran en los filtros.</td>
+                        <td class="description-cell">Al seleccionar una categoría (vestidos, camisetas, pantalones,
+                            etc.), se muestran solo productos de esa categoría. El contador muestra cuántos productos
+                            tiene cada categoría. Las categorías sin productos no se muestran en los filtros.</td>
                         <td class="code-cell">RI-075</td>
                         <td class="description-cell">
-                            Categoría seleccionada, productos filtrados por esa categoría, cantidad de productos en la categoría, subcategorías disponibles (si aplica) y opciones de ordenamiento de resultados.
+                            Categoría seleccionada, productos filtrados por esa categoría, cantidad de productos en la
+                            categoría, subcategorías disponibles (si aplica) y opciones de ordenamiento de resultados.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Filtrar por rango de precio</td>
                         <td class="code-cell">RF-076</td>
                         <td class="description-cell">
-                            El sistema debe permitir filtrar productos por rango de precio usando un control deslizante con precio mínimo y máximo.
+                            El sistema debe permitir filtrar productos por rango de precio usando un control deslizante
+                            con precio mínimo y máximo.
                         </td>
                         <td class="code-cell">RN-076</td>
-                        <td class="description-cell">Puedes definir un rango de precio personalizado arrastrando los controles deslizantes o ingresando valores específicos. El sistema muestra automáticamente solo productos dentro de ese rango. Los valores extremos se ajustan a los precios reales disponibles.</td>
+                        <td class="description-cell">Puedes definir un rango de precio personalizado arrastrando los
+                            controles deslizantes o ingresando valores específicos. El sistema muestra automáticamente
+                            solo productos dentro de ese rango. Los valores extremos se ajustan a los precios reales
+                            disponibles.</td>
                         <td class="code-cell">RI-076</td>
                         <td class="description-cell">
-                            Precio mínimo seleccionado, precio máximo seleccionado, precio mínimo disponible en catálogo, precio máximo disponible en catálogo, productos filtrados por rango y cantidad de resultados encontrados.
+                            Precio mínimo seleccionado, precio máximo seleccionado, precio mínimo disponible en
+                            catálogo, precio máximo disponible en catálogo, productos filtrados por rango y cantidad de
+                            resultados encontrados.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Filtrar por género</td>
                         <td class="code-cell">RF-077</td>
                         <td class="description-cell">
-                            El sistema debe permitir filtrar productos por género (niño, niña, bebé, unisex) mostrando solo productos apropiados para la selección.
+                            El sistema debe permitir filtrar productos por género (niño, niña, bebé, unisex) mostrando
+                            solo productos apropiados para la selección.
                         </td>
                         <td class="code-cell">RN-077</td>
-                        <td class="description-cell">Puedes seleccionar uno o múltiples géneros simultáneamente. Si seleccionas "niña" y "bebé", se mostrarán productos de ambas categorías. Cada opción muestra el contador de productos disponibles. Los filtros se pueden combinar con categorías y precios.</td>
+                        <td class="description-cell">Puedes seleccionar uno o múltiples géneros simultáneamente. Si
+                            seleccionas "niña" y "bebé", se mostrarán productos de ambas categorías. Cada opción muestra
+                            el contador de productos disponibles. Los filtros se pueden combinar con categorías y
+                            precios.</td>
                         <td class="code-cell">RI-077</td>
                         <td class="description-cell">
-                            Géneros seleccionados (niño/niña/bebé/unisex), productos filtrados por género(s), cantidad de productos por género, combinación con otros filtros activos y ordenamiento de resultados.
+                            Géneros seleccionados (niño/niña/bebé/unisex), productos filtrados por género(s), cantidad
+                            de productos por género, combinación con otros filtros activos y ordenamiento de resultados.
                         </td>
                     </tr>
-                </tbody>
+                    </tbody>
             </table>
         </div>
         <div class="footer">
@@ -330,4 +398,5 @@
         </div>
     </div>
 </body>
+
 </html>

@@ -128,7 +128,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const beforeNorm = (before || '').toString().trim();
             if ((beforeNorm === '' || beforeNorm === 'none' || /^['"]{2}$/.test(beforeNorm)) && !svg && text === '') {
                 const fallback = el.getAttribute('data-fallback') || 'fa-check-circle';
-                [...el.classList].forEach(cls => { if (cls.startsWith('fa-') && cls !== 'fa-fallback' && cls !== 'fas') el.classList.remove(cls); });
+                [...el.classList].forEach(cls => {
+                    // Keep known style prefixes so the icon style (solid/regular/brands) remains when
+                    // swapping the actual glyph class to fallback. This now supports FA6 style names.
+                    const styleExceptions = ['fa-fallback', 'fas', 'fa-solid', 'far', 'fa-regular', 'fab', 'fa-brands'];
+                    if (cls.startsWith('fa-') && !styleExceptions.includes(cls)) el.classList.remove(cls);
+                });
                 el.classList.add(fallback);
                 el.classList.remove('fa-fallback');
                 const after = getComputedStyle(el, '::before').content;

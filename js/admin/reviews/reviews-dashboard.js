@@ -32,6 +32,7 @@ class ReviewsInbox {
         this.ratingLegend = document.getElementById('reviews-rating-legend');
         this.highlightsList = document.getElementById('reviews-highlights');
         this.tableBody = document.getElementById('reviews-table');
+        this.listContainer = document.getElementById('reviews-list');
         this.searchInput = document.getElementById('reviews-search');
         this.statusSelect = document.getElementById('reviews-status');
         this.ratingSelect = document.getElementById('reviews-rating');
@@ -83,19 +84,22 @@ class ReviewsInbox {
             });
         });
 
-        this.tableBody?.addEventListener('click', (evt) => {
+        const delegatedClick = (evt, containerIsList = false) => {
             const actionBtn = evt.target.closest('[data-action]');
-            const row = evt.target.closest('tr[data-id]');
+            const row = evt.target.closest('tr[data-id]') || evt.target.closest('.review-card[data-review-id]');
             if (actionBtn) {
                 evt.stopPropagation();
-                const id = actionBtn.closest('tr')?.getAttribute('data-id');
-                this.handleAction(actionBtn.getAttribute('data-action'), id);
+                const id = actionBtn.closest('[data-id]')?.getAttribute('data-id') || actionBtn.closest('[data-review-id]')?.getAttribute('data-review-id');
+                this.handleAction(actionBtn.getAttribute('data-action'), id, evt);
                 return;
             }
             if (row) {
-                this.openDetail(row.getAttribute('data-id'));
+                const id = row.getAttribute('data-id') || row.getAttribute('data-review-id');
+                this.openDetail(id);
             }
-        });
+        };
+        this.tableBody?.addEventListener('click', (evt) => delegatedClick(evt, false));
+        this.listContainer?.addEventListener('click', (evt) => delegatedClick(evt, true));
 
         this.detailToggle?.addEventListener('click', (evt) => {
             evt.stopPropagation();
@@ -140,8 +144,9 @@ class ReviewsInbox {
     }
 
     async loadList() {
-        if (!this.tableBody) return;
-        this.tableBody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
+        if (!this.tableBody && !this.listContainer) return;
+        if (this.listContainer) this.listContainer.innerHTML = '<div class="text-muted">Cargando...</div>';
+        if (this.tableBody) this.tableBody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
         const params = new URLSearchParams();
         params.set('page', this.state.page);
         params.set('per_page', this.state.perPage);
@@ -240,9 +245,10 @@ class ReviewsInbox {
                 // If the `::before` content is missing/empty (or "none") AND there is no SVG child and no inline text, the icon glyph is likely unavailable
                 if ((beforeNorm === '' || beforeNorm === 'none' || /^['"]{2}$/.test(beforeNorm)) && !svg && inlineText === '') {
                     const fallback = el.getAttribute('data-fallback') || 'fa-check-circle';
-                    // Replace the class name for the icon
+                    // Replace the class name for the icon but keep style prefix classes
                     [...el.classList].forEach(cls => {
-                        if (cls.startsWith('fa-') && cls !== 'fa-fallback' && cls !== 'fas') el.classList.remove(cls);
+                        const styleExceptions = ['fa-fallback', 'fas', 'fa-solid', 'far', 'fa-regular', 'fab', 'fa-brands'];
+                        if (cls.startsWith('fa-') && !styleExceptions.includes(cls)) el.classList.remove(cls);
                     });
                     console.info('REVIEWS DEBUG: icon unavailable, swapping', el, '->', fallback);
                     el.classList.add(fallback);
@@ -406,7 +412,8 @@ class ReviewsInbox {
             if (this.state.verified !== '') filters.push(`Verificado: ${this.state.verified}`);
             const filtersText = filters.length ? ` — filtros activos: ${filters.join(', ')}` : '';
             const clear = this.clearBtn ? `<button class="btn-soft" id="reviews-inline-clear">Limpiar filtros</button>` : '';
-            this.tableBody.innerHTML = `<tr><td colspan="5">Sin resultados${filtersText} ${clear}</td></tr>`;
+            if (this.listContainer) this.listContainer.innerHTML = `<div class="text-muted">Sin resultados${filtersText} ${clear}</div>`;
+            if (this.tableBody) this.tableBody.innerHTML = `<tr><td colspan="5">Sin resultados${filtersText} ${clear}</td></tr>`;
             // wire inline clear if present
             setTimeout(() => {
                 const btn = document.getElementById('reviews-inline-clear');
@@ -414,6 +421,49 @@ class ReviewsInbox {
             }, 50);
             return;
         }
+        // If a card-list container is present, render as review cards to match product pages
+        if (this.listContainer) {
+            this.listContainer.innerHTML = items.map((item) => {
+                this.items.set(String(item.id), item);
+                const title = item.title || 'Sin titulo';
+                const safeComment = (item.comment || '').slice(0, 160);
+                const userName = item.customer?.name || item.customer?.email || 'Cliente';
+                const initials = (userName.split(' ').slice(0,2).map(p=>p[0]||'').join('') || '?').toUpperCase();
+                const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
+                const verifiedBadge = isVerified ? '<span class="badge verified small">Verificada</span>' : '';
+                const productName = item.product?.name || 'Producto';
+                const reviewImages = Array.isArray(item.images) && item.images.length ? item.images.map((img) => `<div class="review-image"><img src="${this.config.baseUrl}/${img}" alt="Imagen reseña"></div>`).join('') : '';
+                return `
+                    <div class="review-card" data-review-id="${item.id}" data-review-rating="${item.rating}">
+                        <div class="review-meta">
+                            <div class="user-avatar"><span>${initials}</span></div>
+                            <div class="user-info">
+                                <strong>${userName}</strong>
+                                <span class="time">${this.formatDate(item.created_at)}</span>
+                                <div class="small text-muted">${verifiedBadge}</div>
+                            </div>
+                        </div>
+                        <div class="review-body">
+                            <div class="review-head">
+                                <h4 class="review-title">${title}</h4>
+                                <div class="user-rating review-stars"><span class="badge-ghost">${item.rating} ★</span></div>
+                            </div>
+                            <p class="review-comment text-muted">${safeComment}${(item.comment || '').length > 160 ? '...' : ''}</p>
+                            <div class="review-footer">
+                                <div class="review-product small text-muted">${productName}</div>
+                                <div class="review-actions actions">
+                                    <button class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar"><i class="fas fa-check"></i></button>
+                                    <button class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar"><i class="fas fa-ban"></i></button>
+                                    <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada"><i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render table fallback (existing behavior)
         this.tableBody.innerHTML = items.map((item) => {
             this.items.set(String(item.id), item);
             const comment = (item.comment || '').slice(0, 70);
@@ -430,29 +480,29 @@ class ReviewsInbox {
                         <button class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar"><i class="fas fa-check"></i></button>
                         <button class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar"><i class="fas fa-ban"></i></button>
                         <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada">
-                            <svg class="inline-icon inline-icon-fallback" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M12 2 3 5v6c0 5.25 3.66 9.74 9 11 5.34-1.26 9-5.75 9-11V5l-9-3zm-1 14-4-4 1.41-1.41L11 13.17l5.59-5.59L18 9l-7 7z"/></svg>
+                            <i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i>
                         </button>
                     </td>
                 </tr>
             `;
-        }).join('');
+            }).join('');
 
         // Post-render: hide/alter verify buttons for already verified reviews
         setTimeout(() => {
             items.forEach((item) => {
-                const row = this.tableBody.querySelector(`tr[data-id="${item.id}"]`);
+                const row = (this.tableBody && this.tableBody.querySelector(`tr[data-id="${item.id}"]`)) || (this.listContainer && this.listContainer.querySelector(`.review-card[data-review-id="${item.id}"]`));
                 if (!row) return;
                 const verifyBtn = row.querySelector('button[data-action="verify"]');
                 const approveBtn = row.querySelector('button[data-action="approve"]');
                 if (!verifyBtn) return;
                 const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
-                if (isVerified) {
+                    if (isVerified) {
                     // If the review is verified, indicate it in the action cell and remove the action to avoid confusion
                     verifyBtn.setAttribute('title', 'Reseña verificada');
                     verifyBtn.disabled = true;
                     verifyBtn.classList.add('btn-verified');
                     // Show a small check mark and tooltip instead of clickable control
-                    verifyBtn.innerHTML = '<i class="fas fa-check-circle"></i>';
+                    verifyBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i>';
                 } else {
                     verifyBtn.setAttribute('title', 'Marcar como verificada');
                     verifyBtn.disabled = false;
@@ -472,12 +522,13 @@ class ReviewsInbox {
 
         // Debug: log first action button classes to ensure JS rendered expected classes (remove once validated)
         setTimeout(() => {
-            const firstActionBtn = this.tableBody?.querySelector('button[data-action]');
+            const firstActionBtn = (this.tableBody && this.tableBody.querySelector('button[data-action]')) || (this.listContainer && this.listContainer.querySelector('button[data-action]'));
             if (firstActionBtn) console.info('REVIEWS DEBUG: first action button classes ->', firstActionBtn.className);
-            const firstTableBtn = this.tableBody?.querySelector('td.actions button[data-action]');
+            const firstTableBtn = (this.tableBody && this.tableBody.querySelector('td.actions button[data-action]')) || (this.listContainer && this.listContainer.querySelector('.review-actions button[data-action]'));
             if (firstTableBtn) console.info('REVIEWS DEBUG: action button computed styles ->', getComputedStyle(firstTableBtn).backgroundColor, getComputedStyle(firstTableBtn).color);
             // Ensure color class exists on all actions - if not, add it by mapping data-action -> class
-            this.tableBody.querySelectorAll('td.actions button[data-action]').forEach((btn) => {
+            const allActionButtons = [ ...(this.tableBody ? Array.from(this.tableBody.querySelectorAll('td.actions button[data-action]')) : []), ...(this.listContainer ? Array.from(this.listContainer.querySelectorAll('.review-actions button[data-action]')) : []) ];
+            allActionButtons.forEach((btn) => {
                 const act = btn.getAttribute('data-action');
                 if (act && !btn.classList.contains(`btn-${act}`)) {
                     btn.classList.add(`btn-${act}`);
@@ -498,8 +549,9 @@ class ReviewsInbox {
             reject: { bg: 'rgba(220,38,38,0.06)', color: '#dc2626', border: 'rgba(220,38,38,0.12)' },
             verify: { bg: 'rgba(15,157,88,0.08)', color: '#0f9d58', border: 'rgba(15,157,88,0.12)' }
         };
-        // Table buttons
-        this.tableBody?.querySelectorAll('td.actions button[data-action]')?.forEach((btn) => {
+        // Table & Card buttons
+        const allButtons = [ ...(this.tableBody ? Array.from(this.tableBody.querySelectorAll('td.actions button[data-action]')) : []), ...(this.listContainer ? Array.from(this.listContainer.querySelectorAll('.review-actions button[data-action]')) : []) ];
+        allButtons?.forEach((btn) => {
             const act = btn.getAttribute('data-action');
             const cfg = map[act];
             if (!cfg) return;
@@ -524,6 +576,7 @@ class ReviewsInbox {
                 if (ic.tagName?.toLowerCase() === 'svg') ic.style.fill = cfg.color;
             }
         });
+        // list buttons handled earlier via `allButtons` union to keep consistent.
     }
 
     renderPagination(meta) {
@@ -538,7 +591,7 @@ class ReviewsInbox {
         if (nextBtn) nextBtn.disabled = this.state.page >= pages;
     }
 
-    async handleAction(action, id) {
+    async handleAction(action, id, evt) {
         if (!id) return;
         const confirmMap = {
             approve: '¿Aprobar esta reseña para publicación?',
@@ -561,7 +614,7 @@ class ReviewsInbox {
 
 
         // Show loading state on button
-        const button = event?.target?.closest('button');
+        const button = evt?.target?.closest('button') || document.querySelector('[data-id="' + id + '"] button[data-action="' + action + '"]') || document.querySelector('[data-review-id="' + id + '"] button[data-action="' + action + '"]');
         const originalHTML = button?.innerHTML;
         if (button) {
             button.disabled = true;
@@ -613,8 +666,9 @@ class ReviewsInbox {
     openDetail(id) {
         const item = this.items.get(String(id));
         if (!item || !this.detailPanel) return;
-        // highlight selected row
+        // highlight selected row or review-card
         this.tableBody?.querySelectorAll('tr[data-id]')?.forEach((r) => r.classList.toggle('is-selected', r.getAttribute('data-id') === String(id)));
+        this.listContainer?.querySelectorAll('.review-card[data-review-id]')?.forEach((r) => r.classList.toggle('is-selected', r.getAttribute('data-review-id') === String(id)));
         // expand detail panel
         this.detailPanel.classList.remove('collapsed');
         this.detailPanel.setAttribute('aria-hidden', 'false');
@@ -631,19 +685,19 @@ class ReviewsInbox {
         content.querySelector('[data-role="comment"]').textContent = item.comment;
         const actions = content.querySelector('[data-role="detail-actions"]');
         actions?.querySelectorAll('button').forEach((btn) => {
-            btn.onclick = () => this.handleAction(btn.getAttribute('data-action'), id);
+            btn.onclick = (e) => this.handleAction(btn.getAttribute('data-action'), id, e);
         });
         // Configure verify and approve button label/state in the detail panel
         const verifyBtn = actions?.querySelector('button[data-action="verify"]');
-        if (verifyBtn) {
+                if (verifyBtn) {
             const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
-            if (isVerified) {
-                verifyBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verificada';
+                if (isVerified) {
+                verifyBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Verificada';
                 verifyBtn.title = 'Reseña verificada';
                 verifyBtn.disabled = true;
                 verifyBtn.classList.add('btn-verified');
-            } else {
-                verifyBtn.innerHTML = '<svg class="inline-icon inline-icon-fallback" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M12 2 3 5v6c0 5.25 3.66 9.74 9 11 5.34-1.26 9-5.75 9-11V5l-9-3zm-1 14-4-4 1.41-1.41L11 13.17l5.59-5.59L18 9l-7 7z"/></svg> Marcar como verificada';
+                } else {
+                verifyBtn.innerHTML = '<i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i> Marcar como verificada';
                 verifyBtn.title = 'Marcar como verificada';
                 verifyBtn.disabled = false;
                 verifyBtn.classList.remove('btn-verified');

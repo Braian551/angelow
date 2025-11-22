@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matriz de Requisitos - Parte 1: Usuarios y Autenticación</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
             line-height: 1.6;
         }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -20,14 +27,24 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
+
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px;
             text-align: center;
         }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .header p { font-size: 1.1em; opacity: 0.9; }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
         .info-bar {
             background: #f8f9fa;
             padding: 15px 30px;
@@ -38,15 +55,29 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-        .info-item { display: flex; align-items: center; gap: 8px; }
-        .info-item strong { color: #667eea; }
-        .table-container { padding: 30px; overflow-x: auto; }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-item strong {
+            color: #667eea;
+        }
+
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.9em;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
         thead {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -54,6 +85,7 @@
             top: 0;
             z-index: 10;
         }
+
         thead th {
             padding: 15px 12px;
             text-align: left;
@@ -64,35 +96,63 @@
             border-right: 1px solid rgba(255, 255, 255, 0.2);
             vertical-align: middle;
         }
-        thead th:last-child { border-right: none; }
+
+        thead th:last-child {
+            border-right: none;
+        }
+
         tbody tr {
             border-bottom: 1px solid #e0e0e0;
             transition: background-color 0.3s;
         }
-        tbody tr:hover { background-color: #f5f5f5; }
-        tbody tr:nth-child(even) { background-color: #fafafa; }
-        tbody tr:nth-child(even):hover { background-color: #f0f0f0; }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        tbody tr:nth-child(even):hover {
+            background-color: #f0f0f0;
+        }
+
         td {
             padding: 14px 12px;
             vertical-align: top;
             border-right: 1px solid #e8e8e8;
             word-wrap: break-word;
         }
-        td:last-child { border-right: none; }
+
+        td:last-child {
+            border-right: none;
+        }
+
         .module-cell {
             font-weight: 600;
             color: #667eea;
             background-color: #f0f4ff !important;
             border-left: 4px solid #667eea;
         }
-        .subprocess-cell { font-weight: 500; color: #555; }
+
+        .subprocess-cell {
+            font-weight: 500;
+            color: #555;
+        }
+
         .code-cell {
             font-family: 'Courier New', monospace;
             font-weight: bold;
             color: #764ba2;
             background-color: #faf5ff;
         }
-        .description-cell { color: #333; line-height: 1.5; }
+
+        .description-cell {
+            color: #333;
+            line-height: 1.5;
+        }
+
         .footer {
             background: #f8f9fa;
             padding: 20px 30px;
@@ -102,6 +162,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -109,7 +170,8 @@
             <p>Usuarios y Autenticación - Sistema Angelow</p>
         </div>
         <div class="info-bar">
-            <div class="info-item"><strong>Módulos:</strong> Gestión de Usuarios, Autenticación, Google OAuth, Direcciones GPS</div>
+            <div class="info-item"><strong>Módulos:</strong> Gestión de Usuarios, Autenticación, Google OAuth,
+                Direcciones GPS</div>
             <div class="info-item"><strong>Fecha:</strong> Noviembre 2025</div>
             <div class="info-item"><strong>Requisitos:</strong> RF-001 a RF-016</div>
         </div>
@@ -123,91 +185,35 @@
                         <th style="width: 25%;">Requisito Funcional</th>
                         <th style="width: 5%;">Nro.<br>RN</th>
                         <th style="width: 20%;">Reglas del Negocio</th>
-                        <th style="width: 5%;">Nro.<br>RI</th>
-                        <th style="width: 20%;">Requisitos de Información</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- GESTIÓN DE USUARIOS -->
-                    <tr>
-                        <td class="module-cell" rowspan="4">Gestión de Usuarios</td>
-                        <td class="subprocess-cell">Registro de usuarios</td>
-                        <td class="code-cell">RF-001</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los visitantes registrarse creando una cuenta nueva con correo electrónico, nombre completo, teléfono y contraseña.
-                        </td>
-                        <td class="code-cell">RN-001</td>
-                        <td class="description-cell">Para crear una cuenta, debes aceptar obligatoriamente los términos y condiciones marcando la casilla de aceptación. Sin esta confirmación no se puede completar el registro.</td>
-                        <td class="code-cell">RI-001</td>
-                        <td class="description-cell">
-                            Nombre completo del usuario, correo electrónico único, número de teléfono, contraseña encriptada, fecha de registro, aceptación de términos y condiciones.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="subprocess-cell">Inicio de sesión</td>
-                        <td class="code-cell">RF-002</td>
-                        <td class="description-cell">
-                            El sistema debe permitir a los usuarios registrados iniciar sesión con su correo electrónico y contraseña, con opción de "Recordar mi cuenta".
-                        </td>
-                        <td class="code-cell">RN-002</td>
-                        <td class="description-cell">Si activas la opción "Recordar mi cuenta", el sistema mantendrá tu sesión activa por 30 días. De lo contrario, la sesión se cerrará automáticamente al cerrar el navegador por seguridad.</td>
-                        <td class="code-cell">RI-002</td>
-                        <td class="description-cell">
-                            Correo electrónico de acceso, contraseña para validación, token de sesión único, fecha de expiración del token, dirección IP del dispositivo y estado de la sesión recordada.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="subprocess-cell">Ver perfil de usuario</td>
-                        <td class="code-cell">RF-003</td>
-                        <td class="description-cell">
-                            El sistema debe permitir a los usuarios ver su información personal completa en su perfil (nombre, correo, teléfono, foto de perfil).
-                        </td>
-                        <td class="code-cell">RN-003</td>
-                        <td class="description-cell">Cada usuario solo puede ver su propia información personal. No tiene acceso a los datos de otros usuarios, garantizando la privacidad de todos.</td>
-                        <td class="code-cell">RI-003</td>
-                        <td class="description-cell">
-                            Identificador único del usuario, nombre completo, correo electrónico, número de teléfono, foto de perfil, rol del usuario y fecha de último acceso.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="subprocess-cell">Editar perfil de usuario</td>
-                        <td class="code-cell">RF-004</td>
-                        <td class="description-cell">
-                            El sistema debe permitir a los usuarios modificar su información personal: nombre, teléfono y foto de perfil.
-                        </td>
-                        <td class="code-cell">RN-004</td>
-                        <td class="description-cell">El correo electrónico no puede modificarse una vez creada la cuenta, ya que es el identificador único para iniciar sesión. Para cambiar el correo debes contactar al administrador.</td>
-                        <td class="code-cell">RI-004</td>
-                        <td class="description-cell">
-                            Nombre completo actualizado, número de teléfono actualizado, foto de perfil nueva (formatos JPG, PNG, máximo 2MB) y fecha de última actualización del perfil.
-                        </td>
-                    </tr>
-                    <!-- AUTENTICACIÓN CON GOOGLE -->
-                    <tr>
-                        <td class="module-cell" rowspan="2">Google OAuth</td>
-                        <td class="subprocess-cell">Registro con Google</td>
-                        <td class="code-cell">RF-005</td>
-                        <td class="description-cell">
-                            El sistema debe permitir a los visitantes registrarse usando su cuenta de Google, creando automáticamente su perfil con los datos de Google.
+                            El sistema debe permitir a los visitantes registrarse usando su cuenta de Google, creando
+                            automáticamente su perfil con los datos de Google.
                         </td>
                         <td class="code-cell">RN-005</td>
-                        <td class="description-cell">Si te registras con Google, tu correo, nombre y foto se importan automáticamente desde tu cuenta de Google. No necesitas crear ni recordar una contraseña adicional para la tienda.</td>
+                        <td class="description-cell">Si te registras con Google, tu correo, nombre y foto se importan
+                            automáticamente desde tu cuenta de Google. No necesitas crear ni recordar una contraseña
+                            adicional para la tienda.</td>
                         <td class="code-cell">RI-005</td>
                         <td class="description-cell">
-                            Identificador único de Google del usuario, correo electrónico de Google, nombre completo de Google, foto de perfil de Google y tokens de acceso y actualización de Google.
+                            Identificador único de Google del usuario, correo electrónico de Google, nombre completo de
+                            Google, foto de perfil de Google y tokens de acceso y actualización de Google.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Inicio de sesión con Google</td>
                         <td class="code-cell">RF-006</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los usuarios iniciar sesión usando su cuenta de Google sin necesidad de contraseña.
+                            El sistema debe permitir a los usuarios iniciar sesión usando su cuenta de Google sin
+                            necesidad de contraseña.
                         </td>
                         <td class="code-cell">RN-006</td>
-                        <td class="description-cell">Cuando inicias sesión con Google, el sistema valida automáticamente tu identidad con los servidores de Google. No necesitas ingresar contraseña. Si es tu primera vez, se crea automáticamente tu cuenta.</td>
+                        <td class="description-cell">Cuando inicias sesión con Google, el sistema valida automáticamente
+                            tu identidad con los servidores de Google. No necesitas ingresar contraseña. Si es tu
+                            primera vez, se crea automáticamente tu cuenta.</td>
                         <td class="code-cell">RI-006</td>
                         <td class="description-cell">
-                            Identificador de Google para validación, tokens temporales de autenticación de Google y fecha y hora del último inicio de sesión con Google.
+                            Identificador de Google para validación, tokens temporales de autenticación de Google y
+                            fecha y hora del último inicio de sesión con Google.
                         </td>
                     </tr>
                     <!-- GESTIÓN DE DIRECCIONES -->
@@ -216,52 +222,71 @@
                         <td class="subprocess-cell">Agregar dirección</td>
                         <td class="code-cell">RF-007</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los usuarios agregar nuevas direcciones de envío con coordenadas GPS, nombre del receptor y teléfono de contacto.
+                            El sistema debe permitir a los usuarios agregar nuevas direcciones de envío con coordenadas
+                            GPS, nombre del receptor y teléfono de contacto.
                         </td>
                         <td class="code-cell">RN-007</td>
-                        <td class="description-cell">Al guardar una dirección de envío, debes incluir obligatoriamente su ubicación exacta en el mapa (coordenadas GPS). Esto es esencial para que los repartidores puedan llegar precisamente a tu domicilio.</td>
+                        <td class="description-cell">Al guardar una dirección de envío, debes incluir obligatoriamente
+                            su ubicación exacta en el mapa (coordenadas GPS). Esto es esencial para que los repartidores
+                            puedan llegar precisamente a tu domicilio.</td>
                         <td class="code-cell">RI-007</td>
                         <td class="description-cell">
-                            Dirección completa de texto, barrio, ciudad, coordenadas GPS obligatorias (latitud y longitud), nombre del receptor, teléfono del receptor e instrucciones especiales de entrega opcionales.
+                            Dirección completa de texto, barrio, ciudad, coordenadas GPS obligatorias (latitud y
+                            longitud), nombre del receptor, teléfono del receptor e instrucciones especiales de entrega
+                            opcionales.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Ver direcciones</td>
                         <td class="code-cell">RF-008</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los usuarios visualizar todas sus direcciones guardadas con su información completa y ubicación en el mapa.
+                            El sistema debe permitir a los usuarios visualizar todas sus direcciones guardadas con su
+                            información completa y ubicación en el mapa.
                         </td>
                         <td class="code-cell">RN-008</td>
-                        <td class="description-cell">Puedes guardar múltiples direcciones de envío (casa, trabajo, casa de familiares). Cada una se muestra con su mapa de ubicación y puedes elegir cuál usar al momento de hacer una compra.</td>
+                        <td class="description-cell">Puedes guardar múltiples direcciones de envío (casa, trabajo, casa
+                            de familiares). Cada una se muestra con su mapa de ubicación y puedes elegir cuál usar al
+                            momento de hacer una compra.</td>
                         <td class="code-cell">RI-008</td>
                         <td class="description-cell">
-                            Listado completo de direcciones del usuario: dirección completa, barrio, ciudad, coordenadas GPS, nombre y teléfono del receptor, indicador de dirección predeterminada y fecha de creación.
+                            Listado completo de direcciones del usuario: dirección completa, barrio, ciudad, coordenadas
+                            GPS, nombre y teléfono del receptor, indicador de dirección predeterminada y fecha de
+                            creación.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Editar dirección</td>
                         <td class="code-cell">RF-009</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los usuarios modificar cualquier dato de sus direcciones guardadas, incluyendo actualizar las coordenadas GPS.
+                            El sistema debe permitir a los usuarios modificar cualquier dato de sus direcciones
+                            guardadas, incluyendo actualizar las coordenadas GPS.
                         </td>
                         <td class="code-cell">RN-009</td>
-                        <td class="description-cell">Puedes actualizar cualquier dato de tus direcciones: cambiar el nombre del receptor, actualizar el teléfono, modificar instrucciones de entrega o corregir la ubicación en el mapa arrastrando el marcador.</td>
+                        <td class="description-cell">Puedes actualizar cualquier dato de tus direcciones: cambiar el
+                            nombre del receptor, actualizar el teléfono, modificar instrucciones de entrega o corregir
+                            la ubicación en el mapa arrastrando el marcador.</td>
                         <td class="code-cell">RI-009</td>
                         <td class="description-cell">
-                            Identificador de la dirección a modificar, nuevos valores para: dirección, barrio, coordenadas GPS, nombre receptor, teléfono receptor, instrucciones de entrega y fecha de última actualización.
+                            Identificador de la dirección a modificar, nuevos valores para: dirección, barrio,
+                            coordenadas GPS, nombre receptor, teléfono receptor, instrucciones de entrega y fecha de
+                            última actualización.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Eliminar dirección</td>
                         <td class="code-cell">RF-010</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los usuarios eliminar direcciones que ya no utilizan de su lista de direcciones guardadas.
+                            El sistema debe permitir a los usuarios eliminar direcciones que ya no utilizan de su lista
+                            de direcciones guardadas.
                         </td>
                         <td class="code-cell">RN-010</td>
-                        <td class="description-cell">Antes de eliminar una dirección, el sistema te pedirá confirmación para evitar borrados accidentales. No puedes eliminar una dirección que esté asociada a pedidos pendientes o en proceso de entrega.</td>
+                        <td class="description-cell">Antes de eliminar una dirección, el sistema te pedirá confirmación
+                            para evitar borrados accidentales. No puedes eliminar una dirección que esté asociada a
+                            pedidos pendientes o en proceso de entrega.</td>
                         <td class="code-cell">RI-010</td>
                         <td class="description-cell">
-                            Identificador de la dirección a eliminar, verificación de que no hay pedidos activos usando esa dirección y fecha de eliminación para auditoría.
+                            Identificador de la dirección a eliminar, verificación de que no hay pedidos activos usando
+                            esa dirección y fecha de eliminación para auditoría.
                         </td>
                     </tr>
                     <!-- SISTEMA DE ROLES -->
@@ -270,26 +295,34 @@
                         <td class="subprocess-cell">Control de acceso por roles</td>
                         <td class="code-cell">RF-011</td>
                         <td class="description-cell">
-                            El sistema debe redirigir automáticamente a cada usuario a su panel correspondiente según su rol al iniciar sesión (admin, customer).
+                            El sistema debe redirigir automáticamente a cada usuario a su panel correspondiente según su
+                            rol al iniciar sesión (admin, customer).
                         </td>
                         <td class="code-cell">RN-011</td>
-                        <td class="description-cell">Cada tipo de usuario tiene acceso solo a las secciones que le corresponden. Los clientes ven su perfil y pedidos, y los administradores el panel completo de gestión de la tienda.</td>
+                        <td class="description-cell">Cada tipo de usuario tiene acceso solo a las secciones que le
+                            corresponden. Los clientes ven su perfil y pedidos, y los administradores el panel completo
+                            de gestión de la tienda.</td>
                         <td class="code-cell">RI-011</td>
                         <td class="description-cell">
-                            Rol del usuario (admin o customer), página de inicio correspondiente al rol, permisos asociados al rol y fecha de asignación del rol.
+                            Rol del usuario (admin o customer), página de inicio correspondiente al rol, permisos
+                            asociados al rol y fecha de asignación del rol.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Restricción de acceso</td>
                         <td class="code-cell">RF-012</td>
                         <td class="description-cell">
-                            El sistema debe bloquear el acceso a secciones no autorizadas y redirigir al usuario a su área correspondiente si intenta acceder a URLs restringidas.
+                            El sistema debe bloquear el acceso a secciones no autorizadas y redirigir al usuario a su
+                            área correspondiente si intenta acceder a URLs restringidas.
                         </td>
                         <td class="code-cell">RN-012</td>
-                        <td class="description-cell">Si intentas acceder a una sección no autorizada para tu rol (por ejemplo, un cliente intentando entrar al panel de administración), serás redirigido automáticamente a tu panel principal con un mensaje informativo.</td>
+                        <td class="description-cell">Si intentas acceder a una sección no autorizada para tu rol (por
+                            ejemplo, un cliente intentando entrar al panel de administración), serás redirigido
+                            automáticamente a tu panel principal con un mensaje informativo.</td>
                         <td class="code-cell">RI-012</td>
                         <td class="description-cell">
-                            URL solicitada, rol del usuario que intenta acceder, permisos requeridos para esa URL, acción tomada (permitir o redirigir) y registro del intento de acceso para auditoría.
+                            URL solicitada, rol del usuario que intenta acceder, permisos requeridos para esa URL,
+                            acción tomada (permitir o redirigir) y registro del intento de acceso para auditoría.
                         </td>
                     </tr>
                     <!-- CONFIGURACIÓN DE CUENTA -->
@@ -298,26 +331,35 @@
                         <td class="subprocess-cell">Ver configuración</td>
                         <td class="code-cell">RF-013</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los usuarios visualizar sus preferencias de notificaciones, configuración de privacidad y opciones de cuenta.
+                            El sistema debe permitir a los usuarios visualizar sus preferencias de notificaciones,
+                            configuración de privacidad y opciones de cuenta.
                         </td>
                         <td class="code-cell">RN-013</td>
-                        <td class="description-cell">En tu configuración de cuenta puedes ver y ajustar qué notificaciones deseas recibir por correo: actualizaciones de tus pedidos, alertas de productos favoritos y ofertas especiales.</td>
+                        <td class="description-cell">En tu configuración de cuenta puedes ver y ajustar qué
+                            notificaciones deseas recibir por correo: actualizaciones de tus pedidos, alertas de
+                            productos favoritos y ofertas especiales.</td>
                         <td class="code-cell">RI-013</td>
                         <td class="description-cell">
-                            Preferencias de notificaciones por correo (órdenes, alertas de productos, ofertas), configuración de privacidad actual y opciones de seguridad de la cuenta.
+                            Preferencias de notificaciones por correo (órdenes, alertas de productos, ofertas),
+                            configuración de privacidad actual y opciones de seguridad de la cuenta.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Actualizar configuración</td>
                         <td class="code-cell">RF-014</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los usuarios modificar sus preferencias de notificaciones, cambiar su contraseña y ajustar opciones de privacidad.
+                            El sistema debe permitir a los usuarios modificar sus preferencias de notificaciones,
+                            cambiar su contraseña y ajustar opciones de privacidad.
                         </td>
                         <td class="code-cell">RN-014</td>
-                        <td class="description-cell">Puedes activar o desactivar cada tipo de notificación individualmente según tu preferencia. Para cambiar la contraseña, debes ingresar primero tu contraseña actual como medida de seguridad.</td>
+                        <td class="description-cell">Puedes activar o desactivar cada tipo de notificación
+                            individualmente según tu preferencia. Para cambiar la contraseña, debes ingresar primero tu
+                            contraseña actual como medida de seguridad.</td>
                         <td class="code-cell">RI-014</td>
                         <td class="description-cell">
-                            Nuevas preferencias de notificaciones seleccionadas, contraseña actual para validación, nueva contraseña encriptada, opciones de privacidad actualizadas y fecha de modificación de la configuración.
+                            Nuevas preferencias de notificaciones seleccionadas, contraseña actual para validación,
+                            nueva contraseña encriptada, opciones de privacidad actualizadas y fecha de modificación de
+                            la configuración.
                         </td>
                     </tr>
                     <!-- AUDITORÍA DE USUARIOS -->
@@ -326,38 +368,49 @@
                         <td class="subprocess-cell">Registro automático de cambios</td>
                         <td class="code-cell">RF-015</td>
                         <td class="description-cell">
-                            El sistema debe registrar automáticamente todos los cambios en las cuentas de usuario (modificación de datos, cambio de rol, cambio de contraseña).
+                            El sistema debe registrar automáticamente todos los cambios en las cuentas de usuario
+                            (modificación de datos, cambio de rol, cambio de contraseña).
                         </td>
                         <td class="code-cell">RN-015</td>
-                        <td class="description-cell">Todas las modificaciones en cuentas de usuario quedan registradas permanentemente con detalles de qué cambió, quién lo hizo, desde dónde (dirección IP) y cuándo. Estos registros no pueden modificarse ni eliminarse.</td>
+                        <td class="description-cell">Todas las modificaciones en cuentas de usuario quedan registradas
+                            permanentemente con detalles de qué cambió, quién lo hizo, desde dónde (dirección IP) y
+                            cuándo. Estos registros no pueden modificarse ni eliminarse.</td>
                         <td class="code-cell">RI-015</td>
                         <td class="description-cell">
-                            Identificador del usuario modificado, tipo de cambio realizado (perfil, rol, contraseña, estado), valores anteriores y nuevos, identificador del usuario que hizo el cambio, dirección IP, fecha y hora del cambio.
+                            Identificador del usuario modificado, tipo de cambio realizado (perfil, rol, contraseña,
+                            estado), valores anteriores y nuevos, identificador del usuario que hizo el cambio,
+                            dirección IP, fecha y hora del cambio.
                         </td>
                     </tr>
                     <tr>
                         <td class="subprocess-cell">Consulta de auditoría</td>
                         <td class="code-cell">RF-016</td>
                         <td class="description-cell">
-                            El sistema debe permitir a los administradores consultar el historial completo de cambios de cualquier usuario para fines de auditoría.
+                            El sistema debe permitir a los administradores consultar el historial completo de cambios de
+                            cualquier usuario para fines de auditoría.
                         </td>
                         <td class="code-cell">RN-016</td>
-                        <td class="description-cell">Solo los administradores pueden consultar los registros de auditoría de usuarios. Estos registros muestran cada cambio con lujo de detalles para tener trazabilidad completa y cumplimiento de protección de datos.</td>
+                        <td class="description-cell">Solo los administradores pueden consultar los registros de
+                            auditoría de usuarios. Estos registros muestran cada cambio con lujo de detalles para tener
+                            trazabilidad completa y cumplimiento de protección de datos.</td>
                         <td class="code-cell">RI-016</td>
                         <td class="description-cell">
-                            Historial completo de cambios del usuario filtrable por: tipo de acción, rango de fechas y usuario ejecutor. Cada registro incluye acción, valores antes/después, IP y fecha/hora.
+                            Historial completo de cambios del usuario filtrable por: tipo de acción, rango de fechas y
+                            usuario ejecutor. Cada registro incluye acción, valores antes/después, IP y fecha/hora.
                         </td>
                     </tr>
-                </tbody>
+                    </tbody>
             </table>
         </div>
         <div class="footer">
             <p><strong>Proyecto Angelow - Parte 1 de 6</strong></p>
             <p>Usuarios y Autenticación | Requisitos: RF-001 a RF-016</p>
             <p style="margin-top: 10px; font-size: 0.85em; color: #666;">
-                Módulos: Gestión de Usuarios, Google OAuth, Direcciones GPS, Sistema de Roles, Configuración de Cuenta, Auditoría
+                Módulos: Gestión de Usuarios, Google OAuth, Direcciones GPS, Sistema de Roles, Configuración de Cuenta,
+                Auditoría
             </p>
         </div>
     </div>
 </body>
+
 </html>
