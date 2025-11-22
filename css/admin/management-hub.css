@@ -1190,6 +1190,20 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 	color: var(--hub-muted);
 }
 
+/* Stars for average rating */
+.rating-stars { margin-top: 8px; }
+.rating-stars .average-star-row i { margin-right: 4px; }
+.rating-stars .average-star-row small { margin-left: 8px; color: #64748b; }
+
+/* Highlight selected table row */
+tr.is-selected { background: rgba(59,130,246,0.06); }
+
+/* Debug area for lists */
+#reviews-debug, #questions-debug {
+	background: rgba(15,23,42,0.02);
+	border-top: 1px dashed rgba(99,102,241,0.07);
+}
+
 /* Inline simple progress bar used by trend timeline entries */
 .progress-bar {
 	display: block;

@@ -116,11 +116,11 @@ if (!function_exists('getAdminNavigationShortcuts')) {
             ],
             [
                 'id' => 'reviews',
-                'label' => 'Resenas',
+                'label' => 'Reseñas',
                 'description' => 'Aprueba comentarios y preguntas.',
                 'icon' => 'fa-star',
                 'path' => '/admin/resenas/index.php',
-                'keywords' => ['resenas', 'reviews', 'opiniones'],
+                'keywords' => ['reseñas', 'reviews', 'opiniones'],
                 'category' => 'module'
             ],
             [

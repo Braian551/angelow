@@ -13,8 +13,8 @@ $perPage = (int) ($_GET['per_page'] ?? 12);
 $perPage = max(5, min(50, $perPage));
 $offset = ($page - 1) * $perPage;
 $status = $_GET['status'] ?? 'pending';
-$rating = isset($_GET['rating']) ? (int) $_GET['rating'] : null;
-$verified = isset($_GET['verified']) ? (int) $_GET['verified'] : null;
+$rating = (isset($_GET['rating']) && $_GET['rating'] !== '') ? (int) $_GET['rating'] : null;
+$verified = (isset($_GET['verified']) && $_GET['verified'] !== '') ? (int) $_GET['verified'] : null;
 $productId = isset($_GET['product_id']) ? (int) $_GET['product_id'] : null;
 $sort = $_GET['sort'] ?? 'recent';
 $search = trim($_GET['search'] ?? '');
@@ -106,7 +106,7 @@ try {
 } catch (Throwable $e) {
     error_log('reviews.list error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'No se pudo obtener la bandeja de resenas']);
+    echo json_encode(['success' => false, 'message' => 'No se pudo obtener la bandeja de reseñas']);
 }
 
 function bindParams(PDOStatement $stmt, array $params): void {

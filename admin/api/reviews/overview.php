@@ -24,7 +24,7 @@ try {
 } catch (Throwable $e) {
     error_log('reviews.overview error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'No se pudo generar el resumen de resenas']);
+    echo json_encode(['success' => false, 'message' => 'No se pudo generar el resumen de reseñas']);
 }
 
 function reviewsStats(PDO $conn): array {

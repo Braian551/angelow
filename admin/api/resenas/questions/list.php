@@ -12,7 +12,7 @@ $perPage = (int) ($_GET['per_page'] ?? 12);
 $perPage = max(5, min(50, $perPage));
 $offset = ($page - 1) * $perPage;
 $search = trim($_GET['search'] ?? '');
-$answered = isset($_GET['answered']) ? (int) $_GET['answered'] : null; // 1=answered, 0=unanswered
+$answered = (isset($_GET['answered']) && $_GET['answered'] !== '') ? (int) $_GET['answered'] : null; // 1=answered, 0=unanswered
 
 try {
     $conditions = ['1=1'];
