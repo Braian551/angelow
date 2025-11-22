@@ -527,7 +527,11 @@ class ClientsDashboard {
             const human = this.humanizeLabel(label);
             const v = Number(value || 0);
             const pct = total ? Math.round((v / total) * 100) : 0;
-            return `<li role="button" tabindex="0" data-bucket="${label}" data-type="${type}" data-count="${v}"><svg class="mini-dot" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="6" fill="var(--hub-primary)"/></svg><span>${human}</span><strong>${v.toLocaleString('es-CO')} <small>${pct}%</small></strong></li>`;
+            return `<li role="button" tabindex="0" data-bucket="${label}" data-type="${type}" data-count="${v}" title="${human}: ${v} clientes - ${pct}%">` +
+                `<svg class="mini-dot" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="6" fill="var(--hub-primary)"/></svg>` +
+                `<span class="mini-label">${human}</span>` +
+                `<div class="mini-metrics"><strong class="mini-count">${v.toLocaleString('es-CO')}</strong><small class="mini-pct">${pct}%</small></div>` +
+            `</li>`;
         }).join('')}</ul>`;
     }
 
