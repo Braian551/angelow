@@ -201,7 +201,7 @@ requireRole('admin');
                     </div>
                 </article>
 
-                <aside class="detail-panel" id="client-detail-panel" aria-hidden="true">
+                <aside class="detail-panel collapsed" id="client-detail-panel" aria-hidden="true">
                     <div class="empty-state" data-state="empty">
                         <h3>Selecciona un cliente</h3>
                         <p>Veras historial y actividad contextual.</p>
@@ -209,9 +209,11 @@ requireRole('admin');
                     <div class="detail-body" data-state="content" hidden>
                         <header>
                             <div class="detail-name"></div>
-                            <div style="display:flex;gap:.6rem;align-items:center;">
-                                <span class="badge-ghost" data-role="segment"></span>
-                                <button class="btn-soft" id="client-detail-toggle" aria-expanded="true" aria-controls="client-detail-panel" title="Cerrar panel">✕</button>
+                            <div class="detail-controls">
+                                <span class="badge-ghost small" data-role="segment"></span>
+                                <button class="btn-soft btn-icon" id="client-detail-toggle" aria-expanded="false" aria-controls="client-detail-panel" aria-label="Abrir panel" title="Abrir panel">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.3 5.71a1 1 0 0 0-1.42 0L12 10.59 7.12 5.7A1 1 0 0 0 5.7 7.12L10.59 12l-4.88 4.88a1 1 0 1 0 1.42 1.42L12 13.41l4.88 4.88a1 1 0 1 0 1.42-1.42L13.41 12l4.88-4.88a1 1 0 0 0 0-1.41z"/></svg>
+                                </button>
                             </div>
                         </header>
                         <div class="meta-line"><span>Correo</span><strong data-role="email"></strong></div>

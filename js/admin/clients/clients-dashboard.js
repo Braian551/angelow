@@ -172,6 +172,7 @@ class ClientsDashboard {
             const newExpanded = !expanded;
             this.detailToggleBtn.setAttribute('aria-expanded', String(newExpanded));
             this.detailToggleBtn.title = newExpanded ? 'Cerrar panel' : 'Abrir panel';
+            this.detailToggleBtn.setAttribute('aria-label', newExpanded ? 'Cerrar panel' : 'Abrir panel');
             // toggle collapsed state and aria-hidden for the detail panel
             if (this.detailPanel) {
                 this.detailPanel.classList.toggle('collapsed', !newExpanded);
@@ -782,15 +783,20 @@ class ClientsDashboard {
             r.classList.toggle('selected', is);
             r.setAttribute('aria-selected', String(is));
         });
-        // add badge to selected row only when present in DOM
+        // add badge to selected row inside the .table-primary element for correct layout
         const newRow = this.tableBody?.querySelector(`tr[data-id="${id}"]`);
         if (newRow) {
-            const firstCell = newRow.querySelector('td');
-            if (firstCell && !firstCell.querySelector('.selected-badge')) {
-                const badge = document.createElement('i');
-                badge.className = 'fas fa-user-check selected-badge';
+            const primary = newRow.querySelector('.table-primary');
+            if (primary && !primary.querySelector('.selected-badge')) {
+                const badge = document.createElement('span');
+                badge.className = 'selected-badge';
                 badge.setAttribute('aria-hidden', 'true');
-                firstCell.prepend(badge);
+                // small check mark SVG (white) without extra circle, the background circle is provided by CSS
+                badge.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path fill="#fff" d="M20.3 6.3a1 1 0 0 0-1.4-1.4l-8.2 8.2-3-3a1 1 0 1 0-1.4 1.4l3.7 3.7a1 1 0 0 0 1.4 0l9.7-9.9z"/></svg>`;
+                //insert before the avatar to keep it aligned with name and avatar
+                const avatar = primary.querySelector('.avatar');
+                if (avatar) primary.insertBefore(badge, avatar);
+                else primary.prepend(badge);
             }
         }
         // top customers: add both selected class and aria-selected state for assistive tech
@@ -1078,11 +1084,39 @@ class ClientsDashboard {
         if (timeline) {
             const events = payload.activity || [];
             timeline.innerHTML = events.length ? events.map((event) => `
-                <li>
-                    <strong>${event.title}</strong>
-                    <span>${this.formatDate(event.created_at)} · ${event.description}</span>
+                <li role="button" tabindex="0" class="detail-event" data-event-id="${event.id || ''}">
+                    <svg class="mini-dot" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="6" fill="var(--hub-primary)"/></svg>
+                    <div class="event-content">
+                        <strong class="event-title">${event.title}</strong>
+                        <small class="event-desc">${event.description || ''}</small>
+                    </div>
+                    <div class="event-meta">${this.formatDate(event.created_at)}</div>
                 </li>
-            `).join('') : '<li>Sin actividad reciente</li>';
+            `).join('') : '<li class="text-muted">Sin actividad reciente</li>';
+
+            // Add keyboard support and click handler to each timeline item
+            timeline.querySelectorAll('li.detail-event').forEach((li) => {
+                li.addEventListener('click', () => {
+                    // if the event contains an order id, open a new tab to the order detail
+                    const eventId = li.getAttribute('data-event-id');
+                    if (eventId) {
+                        // open in new tab if it's an order; fallback: highlight the item
+                        if (eventId.startsWith('ORD')) {
+                            window.open(`${this.config.baseUrl}/admin/order/${encodeURIComponent(eventId)}`, '_blank');
+                        } else {
+                            li.classList.toggle('selected');
+                        }
+                    } else {
+                        li.classList.toggle('selected');
+                    }
+                });
+                li.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        li.click();
+                    }
+                });
+            });
         }
         // highlight the client in table and top customers when detail is loaded
         if (payload.profile && payload.profile.id) {

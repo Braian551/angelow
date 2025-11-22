@@ -607,10 +607,18 @@ tbody tr.selected {
 tbody tr.selected td { padding-left: 0.75rem; }
 
 .selected-badge {
+	width: 22px;
+	height: 22px;
+	display: inline-grid;
+	place-items:center;
 	margin-right: 0.6rem;
-	color: var(--hub-primary);
-	font-size: 1.05rem;
-	vertical-align: middle;
+	color: #fff;
+	font-size: 0.9rem;
+	line-height: 0;
+	flex: 0 0 auto;
+	border-radius: 999px;
+	background: var(--hub-primary);
+	box-shadow: 0 2px 8px rgba(8,18,34,0.06);
 }
 
 /* If the top customer row is highlighted, make the dot darker */
@@ -704,10 +712,30 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 	box-shadow: 0 6px 18px rgba(11, 45, 76, 0.04);
 }
 
+/* Keep header sticky while content scrolls inside the detail panel */
+.detail-panel { overflow: hidden; }
+.detail-panel .detail-body { overflow-y: auto; max-height: calc(100vh - 180px); }
+.detail-panel .detail-body header { position: sticky; top: 0; z-index: 4; background: var(--hub-card); padding-top: 0.25rem; padding-bottom: 0.25rem; padding-left: 0.25rem; padding-right: 0.25rem; }
+
 /* When detail panel is visible ensure header pill/buttons are aligned */
 .detail-panel .detail-body header {
 	display:flex; align-items:center; justify-content:space-between; gap:0.8rem;
 }
+.detail-controls { display:flex; align-items:center; gap: 0.6rem; }
+.detail-controls .badge-ghost.small { font-size: 0.78rem; padding: 3px 8px; border-radius: 999px; }
+
+/* small icon button variant for header actions */
+.btn-soft.btn-icon { --size: 36px; width: var(--size); height: var(--size); display:inline-grid; place-items:center; padding: 0; border-radius: 999px; }
+.btn-soft.btn-icon svg { width: 16px; height: 16px; color: var(--hub-primary); fill: currentColor; }
+.btn-soft.btn-icon { border: 1px solid rgba(15,23,42,0.06); background: rgba(255,255,255,0.98); box-shadow: 0 2px 10px rgba(8, 18, 34, 0.03); }
+.btn-soft.btn-icon:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.btn-soft.btn-icon[aria-expanded="false"] { opacity: 0.95; }
+
+/* Make sure badge-ghost in the detail header sits well */
+.detail-body .badge-ghost.small { border-radius: 999px; padding: 6px 10px; font-size: 0.9rem; border: 1px dashed rgba(15,23,42,0.06); background: rgba(15,23,42,0.02); color: var(--hub-muted-strong); }
+
+.detail-body .detail-name { display:flex; align-items:center; gap:0.6rem; }
+.detail-body .detail-name .avatar-large { margin-right: 0.6rem; }
 
 /* Small close button in detail header */
 .detail-panel #client-detail-toggle {
@@ -777,24 +805,18 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 
 .timeline li {
 	position: relative;
-	padding-left: 1.5rem;
+	padding: 0.6rem 0;
 	color: var(--hub-muted-strong);
 	font-size: 0.95rem;
 	display: grid;
-	grid-template-columns: 1fr auto;
+	grid-template-columns: 18px 1fr auto;
 	align-items: center;
 	gap: 0.65rem;
 }
 
 .timeline li::before {
-	content: '';
-	width: 10px;
-	height: 10px;
-	border-radius: 50%;
-	background: var(--hub-primary);
-	position: absolute;
-	left: 0;
-	top: 0.4rem;
+	/* default timeline dot removed: events now insert explicit svg dots */
+	content: none;
 }
 
 .timeline strong {
@@ -807,6 +829,16 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 	color: var(--hub-muted);
 	font-size: 0.95rem;
 }
+
+/* Detail timeline specific styles */
+.detail-body .timeline li { border-bottom: 1px dashed rgba(15, 23, 42, 0.04); padding: 0.65rem 0; }
+.detail-body .timeline li .mini-dot { width: 12px; height: 12px; border-radius: 999px; display: inline-grid; place-items:center; }
+.detail-body .timeline li .event-content { display: flex; flex-direction: column; gap: 2px; }
+.detail-body .timeline li .event-title { font-weight: 700; color: var(--hub-text); }
+.detail-body .timeline li .event-desc { font-size: 0.9rem; color: var(--hub-muted); }
+.detail-body .timeline li .event-meta { justify-self: end; font-size: 0.92rem; color: var(--hub-muted); }
+.detail-body .timeline li:hover { background: rgba(29, 78, 216, 0.03); }
+.detail-body .timeline li.selected { background: rgba(29, 78, 216, 0.06); border-left: 3px solid rgba(29,78,216,0.12); }
 
 .timeline li .progress-bar {
 	grid-column: 1 / -1;
