@@ -225,45 +225,37 @@
 }
 
 /* ======== REVIEWS HUB: STAT CARD ENHANCEMENTS ======== */
-/* Make verified purchases stat card stylized and clearly visible (matches client palette) */
-#reviews-insights .stat-card[data-metric="verified"] .stat-icon {
-    background: linear-gradient(180deg, rgba(16,185,129,0.06), rgba(16,185,129,0.04));
-    color: var(--hub-success);
-    box-shadow: 0 6px 20px rgba(16,185,129,0.06);
-}
-
-#reviews-insights .stat-card[data-metric="verified"] .stat-value {
-    color: var(--hub-success);
-}
+/* Leave the stat icon background white for all metrics; glyph color & halo are set per-metric below */
 
 /* Slightly larger icon for better balance in the hub like clients cards */
+/* stat-icon: white rounded square with no inner box-shadow; halo via ::before */
 #reviews-insights .stat-card .stat-icon {
-    width: 54px;
-    height: 54px;
+    width: 48px;
+    height: 48px;
     font-size: 20px;
     border-radius: 12px;
     display: inline-grid;
     place-items: center;
-    box-shadow: 0 6px 18px rgba(8,18,34,0.06);
     position: relative; /* for pseudo-layer behind icon */
-    background: #ffffff; /* white square inside halo */
-    color: var(--hub-muted); /* default icon color - overridden per metric */
+    background: #ffffff !important; /* white square inside halo */
+    color: var(--hub-muted) !important; /* default icon color - overridden per metric */
+    box-shadow: none !important; /* remove any other box-shadow to avoid double look */
 }
 
 /* base halo - neutral (in case metric-specific is absent) */
+/* halo behind the icon: slightly larger and softened to match client */
 #reviews-insights .stat-card .stat-icon::before {
-    /* subtle pseudo background behind each stat icon for balanced look */
     content: '';
     position: absolute;
-    top: -8px;
-    left: -8px;
-    width: 64px;
-    height: 64px;
+    top: -10px;
+    left: -10px;
+    width: 68px;
+    height: 68px;
     border-radius: 14px;
-    background: rgba(248,250,252,0.8);
-    box-shadow: 0 8px 20px rgba(8,18,34,0.04);
-    transform: rotate(0deg);
-    z-index: -1;
+    filter: blur(8px);
+    opacity: 0.75;
+    transform: translate3d(0, 0, 0);
+    z-index: -1; /* keep behind the white square */
 }
 /* Inline SVG fallback sizing and color so injected SVG inherits the stat color */
 #reviews-insights .stat-card .inline-icon.inline-icon-fallback {
@@ -346,6 +338,7 @@
 #reviews-insights .stat-card[data-metric="pending"] .stat-value { color: #0284c7; }
 #reviews-insights .stat-card[data-metric="approved"] .stat-value { color: #059669; }
 #reviews-insights .stat-card[data-metric="average"] .stat-value { color: #f59e0b; }
+#reviews-insights .stat-card[data-metric="verified"] .stat-value { color: #10b981; }
 
 /* Improve stat value sizing and spacing closer to client look */
 #reviews-insights .stat-card .stat-value { font-size: clamp(1.6rem, 2.2vw, 3rem); font-weight: 900; color: var(--hub-text); }
