@@ -7,7 +7,7 @@ class ClientsDashboard {
             search: '',
             segment: 'all',
             sort: 'recent',
-            range: 90
+            range: 30
         };
         this.charts = {
             acquisition: null,
@@ -19,6 +19,24 @@ class ClientsDashboard {
         this.loadOverview();
         this.loadList();
         this.runEntranceAnimation();
+    }
+
+    updateRangeButtonsUI() {
+        Array.from(this.rangeButtons || []).forEach((btn) => {
+            const isActive = parseInt(btn.dataset.range, 10) === this.state.range;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-pressed', String(isActive));
+        });
+        // Update acquisition subtitle to show the number of weeks shown in the trend.
+        if (this.acquisitionSubtitle) {
+            const weeks = Math.ceil((this.state.range || 30) / 7);
+            this.acquisitionSubtitle.textContent = `Comparativo últimas ${weeks} semana${weeks > 1 ? 's' : ''}.`;
+        }
+        // Debug: log current state and which buttons are active
+        if (window && window.console && typeof window.console.debug === 'function') {
+            const active = Array.from(this.rangeButtons || []).map((btn) => btn.classList.contains('active') ? btn.dataset.range : null).filter(Boolean);
+            console.debug('[ClientsDashboard] updateRangeButtonsUI', 'state.range:', this.state.range, 'active:', active.join(','));
+        }
     }
 
     runEntranceAnimation() {
@@ -35,6 +53,9 @@ class ClientsDashboard {
         this.statCards = this.hub?.querySelectorAll('.stat-card') || [];
         this.segmentContainer = document.getElementById('client-segments');
         this.trendList = document.getElementById('acquisition-trend');
+        // Acquire the subtitle element for the weekly acquisition section to
+        // update it when the user selects a different range.
+        this.acquisitionSubtitle = this.trendList?.closest('article')?.querySelector('.section-header p');
         this.engagementContainer = document.getElementById('engagement-matrix');
         this.topCustomersList = document.getElementById('top-customers');
         this.searchInput = document.getElementById('clients-search');
@@ -54,6 +75,22 @@ class ClientsDashboard {
         };
         this.chartCards = this.hub?.querySelectorAll('.chart-card') || [];
         this.tableCard = this.hub?.querySelector('.table-card');
+
+        // If there's an active range in the DOM, use it to override the default
+        // state. This keeps the UI and the internal state in sync (e.g. HTML may
+        // show 30d active, while the state default was 90).
+        try {
+            const activeBtn = Array.from(this.rangeButtons || []).find((b) => b.classList.contains('active'));
+            if (activeBtn && activeBtn.dataset && activeBtn.dataset.range) {
+                this.state.range = parseInt(activeBtn.dataset.range, 10);
+            }
+            // Ensure aria-pressed is set correctly on range buttons for a11y
+            Array.from(this.rangeButtons || []).forEach((btn) => {
+                btn.setAttribute('aria-pressed', String(btn.classList.contains('active')));
+            });
+        } catch (e) {
+            // ignore if anything fails; state will stay as default
+        }
     }
 
     bindEvents() {
@@ -101,8 +138,17 @@ class ClientsDashboard {
                 if (!selectedRange || selectedRange === this.state.range) {
                     return;
                 }
+                if (window && window.console && typeof window.console.debug === 'function') {
+                    console.debug('[ClientsDashboard] range click', 'prev:', this.state.range, 'selected:', selectedRange);
+                }
                 this.state.range = selectedRange;
-                this.rangeButtons.forEach((btn) => btn.classList.toggle('active', btn === button));
+                // Update active class and aria-pressed for all buttons so the UI
+                // and a11y attributes remain in sync.
+                Array.from(this.rangeButtons || []).forEach((btn) => {
+                    const isActive = parseInt(btn.dataset.range, 10) === this.state.range;
+                    btn.classList.toggle('active', isActive);
+                    btn.setAttribute('aria-pressed', String(isActive));
+                });
                 this.loadOverview();
             });
         });
@@ -159,9 +205,18 @@ class ClientsDashboard {
     }
 
     async loadOverview() {
+        // Keep the range UI synced before the request so the correct range
+        // is encoded in the request and visually indicated to the user.
+        this.updateRangeButtonsUI();
         this.setOverviewLoading(true);
         try {
-            const response = await fetch(`${this.config.endpoints.overview}?range=${this.state.range}`, { credentials: 'same-origin' });
+            // Append a cache-busting timestamp during development to ensure the server
+            // returns fresh values when testing UI range changes.
+            const reqUrl = `${this.config.endpoints.overview}?range=${this.state.range}&_=${Date.now()}`;
+            if (window && window.console && typeof window.console.debug === 'function') {
+                console.debug('[ClientsDashboard] loading overview', 'url:', reqUrl, 'range:', this.state.range);
+            }
+            const response = await fetch(reqUrl, { credentials: 'same-origin' });
             if (!response.ok) throw new Error('HTTP ' + response.status);
             const payload = await response.json();
             if (!payload.success) return;

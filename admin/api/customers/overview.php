@@ -8,12 +8,15 @@ header('Content-Type: application/json');
 
 requireRole('admin');
 
+// Range is provided in days via ?range=X. Cap to 180 days min 7.
 $rangeDays = isset($_GET['range']) ? max(7, min(180, (int) $_GET['range'])) : 90;
+// Convert days into weeks (rounded up) for weekly trend charts.
+$rangeWeeks = max(1, (int) ceil($rangeDays / 7));
 
 try {
     $stats = getCustomerStats($conn, $rangeDays);
     $segments = getCustomerSegments($conn);
-    $trend = getCustomerAcquisitionTrend($conn, 8);
+    $trend = getCustomerAcquisitionTrend($conn, $rangeWeeks);
     $engagement = getCustomerEngagementMatrix($conn);
     $topCustomers = getTopCustomers($conn, 5);
 
