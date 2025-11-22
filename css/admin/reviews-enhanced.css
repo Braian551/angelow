@@ -249,6 +249,26 @@
 }
 
 #reviews-insights .stat-card .stat-icon::before {
+
+/* Inline SVG fallback sizing and color so injected SVG inherits the stat color */
+#reviews-insights .stat-card .inline-icon.inline-icon-fallback {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    vertical-align: middle;
+    color: var(--hub-success);
+}
+
+/* Ensure inline SVGs inside stat icons use the stat color and size */
+#reviews-insights .stat-card .stat-icon svg,
+#reviews-insights .stat-card .stat-icon .inline-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+    fill: currentColor;
+    color: inherit;
+}
     content: '';
     position: absolute;
     top: -8px;
@@ -460,17 +480,17 @@
 }
 
 .detail-panel .action-verify {
-    background: rgba(0, 119, 182, 0.12);
-    color: #0077b6;
-    border-color: rgba(0, 119, 182, 0.25);
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--hub-success);
+    border-color: rgba(16, 185, 129, 0.25);
 }
 
 .detail-panel .action-verify:hover {
-    background: #0077b6;
+    background: var(--hub-success);
     color: white;
-    border-color: #0077b6;
+    border-color: var(--hub-success);
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(0, 119, 182, 0.3);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
 }
 
 /* Responsive */
@@ -643,19 +663,29 @@
     transform: translateY(-2px) scale(1.04);
 }
 
-/* Verify - blue */
+/* Verify - green (treated like a positive outcome) */
 #reviews-table .btn-soft[data-action="verify"],
 #reviews-highlights li .btn-soft[data-action="verify"] {
-    background-color: rgba(0, 119, 182, 0.06);
-    color: #0077b6;
-    border-color: rgba(0,119,182,0.12);
+    background-color: rgba(16, 185, 129, 0.06);
+    color: var(--hub-success);
+    border-color: rgba(16,185,129,0.12);
 }
 #reviews-table .btn-soft[data-action="verify"]:hover,
 #reviews-highlights li .btn-soft[data-action="verify"]:hover {
-    background-color: rgba(0, 119, 182, 0.14);
-    box-shadow: 0 10px 20px rgba(0,119,182,0.06);
+    background-color: rgba(16, 185, 129, 0.16);
+    box-shadow: 0 10px 20px rgba(16,185,129,0.06);
     transform: translateY(-2px) scale(1.04);
 }
+
+/* Verified state variant: visually indicates an already verified review and disables interaction */
+.btn-verified {
+    background-color: #10b981 !important; /* strong green */
+    color: #fff !important;
+    border-color: rgba(16,185,129,0.14) !important;
+    cursor: default !important;
+    pointer-events: none !important;
+}
+.btn-verified i, .btn-verified svg { color: #fff !important; fill: #fff !important; }
 
 /* Allow smaller icon sizing in some places */
 #reviews-table .btn-soft[data-action] { font-size: 1.0rem; }
@@ -733,7 +763,7 @@
 /* Class-based color variants (in case some other CSS picks by class) */
 .btn-approve {
     background: #fff !important;
-    color: #059669 !important;
+    color: var(--hub-success) !important;
     border-color: rgba(16,185,129,0.12) !important;
 }
 .btn-reject {
@@ -743,14 +773,14 @@
 }
 .btn-verify {
     background: #fff !important;
-    color: #059669 !important;
+    color: var(--hub-success) !important;
     border-color: rgba(16,185,129,0.12) !important;
 }
 
 /* Ensure icon colors are explicit and more specific than global rules */
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-approve i,
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-approve i.fas,
-.btn-approve i { color: #059669 !important; opacity: 1 !important; filter: none !important; }
+.btn-approve i { color: var(--hub-success) !important; opacity: 1 !important; filter: none !important; }
 
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-reject i,
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-reject i.fas,
@@ -758,7 +788,7 @@
 
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-verify i,
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-verify i.fas,
-.btn-verify i { color: #059669 !important; opacity: 1 !important; filter: none !important; }
+.btn-verify i { color: var(--hub-success) !important; opacity: 1 !important; filter: none !important; }
 
 /* Hover states for icon buttons */
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-soft.btn-sm.btn-approve:hover,
@@ -814,7 +844,7 @@
 /* Color tones mapped similarly to size.css but per action */
 #reviews-hub .btn-approve {
     background-color: rgba(16, 185, 129, 0.08) !important;
-    color: #059669 !important;
+    color: var(--hub-success) !important;
     border: 1px solid rgba(16, 185, 129, 0.2) !important;
 }
 #reviews-hub .btn-approve:hover {
@@ -834,7 +864,7 @@
 
 #reviews-hub .btn-verify {
     background-color: rgba(16, 185, 129, 0.08) !important;
-    color: #059669 !important;
+    color: var(--hub-success) !important;
     border: 1px solid rgba(16, 185, 129, 0.12) !important;
 }
 #reviews-hub .btn-verify:hover {
@@ -884,6 +914,51 @@
     color: var(--hub-text) !important;
 }
 
+/* Make the reviews table header look like the clients dashboard: colored bar with rounded corners */
+.management-hub#reviews-hub .table-wrapper table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 14px;
+}
+
+.management-hub#reviews-hub .table-wrapper {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 24px rgba(8,18,34,0.04);
+}
+
+.management-hub#reviews-hub .table-wrapper table thead th {
+    background: linear-gradient(180deg, var(--primary-color), rgba(0,119,182,0.9));
+    color: #ffffff !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 1.05rem;
+    letter-spacing: 0.06em;
+    border-bottom: none;
+    padding: 1.05rem 1.2rem !important;
+}
+
+.management-hub#reviews-hub .table-wrapper table thead th:first-child { border-top-left-radius: 12px; }
+.management-hub#reviews-hub .table-wrapper table thead th:last-child { border-top-right-radius: 12px; }
+
+.management-hub#reviews-hub .table-wrapper table thead th:last-child { text-align: right; }
+
+/* Reserve width for actions column and keep icons aligned */
+.management-hub#reviews-hub .table-wrapper table thead th:nth-child(5),
+.management-hub#reviews-hub .table-wrapper table tbody td:nth-child(5) {
+    width: 160px;
+    text-align: right;
+}
+
+.management-hub#reviews-hub .table-wrapper table tbody tr td { padding: 1rem 1.1rem !important; }
+.management-hub#reviews-hub .table-wrapper table thead th .stat-icon i,
+.management-hub#reviews-hub .table-wrapper table thead th .section-icon i {
+    color: #ffffff !important;
+}
+.management-hub#reviews-hub .table-wrapper table tbody tr:hover td { background: rgba(0,0,0,0.02); }
+
 /* Action column layout - center icons vertically and align them to the right like other admin pages */
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions {
     display: flex !important;
@@ -913,7 +988,7 @@
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button.btn-soft.btn-sm[data-action="approve"],
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button.btn-soft[data-action="approve"] {
     background-color: rgba(16, 185, 129, 0.08) !important;
-    color: #059669 !important;
+    color: var(--hub-success) !important;
     border-color: rgba(16, 185, 129, 0.12) !important;
 }
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button.btn-soft.btn-sm[data-action="reject"],

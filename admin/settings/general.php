@@ -10,10 +10,11 @@ requireRole('admin');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuraci&oacute;n general | Panel Angelow</title>
+    <title>Configuración general | Panel Angelow</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/management-hub.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/image-uploader.css">
     <style>
         .settings-grid-layout {
             display: grid;
@@ -128,28 +129,6 @@ requireRole('admin');
         textarea.form-control {
             min-height: 80px;
             resize: vertical;
-        }
-
-        .current-image-preview {
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            border: 1px dashed var(--hub-border);
-            border-radius: 8px;
-            display: inline-block;
-        }
-
-        .current-image-preview img {
-            max-height: 60px;
-            width: auto;
-            display: block;
-        }
-
-        .file-input-wrapper {
-            width: 100%;
-        }
-        
-        .file-input-wrapper input[type="file"] {
-            padding: 0.5rem;
         }
     </style>
 </head>

@@ -59,7 +59,7 @@ requireRole('admin');
                 </article>
                 <article class="stat-card" data-metric="active" role="status" aria-live="polite">
                     <div class="stat-top">
-                        <span class="stat-icon" aria-hidden="true"><i class="fas fa-user-check"></i></span>
+                        <span class="stat-icon" aria-hidden="true"><i class="fas fa-shield-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i></span>
                         <h2>Activos (90d)</h2>
                     </div>
                     <strong class="stat-value">--</strong>

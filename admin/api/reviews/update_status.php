@@ -48,6 +48,14 @@ try {
         case 'reject':
             $conn->prepare('UPDATE product_reviews SET is_approved = 0 WHERE id = ?')->execute([$reviewId]);
             break;
+        case 'verify':
+            // Backwards compatibility: accept `verify` action to mark as verified
+            $conn->prepare('UPDATE product_reviews SET is_verified = 1 WHERE id = ?')->execute([$reviewId]);
+            break;
+        case 'unverify':
+            // Backwards compatibility: accept `unverify` to clear verified flag
+            $conn->prepare('UPDATE product_reviews SET is_verified = 0 WHERE id = ?')->execute([$reviewId]);
+            break;
         case 'toggle_verified':
             $value = isset($input['value']) ? (int) $input['value'] : 0;
             $conn->prepare('UPDATE product_reviews SET is_verified = ? WHERE id = ?')->execute([$value ? 1 : 0, $reviewId]);

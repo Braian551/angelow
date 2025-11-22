@@ -117,4 +117,35 @@ $notificationsEndpoint = $baseUrl . '/admin/api/dashboard/notifications.php';
 <script id="admin-header-quick-actions-data" type="application/json">
 <?= json_encode($quickActions, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>
 </script>
+<!-- Global Font Awesome fallback helper: swap `fa-fallback` icons with supported icons or inject inline SVG when FA glyphs are unavailable -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    function swapFallback(el) {
+        try {
+            const before = getComputedStyle(el, '::before').content;
+            const svg = el.querySelector('svg');
+            const text = (el.textContent || '').trim();
+            const beforeNorm = (before || '').toString().trim();
+            if ((beforeNorm === '' || beforeNorm === 'none' || /^['"]{2}$/.test(beforeNorm)) && !svg && text === '') {
+                const fallback = el.getAttribute('data-fallback') || 'fa-check-circle';
+                [...el.classList].forEach(cls => { if (cls.startsWith('fa-') && cls !== 'fa-fallback' && cls !== 'fas') el.classList.remove(cls); });
+                el.classList.add(fallback);
+                el.classList.remove('fa-fallback');
+                const after = getComputedStyle(el, '::before').content;
+                const afterNorm = (after || '').toString().trim();
+                if ((afterNorm === '' || afterNorm === 'none' || /^['"]{2}$/.test(afterNorm)) && !el.querySelector('svg')) {
+                    const svgStr = '<svg class="inline-icon inline-icon-fallback" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15-5-5 1.41-1.41L11 14.17l7.59-7.59L20 8l-9 9z"/></svg>';
+                    try { el.outerHTML = svgStr; } catch (e) { console.info('ADMIN-FALLBACK: failed to inject inline svg', e); }
+                }
+            }
+        } catch (e) { console.info('ADMIN-FALLBACK error', e); }
+    }
+    const els = document.querySelectorAll('.fa-fallback');
+    if (els.length) console.info('ADMIN-FALLBACK found', els.length, 'fallback candidates.');
+    els.forEach(swapFallback);
+    setTimeout(() => els.forEach(swapFallback), 150);
+    setTimeout(() => els.forEach(swapFallback), 600);
+    window.addEventListener('load', () => els.forEach(swapFallback));
+});
+</script>
 <script defer src="<?= htmlspecialchars($baseUrl, ENT_QUOTES) ?>/js/admin/header-widgets.js"></script>

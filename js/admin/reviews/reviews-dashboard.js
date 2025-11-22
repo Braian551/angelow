@@ -20,6 +20,8 @@ class ReviewsInbox {
         this.bindEvents();
         this.loadOverview();
         this.loadList();
+        // Ensure icons are valid after initial render and on page updates
+        this.scheduleIconFallbacks();
     }
 
     cacheDom() {
@@ -222,6 +224,57 @@ class ReviewsInbox {
         return `<div class="average-star-row">${stars} <small class="text-muted">${avg}</small></div>`;
     }
 
+    // If a Font Awesome icon isn't included in the current CDN version,
+    // `::before` will have no content. This helper will find elements marked
+    // with `.fa-fallback` and replace the class with a known working icon.
+    ensureIconFallbacks() {
+        const els = document.querySelectorAll('.fa-fallback');
+        if (els.length) console.info('REVIEWS DEBUG: ensureIconFallbacks found', els.length, 'elements');
+        if (!els.length) return;
+        els.forEach((el) => {
+            try {
+                const before = getComputedStyle(el, '::before').content;
+                const svg = el.querySelector('svg');
+                const inlineText = (el.textContent || '').trim();
+                const beforeNorm = (before || '').toString().trim();
+                // If the `::before` content is missing/empty (or "none") AND there is no SVG child and no inline text, the icon glyph is likely unavailable
+                if ((beforeNorm === '' || beforeNorm === 'none' || /^['"]{2}$/.test(beforeNorm)) && !svg && inlineText === '') {
+                    const fallback = el.getAttribute('data-fallback') || 'fa-check-circle';
+                    // Replace the class name for the icon
+                    [...el.classList].forEach(cls => {
+                        if (cls.startsWith('fa-') && cls !== 'fa-fallback' && cls !== 'fas') el.classList.remove(cls);
+                    });
+                    console.info('REVIEWS DEBUG: icon unavailable, swapping', el, '->', fallback);
+                    el.classList.add(fallback);
+                    el.classList.remove('fa-fallback');
+                    // If fallback class still results in no glyph, inject a simple inline SVG fallback
+                    const after = getComputedStyle(el, '::before').content;
+                    const afterNorm = (after || '').toString().trim();
+                    const svgNow = el.querySelector('svg');
+                    if ((afterNorm === '' || afterNorm === 'none' || /^['"]{2}$/.test(afterNorm)) && !svgNow) {
+                        const svgStr = '<svg class="inline-icon inline-icon-fallback" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15-5-5 1.41-1.41L11 14.17l7.59-7.59L20 8l-9 9z"/></svg>';
+                        try { el.outerHTML = svgStr; } catch (e) { console.info('REVIEWS DEBUG: could not inject inline svg', e); }
+                    }
+                }
+            } catch (e) {
+                // If anything goes wrong, fallback anyway
+                const fallback = el.getAttribute('data-fallback') || 'fa-check-circle';
+                console.info('REVIEWS DEBUG: icon fallback error, adding fallback', el, fallback, e);
+                el.classList.add(fallback);
+                el.classList.remove('fa-fallback');
+            }
+        });
+    }
+
+    // Re-run fallback checks a few times and when the window fully loads
+    scheduleIconFallbacks() {
+        this.ensureIconFallbacks();
+        setTimeout(() => this.ensureIconFallbacks(), 100);
+        setTimeout(() => this.ensureIconFallbacks(), 350);
+        setTimeout(() => this.ensureIconFallbacks(), 1500);
+        window.addEventListener('load', () => this.ensureIconFallbacks());
+    }
+
     renderDistribution(distribution = []) {
         // render fallback list if present
         if (this.distributionList) {
@@ -376,11 +429,36 @@ class ReviewsInbox {
                     <td class="actions">
                         <button class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar"><i class="fas fa-check"></i></button>
                         <button class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar"><i class="fas fa-ban"></i></button>
-                        <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada"><i class="fas fa-user-check"></i></button>
+                        <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada">
+                            <svg class="inline-icon inline-icon-fallback" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M12 2 3 5v6c0 5.25 3.66 9.74 9 11 5.34-1.26 9-5.75 9-11V5l-9-3zm-1 14-4-4 1.41-1.41L11 13.17l5.59-5.59L18 9l-7 7z"/></svg>
+                        </button>
                     </td>
                 </tr>
             `;
         }).join('');
+
+        // Post-render: hide/alter verify buttons for already verified reviews
+        setTimeout(() => {
+            items.forEach((item) => {
+                const row = this.tableBody.querySelector(`tr[data-id="${item.id}"]`);
+                if (!row) return;
+                const verifyBtn = row.querySelector('button[data-action="verify"]');
+                if (!verifyBtn) return;
+                const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
+                if (isVerified) {
+                    // If the review is verified, indicate it in the action cell and remove the action to avoid confusion
+                    verifyBtn.setAttribute('title', 'Reseña verificada');
+                    verifyBtn.disabled = true;
+                    verifyBtn.classList.add('btn-verified');
+                    // Show a small check mark and tooltip instead of clickable control
+                    verifyBtn.innerHTML = '<i class="fas fa-check-circle"></i>';
+                } else {
+                    verifyBtn.setAttribute('title', 'Marcar como verificada');
+                    verifyBtn.disabled = false;
+                    verifyBtn.classList.remove('btn-verified');
+                }
+            });
+        }, 25);
 
         // Debug: log first action button classes to ensure JS rendered expected classes (remove once validated)
         setTimeout(() => {
@@ -400,13 +478,15 @@ class ReviewsInbox {
         // Ensure icon colors are applied even if other CSS overrides
         // Colors handled by CSS, but apply inline fallback for stubborn overrides (cache or later CSS).
         this.applyActionButtonStyles();
+        // After table DOM updates, ensure any `fa-fallback` icons are checked and swapped
+        this.ensureIconFallbacks();
     }
 
     applyActionButtonStyles() {
         const map = {
-            approve: { bg: 'rgba(16,185,129,0.08)', color: '#059669', border: 'rgba(16,185,129,0.12)' },
+            approve: { bg: 'rgba(15,157,88,0.08)', color: '#0f9d58', border: 'rgba(15,157,88,0.12)' },
             reject: { bg: 'rgba(220,38,38,0.06)', color: '#dc2626', border: 'rgba(220,38,38,0.12)' },
-            verify: { bg: 'rgba(16,185,129,0.08)', color: '#059669', border: 'rgba(16,185,129,0.12)' }
+            verify: { bg: 'rgba(15,157,88,0.08)', color: '#0f9d58', border: 'rgba(15,157,88,0.12)' }
         };
         // Table buttons
         this.tableBody?.querySelectorAll('td.actions button[data-action]')?.forEach((btn) => {
@@ -453,9 +533,22 @@ class ReviewsInbox {
         const confirmMap = {
             approve: '¿Aprobar esta reseña para publicación?',
             reject: '¿Rechazar esta reseña? No será visible en la tienda.',
+            // Will be replaced dynamically below when we map verify -> toggle_verified
             verify: '¿Marcar como compra verificada?'
         };
-        if (confirmMap[action] && !window.confirm(confirmMap[action])) return;
+        // Map logical client action to API action and determine any extra params
+        const item = this.items.get(String(id));
+        let apiAction = action;
+        const extra = {};
+        if (action === 'verify') {
+            apiAction = 'toggle_verified';
+            // Toggle value if we already have it cached
+            extra.value = item?.is_verified ? 0 : 1;
+            confirmMap.verify = item?.is_verified ? '¿Marcar como NO verificada esta reseña?' : '¿Marcar como verificada esta reseña?';
+        }
+        const confirmMessage = confirmMap[action] || null;
+        if (confirmMessage && !window.confirm(confirmMessage)) return;
+
 
         // Show loading state on button
         const button = event?.target?.closest('button');
@@ -465,7 +558,7 @@ class ReviewsInbox {
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         }
 
-        const body = JSON.stringify({ review_id: id, action });
+        const body = JSON.stringify(Object.assign({ review_id: id, action: apiAction }, extra));
         try {
             const response = await fetch(this.config.endpoints.update, {
                 headers: { 'Content-Type': 'application/json' },
@@ -530,8 +623,26 @@ class ReviewsInbox {
         actions?.querySelectorAll('button').forEach((btn) => {
             btn.onclick = () => this.handleAction(btn.getAttribute('data-action'), id);
         });
+        // Configure verify button label/state in the detail panel
+        const verifyBtn = actions?.querySelector('button[data-action="verify"]');
+        if (verifyBtn) {
+            const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
+            if (isVerified) {
+                verifyBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verificada';
+                verifyBtn.title = 'Reseña verificada';
+                verifyBtn.disabled = true;
+                verifyBtn.classList.add('btn-verified');
+            } else {
+                verifyBtn.innerHTML = '<svg class="inline-icon inline-icon-fallback" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M12 2 3 5v6c0 5.25 3.66 9.74 9 11 5.34-1.26 9-5.75 9-11V5l-9-3zm-1 14-4-4 1.41-1.41L11 13.17l5.59-5.59L18 9l-7 7z"/></svg> Marcar como verificada';
+                verifyBtn.title = 'Marcar como verificada';
+                verifyBtn.disabled = false;
+                verifyBtn.classList.remove('btn-verified');
+            }
+        }
         // Apply inline fallback styles to the detail panel action buttons
         this.applyActionButtonStyles();
+        // Check for any icons that need a fallback replacement inside the detail
+        this.ensureIconFallbacks();
     }
 
     renderStatusChip(item) {

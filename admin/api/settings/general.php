@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../../conexion.php';
 require_once __DIR__ . '/../../../auth/role_redirect.php';
 require_once __DIR__ . '/../../../settings/site_settings.php';
 
+
 header('Content-Type: application/json');
 
 requireRole('admin');

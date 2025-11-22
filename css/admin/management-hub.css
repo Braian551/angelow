@@ -436,6 +436,12 @@
 	color: #10b981;
 }
 
+.insights-grid>.stat-card[data-metric="verified"] .stat-icon {
+	/* Use same green tone for verified purchases */
+	background: rgba(16, 185, 129, 0.06);
+	color: #10b981;
+}
+
 .insights-grid>.stat-card[data-metric="repeat"] .stat-icon {
 	background: rgba(245, 158, 11, 0.06);
 	color: #f59e0b;

@@ -687,6 +687,7 @@
             initImageUploader(index);
         });
         updateRemoveButtonsVisibility();
+initImageUploader(0, true);
 
         function initImageUploader(index, isMain = false) {
             const uploadArea = isMain ?
