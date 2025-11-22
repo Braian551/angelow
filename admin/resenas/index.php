@@ -27,6 +27,9 @@ requireRole('admin');
             <div class="page-header">
                 <div>
                     <h1><i class="fas fa-star"></i> Reseñas</h1>
+                    <div class="breadcrumb">
+                        <a href="<?= BASE_URL ?>/admin">Dashboard</a> / <span>reseñas</span>
+                    </div>
                     <p>Moderacion centralizada y visibilidad de reputacion.</p>
                 </div>
                 <div class="actions">
@@ -35,7 +38,7 @@ requireRole('admin');
             </div>
 
             <section class="insights-grid" id="reviews-insights">
-                <article class="stat-card" data-metric="pending">
+                <article class="stat-card" data-metric="pending" role="status" aria-live="polite">
                     <div class="stat-top">
                         <span class="stat-icon" aria-hidden="true"><i class="fas fa-clock"></i></span>
                         <h2>Pendientes</h2>
@@ -43,7 +46,7 @@ requireRole('admin');
                     <strong class="stat-value">--</strong>
                     <div class="stat-subtext">En espera de moderación</div>
                 </article>
-                <article class="stat-card" data-metric="approved">
+                <article class="stat-card" data-metric="approved" role="status" aria-live="polite">
                     <div class="stat-top">
                         <span class="stat-icon" aria-hidden="true"><i class="fas fa-check"></i></span>
                         <h2>Publicadas</h2>
@@ -51,7 +54,7 @@ requireRole('admin');
                     <strong class="stat-value">--</strong>
                     <div class="stat-subtext">Reseñas visibles en tienda</div>
                 </article>
-                <article class="stat-card" data-metric="average">
+                <article class="stat-card" data-metric="average" role="status" aria-live="polite">
                     <div class="stat-top">
                         <span class="stat-icon" aria-hidden="true"><i class="fas fa-star"></i></span>
                         <h2>Rating promedio</h2>
@@ -60,7 +63,7 @@ requireRole('admin');
                     <div class="rating-stars" data-role="average-stars" aria-hidden="true"></div>
                     <div class="stat-subtext">Basado en reseñas publicadas</div>
                 </article>
-                <article class="stat-card" data-metric="verified">
+                <article class="stat-card" data-metric="verified" role="status" aria-live="polite">
                     <div class="stat-top">
                         <span class="stat-icon" aria-hidden="true"><i class="fas fa-shield-check"></i></span>
                         <h2>Compras verificadas</h2>
@@ -72,12 +75,12 @@ requireRole('admin');
 
             <section class="client-charts split-grid" id="reviews-charts">
                 <article class="chart-card chart-card-small" id="reviews-rating-card">
-                    <header class="filter-bar">
+                    <div class="chart-header">
                         <div>
-                            <h2>Distribucion de rating</h2>
-                            <p class="text-muted">Vista rapida por estrellas.</p>
+                            <h3><span class="section-icon" aria-hidden="true"><i class="fas fa-chart-pie"></i></span> Distribucion de rating</h3>
+                            <p class="chart-subtitle text-muted">Vista rapida por estrellas.</p>
                         </div>
-                    </header>
+                    </div>
                     <div class="chart-body">
                         <canvas id="reviews-rating-chart" aria-label="Distribucion de rating" role="img" height="140"></canvas>
                         <div class="chart-empty" data-empty="reviews-rating" hidden>Sin datos para graficar</div>
@@ -85,13 +88,13 @@ requireRole('admin');
                     <div class="chart-legend" id="reviews-rating-legend"></div>
                 </article>
                 <article class="surface-card">
-                    <header class="filter-bar">
+                    <div class="section-header surface-header">
                         <div>
-                            <h2>Últimas reseñas</h2>
+                            <h3><span class="section-icon" aria-hidden="true"><i class="fas fa-comments"></i></span> Últimas reseñas</h3>
                             <p class="text-muted">Monitorea tono y urgencia.</p>
                         </div>
-                    </header>
-                    <ul class="timeline" id="reviews-highlights"></ul>
+                    </div>
+                    <ul class="timeline detail-body" id="reviews-highlights"></ul>
                 </article>
             </section>
 
@@ -162,6 +165,7 @@ requireRole('admin');
                     </div>
                     <div class="detail-body" data-state="content" hidden>
                         <header>
+                            <span class="section-icon" aria-hidden="true"><i class="fas fa-star"></i></span>
                             <div class="detail-name" data-role="title"></div>
                             <div class="detail-controls">
                                 <button class="btn-soft btn-icon" id="review-detail-toggle" aria-expanded="false" aria-controls="review-detail" title="Cerrar panel">

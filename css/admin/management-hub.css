@@ -462,8 +462,9 @@
 	color: var(--hub-text);
 }
 
-.surface-card .section-header h3 i,
-.surface-card .surface-header h3 i {
+.surface-card .section-header h3 > i,
+.surface-card .surface-header h3 > i {
+	/* direct child <i> fallback to preserve legacy markup */
 	width: 32px;
 	height: 32px;
 	border-radius: 10px;
@@ -472,6 +473,26 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+}
+
+/* Prefer using .section-icon wrapper for better structure and to avoid conflicts */
+.surface-card .section-header h3 .section-icon,
+.surface-card .surface-header h3 .section-icon {
+	width: 32px;
+	height: 32px;
+	border-radius: 10px;
+	background: rgba(29, 78, 216, 0.12);
+	color: var(--hub-primary);
+	display: inline-grid;
+	place-items: center;
+}
+.surface-card .section-header h3 .section-icon i,
+.surface-card .surface-header h3 .section-icon i {
+	width: 18px;
+	height: 18px;
+	background: transparent;
+	display: inline-block;
+	color: inherit;
 }
 
 .segment-tile {
@@ -972,7 +993,7 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 	color: var(--hub-muted-strong);
 	font-size: 0.95rem;
 	display: grid;
-	grid-template-columns: 18px 1fr auto;
+	grid-template-columns: 34px 1fr auto;
 	align-items: center;
 	gap: 0.65rem;
 }
@@ -1052,6 +1073,24 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 	flex: 0 0 auto;
 }
 
+/* Surface card timeline tweaks: keep the items compact and add a subtle divider */
+.surface-card .timeline {
+	padding: 0.8rem 0.6rem;
+}
+.surface-card .timeline li { 
+	padding: 0.6rem 0;
+	border-bottom: 1px dashed rgba(15, 23, 42, 0.04);
+}
+.surface-card .timeline li:last-child { border-bottom: none; }
+.surface-card .timeline li .mini-dot { width: 28px; height: 28px; font-size: 12px; background: var(--hub-primary); color: #fff; border-radius: 999px; box-shadow: 0 2px 6px rgba(2,6,23,0.06); place-items:center; display:inline-grid; }
+.surface-card .timeline li .mini-dot svg, .surface-card .timeline li .mini-dot i { width: 18px; height: 18px; color: inherit; }
+.surface-card .timeline li .mini-dot i { font-size: 14px; line-height: 1; }
+.surface-card .timeline li .event-content { gap: 4px; }
+.surface-card .timeline li p { margin: 0; }
+
+/* Make rating pills compact inside timelines */
+.surface-card .timeline .badge-ghost.small { border-radius: 999px; padding: 4px 8px; font-size: 0.82rem; border: 1px dashed rgba(15,23,42,0.06); background: rgba(15,23,42,0.02); color: var(--hub-muted-strong); }
+
 /* Top customers: show a small badge / dot on each item and align as a row: icon + name + meta */
 #top-customers { padding-left: 0; }
 #top-customers li { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 0.85rem; padding: 0.6rem 0; }
@@ -1095,6 +1134,24 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 	color: var(--hub-primary);
 	display: grid;
 	place-items: center;
+}
+
+/* Prefer .section-icon wrapper in chart headers to avoid double-styling */
+.chart-header h3 .section-icon {
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	background: var(--hub-primary-soft);
+	color: var(--hub-primary);
+	display: inline-grid;
+	place-items: center;
+}
+.chart-header h3 .section-icon i {
+	width: 18px;
+	height: 18px;
+	color: inherit;
+	display: inline-block;
+	background: transparent;
 }
 
 .chart-subtitle {
@@ -1454,3 +1511,11 @@ tbody tr:focus { outline: 3px solid rgba(29,78,216,0.12); outline-offset: -3px; 
 /* section inline icons (fallback) */
 .section-icon { display:inline-grid; width:38px; height:38px; border-radius:50%; background:var(--hub-primary-soft); color:var(--hub-primary); place-items:center; margin-right: 0.6rem; }
 .section-icon .icon-grid { width:18px; height:18px; }
+/* Ensure any font icon inside section-icon or mini-dot is perfectly centered */
+.section-icon i,
+.section-icon .icon-grid,
+.mini-dot i,
+.mini-dot svg,
+.chart-header h3 .section-icon i,
+.surface-card .section-header h3 .section-icon i { display: inline-grid; place-items: center; width: 18px; height: 18px; vertical-align: middle; line-height: 1; }
+.section-icon i, .mini-dot i { font-size: 14px; }

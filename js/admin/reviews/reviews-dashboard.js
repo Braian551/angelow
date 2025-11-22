@@ -292,25 +292,37 @@ class ReviewsInbox {
     renderHighlights(highlights = []) {
         if (!this.highlightsList) return;
         if (!highlights.length) {
-            this.highlightsList.innerHTML = '<li>Sin actividad reciente</li>';
+            this.highlightsList.innerHTML = '<li class="text-muted">Sin actividad reciente</li>';
             return;
         }
         this.highlightsList.innerHTML = highlights.map((item) => `
-            <li class="timeline-item">
-                <div class="timeline-point" aria-hidden="true"></div>
-                <div class="timeline-content">
-                    <div class="timeline-top">
-                        <strong>${item.customer_name || 'Cliente anónimo'}</strong>
-                        <small class="text-muted">${this.formatDate(item.created_at)}</small>
-                    </div>
-                    <div class="timeline-body">
-                        <div class="muted"><small>${item.product_name || 'Producto'}</small></div>
-                        <div class="mt-1"><span class="badge-ghost">${item.rating} ★</span></div>
-                        <p class="text-muted mt-2">${(item.comment || '').slice(0, 160)}${(item.comment || '').length > 160 ? '...' : ''}</p>
-                    </div>
+            <li role="button" tabindex="0" data-id="${item.id}">
+                <span class="mini-dot" aria-hidden="true"><i class="fas fa-comments" aria-hidden="true"></i></span>
+                <div class="event-content">
+                    <strong class="event-title">${item.customer_name || 'Cliente anónimo'}</strong>
+                    <small class="event-desc">${item.product_name || 'Producto'}</small>
+                    <div class="mt-1"><span class="badge-ghost small">${item.rating} ★</span></div>
+                    <p class="text-muted mt-2">${(item.comment || '').slice(0, 160)}${(item.comment || '').length > 160 ? '...' : ''}</p>
                 </div>
+                <div class="event-meta">${this.formatDate(item.created_at)}</div>
             </li>
         `).join('');
+
+        // Attach interactions to timeline items for keyboard and pointer accessibility
+        this.highlightsList.querySelectorAll('li[tabindex]')?.forEach((li) => {
+            li.addEventListener('click', () => {
+                const id = li.getAttribute('data-id');
+                // try to open detail if the ID is present in the list cache
+                if (id) this.openDetail(id);
+                li.classList.toggle('selected');
+            });
+            li.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    li.click();
+                }
+            });
+        });
     }
 
     renderTable(items = []) {
