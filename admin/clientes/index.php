@@ -107,7 +107,7 @@ requireRole('admin');
                 </article>
             </section>
 
-            <section class="split-grid">
+            <section class="split-grid layout-table-detail">
                 <article class="surface-card">
                     <div class="section-header surface-header">
                         <div>
@@ -152,7 +152,7 @@ requireRole('admin');
             <section class="split-grid">
                 <article class="table-card">
                     <header>
-                        <div class="filter-group">
+                        <div class="filter-group search">
                             <label for="clients-search" class="sr-only">Buscar</label>
                             <input type="search" id="clients-search" placeholder="Buscar nombre, correo o telefono">
                         </div>
@@ -201,7 +201,7 @@ requireRole('admin');
                     </div>
                 </article>
 
-                <aside class="detail-panel" id="client-detail-panel">
+                <aside class="detail-panel" id="client-detail-panel" aria-hidden="true">
                     <div class="empty-state" data-state="empty">
                         <h3>Selecciona un cliente</h3>
                         <p>Veras historial y actividad contextual.</p>
@@ -209,7 +209,10 @@ requireRole('admin');
                     <div class="detail-body" data-state="content" hidden>
                         <header>
                             <div class="detail-name"></div>
-                            <span class="badge-ghost" data-role="segment"></span>
+                            <div style="display:flex;gap:.6rem;align-items:center;">
+                                <span class="badge-ghost" data-role="segment"></span>
+                                <button class="btn-soft" id="client-detail-toggle" aria-expanded="true" aria-controls="client-detail-panel" title="Cerrar panel">✕</button>
+                            </div>
                         </header>
                         <div class="meta-line"><span>Correo</span><strong data-role="email"></strong></div>
                         <div class="meta-line"><span>Telefono</span><strong data-role="phone"></strong></div>

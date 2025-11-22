@@ -193,6 +193,13 @@
 	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
 
+/* Layout for table + detail page specifically: wider table with a detail panel column */
+.split-grid.layout-table-detail {
+	grid-template-columns: 1fr minmax(320px, 420px);
+	gap: 1.6rem;
+	align-items: start;
+}
+
 .client-charts {
 	grid-template-columns: minmax(0, 1.8fr) minmax(320px, 1fr);
 }
@@ -540,6 +547,9 @@
 	color: var(--hub-text);
 	transition: border-color 0.2s ease;
 }
+.filter-group input { padding-left: 2.8rem; }
+.filter-group { position: relative; }
+.filter-group.search::before { content: '\f002'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--hub-muted); }
 
 .filter-group input:focus,
 .filter-group select:focus {
@@ -575,6 +585,10 @@ tbody td {
 	color: var(--hub-text);
 }
 
+/* Right align numerical columns */
+td[data-label="Pedidos"], td[data-label="Ticket"], td[data-label="Último pedido"] { text-align: center; }
+td[data-label="Cliente"] { text-align: left; }
+
 tbody tr {
 	transition: background 0.2s, transform 0.2s;
 }
@@ -583,6 +597,28 @@ tbody tr:hover {
 	background: rgba(29, 78, 216, 0.04);
 	transform: translateY(-1px);
 }
+
+/* Selected row in table */
+tbody tr.selected {
+	background: rgba(14, 165, 233, 0.06);
+	border-left: 4px solid var(--hub-primary);
+}
+
+tbody tr.selected td { padding-left: 0.75rem; }
+
+.selected-badge {
+	margin-right: 0.6rem;
+	color: var(--hub-primary);
+	font-size: 1.05rem;
+	vertical-align: middle;
+}
+
+/* If the top customer row is highlighted, make the dot darker */
+#top-customers li.selected svg.mini-dot circle { fill: var(--hub-primary); transform: scale(1.05); }
+#top-customers li.selected strong { color: var(--hub-primary); }
+
+/* Selected in top customers list */
+#top-customers li.selected { background: rgba(29, 78, 216, 0.06); box-shadow: 0 8px 22px rgba(8, 18, 34, 0.04); }
 
 .status-chip {
 	border-radius: 999px;
@@ -594,6 +630,15 @@ tbody tr:hover {
 	gap: 0.35rem;
 	border: 1px solid transparent;
 }
+
+/* Center status chip in table row column */
+td[data-label="Status"] { display:flex; align-items:center; justify-content:center; }
+.status-chip { min-width: 92px; text-align:center; }
+
+/* Detail header layout: avatar and badges */
+.detail-body header { display:flex; justify-content:space-between; align-items:center; gap: 1rem; }
+.detail-body .detail-name { display:flex; align-items:center; gap:0.6rem; }
+.badge-ghost { display:inline-block; }
 
 .status-chip.success {
 	background: rgba(15, 157, 88, 0.12);
@@ -641,6 +686,41 @@ tbody tr:hover {
 	gap: 1rem;
 }
 
+.detail-panel.collapsed {
+	opacity: 0;
+	transform: translateX(8px);
+	pointer-events: none;
+	display: none;
+}
+
+/* Separate table card visually from the detail panel */
+.table-card {
+	padding: clamp(1rem, 1.2vw, 1.6rem);
+}
+
+.detail-panel {
+	border-left: 1px solid rgba(15, 23, 42, 0.04);
+	padding: clamp(1rem, 1.2vw, 1.6rem);
+	box-shadow: 0 6px 18px rgba(11, 45, 76, 0.04);
+}
+
+/* When detail panel is visible ensure header pill/buttons are aligned */
+.detail-panel .detail-body header {
+	display:flex; align-items:center; justify-content:space-between; gap:0.8rem;
+}
+
+/* Small close button in detail header */
+.detail-panel #client-detail-toggle {
+	height: 36px;
+	padding: 0.4rem 0.6rem;
+	border-radius: 999px;
+	background: rgba(255,255,255,0.92);
+	border: 1px solid rgba(15,23,42,0.06);
+	box-shadow: none;
+	font-size: 0.95rem;
+}
+.detail-panel #client-detail-toggle[aria-expanded="false"] { opacity: 0.7; }
+
 .detail-panel .detail-body header {
 	display: flex;
 	justify-content: space-between;
@@ -653,6 +733,7 @@ tbody tr:hover {
 	font-weight: 600;
 	color: var(--hub-text);
 }
+.detail-body .detail-name i { margin-right: 0.55rem; color: var(--hub-primary); }
 
 .badge-ghost {
 	border-radius: 999px;
@@ -661,6 +742,9 @@ tbody tr:hover {
 	color: var(--hub-muted-strong);
 	font-size: 0.85rem;
 }
+
+/* Detail body small icons for email and phone */
+.detail-body [data-role="email"] i, .detail-body [data-role="phone"] i { color: var(--hub-muted-strong); margin-right: 0.5rem; }
 
 .meta-line {
 	display: flex;
@@ -776,13 +860,21 @@ tbody tr:hover {
 
 /* Top customers: show a small badge / dot on each item and align as a row: icon + name + meta */
 #top-customers { padding-left: 0; }
-#top-customers li { display: grid; grid-template-columns: 18px 1fr auto; align-items: center; gap: 0.85rem; padding: 0.6rem 0; }
+#top-customers li { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 0.85rem; padding: 0.6rem 0; }
 #top-customers li::before { content: none; }
-.top-customer-meta { color: var(--hub-muted); font-size: 0.95rem; justify-self: end; }
-#top-customers li strong { justify-self: start; font-weight: 700; }
-#top-customers li strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#top-customers li span.top-customer-meta { color: var(--hub-muted); text-align: right; }
+#top-customers li strong { justify-self: start; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #top-customers li { border-bottom: 1px dashed rgba(15,23,42,0.04); padding-bottom: 0.6rem; }
+
+/* Avatar small size and alignment specifically for top customers */
+#top-customers li .avatar { width: 34px; height: 34px; font-size: 0.95rem; }
+
+/* meta column on the right */
+.top-customer-meta { color: var(--hub-muted); font-size: 0.95rem; justify-self: end; text-align: right; min-width: 96px; padding-left: 8px; }
+
+/* Highlighted/top row style
+	Similar to selected in table, but more subtle to match the small list style */
+#top-customers li.selected { background: rgba(29,78,216,0.04); box-shadow: 0 6px 18px rgba(8,18,34,0.04); border-left: 3px solid var(--hub-primary); padding-left: 0.85rem; }
+#top-customers li.selected strong { color: var(--hub-primary); }
 
 /* ======== CHART CARDS ======== */
 .chart-header {
@@ -927,6 +1019,34 @@ tbody tr:hover {
 .table-primary {
 	font-weight: 700;
 	color: var(--hub-text);
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+/* Avatar initials in table and detail */
+.avatar {
+	display: inline-grid;
+	place-items: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 999px;
+	color: #fff;
+	font-weight: 700;
+	margin-right: 0.8rem;
+	flex: 0 0 auto;
+}
+
+.avatar-large {
+	display: inline-grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 999px;
+	color: #fff;
+	font-weight: 800;
+	margin-right: 0.9rem;
+	font-size: 1.05rem;
 }
 
 /* ======== RESPONSIVE ======== */
@@ -976,6 +1096,16 @@ tbody tr:hover {
 		width: 100%;
 	}
 }
+
+/* Make top customers responsive: move meta under name on small screens */
+@media (max-width: 720px) {
+	#top-customers li { grid-template-columns: 34px 1fr; grid-template-rows: auto auto; align-items: start; }
+	#top-customers li strong { grid-column: 2 / -1; }
+	.top-customer-meta { grid-column: 2 / -1; justify-self: start; padding-left: 0; }
+}
+
+/* Make table rows keyboard-focus visible */
+tbody tr:focus { outline: 3px solid rgba(29,78,216,0.12); outline-offset: -3px; }
 
 /* ======== MICRO INTERACTIONS ======== */
 @keyframes hubPulse {

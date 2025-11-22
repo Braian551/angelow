@@ -68,6 +68,7 @@ class ClientsDashboard {
         this.tableBody = document.getElementById('clients-table-body');
         this.pagination = document.getElementById('clients-pagination');
         this.detailPanel = document.getElementById('client-detail-panel');
+        this.detailToggleBtn = document.getElementById('client-detail-toggle');
         this.refreshBtn = document.getElementById('clients-refresh-btn');
         this.rangeButtons = document.querySelectorAll('#clients-growth-card .chart-range');
         this.acquisitionCanvas = document.getElementById('clients-acquisition-chart');
@@ -163,6 +164,19 @@ class ClientsDashboard {
                 });
                 this.loadOverview();
             });
+        });
+
+        // Detail panel toggle button (close / open)
+        this.detailToggleBtn?.addEventListener('click', () => {
+            const expanded = this.detailToggleBtn.getAttribute('aria-expanded') === 'true';
+            const newExpanded = !expanded;
+            this.detailToggleBtn.setAttribute('aria-expanded', String(newExpanded));
+            this.detailToggleBtn.title = newExpanded ? 'Cerrar panel' : 'Abrir panel';
+            // toggle collapsed state and aria-hidden for the detail panel
+            if (this.detailPanel) {
+                this.detailPanel.classList.toggle('collapsed', !newExpanded);
+                this.detailPanel.setAttribute('aria-hidden', String(!newExpanded));
+            }
         });
     }
 
@@ -324,6 +338,26 @@ class ClientsDashboard {
             </article>
         `;
         }).join('');
+        // after rendering segments, rebind click to tiles to update highlight and select first client
+        this.segmentContainer.querySelectorAll('.segment-tile').forEach((tile) => {
+            tile.addEventListener('click', () => {
+                const seg = tile.getAttribute('data-segment');
+                // apply segment to filter
+                if (this.segmentSelect) {
+                    this.segmentSelect.value = seg;
+                    this.segmentSelect.dispatchEvent(new Event('change'));
+                } else {
+                    this.state.segment = seg;
+                    this.loadList();
+                }
+                // clear selection and if any rows exist select first one automatically
+                const firstRow = this.tableBody?.querySelector('tr[data-id]');
+                if (firstRow) {
+                    const id = firstRow.getAttribute('data-id');
+                    if (id) setTimeout(() => this.selectCustomer(id), 100);
+                }
+            });
+        });
 
         // Add interaction to tiles: focus/activate a segment to filter list
         this.segmentContainer.querySelectorAll('.segment-tile').forEach((tile) => {
@@ -577,40 +611,48 @@ class ClientsDashboard {
             this.topCustomersList.innerHTML = '<li>Sin clientes destacados</li>';
             return;
         }
-        const total = list.reduce((s, it) => s + (Number(it.total_spent) || 0), 0) || 0;
-        const avg = list.length ? Math.round(total / list.length) : 0;
-        const summaryHtml = `
-            <div class="trend-summary" role="status">
-                <div>
-                    <strong>${list.length} clientes</strong>
-                    <small>Top promedio ${this.formatCurrency(avg)}</small>
-                </div>
-                <div class="trend-controls">
-                    ${list.length > 6 ? '<button class="btn-soft btn-mini" aria-expanded="false">Ver todos</button>' : ''}
-                </div>
-            </div>
-        `;
+        // top customers list should not touch the main table. Render top customers below.
         // Insert or update summary in the article containing the top customers list
         const topContainer = this.topCustomersList?.closest('article');
         if (topContainer) {
             const headerEl = topContainer.querySelector('.section-header') || topContainer.querySelector('.surface-header');
             const existing = topContainer.querySelector('.trend-summary');
+            // build a small summary for the top customers area
+            const totalSpent = list.reduce((s, it) => s + (Number(it.total_spent) || 0), 0);
+            const avg = list.length ? Math.round(totalSpent / list.length) : 0;
+            const summaryHtml = `
+                <div class="trend-summary" role="status">
+                    <div>
+                        <strong>${list.length} clientes</strong>
+                        <small>Gasto promedio ${this.formatCurrency(avg)} • Top ${list.length}</small>
+                    </div>
+                    <div class="trend-controls">
+                        <button class="btn-soft btn-mini" aria-expanded="false">Ver todos</button>
+                    </div>
+                </div>
+            `;
             if (existing) existing.outerHTML = summaryHtml;
             else if (headerEl) headerEl.insertAdjacentHTML('afterend', summaryHtml);
             else topContainer.insertAdjacentHTML('afterbegin', summaryHtml);
         }
-        this.topCustomersList.innerHTML = list.map((item) => `
-            <li role="button" tabindex="0" data-id="${item.id}"><svg class="mini-dot" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="6" fill="var(--hub-primary)"/></svg>
-                <strong>${item.name || item.email}</strong>
+        this.topCustomersList.innerHTML = list.map((item) => {
+            const name = item.name || item.email;
+            const initials = this.getInitials(name);
+            const bg = this.computeNameColor(name);
+            return `
+            <li role="button" tabindex="0" data-id="${item.id}"><span class="avatar" style="background:${bg}">${initials}</span>
+                <strong>${name}</strong>
                 <span>${this.formatCurrency(item.total_spent)} • ${item.orders_count} pedidos</span>
             </li>
-        `).join('');
+        `;
+        }).join('');
         // Add click/keyboard interactions to open detail from top customers
             this.topCustomersList.querySelectorAll('li[data-id]').forEach((li) => {
-            li.addEventListener('click', () => {
-                const id = li.getAttribute('data-id');
-                if (id) this.openDetail(id);
-            });
+                li.addEventListener('click', () => {
+                    const id = li.getAttribute('data-id');
+                    if (!id) return;
+                    this.selectCustomer(id, { source: 'top' });
+                });
             li.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -618,8 +660,12 @@ class ClientsDashboard {
                 }
             });
         });
-            // add small icon to each item for visual parity with other lists
-            this.topCustomersList.querySelectorAll('li[data-id] span').forEach((el) => el.classList.add('top-customer-meta'));
+            // ensure only the last span (the meta info) gets the top-customer-meta class,
+            // avoid accidentally tagging the avatar span which would break the layout
+            this.topCustomersList.querySelectorAll('li[data-id]').forEach((li) => {
+                const meta = li.querySelector('span:not(.avatar)');
+                if (meta) meta.classList.add('top-customer-meta');
+            });
         // collapse after a limit for readability
         const COLLAPSE_LIMIT = 6;
         if (list.length > COLLAPSE_LIMIT) {
@@ -640,6 +686,8 @@ class ClientsDashboard {
             if (btn) btn.remove();
             this.topCustomersList.classList.remove('collapsed');
         }
+        // Set initial focus/aria selection states for a11y
+        this.topCustomersList.querySelectorAll('li[data-id]').forEach((li) => li.setAttribute('role', 'button'));
     }
 
     renderAcquisitionChart(trend = []) {
@@ -717,6 +765,53 @@ class ClientsDashboard {
                 }
             }
         });
+        // Also expose a method to highlight a row in the top customers list
+        this.topCustomersList.querySelectorAll('li[data-id]').forEach((li) => {
+            li.classList.remove('selected');
+        });
+    }
+
+    // Utility to highlight customer elements in UI
+    highlightById(id) {
+        if (!id) return;
+        // table
+        // remove previous badge icon
+        this.tableBody?.querySelectorAll('.selected-badge')?.forEach((el) => el.remove());
+        this.tableBody?.querySelectorAll('tr')?.forEach((r) => {
+            const is = r.getAttribute('data-id') === String(id);
+            r.classList.toggle('selected', is);
+            r.setAttribute('aria-selected', String(is));
+        });
+        // add badge to selected row only when present in DOM
+        const newRow = this.tableBody?.querySelector(`tr[data-id="${id}"]`);
+        if (newRow) {
+            const firstCell = newRow.querySelector('td');
+            if (firstCell && !firstCell.querySelector('.selected-badge')) {
+                const badge = document.createElement('i');
+                badge.className = 'fas fa-user-check selected-badge';
+                badge.setAttribute('aria-hidden', 'true');
+                firstCell.prepend(badge);
+            }
+        }
+        // top customers: add both selected class and aria-selected state for assistive tech
+        this.topCustomersList?.querySelectorAll('li')?.forEach((li) => {
+            const is = li.getAttribute('data-id') === String(id);
+            li.classList.toggle('selected', is);
+            li.setAttribute('aria-selected', String(is));
+            li.setAttribute('aria-pressed', String(is));
+        });
+        // ensure selected row is visible
+        const row = this.tableBody?.querySelector(`tr[data-id="${id}"]`);
+        if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // UI selection: highlight and show details
+    selectCustomer(id, opts = {}) {
+        if (!id) return;
+        // remove previously selected rows and add to new
+        this.highlightById(id);
+        // load details with the new selection
+        this.openDetail(id);
     }
 
     renderSegmentsChart(segments = []) {
@@ -864,10 +959,13 @@ class ClientsDashboard {
             this.tableBody.innerHTML = '<tr><td colspan="5">No se encontraron clientes con los filtros actuales</td></tr>';
             return;
         }
-        this.tableBody.innerHTML = items.map((item) => `
-            <tr data-id="${item.id}">
+        this.tableBody.innerHTML = items.map((item) => {
+            const initials = this.getInitials(item.name || item.email);
+            const bg = this.computeNameColor(item.name || item.email);
+            return `
+            <tr tabindex="0" data-id="${item.id}">
                 <td data-label="Cliente">
-                    <div class="table-primary">${item.name || item.email}</div>
+                    <div class="table-primary"><span class="avatar" style="background:${bg}">${initials}</span>${item.name || item.email}</div>
                     <small class="text-muted">${item.email}</small>
                 </td>
                 <td data-label="Pedidos">${item.orders_count}</td>
@@ -875,14 +973,38 @@ class ClientsDashboard {
                 <td data-label="Ticket">${this.formatCurrency(item.avg_ticket)}</td>
                 <td data-label="Status">${this.renderStatusChip(item.status)}</td>
             </tr>
-        `).join('');
+        `;
+        }).join('');
 
         this.tableBody.querySelectorAll('tr').forEach((row) => {
             row.addEventListener('click', () => {
                 const id = row.getAttribute('data-id');
-                this.openDetail(id);
+                if (!id) return;
+                this.selectCustomer(id, { source: 'table' });
+            });
+            // keyboard support to select a row
+            row.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const id = row.getAttribute('data-id');
+                    if (id) this.selectCustomer(id, { source: 'table' });
+                }
+                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const rows = Array.from(row.parentElement.querySelectorAll('tr'));
+                    const i = rows.indexOf(row);
+                    const next = e.key === 'ArrowDown' ? rows[i + 1] : rows[i - 1];
+                    if (next) next.focus();
+                }
             });
         });
+        // Auto-select first row if there's no selection (only on first render)
+        const currentlySelected = this.tableBody.querySelector('tr.selected');
+        const firstRow = this.tableBody.querySelector('tr[data-id]');
+        if (!currentlySelected && firstRow) {
+            const id = firstRow.getAttribute('data-id');
+            if (id) this.selectCustomer(id, { source: 'table-auto' });
+        }
     }
 
     renderPagination(meta) {
@@ -897,6 +1019,14 @@ class ClientsDashboard {
 
     async openDetail(id) {
         if (!id) return;
+        // Show loading skeleton in detail panel
+        if (this.detailPanel) {
+            this.detailPanel.classList.add('is-loading');
+            const empty = this.detailPanel.querySelector('[data-state="empty"]');
+            const content = this.detailPanel.querySelector('[data-state="content"]');
+            if (content) content.setAttribute('hidden', 'hidden');
+            if (empty) empty.setAttribute('hidden', 'hidden');
+        }
         try {
             const response = await fetch(`${this.config.endpoints.detail}?id=${encodeURIComponent(id)}`, { credentials: 'same-origin' });
             if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -905,6 +1035,15 @@ class ClientsDashboard {
             this.renderDetail(payload);
         } catch (error) {
             console.error('client detail', error);
+        }
+        finally {
+            if (this.detailPanel) {
+                this.detailPanel.classList.remove('is-loading');
+                // Ensure detail panel is visible when opening
+                this.detailPanel.classList.remove('collapsed');
+                this.detailPanel.setAttribute('aria-hidden', 'false');
+                if (this.detailToggleBtn) this.detailToggleBtn.setAttribute('aria-expanded', 'true');
+            }
         }
     }
 
@@ -915,10 +1054,24 @@ class ClientsDashboard {
         emptyState?.setAttribute('hidden', 'hidden');
         content?.removeAttribute('hidden');
 
-        content.querySelector('.detail-name').textContent = payload.profile.name || payload.profile.email;
-        content.querySelector('[data-role="segment"]').textContent = (payload.metrics.segments || []).join(', ') || 'Sin segmento';
-        content.querySelector('[data-role="email"]').textContent = payload.profile.email;
-        content.querySelector('[data-role="phone"]').textContent = payload.profile.phone || 'Sin telefono';
+        const detailName = content.querySelector('.detail-name');
+        if (detailName) {
+            const name = payload.profile.name || payload.profile.email;
+            const initials = this.getInitials(name);
+            const bg = this.computeNameColor(name);
+            detailName.innerHTML = `<span class="avatar-large" style="background:${bg}">${initials}</span> ${name}`;
+        }
+        // Render segments as small badges in the detail header
+        const segNode = content.querySelector('[data-role="segment"]');
+        if (segNode) {
+            const segs = payload.metrics.segments || [];
+            segNode.innerHTML = segs.length ? segs.map(s => `<span class="badge-ghost">${s}</span>`).join(' ') : '<span class="badge-ghost">Sin segmento</span>';
+        }
+        // show email/phone with icons for clarity
+        const emailEl = content.querySelector('[data-role="email"]');
+        const phoneEl = content.querySelector('[data-role="phone"]');
+        if (emailEl) emailEl.innerHTML = `<i class="fas fa-envelope" aria-hidden="true"></i> ${payload.profile.email}`;
+        if (phoneEl) phoneEl.innerHTML = payload.profile.phone ? `<i class="fas fa-phone" aria-hidden="true"></i> ${payload.profile.phone}` : 'Sin telefono';
         content.querySelector('[data-role="created"]').textContent = this.formatDate(payload.profile.created_at);
 
         const timeline = document.getElementById('client-activity');
@@ -930,6 +1083,20 @@ class ClientsDashboard {
                     <span>${this.formatDate(event.created_at)} · ${event.description}</span>
                 </li>
             `).join('') : '<li>Sin actividad reciente</li>';
+        }
+        // highlight the client in table and top customers when detail is loaded
+        if (payload.profile && payload.profile.id) {
+            this.highlightById(payload.profile.id);
+        }
+        // highlight the segment tiles that apply to this client
+        const segs = payload.metrics?.segments || [];
+        if (this.segmentContainer) {
+            this.segmentContainer.querySelectorAll('.segment-tile').forEach((tile) => {
+                const h3 = tile.querySelector('h3')?.textContent?.trim();
+                tile.classList.toggle('selected', h3 && segs.includes(h3));
+            });
+            // Move keyboard focus to detail toggle to help keyboard users notice the panel
+            if (this.detailToggleBtn) this.detailToggleBtn.focus();
         }
     }
 
@@ -946,6 +1113,24 @@ class ClientsDashboard {
     formatDate(value) {
         if (!value) return 'Sin datos';
         return new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+    }
+
+    getInitials(name) {
+        if (!name) return '';
+        const parts = String(name).trim().split(/\s+/).filter(Boolean);
+        if (!parts.length) return '';
+        if (parts.length === 1) return (parts[0][0] || '').toUpperCase();
+        const initials = (parts[0][0] || '') + (parts[1][0] || '');
+        return initials.toUpperCase();
+    }
+
+    computeNameColor(name) {
+        const palette = (this.theme && this.theme.palette) ? this.theme.palette : ['#0077b6', '#48cae4', '#5c6ac4', '#f59e0b', '#059669', '#dc2626'];
+        const str = String(name || '');
+        let sum = 0;
+        for (let i = 0; i < str.length; i++) sum += str.charCodeAt(i);
+        const idx = sum % palette.length;
+        return palette[idx] || '#0077b6';
     }
 
     debounce(fn, delay) {
