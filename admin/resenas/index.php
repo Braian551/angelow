@@ -32,6 +32,7 @@ requireRole('admin');
         .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-soft.btn-sm[data-action] { background: transparent !important; }
         /* Show card list by default inside admin and hide the old table fallback */
         .management-hub#reviews-hub .table-wrapper .reviews-list { display: grid; grid-template-columns: 1fr; gap: 0.9rem; padding: 0.75rem; }
+        @media (min-width: 1160px) { .management-hub#reviews-hub .table-wrapper .reviews-list { grid-template-columns: repeat(2, 1fr); } }
         .management-hub#reviews-hub .table-wrapper table { display: none; }
     </style>
 </head>
@@ -125,7 +126,7 @@ requireRole('admin');
             <section class="split-grid layout-table-detail">
                 <article class="table-card">
                     <header>
-                        <div class="filter-group">
+                        <div class="filter-group search">
                             <input type="search" id="reviews-search" placeholder="Buscar título, texto o producto">
                         </div>
                         <div class="filter-group">
@@ -231,11 +232,8 @@ window.REVIEWS_INBOX_CONFIG = {
         update: '<?= BASE_URL ?>/admin/api/reviews/update_status.php'
     }
 };
-</script>
+    </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="<?= BASE_URL ?>/js/admin/reviews/reviews-dashboard.js?v=<?= filemtime(__DIR__ . '/../../js/admin/reviews/reviews-dashboard.js') ?>"></script>
-        </div>
-    </main>
-    </div>
 </body>
 </html>

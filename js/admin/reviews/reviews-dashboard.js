@@ -104,9 +104,11 @@ class ReviewsInbox {
         this.detailToggle?.addEventListener('click', (evt) => {
             evt.stopPropagation();
             if (!this.detailPanel) return;
-            const expanded = this.detailPanel.classList.toggle('collapsed');
-            this.detailPanel.setAttribute('aria-hidden', String(expanded));
-            this.detailToggle.setAttribute('aria-expanded', String(!expanded));
+            const collapsed = this.detailPanel.classList.toggle('collapsed');
+            this.detailPanel.setAttribute('aria-hidden', String(collapsed));
+            // Keep container state so we can alter grid to allow full-width table when detail is closed
+            if (this.container) this.container.classList.toggle('detail-open', !collapsed);
+            this.detailToggle.setAttribute('aria-expanded', String(!collapsed));
         });
 
         this.refreshBtn?.addEventListener('click', () => {
@@ -650,6 +652,7 @@ class ReviewsInbox {
                 if (this.detailPanel) {
                     this.detailPanel.classList.add('collapsed');
                     this.detailPanel.setAttribute('aria-hidden', 'true');
+                    if (this.container) this.container.classList.remove('detail-open');
                 }
             }
         } catch (error) {
@@ -671,6 +674,7 @@ class ReviewsInbox {
         this.listContainer?.querySelectorAll('.review-card[data-review-id]')?.forEach((r) => r.classList.toggle('is-selected', r.getAttribute('data-review-id') === String(id)));
         // expand detail panel
         this.detailPanel.classList.remove('collapsed');
+        if (this.container) this.container.classList.add('detail-open');
         this.detailPanel.setAttribute('aria-hidden', 'false');
         if (this.detailToggle) this.detailToggle.setAttribute('aria-expanded', 'true');
         const emptyState = this.detailPanel.querySelector('[data-state="empty"]');

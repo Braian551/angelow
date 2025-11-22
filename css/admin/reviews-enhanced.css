@@ -716,6 +716,101 @@
     font-weight: 700;
 }
 
+/* ====== Layout tweaks for the reviews hub (improve detail panel and card layout) ====== */
+/* Make the table + detail layout allocate more room to the detail panel by default */
+.management-hub#reviews-hub.split-grid.layout-table-detail {
+    grid-template-columns: 1fr;
+}
+
+/* When the hub container has `detail-open`, allocate room for the right panel */
+.management-hub#reviews-hub.detail-open.split-grid.layout-table-detail {
+    grid-template-columns: 1fr minmax(360px, 520px);
+}
+
+/* When the detail panel is collapsed (hidden), allow the table to span full width */
+.management-hub#reviews-hub.split-grid.layout-table-detail .detail-panel.collapsed {
+    display: none !important;
+}
+
+/* Force detail panel to be a visually consistent floating card */
+.management-hub#reviews-hub .detail-panel {
+    min-width: 360px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(8, 18, 34, 0.06);
+    border-radius: 14px;
+}
+
+/* Keep the title left-aligned inside the detail header to avoid odd centering when an avatar/icon is used */
+.management-hub#reviews-hub .detail-panel .detail-body header .detail-name {
+    text-align: left;
+}
+
+/* Slightly increase padding of the detail body so it reads more like a card */
+.management-hub#reviews-hub .detail-panel .detail-body {
+    padding: 0.5rem 1rem 1.4rem 1rem;
+}
+
+/* Ensure the floating close (X) control doesn't overlap content when the detail header is narrow */
+#review-detail #review-detail-toggle { top: 8px !important; right: 8px !important; }
+
+/* ====== Card style for each review in the list to improve readability ====== */
+.management-hub#reviews-hub .reviews-list .review-card {
+    background: linear-gradient(180deg, #ffffff 0%, rgba(248,250,252,0.96) 100%);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-radius: 12px;
+    padding: 1rem 1.15rem;
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 0.9rem;
+    align-items: start;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .user-avatar {
+    width: 56px;
+    height: 56px;
+    background: var(--hub-primary);
+    color: #fff;
+    display: inline-grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 1rem;
+    border-radius: 10px;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-meta .user-info strong {
+    display: block;
+    font-weight: 700;
+    color: var(--hub-text);
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-body {
+    padding: 0;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-actions {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+/* Improve the spacing of the table-card header controls for small viewports */
+.management-hub#reviews-hub .table-card header .filter-group { min-width: 120px; }
+
+/* Ensure verify/approve/reject detail buttons sit gracefully when stacked - make them full width on smaller screens */
+.management-hub#reviews-hub .detail-panel .detail-actions .btn-soft.primary,
+.management-hub#reviews-hub .detail-panel .detail-actions .btn-soft[data-action] {
+    min-width: 100%;
+}
+
+/* Slightly soften the highlight color so the detail card feels cohesive */
+.management-hub#reviews-hub .detail-panel .detail-body header {
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+/* Minor improvement: increase timeline item's min-width so long product names don't overflow */
+#reviews-highlights li .event-content { min-width: 0; max-width: calc(100% - 120px); }
+
 /* Buttons inside table rows (small icon buttons) - styles inspired by sizes page */
 #reviews-table .btn-soft[data-action],
 #reviews-highlights li .btn-soft[data-action] {
