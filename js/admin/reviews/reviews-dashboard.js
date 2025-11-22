@@ -38,8 +38,6 @@ class ReviewsInbox {
         this.ratingSelect = document.getElementById('reviews-rating');
         this.verifiedSelect = document.getElementById('reviews-verified');
         this.pagination = document.getElementById('reviews-pagination');
-        this.detailPanel = document.getElementById('review-detail');
-        this.detailToggle = document.getElementById('review-detail-toggle');
         this.refreshBtn = document.getElementById('reviews-refresh');
         this.clearBtn = document.getElementById('reviews-clear-filters');
         this.debugPanel = document.getElementById('reviews-debug');
@@ -84,30 +82,16 @@ class ReviewsInbox {
             });
         });
 
-        const delegatedClick = (evt, containerIsList = false) => {
+        const delegatedClick = (evt) => {
             const actionBtn = evt.target.closest('[data-action]');
-            const row = evt.target.closest('tr[data-id]') || evt.target.closest('.review-card[data-review-id]');
             if (actionBtn) {
                 evt.stopPropagation();
                 const id = actionBtn.closest('[data-id]')?.getAttribute('data-id') || actionBtn.closest('[data-review-id]')?.getAttribute('data-review-id');
                 this.handleAction(actionBtn.getAttribute('data-action'), id, evt);
-                return;
-            }
-            if (row) {
-                const id = row.getAttribute('data-id') || row.getAttribute('data-review-id');
-                this.openDetail(id);
             }
         };
-        this.tableBody?.addEventListener('click', (evt) => delegatedClick(evt, false));
-        this.listContainer?.addEventListener('click', (evt) => delegatedClick(evt, true));
-
-        this.detailToggle?.addEventListener('click', (evt) => {
-            evt.stopPropagation();
-            if (!this.detailPanel) return;
-            const expanded = this.detailPanel.classList.toggle('collapsed');
-            this.detailPanel.setAttribute('aria-hidden', String(expanded));
-            this.detailToggle.setAttribute('aria-expanded', String(!expanded));
-        });
+        this.tableBody?.addEventListener('click', delegatedClick);
+        this.listContainer?.addEventListener('click', delegatedClick);
 
         this.refreshBtn?.addEventListener('click', () => {
             this.loadOverview();
@@ -563,19 +547,6 @@ class ReviewsInbox {
                 if (ic.tagName?.toLowerCase() === 'svg') ic.style.fill = cfg.color;
             }
         });
-        // Detail panel buttons
-        this.detailPanel?.querySelectorAll('button[data-action]')?.forEach((btn) => {
-            const act = btn.getAttribute('data-action');
-            const cfg = map[act];
-            if (!cfg) return;
-            btn.style.backgroundColor = cfg.bg;
-            btn.style.borderColor = cfg.border;
-            const ic = btn.querySelector('i') || btn.querySelector('svg');
-            if (ic) {
-                ic.style.color = cfg.color;
-                if (ic.tagName?.toLowerCase() === 'svg') ic.style.fill = cfg.color;
-            }
-        });
         // list buttons handled earlier via `allButtons` union to keep consistent.
     }
 
@@ -638,19 +609,10 @@ class ReviewsInbox {
                 // Refresh both overview and list
                 this.loadOverview();
                 this.loadList();
-                // Update detail panel if open
-                if (this.detailPanel?.querySelector('.detail-body')?.hidden === false) {
-                    this.openDetail(id);
-                }
             } else if (payload.deleted) {
                 this.state.page = 1;
                 this.loadOverview();
                 this.loadList();
-                // Close detail panel
-                if (this.detailPanel) {
-                    this.detailPanel.classList.add('collapsed');
-                    this.detailPanel.setAttribute('aria-hidden', 'true');
-                }
             }
         } catch (error) {
             console.error('review action', error);
@@ -661,62 +623,6 @@ class ReviewsInbox {
                 button.innerHTML = originalHTML;
             }
         }
-    }
-
-    openDetail(id) {
-        const item = this.items.get(String(id));
-        if (!item || !this.detailPanel) return;
-        // highlight selected row or review-card
-        this.tableBody?.querySelectorAll('tr[data-id]')?.forEach((r) => r.classList.toggle('is-selected', r.getAttribute('data-id') === String(id)));
-        this.listContainer?.querySelectorAll('.review-card[data-review-id]')?.forEach((r) => r.classList.toggle('is-selected', r.getAttribute('data-review-id') === String(id)));
-        // expand detail panel
-        this.detailPanel.classList.remove('collapsed');
-        this.detailPanel.setAttribute('aria-hidden', 'false');
-        if (this.detailToggle) this.detailToggle.setAttribute('aria-expanded', 'true');
-        const emptyState = this.detailPanel.querySelector('[data-state="empty"]');
-        const content = this.detailPanel.querySelector('[data-state="content"]');
-        emptyState?.setAttribute('hidden', 'hidden');
-        content?.removeAttribute('hidden');
-        content.querySelector('[data-role="title"]').textContent = item.title || 'Sin titulo';
-        content.querySelector('[data-role="rating"]').textContent = `${item.rating} ★`;
-        content.querySelector('[data-role="customer"]').textContent = item.customer?.name || item.customer?.email || 'Cliente';
-        content.querySelector('[data-role="product"]').textContent = item.product?.name || 'Producto';
-        content.querySelector('[data-role="date"]').textContent = this.formatDate(item.created_at);
-        content.querySelector('[data-role="comment"]').textContent = item.comment;
-        const actions = content.querySelector('[data-role="detail-actions"]');
-        actions?.querySelectorAll('button').forEach((btn) => {
-            btn.onclick = (e) => this.handleAction(btn.getAttribute('data-action'), id, e);
-        });
-        // Configure verify and approve button label/state in the detail panel
-        const verifyBtn = actions?.querySelector('button[data-action="verify"]');
-                if (verifyBtn) {
-            const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
-                if (isVerified) {
-                verifyBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Verificada';
-                verifyBtn.title = 'Reseña verificada';
-                verifyBtn.disabled = true;
-                verifyBtn.classList.add('btn-verified');
-                } else {
-                verifyBtn.innerHTML = '<i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i> Marcar como verificada';
-                verifyBtn.title = 'Marcar como verificada';
-                verifyBtn.disabled = false;
-                verifyBtn.classList.remove('btn-verified');
-            }
-        }
-        // Hide approve button in the detail panel if already approved
-        const approveBtn = actions?.querySelector('button[data-action="approve"]');
-        if (approveBtn) {
-            const isApproved = Boolean(item.is_approved);
-            if (isApproved) {
-                approveBtn.style.display = 'none';
-            } else {
-                approveBtn.style.display = '';
-            }
-        }
-        // Apply inline fallback styles to the detail panel action buttons
-        this.applyActionButtonStyles();
-        // Check for any icons that need a fallback replacement inside the detail
-        this.ensureIconFallbacks();
     }
 
     renderStatusChip(item) {

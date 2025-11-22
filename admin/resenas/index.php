@@ -32,6 +32,7 @@ requireRole('admin');
         .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-soft.btn-sm[data-action] { background: transparent !important; }
         /* Show card list by default inside admin and hide the old table fallback */
         .management-hub#reviews-hub .table-wrapper .reviews-list { display: grid; grid-template-columns: 1fr; gap: 0.9rem; padding: 0.75rem; }
+        @media (min-width: 1160px) { .management-hub#reviews-hub .table-wrapper .reviews-list { grid-template-columns: repeat(2, 1fr); } }
         .management-hub#reviews-hub .table-wrapper table { display: none; }
     </style>
 </head>
@@ -122,10 +123,10 @@ requireRole('admin');
                 </article>
             </section>
 
-            <section class="split-grid layout-table-detail">
+            <section>
                 <article class="table-card">
                     <header>
-                        <div class="filter-group">
+                        <div class="filter-group search">
                             <input type="search" id="reviews-search" placeholder="Buscar título, texto o producto">
                         </div>
                         <div class="filter-group">
@@ -184,39 +185,6 @@ requireRole('admin');
                         </div>
                     </div>
                 </article>
-
-                <aside class="detail-panel collapsed" id="review-detail" aria-hidden="true">
-                    <div class="empty-state" data-state="empty">
-                        <h3>Selecciona una reseña</h3>
-                        <p>Verás el detalle completo para responder o moderar.</p>
-                    </div>
-                    <div class="detail-body" data-state="content" hidden>
-                        <header>
-                            <span class="section-icon" aria-hidden="true"><i class="fas fa-star"></i></span>
-                            <div class="detail-name" data-role="title"></div>
-                            <div class="detail-controls">
-                                <button class="btn-soft btn-icon" id="review-detail-toggle" aria-expanded="false" aria-controls="review-detail" title="Cerrar panel">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.3 5.71a1 1 0 0 0-1.42 0L12 10.59 7.12 5.7A1 1 0 0 0 5.7 7.12L10.59 12l-4.88 4.88a1 1 0 1 0 1.42 1.42L12 13.41l4.88 4.88a1 1 0 1 0 1.42-1.42L13.41 12l4.88-4.88a1 1 0 0 0 0-1.41z"/></svg>
-                                </button>
-                            </div>
-                            <span class="badge-ghost" data-role="rating"></span>
-                        </header>
-                        <div class="meta-line"><span>Cliente</span><strong data-role="customer"></strong></div>
-                        <div class="meta-line"><span>Producto</span><strong data-role="product"></strong></div>
-                        <div class="meta-line"><span>Fecha</span><strong data-role="date"></strong></div>
-                        <hr>
-                        <p data-role="comment" class="text-muted"></p>
-                                <div class="actions" data-role="detail-actions">
-                            <button class="btn-soft primary btn-approve" data-action="approve"><i class="fas fa-check"></i> Aprobar</button>
-                            <button class="btn-soft btn-reject btn-delete" data-action="reject"><i class="fas fa-ban"></i> Rechazar</button>
-                            <!-- Use same icon as stat and clearer label for the action -->
-                            <button class="btn-soft btn-verify btn-status" data-action="verify">
-                                <i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i>
-                                Marcar como verificada
-                            </button>
-                        </div>
-                    </div>
-                </aside>
             </section>
         </div>
     </main>
@@ -231,11 +199,8 @@ window.REVIEWS_INBOX_CONFIG = {
         update: '<?= BASE_URL ?>/admin/api/reviews/update_status.php'
     }
 };
-</script>
+    </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="<?= BASE_URL ?>/js/admin/reviews/reviews-dashboard.js?v=<?= filemtime(__DIR__ . '/../../js/admin/reviews/reviews-dashboard.js') ?>"></script>
-        </div>
-    </main>
-    </div>
 </body>
 </html>

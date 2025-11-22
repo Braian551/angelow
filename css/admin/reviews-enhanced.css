@@ -716,6 +716,52 @@
     font-weight: 700;
 }
 
+/* ====== Card style for each review in the list to improve readability ====== */
+.management-hub#reviews-hub .reviews-list .review-card {
+    background: linear-gradient(180deg, #ffffff 0%, rgba(248,250,252,0.96) 100%);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-radius: 12px;
+    padding: 1rem 1.15rem;
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 0.9rem;
+    align-items: start;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .user-avatar {
+    width: 56px;
+    height: 56px;
+    background: var(--hub-primary);
+    color: #fff;
+    display: inline-grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 1rem;
+    border-radius: 10px;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-meta .user-info strong {
+    display: block;
+    font-weight: 700;
+    color: var(--hub-text);
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-body {
+    padding: 0;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-actions {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+/* Improve the spacing of the table-card header controls for small viewports */
+.management-hub#reviews-hub .table-card header .filter-group { min-width: 120px; }
+
+/* Minor improvement: increase timeline item's min-width so long product names don't overflow */
+#reviews-highlights li .event-content { min-width: 0; max-width: calc(100% - 120px); }
+
 /* Buttons inside table rows (small icon buttons) - styles inspired by sizes page */
 #reviews-table .btn-soft[data-action],
 #reviews-highlights li .btn-soft[data-action] {
