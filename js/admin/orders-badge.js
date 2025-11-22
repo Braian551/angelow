@@ -7,7 +7,8 @@
     'use strict';
 
     // Obtener la URL base desde el meta tag
-    const baseUrl = document.querySelector('meta[name="base-url"]').content || '';
+    const metaTag = document.querySelector('meta[name="base-url"]');
+    const baseUrl = metaTag ? metaTag.content : window.location.origin;
     const ordersBadge = document.getElementById('orders-badge');
 
     /**

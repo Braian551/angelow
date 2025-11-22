@@ -376,7 +376,7 @@ class ReviewsInbox {
                     <td class="actions">
                         <button class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar"><i class="fas fa-check"></i></button>
                         <button class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar"><i class="fas fa-ban"></i></button>
-                        <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada"><i class="fas fa-badge-check"></i></button>
+                        <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada"><i class="fas fa-user-check"></i></button>
                     </td>
                 </tr>
             `;

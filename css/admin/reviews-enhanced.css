@@ -227,27 +227,53 @@
 /* ======== REVIEWS HUB: STAT CARD ENHANCEMENTS ======== */
 /* Make verified purchases stat card stylized and clearly visible (matches client palette) */
 #reviews-insights .stat-card[data-metric="verified"] .stat-icon {
-    background: rgba(16, 185, 129, 0.06);
-    color: #059669;
-    box-shadow: 0 6px 18px rgba(5, 150, 105, 0.06);
+    background: linear-gradient(180deg, rgba(16,185,129,0.06), rgba(16,185,129,0.04));
+    color: var(--hub-success);
+    box-shadow: 0 6px 20px rgba(16,185,129,0.06);
 }
 
 #reviews-insights .stat-card[data-metric="verified"] .stat-value {
-    color: #059669;
+    color: var(--hub-success);
 }
 
 /* Slightly larger icon for better balance in the hub like clients cards */
 #reviews-insights .stat-card .stat-icon {
-    width: 48px;
-    height: 48px;
+    width: 54px;
+    height: 54px;
     font-size: 20px;
     border-radius: 12px;
+    display: inline-grid;
+    place-items: center;
+    box-shadow: 0 6px 18px rgba(8,18,34,0.06);
+    position: relative; /* for pseudo-layer behind icon */
 }
 
-/* Improve the visual contrast of the rating card and verified, so the numbers stand out */
-#reviews-insights .stat-card .stat-value { color: var(--hub-text); }
-/* Subtle card background for reviews hub to feel lighter like clients page */
-#reviews-insights .stat-card { background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,251,255,0.98)); }
+#reviews-insights .stat-card .stat-icon::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    background: rgba(248,250,252,0.8);
+    box-shadow: 0 8px 20px rgba(8,18,34,0.04);
+    transform: rotate(0deg);
+    z-index: -1;
+}
+
+#reviews-insights .stat-card[data-metric="verified"] .stat-icon::before {
+    background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.03));
+}
+
+/* Slightly lighter card background so it reads close to clients page */
+#reviews-insights .stat-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.98));
+    border-radius: 14px;
+}
+
+/* Make stat title uppercase and align colors like clients */
+#reviews-insights .stat-card .stat-top h2 { text-transform: uppercase; font-weight: 700; color: var(--hub-muted); }
 
 /* ======== DETAIL PANEL - REORGANIZED ======== */
 
@@ -732,7 +758,7 @@
 
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-verify i,
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-verify i.fas,
-.btn-verify i { color: #0b74a6 !important; opacity: 1 !important; filter: none !important; }
+.btn-verify i { color: #059669 !important; opacity: 1 !important; filter: none !important; }
 
 /* Hover states for icon buttons */
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-soft.btn-sm.btn-approve:hover,
@@ -898,9 +924,9 @@
 }
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button.btn-soft.btn-sm[data-action="verify"],
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button.btn-soft[data-action="verify"] {
-    background-color: rgba(0, 119, 182, 0.06) !important;
-    color: #0077b6 !important;
-    border-color: rgba(0, 119, 182, 0.12) !important;
+    background-color: rgba(16, 185, 129, 0.08) !important;
+    color: #059669 !important;
+    border-color: rgba(16, 185, 129, 0.12) !important;
 }
 
 /* Explicit icon color for data-action buttons */
@@ -909,4 +935,4 @@
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="reject"] i,
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="reject"] svg { color: #dc2626 !important; fill: #dc2626 !important; }
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="verify"] i,
-.management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="verify"] svg { color: #0b74a6 !important; fill: #0b74a6 !important; }
+.management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="verify"] svg { color: #059669 !important; fill: #059669 !important; }
