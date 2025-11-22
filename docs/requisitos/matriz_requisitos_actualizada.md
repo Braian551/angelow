@@ -27,7 +27,11 @@ Esta matriz desglosa los requisitos funcionales del sistema Angelow con un nivel
 | **RF-CONF-018** | Configurar Redes Sociales | El sistema debe permitir definir las URLs de Instagram, Facebook y TikTok. |
 
 ## 2. Gestión de Productos (Admin)
+<<<<<<< HEAD
 **Fuente:** `admin/products.php`, `admin/editproducto.php`, `admin/subproducto.php`
+=======
+**Fuente:** `admin/products.php`, `admin/editproducto.php`
+>>>>>>> origin/main
 
 | ID | Requisito Funcional | Descripción Detallada |
 |---|---|---|
@@ -46,6 +50,7 @@ Esta matriz desglosa los requisitos funcionales del sistema Angelow con un nivel
 | **RF-PROD-013** | Visualizar Stock en Lista | El sistema debe mostrar visualmente el nivel de stock en la tarjeta del producto. |
 | **RF-PROD-014** | Visualizar Etiquetas en Lista | El sistema debe mostrar las etiquetas (tags) asignadas al producto en la vista de lista. |
 
+<<<<<<< HEAD
 ## 3. Gestión de Categorías (Admin)
 **Fuente:** `admin/categoria/categories_list.php`
 
@@ -120,6 +125,9 @@ Esta matriz desglosa los requisitos funcionales del sistema Angelow con un nivel
 | **RF-ADM-002** | Crear Administrador | El sistema debe permitir registrar un nuevo usuario con rol de administrador. |
 
 ## 10. Gestión de Usuarios (Cliente)
+=======
+## 3. Gestión de Usuarios (Cliente)
+>>>>>>> origin/main
 **Fuente:** `users/formlogin.php`, `users/addresses.php`, `users/wishlist.php`
 
 | ID | Requisito Funcional | Descripción Detallada |
@@ -135,7 +143,11 @@ Esta matriz desglosa los requisitos funcionales del sistema Angelow con un nivel
 | **RF-USER-009** | Agregar a Lista de Deseos | El sistema debe permitir marcar un producto como favorito desde la tienda. |
 | **RF-USER-010** | Eliminar de Lista de Deseos | El sistema debe permitir quitar un producto de la lista de favoritos. |
 
+<<<<<<< HEAD
 ## 11. Gestión de Órdenes (Admin)
+=======
+## 4. Gestión de Órdenes (Admin)
+>>>>>>> origin/main
 **Fuente:** `admin/orders.php`, `admin/order/`
 
 | ID | Requisito Funcional | Descripción Detallada |
@@ -146,7 +158,11 @@ Esta matriz desglosa los requisitos funcionales del sistema Angelow con un nivel
 | **RF-ORD-004** | Cambiar Estado de Orden | El sistema debe permitir al administrador actualizar el estado del pedido. |
 | **RF-ORD-005** | Verificar Pago | El sistema debe permitir validar y aprobar comprobantes de pago manuales. |
 
+<<<<<<< HEAD
 ## 12. Descuentos y Promociones
+=======
+## 5. Descuentos y Promociones
+>>>>>>> origin/main
 **Fuente:** `admin/descuento/`
 
 | ID | Requisito Funcional | Descripción Detallada |

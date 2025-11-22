@@ -90,8 +90,23 @@ class ReviewsInbox {
                 this.handleAction(actionBtn.getAttribute('data-action'), id, evt);
             }
         };
+<<<<<<< HEAD
         this.tableBody?.addEventListener('click', delegatedClick);
         this.listContainer?.addEventListener('click', delegatedClick);
+=======
+        this.tableBody?.addEventListener('click', (evt) => delegatedClick(evt, false));
+        this.listContainer?.addEventListener('click', (evt) => delegatedClick(evt, true));
+
+        this.detailToggle?.addEventListener('click', (evt) => {
+            evt.stopPropagation();
+            if (!this.detailPanel) return;
+            const collapsed = this.detailPanel.classList.toggle('collapsed');
+            this.detailPanel.setAttribute('aria-hidden', String(collapsed));
+            // Keep container state so we can alter grid to allow full-width table when detail is closed
+            if (this.container) this.container.classList.toggle('detail-open', !collapsed);
+            this.detailToggle.setAttribute('aria-expanded', String(!collapsed));
+        });
+>>>>>>> origin/main
 
         this.refreshBtn?.addEventListener('click', () => {
             this.loadOverview();
@@ -613,6 +628,15 @@ class ReviewsInbox {
                 this.state.page = 1;
                 this.loadOverview();
                 this.loadList();
+<<<<<<< HEAD
+=======
+                // Close detail panel
+                if (this.detailPanel) {
+                    this.detailPanel.classList.add('collapsed');
+                    this.detailPanel.setAttribute('aria-hidden', 'true');
+                    if (this.container) this.container.classList.remove('detail-open');
+                }
+>>>>>>> origin/main
             }
         } catch (error) {
             console.error('review action', error);
@@ -625,6 +649,66 @@ class ReviewsInbox {
         }
     }
 
+<<<<<<< HEAD
+=======
+    openDetail(id) {
+        const item = this.items.get(String(id));
+        if (!item || !this.detailPanel) return;
+        // highlight selected row or review-card
+        this.tableBody?.querySelectorAll('tr[data-id]')?.forEach((r) => r.classList.toggle('is-selected', r.getAttribute('data-id') === String(id)));
+        this.listContainer?.querySelectorAll('.review-card[data-review-id]')?.forEach((r) => r.classList.toggle('is-selected', r.getAttribute('data-review-id') === String(id)));
+        // expand detail panel
+        this.detailPanel.classList.remove('collapsed');
+        if (this.container) this.container.classList.add('detail-open');
+        this.detailPanel.setAttribute('aria-hidden', 'false');
+        if (this.detailToggle) this.detailToggle.setAttribute('aria-expanded', 'true');
+        const emptyState = this.detailPanel.querySelector('[data-state="empty"]');
+        const content = this.detailPanel.querySelector('[data-state="content"]');
+        emptyState?.setAttribute('hidden', 'hidden');
+        content?.removeAttribute('hidden');
+        content.querySelector('[data-role="title"]').textContent = item.title || 'Sin titulo';
+        content.querySelector('[data-role="rating"]').textContent = `${item.rating} ★`;
+        content.querySelector('[data-role="customer"]').textContent = item.customer?.name || item.customer?.email || 'Cliente';
+        content.querySelector('[data-role="product"]').textContent = item.product?.name || 'Producto';
+        content.querySelector('[data-role="date"]').textContent = this.formatDate(item.created_at);
+        content.querySelector('[data-role="comment"]').textContent = item.comment;
+        const actions = content.querySelector('[data-role="detail-actions"]');
+        actions?.querySelectorAll('button').forEach((btn) => {
+            btn.onclick = (e) => this.handleAction(btn.getAttribute('data-action'), id, e);
+        });
+        // Configure verify and approve button label/state in the detail panel
+        const verifyBtn = actions?.querySelector('button[data-action="verify"]');
+                if (verifyBtn) {
+            const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
+                if (isVerified) {
+                verifyBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Verificada';
+                verifyBtn.title = 'Reseña verificada';
+                verifyBtn.disabled = true;
+                verifyBtn.classList.add('btn-verified');
+                } else {
+                verifyBtn.innerHTML = '<i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i> Marcar como verificada';
+                verifyBtn.title = 'Marcar como verificada';
+                verifyBtn.disabled = false;
+                verifyBtn.classList.remove('btn-verified');
+            }
+        }
+        // Hide approve button in the detail panel if already approved
+        const approveBtn = actions?.querySelector('button[data-action="approve"]');
+        if (approveBtn) {
+            const isApproved = Boolean(item.is_approved);
+            if (isApproved) {
+                approveBtn.style.display = 'none';
+            } else {
+                approveBtn.style.display = '';
+            }
+        }
+        // Apply inline fallback styles to the detail panel action buttons
+        this.applyActionButtonStyles();
+        // Check for any icons that need a fallback replacement inside the detail
+        this.ensureIconFallbacks();
+    }
+
+>>>>>>> origin/main
     renderStatusChip(item) {
         const status = item.is_approved ? 'Publicado' : 'Pendiente';
         const className = item.is_approved ? 'success' : 'warning';
