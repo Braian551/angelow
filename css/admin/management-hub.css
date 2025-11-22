@@ -787,6 +787,19 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 	color: var(--hub-text);
 }
 
+/* Right aligned meta values (email/phone/created) */
+.meta-line [data-role] {
+	display: inline-flex;
+	gap: 0.5rem;
+	align-items: center;
+	justify-self: end;
+}
+.meta-line [data-role] svg { width: 16px; height: 16px; color: var(--hub-primary); opacity: 0.95; }
+.meta-line [data-role] a { color: var(--hub-text); font-weight: 700; text-decoration: none; }
+.meta-line [data-role] a:hover { text-decoration: underline; }
+.meta-line [data-role] .text-muted { color: var(--hub-muted); }
+.meta-line .meta-created { font-weight: 700; }
+
 .empty-state {
 	text-align: center;
 	padding: 2.4rem 1rem;
@@ -826,7 +839,6 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 
 .timeline li span {
 	justify-self: end;
-	color: var(--hub-muted);
 	font-size: 0.95rem;
 }
 

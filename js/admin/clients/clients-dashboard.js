@@ -1076,8 +1076,31 @@ class ClientsDashboard {
         // show email/phone with icons for clarity
         const emailEl = content.querySelector('[data-role="email"]');
         const phoneEl = content.querySelector('[data-role="phone"]');
-        if (emailEl) emailEl.innerHTML = `<i class="fas fa-envelope" aria-hidden="true"></i> ${payload.profile.email}`;
-        if (phoneEl) phoneEl.innerHTML = payload.profile.phone ? `<i class="fas fa-phone" aria-hidden="true"></i> ${payload.profile.phone}` : 'Sin telefono';
+        const createdEl = content.querySelector('[data-role="created"]');
+        // Use inline SVGs for icons to avoid dependency on external fonts and to guarantee rendering
+        const svgMail = `<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>`;
+        const svgPhone = `<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.11-.21 11.36 11.36 0 0 0 3.56.57 1 1 0 0 1 1 1v3.5a1 1 0 0 1-1 1A17 17 0 0 1 3 5a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.56 1 1 0 0 1-.21 1.11l-2.24 2.24z"/></svg>`;
+        const svgCalendar = `<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 15H5V9h14v10z"/></svg>`;
+        if (emailEl) {
+            const mail = payload.profile.email || 'Sin correo';
+            if (payload.profile.email) {
+                emailEl.innerHTML = `${svgMail} <a href="mailto:${mail}" aria-label="Enviar correo">${this.escapeHtml(mail)}</a>`;
+            } else {
+                emailEl.innerHTML = `${svgMail} <span class="text-muted">Sin correo</span>`;
+            }
+        }
+        if (phoneEl) {
+            const phone = payload.profile.phone || null;
+            if (phone) {
+                phoneEl.innerHTML = `${svgPhone} <a href="tel:${phone}" aria-label="Llamar">${this.escapeHtml(phone)}</a>`;
+            } else {
+                phoneEl.innerHTML = `${svgPhone} <span class="text-muted">Sin telefono</span>`;
+            }
+        }
+        if (createdEl) {
+            const created = payload.profile.created_at ? this.formatDate(payload.profile.created_at) : 'Sin datos';
+            createdEl.innerHTML = `${svgCalendar} <span class="meta-created">${this.escapeHtml(created)}</span>`;
+        }
         content.querySelector('[data-role="created"]').textContent = this.formatDate(payload.profile.created_at);
 
         const timeline = document.getElementById('client-activity');
@@ -1156,6 +1179,13 @@ class ClientsDashboard {
         if (parts.length === 1) return (parts[0][0] || '').toUpperCase();
         const initials = (parts[0][0] || '') + (parts[1][0] || '');
         return initials.toUpperCase();
+    }
+
+    escapeHtml(text = '') {
+        return String(text || '').replace(/[&<>"'`]/g, (s) => {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;' };
+            return map[s] || s;
+        });
     }
 
     computeNameColor(name) {
