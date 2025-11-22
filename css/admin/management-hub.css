@@ -186,8 +186,51 @@
 }
 
 .insights-grid {
-	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	/* Improved column sizing so cards don't grow excessively on large
+	   screens. Use minmax for predictable upper bounds and a smaller
+	   first column so the large ticket card doesn't consume the full row. */
+	grid-template-columns: minmax(280px, 1.3fr) minmax(220px, 1fr) minmax(220px, 1fr);
+	grid-auto-flow: row dense;
+	grid-auto-rows: minmax(120px, auto);
+	justify-content: stretch;
+	align-items: start;
+	gap: 1rem 1.4rem;
+	width: 100%;
+	max-width: none;
+	margin-inline: 0;
 }
+
+/* Explicitly position stat cards to improve predictability and make the
+   header visually similar to the previous horizontal layout. These placements
+   only apply in larger viewports — they're reverted at smaller widths below. */
+.insights-grid > .stat-card[data-metric="total"] { grid-column: 1; grid-row: 1; }
+.insights-grid > .stat-card[data-metric="new"] { grid-column: 2; grid-row: 1; }
+.insights-grid > .stat-card[data-metric="active"] { grid-column: 3; grid-row: 1; }
+.insights-grid > .stat-card[data-metric="ticket"] { grid-column: 1 / span 2; grid-row: 2; max-width: 920px; }
+.insights-grid > .stat-card[data-metric="repeat"] { grid-column: 3; grid-row: 2; }
+.insights-grid > .stat-card[data-metric="ltv"] { grid-column: 1; grid-row: 3; }
+
+@media (max-width: 1160px) {
+	/* On smaller screens revert to a 2-column flow so cards stack naturally. */
+	.insights-grid > .stat-card[data-metric="total"],
+	.insights-grid > .stat-card[data-metric="new"],
+	.insights-grid > .stat-card[data-metric="active"],
+	.insights-grid > .stat-card[data-metric="ticket"],
+	.insights-grid > .stat-card[data-metric="repeat"],
+	.insights-grid > .stat-card[data-metric="ltv"] {
+		grid-column: auto; grid-row: auto;
+	}
+}
+
+/* Explicit placement for predictable layout: 3 columns */
+/* Allow implicit placement and `grid-auto-flow: row dense` to place cards naturally. */
+
+.insights-grid > .stat-card { min-height: 140px; padding: 1.35rem 1.9rem; width: 100%; justify-self: stretch; }
+
+/* Prevent normal-sized cards from growing too wide: keep them readable and
+	aligned to the left column area. Large cards still span two columns. */
+.insights-grid > .stat-card:not(.large) { max-width: 520px; justify-self: start; }
+.insights-grid > .stat-card h2 { margin-top: 0; }
 
 .split-grid {
 	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -210,6 +253,30 @@
 	}
 }
 
+/* Responsive rules for the top stat cards */
+@media (max-width: 1160px) {
+	/* Use auto-fit so cards fill the available width and avoid outer gaps */
+	.insights-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem 1.4rem; }
+}
+
+@media (max-width: 900px) {
+	/* On narrow screens, don't constrain card widths so they can fill 100% */
+	.insights-grid > .stat-card:not(.large) { max-width: none; justify-self: stretch; }
+}
+
+/* Limit the cards from becoming extremely wide on very large screens by
+   constraining the maximum width for the whole grid to match common layout
+   widths used across the admin. This keeps cards readable and aligned with
+   other content, while still allowing the grid to adapt on smaller screens. */
+@media (min-width: 1400px) {
+	.insights-grid { grid-template-columns: minmax(320px, 1.2fr) minmax(240px, 1fr) minmax(240px, 1fr); }
+	.insights-grid > .stat-card[data-metric="ticket"] { max-width: 1120px; }
+}
+@media (max-width: 760px) {
+	.insights-grid { grid-template-columns: 1fr; }
+	.stat-card { min-height: 140px; }
+}
+
 /* ======== CARD BASE ======== */
 .stat-card,
 .surface-card,
@@ -227,6 +294,21 @@
 	overflow: hidden;
 	backdrop-filter: blur(var(--hub-blur));
 	transition: transform var(--hub-transition), box-shadow var(--hub-transition), opacity 0.25s ease;
+}
+
+/* Keep stat cards compact and consistent */
+.stat-card {
+	/* Allow stat cards to stretch inside the grid cell for a more horizontal
+	   appearance. Keep the centered content and comfortable padding. */
+	min-width: 220px;
+	max-width: none; /* let the grid control width, not the card */
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	min-height: 140px;
 }
 
 .stat-card::after,
@@ -262,8 +344,68 @@
 
 .stat-card strong {
 	display: block;
-	font-size: clamp(1.8rem, 2vw, 2.6rem);
+	font-size: clamp(1.7rem, 1.9vw, 2.4rem);
 	color: var(--hub-text);
+	text-align: center;
+}
+
+/* ======== STAT CARD ICONS & LAYOUT ======== */
+.stat-card .stat-top {
+	display: flex;
+	align-items: center;
+	gap: 0.9rem;
+	width: 100%;
+	justify-content: center;
+}
+
+.stat-card .stat-top h2 { font-size: 0.95rem; margin: 0; }
+
+/* metric-specific colors for stat icons */
+.insights-grid > .stat-card[data-metric="total"] .stat-icon { background: rgba(0, 119, 182, 0.07); color: var(--primary-color); }
+.insights-grid > .stat-card[data-metric="new"] .stat-icon { background: rgba(96, 165, 250, 0.06); color: #2563eb; }
+.insights-grid > .stat-card[data-metric="active"] .stat-icon { background: rgba(16, 185, 129, 0.06); color: #10b981; }
+.insights-grid > .stat-card[data-metric="repeat"] .stat-icon { background: rgba(245, 158, 11, 0.06); color: #f59e0b; }
+.insights-grid > .stat-card[data-metric="ltv"] .stat-icon { background: rgba(4, 120, 87, 0.06); color: #059669; }
+.insights-grid > .stat-card[data-metric="ticket"] .stat-icon { background: rgba(29, 78, 216, 0.06); color: var(--primary-color); }
+
+.stat-card .stat-icon {
+	display: inline-grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 10px;
+	background: rgba(29, 78, 216, 0.06);
+	color: var(--hub-primary);
+	font-size: 18px;
+	flex: 0 0 44px;
+	box-shadow: 0 4px 14px rgba(29,78,216,0.06);
+}
+
+.stat-card .stat-icon { transition: transform var(--hub-transition), box-shadow var(--hub-transition); }
+.stat-card:hover .stat-icon { transform: translateY(-4px) scale(1.05); box-shadow: var(--hub-shadow-hover); }
+
+.stat-card .delta { font-size: 0.9rem; }
+
+/* Stat value variant: slightly larger and bold */
+.stat-card .stat-value { font-size: clamp(1.4rem, 2.4vw, 2.4rem); font-weight: 800; }
+
+.stat-card .stat-subtext { margin-top: 0.35rem; font-size: 0.95rem; }
+
+/* Make stat-top left-aligned inside card on wider layouts to keep icon and title together */
+@media (min-width: 1160px) {
+	.insights-grid > .stat-card { align-items: flex-start; text-align: left; }
+	.insights-grid > .stat-card .stat-top { justify-content: flex-start; }
+}
+
+/* Larger stat card to visually separate LTV or averages when needed */
+.stat-card.large {
+	/* A large stat card (like an average or an LTV) should span the wider
+	   left column plus one of the smaller ones so it reads as an emphasized
+	   horizontal card. On smaller screens, it reverts to normal. */
+	grid-column: 1 / span 2;
+	grid-row: auto;
+	padding: 1.6rem 2.2rem;
+	min-height: 150px;
 }
 
 .stat-card .delta {
@@ -691,7 +833,7 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 	background: #fff;
 }
 /* Larger clickable area and disabled state for pagination controls */
-#clients-pagination .actions button { min-width: 40px; min-height: 40px; display:inline-grid; place-items:center; }
+#clients-pagination .actions button { min-width: 44px; min-height: 44px; display:inline-grid; place-items:center; border-radius: 12px; }
 #clients-pagination .actions button[disabled], #clients-pagination .actions button[aria-disabled="true"] { opacity: 0.55; pointer-events: none; cursor: not-allowed; border-color: rgba(15,23,42,0.06); }
 
 /* ======== DETAIL PANEL ======== */
@@ -1147,6 +1289,11 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 		position: static;
 		width: 100%;
 	}
+}
+
+/* On very narrow screens, large stat cards should behave like normal items */
+@media (max-width: 900px) {
+	.stat-card.large { grid-column: auto; }
 }
 
 /* Make top customers responsive: move meta under name on small screens */

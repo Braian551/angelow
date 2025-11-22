@@ -41,35 +41,53 @@ requireRole('admin');
             </div>
 
             <section class="insights-grid" id="clients-insights">
-                <article class="stat-card" data-metric="total">
-                    <h2>Total clientes</h2>
-                    <strong>--</strong>
-                    <div class="delta muted">vs periodo anterior</div>
+                <article class="stat-card" data-metric="total" role="status" aria-live="polite">
+                    <div class="stat-top">
+                        <span class="stat-icon" aria-hidden="true"><i class="fas fa-users"></i></span>
+                        <h2>Total clientes</h2>
+                    </div>
+                    <strong class="stat-value">--</strong>
+                    <div class="delta muted stat-subtext">vs periodo anterior</div>
                 </article>
-                <article class="stat-card" data-metric="new">
-                    <h2>Nuevos (30d)</h2>
-                    <strong>--</strong>
-                    <div class="delta positive">--%</div>
+                <article class="stat-card" data-metric="new" role="status" aria-live="polite">
+                    <div class="stat-top">
+                        <span class="stat-icon" aria-hidden="true"><i class="fas fa-user-plus"></i></span>
+                        <h2>Nuevos (30d)</h2>
+                    </div>
+                    <strong class="stat-value">--</strong>
+                    <div class="delta positive stat-subtext">--%</div>
                 </article>
-                <article class="stat-card" data-metric="active">
-                    <h2>Activos (90d)</h2>
-                    <strong>--</strong>
-                    <div class="delta muted">Clientes con orden reciente</div>
+                <article class="stat-card" data-metric="active" role="status" aria-live="polite">
+                    <div class="stat-top">
+                        <span class="stat-icon" aria-hidden="true"><i class="fas fa-user-check"></i></span>
+                        <h2>Activos (90d)</h2>
+                    </div>
+                    <strong class="stat-value">--</strong>
+                    <div class="delta muted stat-subtext">Clientes con orden reciente</div>
                 </article>
-                <article class="stat-card" data-metric="repeat">
-                    <h2>Tasa recompra</h2>
-                    <strong>--%</strong>
-                    <div class="delta positive">Clientes con +2 pedidos</div>
+                <article class="stat-card" data-metric="repeat" role="status" aria-live="polite">
+                    <div class="stat-top">
+                        <span class="stat-icon" aria-hidden="true"><i class="fas fa-repeat"></i></span>
+                        <h2>Tasa recompra</h2>
+                    </div>
+                    <strong class="stat-value">--%</strong>
+                    <div class="delta positive stat-subtext">Clientes con +2 pedidos</div>
                 </article>
-                <article class="stat-card" data-metric="ltv">
-                    <h2>Valor de vida</h2>
-                    <strong>--</strong>
-                    <div class="delta muted">Promedio global</div>
+                <article class="stat-card" data-metric="ltv" role="status" aria-live="polite">
+                    <div class="stat-top">
+                        <span class="stat-icon" aria-hidden="true"><i class="fas fa-wallet"></i></span>
+                        <h2>Valor de vida</h2>
+                    </div>
+                    <strong class="stat-value">--</strong>
+                    <div class="delta muted stat-subtext">Promedio global</div>
                 </article>
-                <article class="stat-card" data-metric="ticket">
-                    <h2>Valor promedio por pedido (COP)</h2>
-                    <strong>--</strong>
-                    <div class="delta muted">Ultimos 60 dias</div>
+                <article class="stat-card large" data-metric="ticket" role="status" aria-live="polite">
+                    <div class="stat-top">
+                        <span class="stat-icon" aria-hidden="true"><i class="fas fa-receipt"></i></span>
+                        <h2>Valor promedio por pedido (COP)</h2>
+                    </div>
+                    <strong class="stat-value">--</strong>
+                    <div class="delta muted stat-subtext">Ultimos 60 dias</div>
                 </article>
             </section>
 
