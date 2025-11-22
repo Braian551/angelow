@@ -14,6 +14,7 @@ class ClientsDashboard {
             segments: null
         };
         this.theme = this.captureTheme();
+        this.trendCollapsed = false;
         this.cacheDom();
         this.bindEvents();
         this.loadOverview();
@@ -53,6 +54,9 @@ class ClientsDashboard {
         this.statCards = this.hub?.querySelectorAll('.stat-card') || [];
         this.segmentContainer = document.getElementById('client-segments');
         this.trendList = document.getElementById('acquisition-trend');
+        this.trendContainer = this.trendList?.closest('article');
+        this.trendSummaryEl = this.trendContainer?.querySelector('.trend-summary') || null;
+        this.trendToggleBtn = null; // assigned when rendering
         // Acquire the subtitle element for the weekly acquisition section to
         // update it when the user selects a different range.
         this.acquisitionSubtitle = this.trendList?.closest('article')?.querySelector('.section-header p');
@@ -298,13 +302,38 @@ class ClientsDashboard {
             this.segmentContainer.innerHTML = '<p class="text-muted">Sin segmentos disponibles</p>';
             return;
         }
-        this.segmentContainer.innerHTML = segments.map((segment) => `
+        const total = segments.reduce((s, seg) => s + (Number(seg.count) || 0), 0) || 1;
+        this.segmentContainer.innerHTML = segments.map((segment) => {
+            const value = Number(segment.count) || 0;
+            const percentage = total ? Math.round((value / total) * 100) : 0;
+            return `
             <article class="segment-tile" data-segment="${segment.key}">
-                <h3>${segment.label}</h3>
+                <div class="tile-head">
+                    <h3>${segment.label}</h3>
+                    <div class="count-badge"><strong>${value.toLocaleString('es-CO')}</strong><small>${percentage}%</small></div>
+                </div>
                 <p>${segment.description}</p>
-                <strong>${Number(segment.count || 0).toLocaleString('es-CO')}</strong>
             </article>
-        `).join('');
+        `;
+        }).join('');
+
+        // Add interaction to tiles: focus/activate a segment to filter list
+        this.segmentContainer.querySelectorAll('.segment-tile').forEach((tile) => {
+            tile.addEventListener('click', () => {
+                const seg = tile.getAttribute('data-segment');
+                if (!seg) return;
+                if (this.segmentSelect) {
+                    this.segmentSelect.value = seg;
+                    this.segmentSelect.dispatchEvent(new Event('change'));
+                } else {
+                    this.state.segment = seg;
+                    this.loadList();
+                }
+            });
+            // Provide the description as a tooltip for accessibility
+            const p = tile.querySelector('p');
+            if (p && p.textContent) tile.setAttribute('title', p.textContent.trim());
+        });
     }
 
     renderTrend(trend = []) {
@@ -314,6 +343,16 @@ class ClientsDashboard {
             this.trendList.innerHTML = '<li>No hay datos suficientes</li>';
             return;
         }
+        // Build summary information: total and average
+        const counts = trend.map((t) => Number(t.count) || 0);
+        const total = counts.reduce((s, v) => s + v, 0);
+        const weeks = trend.length || 0;
+        const average = weeks ? Math.round(total / weeks) : 0;
+
+        // Create or update the trend summary UI
+        this.upsertTrendSummary({ total, average, weeks });
+
+        // Render list items (keeps full list in DOM; collapsed view will hide via CSS and JS)
         this.trendList.innerHTML = trend.map((point) => {
             const width = Math.min(100, (point.count || 0) * 4);
             return `
@@ -326,6 +365,76 @@ class ClientsDashboard {
                 </li>
             `;
         }).join('');
+
+        // If the trend is long, default collapse it for readability and add toggle
+        const COLLAPSE_LIMIT = 8;
+        if (trend.length > COLLAPSE_LIMIT) {
+            this.trendCollapsed = true;
+            this.trendList.classList.add('collapsed');
+            this.addTrendToggle();
+        } else {
+            this.trendCollapsed = false;
+            this.trendList.classList.remove('collapsed');
+            this.removeTrendToggle();
+        }
+    }
+
+    upsertTrendSummary({ total, average, weeks }) {
+        if (!this.trendContainer) return;
+        // Build HTML for summary; reuse existing element if present
+        const html = `
+            <div class="trend-summary" role="status">
+                <div>
+                    <strong>${total.toLocaleString('es-CO')} clientes</strong>
+                    <small>Promedio ${average} / semana • Últimas ${weeks} semana${weeks > 1 ? 's' : ''}</small>
+                </div>
+                <div class="trend-controls">
+                    <button class="btn-soft btn-mini" aria-expanded="false">Ver todas</button>
+                </div>
+            </div>
+        `;
+        if (this.trendSummaryEl) {
+            this.trendSummaryEl.outerHTML = html;
+            this.trendSummaryEl = this.trendContainer.querySelector('.trend-summary');
+        } else {
+            this.trendContainer.insertAdjacentHTML('afterbegin', html);
+            this.trendSummaryEl = this.trendContainer.querySelector('.trend-summary');
+        }
+        // Ensure toggle button ref is updated and event bound
+        this.trendToggleBtn = this.trendSummaryEl.querySelector('button');
+        if (this.trendToggleBtn) {
+            this.trendToggleBtn.addEventListener('click', () => {
+                this.trendCollapsed = !this.trendCollapsed;
+                this.toggleTrendCollapsed(this.trendCollapsed);
+            });
+            // Set initial accessible label
+            this.trendToggleBtn.setAttribute('aria-expanded', String(!this.trendCollapsed));
+            this.trendToggleBtn.textContent = this.trendCollapsed ? 'Ver todas' : 'Ver menos';
+        }
+    }
+
+    addTrendToggle() {
+        if (!this.trendSummaryEl) return;
+        // Keep button updated
+        this.trendToggleBtn = this.trendSummaryEl.querySelector('button');
+        if (!this.trendToggleBtn) return;
+        this.trendToggleBtn.setAttribute('aria-expanded', String(!this.trendCollapsed));
+        this.trendToggleBtn.textContent = this.trendCollapsed ? 'Ver todas' : 'Ver menos';
+    }
+
+    removeTrendToggle() {
+        if (!this.trendSummaryEl) return;
+        const btn = this.trendSummaryEl.querySelector('button');
+        if (btn) btn.remove();
+    }
+
+    toggleTrendCollapsed(collapsed) {
+        if (!this.trendList) return;
+        this.trendList.classList.toggle('collapsed', !!collapsed);
+        if (this.trendToggleBtn) {
+            this.trendToggleBtn.setAttribute('aria-expanded', String(!collapsed));
+            this.trendToggleBtn.textContent = collapsed ? 'Ver todas' : 'Ver menos';
+        }
     }
 
     renderEngagement(matrix = {}) {

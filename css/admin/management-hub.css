@@ -244,6 +244,7 @@
 	padding: 1rem;
 	background: rgba(255, 255, 255, 0.86);
 	transition: var(--hub-transition);
+	cursor: pointer;
 }
 
 .segment-tile:hover { transform: translateY(-4px); }
@@ -358,6 +359,9 @@
 .segment-tile h3 { font-size: 1.05rem; color: var(--hub-text); }
 .segment-tile p { color: var(--hub-muted); font-size: 0.9rem; margin: 0.35rem 0 0.65rem; }
 .segment-tile strong { font-size: 1.6rem; color: var(--hub-primary); }
+
+.tile-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.tile-head h3 { margin: 0; }
 
 /* ======== FILTERS & TABLE ======== */
 .table-card header,
@@ -506,6 +510,10 @@ tbody tr:hover {
 	padding-left: 1.5rem;
 	color: var(--hub-muted-strong);
 	font-size: 0.95rem;
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+	gap: 0.65rem;
 }
 
 .timeline li::before {
@@ -520,6 +528,10 @@ tbody tr:hover {
 }
 
 .timeline strong { color: var(--hub-text); font-size: 1rem; }
+
+.timeline li span { justify-self: end; color: var(--hub-muted); font-size: 0.95rem; }
+
+.timeline li .progress-bar { grid-column: 1 / -1; }
 
 /* ======== CHART CARDS ======== */
 .chart-header {
@@ -672,3 +684,69 @@ tbody tr:hover {
 .chart-card:hover::after {
 	animation: hubPulse 1.8s ease-out forwards;
 }
+
+/* Additional styles to improve the acquisition weekly visualization and summarization */
+/* Collapsed timeline for long lists: limit visible height and add fade gradient */
+.timeline.collapsed {
+	max-height: 360px; /* shows approx ~8-12 rows depending on line-height */
+	overflow: hidden;
+	position: relative;
+}
+
+.timeline.collapsed::after {
+	/* subtle gradient fade at the bottom to indicate more content */
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 48px;
+	pointer-events: none;
+	background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(247,249,252,0.98) 40%);
+}
+
+.trend-summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.35rem 0.2rem 0.9rem 0.2rem;
+	border-bottom: 1px solid rgba(15, 23, 42, 0.04);
+	margin-bottom: 0.6rem;
+}
+
+@media (max-width: 720px) {
+	.trend-summary { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+	.trend-controls { width: 100%; display:flex; justify-content:flex-end; }
+	.timeline.collapsed { max-height: 260px; }
+}
+
+.trend-summary strong { font-size: 1.1rem; color: var(--hub-text); }
+.trend-summary small { color: var(--hub-muted); margin-left: 0.45rem; }
+
+.trend-controls button {
+	border-radius: 999px;
+	padding: 0.35rem 0.8rem;
+	border: 1px solid var(--hub-border);
+	background: transparent;
+	cursor: pointer;
+}
+
+.btn-mini { padding: 0.35rem 0.6rem; font-size: 0.86rem; }
+
+/* Badge displayed on segment tiles for counts */
+.segment-tile .count-badge {
+	display: inline-flex;
+	margin-top: 0.35rem;
+	align-items: center;
+	gap: 0.5rem;
+	font-weight: 700;
+	color: var(--hub-primary);
+	font-size: 1.05rem;
+}
+
+.segment-tile .count-badge small { font-weight: 600; color: var(--hub-muted); font-size: 0.9rem; }
+
+/* Provide a small compact view for the trend that shows the latest weeks */
+.timeline.compact li span { color: var(--hub-muted); font-size: 0.9rem; }
+
