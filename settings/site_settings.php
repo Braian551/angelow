@@ -8,27 +8,197 @@
 if (!function_exists('site_settings_definitions')) {
     function site_settings_definitions(): array {
         return [
-            'store_name' => ['type' => 'string', 'category' => 'brand', 'default' => 'Angelow', 'max_length' => 140],
-            'store_tagline' => ['type' => 'string', 'category' => 'brand', 'default' => 'Moda con proposito', 'max_length' => 180],
-            'brand_logo' => ['type' => 'string', 'category' => 'brand', 'default' => '', 'max_length' => 255],
-            'primary_color' => ['type' => 'string', 'category' => 'brand', 'default' => '#0077b6', 'pattern' => '/^#([A-Fa-f0-9]{6})$/'],
-            'secondary_color' => ['type' => 'string', 'category' => 'brand', 'default' => '#0f172a', 'pattern' => '/^#([A-Fa-f0-9]{6})$/'],
-            'support_email' => ['type' => 'string', 'category' => 'support', 'default' => 'soporte@angelow.com', 'max_length' => 180],
-            'support_phone' => ['type' => 'string', 'category' => 'support', 'default' => '+57 300 000 0000', 'max_length' => 40],
-            'support_whatsapp' => ['type' => 'string', 'category' => 'support', 'default' => '+57 300 000 0000', 'max_length' => 40],
-            'support_hours' => ['type' => 'string', 'category' => 'support', 'default' => 'L-V 8:00 a 18:00', 'max_length' => 120],
-            'support_address' => ['type' => 'string', 'category' => 'support', 'default' => 'Medellin, Colombia', 'max_length' => 240],
-            'order_auto_cancel_hours' => ['type' => 'int', 'category' => 'operations', 'default' => 48, 'min' => 1, 'max' => 720],
-            'order_review_window_days' => ['type' => 'int', 'category' => 'operations', 'default' => 15, 'min' => 1, 'max' => 60],
-            'low_stock_threshold' => ['type' => 'int', 'category' => 'operations', 'default' => 5, 'min' => 1, 'max' => 200],
-            'review_auto_approve' => ['type' => 'bool', 'category' => 'operations', 'default' => true],
-            'currency_code' => ['type' => 'string', 'category' => 'operations', 'default' => 'COP', 'pattern' => '/^[A-Z]{3}$/'],
-            'analytics_timezone' => ['type' => 'string', 'category' => 'operations', 'default' => 'America/Bogota', 'max_length' => 64],
-            'dashboard_welcome' => ['type' => 'string', 'category' => 'brand', 'default' => 'Bienvenido al panel Angelow', 'max_length' => 255],
-            'social_instagram' => ['type' => 'string', 'category' => 'social', 'default' => 'https://instagram.com/angelow', 'max_length' => 255],
-            'social_facebook' => ['type' => 'string', 'category' => 'social', 'default' => 'https://facebook.com/angelow', 'max_length' => 255],
-            'social_tiktok' => ['type' => 'string', 'category' => 'social', 'default' => '', 'max_length' => 255],
-            'social_whatsapp' => ['type' => 'string', 'category' => 'social', 'default' => 'https://wa.me/573000000000', 'max_length' => 255],
+            'store_name' => [
+                'type' => 'string', 
+                'category' => 'brand', 
+                'default' => 'Angelow', 
+                'max_length' => 140,
+                'label' => 'Nombre de la tienda',
+                'hint' => 'Nombre visible en el sitio web y correos.',
+                'icon' => 'fa-store'
+            ],
+            'store_tagline' => [
+                'type' => 'string', 
+                'category' => 'brand', 
+                'default' => 'Moda con proposito', 
+                'max_length' => 180,
+                'label' => 'Lema de la tienda',
+                'hint' => 'Frase corta que describe tu negocio.',
+                'icon' => 'fa-tag'
+            ],
+            'brand_logo' => [
+                'type' => 'image', 
+                'category' => 'brand', 
+                'default' => '', 
+                'max_length' => 255,
+                'label' => 'Logo de la marca',
+                'hint' => 'Sube tu logo en formato PNG o SVG.',
+                'icon' => 'fa-image'
+            ],
+            'primary_color' => [
+                'type' => 'string', 
+                'category' => 'brand', 
+                'default' => '#0077b6', 
+                'pattern' => '/^#([A-Fa-f0-9]{6})$/',
+                'label' => 'Color primario',
+                'hint' => 'Color principal de la marca (HEX).',
+                'icon' => 'fa-palette'
+            ],
+            'secondary_color' => [
+                'type' => 'string', 
+                'category' => 'brand', 
+                'default' => '#0f172a', 
+                'pattern' => '/^#([A-Fa-f0-9]{6})$/',
+                'label' => 'Color secundario',
+                'hint' => 'Color secundario de la marca (HEX).',
+                'icon' => 'fa-paint-brush'
+            ],
+            'support_email' => [
+                'type' => 'email', 
+                'category' => 'support', 
+                'default' => 'soporte@angelow.com', 
+                'max_length' => 180,
+                'label' => 'Correo de soporte',
+                'hint' => 'Email visible para contacto de clientes.',
+                'icon' => 'fa-envelope'
+            ],
+            'support_phone' => [
+                'type' => 'string', 
+                'category' => 'support', 
+                'default' => '+57 300 000 0000', 
+                'max_length' => 40,
+                'label' => 'Teléfono de soporte',
+                'hint' => 'Número de contacto principal.',
+                'icon' => 'fa-phone'
+            ],
+            'support_whatsapp' => [
+                'type' => 'string', 
+                'category' => 'support', 
+                'default' => '+57 300 000 0000', 
+                'max_length' => 40,
+                'label' => 'WhatsApp',
+                'hint' => 'Número para botón de WhatsApp.',
+                'icon' => 'fa-whatsapp'
+            ],
+            'support_hours' => [
+                'type' => 'string', 
+                'category' => 'support', 
+                'default' => 'L-V 8:00 a 18:00', 
+                'max_length' => 120,
+                'label' => 'Horario de atención',
+                'hint' => 'Horario visible en el pie de página.',
+                'icon' => 'fa-clock'
+            ],
+            'support_address' => [
+                'type' => 'string', 
+                'category' => 'support', 
+                'default' => 'Medellin, Colombia', 
+                'max_length' => 240,
+                'label' => 'Dirección física',
+                'hint' => 'Dirección de la tienda o bodega.',
+                'icon' => 'fa-map-marker-alt'
+            ],
+            'order_auto_cancel_hours' => [
+                'type' => 'int', 
+                'category' => 'operations', 
+                'default' => 48, 
+                'min' => 1, 
+                'max' => 720,
+                'label' => 'Auto-cancelar órdenes (horas)',
+                'hint' => 'Tiempo antes de cancelar órdenes pendientes.',
+                'icon' => 'fa-hourglass-half'
+            ],
+            'order_review_window_days' => [
+                'type' => 'int', 
+                'category' => 'operations', 
+                'default' => 15, 
+                'min' => 1, 
+                'max' => 60,
+                'label' => 'Ventana de reseñas (días)',
+                'hint' => 'Días permitidos para dejar reseña tras compra.',
+                'icon' => 'fa-calendar-alt'
+            ],
+            'low_stock_threshold' => [
+                'type' => 'int', 
+                'category' => 'operations', 
+                'default' => 5, 
+                'min' => 1, 
+                'max' => 200,
+                'label' => 'Umbral de stock bajo',
+                'hint' => 'Cantidad para alerta de inventario bajo.',
+                'icon' => 'fa-box-open'
+            ],
+            'review_auto_approve' => [
+                'type' => 'bool', 
+                'category' => 'operations', 
+                'default' => true,
+                'label' => 'Auto-aprobar reseñas',
+                'hint' => 'Publicar reseñas automáticamente.',
+                'icon' => 'fa-check-circle'
+            ],
+            'currency_code' => [
+                'type' => 'string', 
+                'category' => 'operations', 
+                'default' => 'COP', 
+                'pattern' => '/^[A-Z]{3}$/',
+                'label' => 'Moneda',
+                'hint' => 'Código ISO de la moneda (ej. COP, USD).',
+                'icon' => 'fa-money-bill-wave'
+            ],
+            'analytics_timezone' => [
+                'type' => 'string', 
+                'category' => 'operations', 
+                'default' => 'America/Bogota', 
+                'max_length' => 64,
+                'label' => 'Zona horaria',
+                'hint' => 'Zona horaria para reportes.',
+                'icon' => 'fa-globe'
+            ],
+            'dashboard_welcome' => [
+                'type' => 'string', 
+                'category' => 'brand', 
+                'default' => 'Bienvenido al panel Angelow', 
+                'max_length' => 255,
+                'label' => 'Mensaje de bienvenida',
+                'hint' => 'Título en el dashboard principal.',
+                'icon' => 'fa-door-open'
+            ],
+            'social_instagram' => [
+                'type' => 'string', 
+                'category' => 'social', 
+                'default' => 'https://instagram.com/angelow', 
+                'max_length' => 255,
+                'label' => 'Instagram URL',
+                'hint' => 'Enlace a perfil de Instagram.',
+                'icon' => 'fa-instagram'
+            ],
+            'social_facebook' => [
+                'type' => 'string', 
+                'category' => 'social', 
+                'default' => 'https://facebook.com/angelow', 
+                'max_length' => 255,
+                'label' => 'Facebook URL',
+                'hint' => 'Enlace a página de Facebook.',
+                'icon' => 'fa-facebook'
+            ],
+            'social_tiktok' => [
+                'type' => 'string', 
+                'category' => 'social', 
+                'default' => '', 
+                'max_length' => 255,
+                'label' => 'TikTok URL',
+                'hint' => 'Enlace a perfil de TikTok.',
+                'icon' => 'fa-tiktok'
+            ],
+            'social_whatsapp' => [
+                'type' => 'string', 
+                'category' => 'social', 
+                'default' => 'https://wa.me/573000000000', 
+                'max_length' => 255,
+                'label' => 'WhatsApp Link',
+                'hint' => 'Enlace directo de WhatsApp.',
+                'icon' => 'fa-whatsapp'
+            ],
         ];
     }
 }

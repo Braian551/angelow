@@ -366,21 +366,74 @@ class ReviewsInbox {
             const comment = (item.comment || '').slice(0, 70);
             return `
                 <tr data-id="${item.id}">
-                    <td>
+                    <td class="review">
                         <div>${item.title || 'Sin titulo'}</div>
                         <small class="text-muted">${comment}${comment.length === 70 ? '...' : ''}</small>
                     </td>
                     <td>${item.product?.name || 'Producto'}</td>
                     <td><span class="badge-ghost">${item.rating} ★</span></td>
                     <td>${this.renderStatusChip(item)}</td>
-                    <td>
-                        <button class="btn-soft" data-action="approve" title="Aprobar"><i class="fas fa-check"></i></button>
-                        <button class="btn-soft" data-action="reject" title="Rechazar"><i class="fas fa-ban"></i></button>
-                        <button class="btn-soft" data-action="verify" title="Verificar"><i class="fas fa-shield"></i></button>
+                    <td class="actions">
+                        <button class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar"><i class="fas fa-check"></i></button>
+                        <button class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar"><i class="fas fa-ban"></i></button>
+                        <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Verificar"><i class="fas fa-shield"></i></button>
                     </td>
                 </tr>
             `;
         }).join('');
+
+        // Debug: log first action button classes to ensure JS rendered expected classes (remove once validated)
+        setTimeout(() => {
+            const firstActionBtn = this.tableBody?.querySelector('button[data-action]');
+            if (firstActionBtn) console.info('REVIEWS DEBUG: first action button classes ->', firstActionBtn.className);
+            const firstTableBtn = this.tableBody?.querySelector('td.actions button[data-action]');
+            if (firstTableBtn) console.info('REVIEWS DEBUG: action button computed styles ->', getComputedStyle(firstTableBtn).backgroundColor, getComputedStyle(firstTableBtn).color);
+            // Ensure color class exists on all actions - if not, add it by mapping data-action -> class
+            this.tableBody.querySelectorAll('td.actions button[data-action]').forEach((btn) => {
+                const act = btn.getAttribute('data-action');
+                if (act && !btn.classList.contains(`btn-${act}`)) {
+                    btn.classList.add(`btn-${act}`);
+                    console.info('REVIEWS DEBUG: added missing class', `btn-${act}`);
+                }
+            });
+        }, 50);
+        // Ensure icon colors are applied even if other CSS overrides
+        // Colors handled by CSS, but apply inline fallback for stubborn overrides (cache or later CSS).
+        this.applyActionButtonStyles();
+    }
+
+    applyActionButtonStyles() {
+        const map = {
+            approve: { bg: 'rgba(16,185,129,0.08)', color: '#059669', border: 'rgba(16,185,129,0.12)' },
+            reject: { bg: 'rgba(220,38,38,0.06)', color: '#dc2626', border: 'rgba(220,38,38,0.12)' },
+            verify: { bg: 'rgba(0,119,182,0.06)', color: '#0077b6', border: 'rgba(0,119,182,0.12)' }
+        };
+        // Table buttons
+        this.tableBody?.querySelectorAll('td.actions button[data-action]')?.forEach((btn) => {
+            const act = btn.getAttribute('data-action');
+            const cfg = map[act];
+            if (!cfg) return;
+            btn.style.backgroundColor = cfg.bg;
+            btn.style.borderColor = cfg.border;
+            const ic = btn.querySelector('i') || btn.querySelector('svg');
+            if (ic) {
+                ic.style.color = cfg.color;
+                if (ic.tagName?.toLowerCase() === 'svg') ic.style.fill = cfg.color;
+            }
+        });
+        // Detail panel buttons
+        this.detailPanel?.querySelectorAll('button[data-action]')?.forEach((btn) => {
+            const act = btn.getAttribute('data-action');
+            const cfg = map[act];
+            if (!cfg) return;
+            btn.style.backgroundColor = cfg.bg;
+            btn.style.borderColor = cfg.border;
+            const ic = btn.querySelector('i') || btn.querySelector('svg');
+            if (ic) {
+                ic.style.color = cfg.color;
+                if (ic.tagName?.toLowerCase() === 'svg') ic.style.fill = cfg.color;
+            }
+        });
     }
 
     renderPagination(meta) {
@@ -415,7 +468,6 @@ class ReviewsInbox {
         const body = JSON.stringify({ review_id: id, action });
         try {
             const response = await fetch(this.config.endpoints.update, {
-                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'same-origin',
                 body
@@ -478,6 +530,8 @@ class ReviewsInbox {
         actions?.querySelectorAll('button').forEach((btn) => {
             btn.onclick = () => this.handleAction(btn.getAttribute('data-action'), id);
         });
+        // Apply inline fallback styles to the detail panel action buttons
+        this.applyActionButtonStyles();
     }
 
     renderStatusChip(item) {

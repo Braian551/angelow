@@ -5,9 +5,15 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../conexion.php';
 require_once __DIR__ . '/../auth/role_redirect.php';
+require_once __DIR__ . '/../settings/site_settings.php';
 
 // Aplicar control de acceso basado en roles
 enforceRoleAccess();
+
+// Obtener configuraciones del sitio
+$siteSettings = fetch_site_settings($conn);
+$logoUrl = !empty($siteSettings['brand_logo']) ? BASE_URL . '/' . $siteSettings['brand_logo'] : BASE_URL . '/images/logo2.png';
+$storeName = $siteSettings['store_name'] ?? 'Angelow - Ropa Infantil';
 
 // Obtener el conteo del carrito si no está en sesión
 if (!isset($_SESSION['cart_count'])) {
@@ -56,7 +62,7 @@ $currentSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''
         <!-- Logo -->
         <div class="content-logo2">
             <a href="<?= BASE_URL ?>/index.html">
-                <img src="<?= BASE_URL ?>/images/logo2.png" alt="Angelow - Ropa Infantil" width="100">
+                <img src="<?= htmlspecialchars($logoUrl) ?>" alt="<?= htmlspecialchars($storeName) ?>" width="100">
             </a>
         </div>
 

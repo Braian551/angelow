@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/../settings/site_settings.php';
+$siteSettings = fetch_site_settings($conn);
+?>
     <footer class="main-footer">
         <div class="footer-container">
             <div class="footer-column">
@@ -36,26 +40,28 @@
             <div class="footer-column">
                 <h3>Contacto</h3>
                 <address>
-                    <p><i class="fas fa-map-marker-alt"></i> Calle 120 # 49 B 24, Medellín</p>
-                    <p><i class="fas fa-phone"></i> +57 313 595 1664</p>
-                    <p><i class="fas fa-envelope"></i> anelhiguita@hotmail.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($siteSettings['support_address'] ?? 'Medellin, Colombia') ?></p>
+                    <p><i class="fas fa-phone"></i> <?= htmlspecialchars($siteSettings['support_phone'] ?? '+57 300 000 0000') ?></p>
+                    <p><i class="fas fa-envelope"></i> <?= htmlspecialchars($siteSettings['support_email'] ?? 'soporte@angelow.com') ?></p>
                 </address>
                 <div class="social-links">
-                    <a href="<?= BASE_URL ?>/#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="<?= BASE_URL ?>/#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="<?= BASE_URL ?>/#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
-                    <a href="<?= BASE_URL ?>/#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <?php if (!empty($siteSettings['social_facebook'])): ?>
+                        <a href="<?= htmlspecialchars($siteSettings['social_facebook']) ?>" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <?php endif; ?>
+                    <?php if (!empty($siteSettings['social_instagram'])): ?>
+                        <a href="<?= htmlspecialchars($siteSettings['social_instagram']) ?>" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <?php endif; ?>
+                    <?php if (!empty($siteSettings['social_tiktok'])): ?>
+                        <a href="<?= htmlspecialchars($siteSettings['social_tiktok']) ?>" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <?php endif; ?>
+                    <?php if (!empty($siteSettings['social_whatsapp'])): ?>
+                        <a href="<?= htmlspecialchars($siteSettings['social_whatsapp']) ?>" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
         
         <div class="footer-bottom">
-            <!-- <div class="payment-methods">
-                <i class="fab fa-cc-visa" style="font-size: 24px; color: #1a1f71;"></i>
-                <i class="fab fa-cc-mastercard" style="font-size: 24px; color: #eb001b;"></i>
-                <i class="fab fa-cc-amex" style="font-size: 24px; color: #006fcf;"></i>
-                                <i class="fab fa-cc-paypal" style="font-size: 24px; color: #003087;"></i>
-            </div> -->
-            <p class="copyright">&copy; 2025 Angelow. Todos los derechos reservados.</p>
+            <p class="copyright">&copy; <?= date('Y') ?> <?= htmlspecialchars($siteSettings['store_name'] ?? 'Angelow') ?>. Todos los derechos reservados.</p>
         </div>
     </footer>

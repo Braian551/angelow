@@ -1,9 +1,15 @@
-
 <?php
 require_once __DIR__ . '/conexion.php';
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/settings/site_settings.php';
 require_once __DIR__ . '/layouts/headerproducts.php';
 require_once __DIR__ . '/helpers/product_pricing.php';
+
+// Fetch site settings
+$siteSettings = fetch_site_settings($conn);
+$storeName = $siteSettings['store_name'] ?? 'Angelow';
+$storeTagline = $siteSettings['store_tagline'] ?? 'Ropa Infantil Premium';
+$brandLogo = !empty($siteSettings['brand_logo']) ? BASE_URL . '/' . $siteSettings['brand_logo'] : 'images/logo.png';
 
 // Obtener anuncios activos para barra superior (solo el de mayor prioridad)
 $top_bar_query = "SELECT * FROM announcements 
@@ -83,15 +89,14 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Angelow - Ropa Infantil Premium</title>
-    <meta name="description" content="Tienda online de ropa infantil de alta calidad. Moda cómoda y segura para bebés, niñas y niños. Envíos a todo el país.">
+    <title><?= htmlspecialchars($storeName) ?> - <?= htmlspecialchars($storeTagline) ?></title>
+    <meta name="description" content="<?= htmlspecialchars($storeTagline) ?>. Tienda online de ropa infantil de alta calidad. Moda cómoda y segura para bebés, niñas y niños. Envíos a todo el país.">
     <meta name="keywords" content="ropa infantil, moda niños, ropa bebé, vestidos niñas, conjuntos niños, pijamas infantiles">
-    <link rel="icon" href="images/logo.png" type="image/x-icon">
+    <link rel="icon" href="<?= htmlspecialchars($brandLogo) ?>" type="image/x-icon">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/productos.css">
     <link rel="stylesheet" href="css/announcements.css">
     <link rel="stylesheet" href="css/notificacion.css">
-    <!-- Preconexión para mejorar performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
