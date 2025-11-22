@@ -443,6 +443,7 @@ class ReviewsInbox {
                 const row = this.tableBody.querySelector(`tr[data-id="${item.id}"]`);
                 if (!row) return;
                 const verifyBtn = row.querySelector('button[data-action="verify"]');
+                const approveBtn = row.querySelector('button[data-action="approve"]');
                 if (!verifyBtn) return;
                 const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
                 if (isVerified) {
@@ -456,6 +457,15 @@ class ReviewsInbox {
                     verifyBtn.setAttribute('title', 'Marcar como verificada');
                     verifyBtn.disabled = false;
                     verifyBtn.classList.remove('btn-verified');
+                }
+                // Hide approve button if the review is already approved
+                const isApproved = Boolean(item.is_approved);
+                if (approveBtn) {
+                    if (isApproved) {
+                        approveBtn.style.display = 'none';
+                    } else {
+                        approveBtn.style.display = '';
+                    }
                 }
             });
         }, 25);
@@ -623,7 +633,7 @@ class ReviewsInbox {
         actions?.querySelectorAll('button').forEach((btn) => {
             btn.onclick = () => this.handleAction(btn.getAttribute('data-action'), id);
         });
-        // Configure verify button label/state in the detail panel
+        // Configure verify and approve button label/state in the detail panel
         const verifyBtn = actions?.querySelector('button[data-action="verify"]');
         if (verifyBtn) {
             const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
@@ -637,6 +647,16 @@ class ReviewsInbox {
                 verifyBtn.title = 'Marcar como verificada';
                 verifyBtn.disabled = false;
                 verifyBtn.classList.remove('btn-verified');
+            }
+        }
+        // Hide approve button in the detail panel if already approved
+        const approveBtn = actions?.querySelector('button[data-action="approve"]');
+        if (approveBtn) {
+            const isApproved = Boolean(item.is_approved);
+            if (isApproved) {
+                approveBtn.style.display = 'none';
+            } else {
+                approveBtn.style.display = '';
             }
         }
         // Apply inline fallback styles to the detail panel action buttons
