@@ -582,7 +582,7 @@ class ClientsDashboard {
                     <small>Top promedio ${this.formatCurrency(avg)}</small>
                 </div>
                 <div class="trend-controls">
-                    <button class="btn-soft btn-mini" aria-expanded="false">Ver todos</button>
+                    ${list.length > 6 ? '<button class="btn-soft btn-mini" aria-expanded="false">Ver todos</button>' : ''}
                 </div>
             </div>
         `;
@@ -600,7 +600,7 @@ class ClientsDashboard {
             </li>
         `).join('');
         // Add click/keyboard interactions to open detail from top customers
-        this.topCustomersList.querySelectorAll('li[data-id]').forEach((li) => {
+            this.topCustomersList.querySelectorAll('li[data-id]').forEach((li) => {
             li.addEventListener('click', () => {
                 const id = li.getAttribute('data-id');
                 if (id) this.openDetail(id);
@@ -612,21 +612,26 @@ class ClientsDashboard {
                 }
             });
         });
+            // add small icon to each item for visual parity with other lists
+            this.topCustomersList.querySelectorAll('li[data-id] span').forEach((el) => el.classList.add('top-customer-meta'));
         // collapse after a limit for readability
         const COLLAPSE_LIMIT = 6;
         if (list.length > COLLAPSE_LIMIT) {
             this.topCustomersList.classList.add('collapsed');
             const btn = topContainer ? topContainer.querySelector('.trend-summary button') : this.topCustomersList.querySelector('.trend-summary button');
             if (btn) {
-                btn.textContent = 'Ver todas';
+                btn.textContent = 'Ver todos';
                 btn.addEventListener('click', () => {
                     const expanded = btn.getAttribute('aria-expanded') === 'true';
                     btn.setAttribute('aria-expanded', String(!expanded));
-                    btn.textContent = expanded ? 'Ver todas' : 'Ver menos';
+                    btn.textContent = expanded ? 'Ver todos' : 'Ver menos';
                     this.topCustomersList.classList.toggle('collapsed');
                 });
             }
         } else {
+            // ensure no toggle button is visible if the list is short
+            const btn = topContainer ? topContainer.querySelector('.trend-summary button') : this.topCustomersList.querySelector('.trend-summary button');
+            if (btn) btn.remove();
             this.topCustomersList.classList.remove('collapsed');
         }
     }

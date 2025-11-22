@@ -30,7 +30,9 @@ requireRole('admin');
             <div class="page-header">
                 <div>
                     <h1><i class="fas fa-users"></i> Clientes</h1>
-                    <p>Seguimiento unificado de segmentos, salud y oportunidades por cliente.</p>
+                      <div class="breadcrumb">
+                        <a href="<?= BASE_URL ?>/admin">Dashboard</a> / <span>clientes</span>
+                    </div>
                 </div>
                 <div class="actions">
                     <button class="btn-soft" data-action="refresh" id="clients-refresh-btn"><i class="fas fa-rotate"></i> Actualizar</button>
