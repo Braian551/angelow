@@ -127,8 +127,13 @@ class ClientsDashboard {
             this.loadList();
         });
 
-        this.pagination?.querySelectorAll('button[data-page]')?.forEach((btn) => {
-            btn.addEventListener('click', () => {
+        // Pagination buttons: use event delegation so event listeners remain
+        // valid even if the DOM changes and to avoid attaching individual
+        // listeners to elements that may be replaced.
+        if (this.pagination) {
+            this.pagination.addEventListener('click', (e) => {
+                const btn = e.target.closest('button[data-page]');
+                if (!btn || !this.pagination.contains(btn)) return;
                 const dir = btn.getAttribute('data-page');
                 if (dir === 'prev' && this.state.page > 1) {
                     this.state.page -= 1;
@@ -138,7 +143,16 @@ class ClientsDashboard {
                     this.loadList();
                 }
             });
-        });
+            // Support keyboard activation for the buttons
+            this.pagination.addEventListener('keydown', (e) => {
+                const btn = e.target.closest('button[data-page]');
+                if (!btn) return;
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    btn.click();
+                }
+            });
+        }
 
         this.refreshBtn?.addEventListener('click', () => {
             this.loadOverview();
@@ -1016,11 +1030,39 @@ class ClientsDashboard {
     renderPagination(meta) {
         if (!this.pagination) return;
         const info = this.pagination.querySelector('[data-role="meta"]');
+        // If the API doesn't provide `pages`, compute it based on total + perPage
+        if (typeof meta.pages === 'undefined' || meta.pages === null) {
+            meta.pages = Math.max(1, Math.ceil((Number(meta.total || 0) || 0) / (this.state.perPage || 10)));
+        }
         info.textContent = `${meta.total} resultados`;
         this.state.page = Math.max(1, Math.min(meta.pages, this.state.page));
         const [prevBtn, nextBtn] = this.pagination.querySelectorAll('button[data-page]');
         if (prevBtn) prevBtn.disabled = this.state.page <= 1;
         if (nextBtn) nextBtn.disabled = this.state.page >= meta.pages;
+        // Set accessible states and titles
+        if (prevBtn) {
+            prevBtn.setAttribute('aria-disabled', String(prevBtn.disabled));
+            prevBtn.setAttribute('title', 'Anterior');
+            prevBtn.setAttribute('aria-label', 'Página anterior');
+        }
+        if (nextBtn) {
+            nextBtn.setAttribute('aria-disabled', String(nextBtn.disabled));
+            nextBtn.setAttribute('title', 'Siguiente');
+            nextBtn.setAttribute('aria-label', 'Página siguiente');
+        }
+        // Hide pagination arrows entirely when there is only a single page.
+        const actions = this.pagination.querySelector('.actions');
+        if (actions) {
+            if (!meta.pages || meta.pages <= 1) {
+                actions.setAttribute('hidden', 'hidden');
+                actions.setAttribute('aria-hidden', 'true');
+                actions.style.display = 'none';
+            } else {
+                actions.removeAttribute('hidden');
+                actions.removeAttribute('aria-hidden');
+                actions.style.display = '';
+            }
+        }
     }
 
     async openDetail(id) {

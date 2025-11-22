@@ -584,6 +584,8 @@ tbody td {
 	font-size: 0.95rem;
 	color: var(--hub-text);
 }
+/* Ensure all table cells vertically center their content */
+table th, table td { vertical-align: middle; }
 
 /* Right align numerical columns */
 td[data-label="Pedidos"], td[data-label="Ticket"], td[data-label="Último pedido"] { text-align: center; }
@@ -630,7 +632,7 @@ tbody tr.selected td { padding-left: 0.75rem; }
 
 .status-chip {
 	border-radius: 999px;
-	padding: 0.25rem 0.75rem;
+	padding: 0.35rem 0.9rem;
 	font-size: 0.85rem;
 	font-weight: 600;
 	display: inline-flex;
@@ -642,6 +644,7 @@ tbody tr.selected td { padding-left: 0.75rem; }
 /* Center status chip in table row column */
 td[data-label="Status"] { display:flex; align-items:center; justify-content:center; }
 .status-chip { min-width: 92px; text-align:center; }
+.status-chip { min-height: 34px; }
 
 /* Detail header layout: avatar and badges */
 .detail-body header { display:flex; justify-content:space-between; align-items:center; gap: 1rem; }
@@ -677,6 +680,7 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 #clients-pagination .actions {
 	display: flex;
 	gap: 0.5rem;
+	align-items: center;
 }
 
 #clients-pagination button {
@@ -685,6 +689,9 @@ td[data-label="Status"] { display:flex; align-items:center; justify-content:cent
 	padding: 0.45rem 0.8rem;
 	background: #fff;
 }
+/* Larger clickable area and disabled state for pagination controls */
+#clients-pagination .actions button { min-width: 40px; min-height: 40px; display:inline-grid; place-items:center; }
+#clients-pagination .actions button[disabled], #clients-pagination .actions button[aria-disabled="true"] { opacity: 0.55; pointer-events: none; cursor: not-allowed; border-color: rgba(15,23,42,0.06); }
 
 /* ======== DETAIL PANEL ======== */
 .detail-panel {

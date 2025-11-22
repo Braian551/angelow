@@ -184,7 +184,7 @@ requireRole('admin');
                                     <th>Pedidos</th>
                                     <th>Ultimo pedido</th>
                                     <th>Valor promedio (COP)</th>
-                                    <th>Status</th>
+                                    <th>Estados</th>
                                 </tr>
                             </thead>
                             <tbody id="clients-table-body">
@@ -194,9 +194,9 @@ requireRole('admin');
                     </div>
                     <div class="filter-bar" id="clients-pagination">
                         <span class="text-muted" data-role="meta">-- resultados</span>
-                        <div class="actions">
-                            <button class="btn-soft" data-page="prev"><i class="fas fa-chevron-left"></i></button>
-                            <button class="btn-soft" data-page="next"><i class="fas fa-chevron-right"></i></button>
+                        <div class="actions" role="group" aria-label="Paginación">
+                            <button class="btn-soft" data-page="prev" title="Anterior" aria-label="Anterior" aria-controls="clients-table-body"><i class="fas fa-chevron-left"></i></button>
+                            <button class="btn-soft" data-page="next" title="Siguiente" aria-label="Siguiente" aria-controls="clients-table-body"><i class="fas fa-chevron-right"></i></button>
                         </div>
                     </div>
                 </article>
