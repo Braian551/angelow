@@ -313,6 +313,10 @@ class ClientsDashboard {
         if (!this.acquisitionCanvas || typeof Chart === 'undefined') return;
         const counts = Array.isArray(trend) ? trend.map((point) => Number(point.count) || 0) : [];
         const hasData = counts.some((value) => value > 0);
+        // Debug: log counts and hasData to diagnose incorrect empty overlay
+        if (window && window.console && typeof window.console.debug === 'function') {
+            console.debug('[ClientsDashboard] acquisition counts:', counts, 'hasData:', hasData);
+        }
         this.toggleEmptyState('acquisition', hasData);
         if (!hasData) {
             this.destroyChart('acquisition');
@@ -386,6 +390,10 @@ class ClientsDashboard {
         if (!this.segmentsCanvas || typeof Chart === 'undefined') return;
         const dataset = Array.isArray(segments) ? segments.map((segment) => Number(segment.count) || 0) : [];
         const hasData = dataset.some((value) => value > 0);
+        // Debug: log dataset and hasData for troubleshooting overlay visibility
+        if (window && window.console && typeof window.console.debug === 'function') {
+            console.debug('[ClientsDashboard] segments dataset:', dataset, 'hasData:', hasData);
+        }
         this.toggleEmptyState('segments', hasData);
         if (!hasData) {
             this.destroyChart('segments');
@@ -444,10 +452,33 @@ class ClientsDashboard {
     toggleEmptyState(type, hasData) {
         const node = this.emptyStates?.[type];
         if (!node) return;
-        if (hasData) {
-            node.setAttribute('hidden', 'hidden');
-        } else {
-            node.removeAttribute('hidden');
+        /*
+         * Prefer setting the boolean hidden property (node.hidden = true/false)
+         * rather than working with attribute strings to avoid inconsistencies
+         * with CSS or other scripts that might touch the attribute directly.
+         */
+        try {
+            // toggle the hidden property, the DOM will normally reflect this as
+            // the [hidden] attribute. Also set aria-hidden for accessibility.
+            node.hidden = !hasData;
+            node.setAttribute('aria-hidden', (!hasData).toString());
+            // Explicitly set display inline style to guarantee overlay is hidden
+            // even when author CSS may override the [hidden] attribute.
+            node.style.display = hasData ? 'none' : 'flex';
+            if (window && window.console && typeof window.console.debug === 'function') {
+                console.debug('[ClientsDashboard] toggleEmptyState', type, 'hasData:', hasData, 'hidden:', node.hidden, 'display:', node.style.display, 'aria-hidden:', node.getAttribute('aria-hidden'));
+            }
+        } catch (e) {
+            // Fallback: update attribute directly if setting property fails in some contexts
+            if (hasData) {
+                node.setAttribute('hidden', 'hidden');
+                node.setAttribute('aria-hidden', 'false');
+                node.style.display = 'none';
+            } else {
+                node.removeAttribute('hidden');
+                node.setAttribute('aria-hidden', 'true');
+                node.style.display = 'flex';
+            }
         }
     }
 

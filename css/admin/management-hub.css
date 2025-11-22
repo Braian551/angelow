@@ -589,6 +589,21 @@ tbody tr:hover {
 	font-size: 0.95rem;
 }
 
+/* Ensure hidden attribute hides chart empty overlays and similar panels.
+ * By default some author CSS rules can override the UA style for [hidden],
+ * so explicitly hide these elements when the attribute is present.
+ */
+.chart-empty[hidden], .empty-state[hidden], .detail-body[hidden] {
+	display: none !important;
+}
+
+/* Prefer hiding chart empty overlays also when aria-hidden is present to
+ * keep behavior consistent when JS only sets aria-hidden for accessibility.
+ */
+.chart-empty[aria-hidden="true"] {
+	display: none !important;
+}
+
 .chart-legend {
 	margin-top: 1rem;
 	display: flex;
