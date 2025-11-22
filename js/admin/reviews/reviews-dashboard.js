@@ -398,11 +398,20 @@ class ReviewsInbox {
     async handleAction(action, id) {
         if (!id) return;
         const confirmMap = {
-            approve: '¿Aprobar esta reseña? ',
-            reject: '¿Rechazar esta reseña? ',
-            verify: '¿Marcar como verificada? '
+            approve: '¿Aprobar esta reseña para publicación?',
+            reject: '¿Rechazar esta reseña? No será visible en la tienda.',
+            verify: '¿Marcar como compra verificada?'
         };
         if (confirmMap[action] && !window.confirm(confirmMap[action])) return;
+
+        // Show loading state on button
+        const button = event?.target?.closest('button');
+        const originalHTML = button?.innerHTML;
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        }
+
         const body = JSON.stringify({ review_id: id, action });
         try {
             const response = await fetch(this.config.endpoints.update, {
@@ -414,19 +423,35 @@ class ReviewsInbox {
             if (!response.ok) throw new Error('HTTP ' + response.status);
             const payload = await response.json();
             if (!payload.success) throw new Error('API');
+
+            // Success feedback
             if (payload.item) {
                 this.items.set(String(id), payload.item);
+                // Refresh both overview and list
+                this.loadOverview();
                 this.loadList();
+                // Update detail panel if open
                 if (this.detailPanel?.querySelector('.detail-body')?.hidden === false) {
                     this.openDetail(id);
                 }
             } else if (payload.deleted) {
                 this.state.page = 1;
+                this.loadOverview();
                 this.loadList();
+                // Close detail panel
+                if (this.detailPanel) {
+                    this.detailPanel.classList.add('collapsed');
+                    this.detailPanel.setAttribute('aria-hidden', 'true');
+                }
             }
         } catch (error) {
             console.error('review action', error);
-            alert('No se pudo completar la accion');
+            alert('No se pudo completar la acción. Por favor intenta de nuevo.');
+            // Restore button
+            if (button && originalHTML) {
+                button.disabled = false;
+                button.innerHTML = originalHTML;
+            }
         }
     }
 
