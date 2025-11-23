@@ -410,6 +410,132 @@
     margin-left: 0; /* Avoid duplication of spacing in the header's controls area */
 }
 
+/* ======== ADMIN REVIEW-CARD IMPROVEMENTS ======== */
+/* Adjust product review cards for management hub with right-aligned actions */
+.management-hub#reviews-hub .reviews-list .review-card {
+    /* Keep base product styles but change column layout for admin */
+    display: grid;
+    grid-template-columns: 64px 1fr 120px;
+    gap: 1rem;
+    align-items: start;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(8,18,34,0.08); }
+.management-hub#reviews-hub .reviews-list .review-card { cursor: pointer; }
+
+.management-hub#reviews-hub .reviews-list .review-card .review-body {
+    grid-column: 2 / 3; /* main content in middle column */
+}
+
+/* Center the body content (title, user info) for easier reading - keep product aligned left */
+.management-hub#reviews-hub .reviews-list .review-card .review-body {
+    text-align: left; /* left align all content */
+    display: block; /* use block flow for easier left alignment and wrap */
+    padding: 0 0.6rem; /* small inner padding */
+}
+.management-hub#reviews-hub .reviews-list .review-card .review-body .review-head { width: 100%; position: relative; }
+.management-hub#reviews-hub .reviews-list .review-card .review-head-left { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+.management-hub#reviews-hub .reviews-list .review-card .review-head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.45rem; margin-left: 1rem; white-space: nowrap; }
+.management-hub#reviews-hub .reviews-list .review-card .user-subinfo { display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; }
+.management-hub#reviews-hub .reviews-list .review-card .review-category { color: var(--hub-muted); font-weight:600; }
+.management-hub#reviews-hub .reviews-list .review-card .review-badges { display:flex; gap: 0.4rem; align-items:center; justify-content:flex-end; }
+.management-hub#reviews-hub .reviews-list .review-card .review-badges .status-chip { margin-left: 0; }
+.management-hub#reviews-hub .reviews-list .review-card .review-badges .badge.verified { margin-left: 0; }
+.management-hub#reviews-hub .reviews-list .review-card .review-badges .status-chip.success { background: rgba(16,185,129,0.08); color: #059669; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; }
+.management-hub#reviews-hub .reviews-list .review-card .review-badges .status-chip.warning { background: rgba(245,158,11,0.08); color: #f59e0b; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; }
+.management-hub#reviews-hub .reviews-list .review-card .review-body .review-head .review-title { margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--hub-text); text-align: left; }
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info { text-align:left; display:block; }
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info strong { display:inline-block; font-size:1.08rem; font-weight:700; margin-right:0.6rem; }
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .time { display:block; color:var(--hub-muted); margin-top: 2px; }
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .small.text-muted { display:flex; gap: 0.6rem; margin-top: 6px; align-items: center; }
+.management-hub#reviews-hub .reviews-list .review-card .review-body .review-comment { max-width: 100%; margin: 0; text-align: left; color: var(--hub-muted-strong); }
+
+/* Keep footer product left aligned within the content column */
+.management-hub#reviews-hub .reviews-list .review-card .review-footer { grid-column: 2 / 3; justify-self: start; width:100%; }
+.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product { text-align: left; margin-left: 0; padding-left: 0; }
+
+.management-hub#reviews-hub .reviews-list .review-card { padding-top: 1.8rem; }
+.management-hub#reviews-hub .reviews-list .review-card .user-avatar { align-self: start; margin-left: 0.9rem; width: 58px; height: 58px; }
+
+.management-hub#reviews-hub .reviews-list .review-card .review-meta { grid-column: 1 / 2; }
+.management-hub#reviews-hub .reviews-list .review-card .review-actions { grid-column: 3 / 4; display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end; justify-content: center; }
+
+/* Status color strip and accessible focus styles */
+.management-hub#reviews-hub .reviews-list .review-card[data-status="approved"] { border-left: 4px solid rgba(16,185,129,0.95); }
+.management-hub#reviews-hub .reviews-list .review-card[data-status="pending"] { border-left: 4px solid rgba(245,158,11,0.95); }
+
+.management-hub#reviews-hub .reviews-list .review-card:focus {
+    outline: none;
+    box-shadow: 0 6px 18px rgba(8, 18, 34, 0.08), 0 0 0 4px rgba(99, 102, 241, 0.06);
+    transform: translateY(-2px);
+}
+
+/* Admin: place rating near the actions, not absolutely positioned top-right (avoids collision with buttons) */
+.management-hub#reviews-hub .reviews-list .review-card .review-head { position: relative; }
+.management-hub#reviews-hub .reviews-list .review-card .user-rating {
+    position: absolute; /* move bubble to top-right */
+    top: 14px;
+    right: 16px;
+    left: auto;
+    transform: none;
+    display: inline-flex;
+    gap: 0.35rem;
+    background: rgba(255,255,255,0.98);
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(12,52,84,0.06);
+    box-shadow: 0 6px 14px rgba(8,18,34,0.06);
+    z-index: 5;
+}
+.management-hub#reviews-hub .reviews-list .review-card .review-head { margin-right: 0; }
+
+/* Make sure action buttons are clearly visible and easy to Tap on mobile */
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft { width: 42px; height: 42px; padding: 0; display: inline-grid; place-items: center; }
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-sm { min-width: 42px; }
+
+/* On small screens layout stacks: avatar / body / actions */
+@media (max-width: 880px) {
+    .management-hub#reviews-hub .reviews-list .review-card { grid-template-columns: 56px 1fr; grid-template-rows: auto auto; }
+    .management-hub#reviews-hub .reviews-list .review-card .review-body { grid-column: 1 / -1; text-align: left; }
+    .management-hub#reviews-hub .reviews-list .review-card .review-actions { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: flex-start; }
+    .management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft { width: auto; height: auto; padding: 0.5rem 0.8rem; }
+}
+
+/* Verified action button state styling */
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-verified {
+    background: rgba(16,185,129,0.08) !important;
+    border-color: rgba(16,185,129,0.12) !important;
+    color: #0f9d58 !important;
+    cursor: default;
+    opacity: 0.9;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft {
+    display: inline-grid;
+    place-items: center;
+    border-radius: 999px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.55rem;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-approve { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.12); color: #0f9d58; }
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-reject { background: rgba(220,38,38,0.06); border-color: rgba(220,38,38,0.12); color: #dc2626; }
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-verify { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.12); color: #0f9d58; }
+
+/* Small visual polish: align rating, product and small info */
+.management-hub#reviews-hub .reviews-list .review-card .user-info { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; justify-content: center; text-align:center; }
+.management-hub#reviews-hub .reviews-list .review-card .user-info .badge.verified { background: rgba(16,185,129,0.12); color: #10b981; border: none; box-shadow: none; }
+.management-hub#reviews-hub .reviews-list .review-card .user-info .status-chip { margin-left: 0.6rem; }
+
+.management-hub#reviews-hub .reviews-list .review-card .review-footer { grid-column: 2 / 3; justify-self: start; text-align: left; margin-top: 0.6rem; }
+.management-hub#reviews-hub .reviews-list .review-card .user-info .time { color: var(--hub-muted); font-size: 0.92rem; }
+
+/* Reduce motion for users preferring reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .management-hub#reviews-hub .reviews-list .review-card { transition: none; }
+}
+
 .detail-panel .btn-icon-close:hover {
     background: rgba(220, 38, 38, 0.08);
     border-color: rgba(220, 38, 38, 0.2);
@@ -796,7 +922,8 @@
     .management-hub#reviews-hub .reviews-list .review-card .user-avatar { grid-column: 1; }
     .management-hub#reviews-hub .reviews-list .review-card .review-meta { align-items: flex-start; }
     .management-hub#reviews-hub .reviews-list .review-card .review-body { grid-column: 2; }
-    .management-hub#reviews-hub .reviews-list .review-card .user-rating { grid-column: 3; justify-self: end; margin-top: 0; }
+    /* Place rating inside the header on large screens (right side of header), not inside the action column */
+    .management-hub#reviews-hub .reviews-list .review-card .user-rating { position: static; grid-column: auto; justify-self: flex-end; margin-top: 0; }
     .management-hub#reviews-hub .reviews-list .review-card .review-footer { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
     .management-hub#reviews-hub .reviews-list .review-card > .review-actions { grid-column: 3; justify-self: end; align-self: flex-start; display: flex; align-items: center; justify-content: flex-end; gap: 0.6rem; }
 }
@@ -856,8 +983,7 @@
 .management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .time { color: var(--hub-muted); font-size: 0.9rem; display:block; margin-top:4px; }
 .management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .badge.verified { display:inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(16,185,129,0.08); color: #10b981; font-weight:600; font-size:0.82rem; margin-top: 0.45rem; }
 
-/* Place rating badge top-right in the card */
-.management-hub#reviews-hub .reviews-list .review-card .user-rating { position: static; top: auto; right: auto; z-index: 4; }
+.management-hub#reviews-hub .reviews-list .review-card .user-rating { position: absolute; top: 14px; right: 16px; left: auto; z-index: 6; }
 .management-hub#reviews-hub .reviews-list .review-card .user-rating .badge-ghost { padding: 0.4rem 0.8rem; border-radius: 999px; font-weight:800; font-size:0.92rem; box-shadow: 0 6px 14px rgba(0,0,0,0.04); }
 
 /* Hover and focus styles for card */
@@ -883,9 +1009,16 @@
 
 /* Footer product label */
 .management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product { color: var(--hub-muted); font-weight:600; font-size:0.9rem; margin-top: 0.35rem; }
+.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product { margin-left: 0; }
+.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product[data-product-id] { cursor: pointer; text-decoration: underline dotted; }
 
 /* Small adjustments for action buttons on cards */
 .management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft { width: 40px; height: 40px; border-radius: 999px; }
+
+/* Review image thumbnails inside card footer */
+.management-hub#reviews-hub .reviews-list .review-card .review-images { display:flex; gap: 0.5rem; align-items:center; margin-top: 0.4rem; }
+.management-hub#reviews-hub .reviews-list .review-card .review-images .review-image { width: 44px; height: 44px; overflow: hidden; border-radius: 6px; border: 1px solid rgba(15,23,42,0.06); background: #fff; display:inline-block; box-shadow: 0 4px 10px rgba(8,18,34,0.04); }
+.management-hub#reviews-hub .reviews-list .review-card .review-images .review-image img { width: 100%; height: 100%; object-fit: cover; }
 
 /* On small screens: stack actions under the review text */
 @media (max-width: 800px) {

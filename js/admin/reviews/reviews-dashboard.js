@@ -92,6 +92,15 @@ class ReviewsInbox {
         };
         this.tableBody?.addEventListener('click', delegatedClick);
         this.listContainer?.addEventListener('click', delegatedClick);
+        // keyboard support: allow Enter/Space to select/highlight a card
+        this.listContainer?.addEventListener('keydown', (evt) => {
+            if (evt.key !== 'Enter' && evt.key !== ' ') return;
+            const card = evt.target.closest('.review-card');
+            if (card) {
+                evt.preventDefault();
+                card.click();
+            }
+        });
 
         this.refreshBtn?.addEventListener('click', () => {
             this.loadOverview();
@@ -423,35 +432,44 @@ class ReviewsInbox {
                 const initials = (userName.split(' ').slice(0,2).map(p=>p[0]||'').join('') || '?').toUpperCase();
                 const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
                 const verifiedBadge = isVerified ? '<span class="badge verified small" aria-hidden="true">Verificada</span>' : '';
+                const categoryName = item.product?.category?.name || item.product?.category_name || item.category_name || '';
+                const statusChip = item.is_approved ? '<span class="status-chip small success">Publicado</span>' : '<span class="status-chip small warning">Pendiente</span>';
                 const productName = item.product?.name || 'Producto';
+                const status = item.is_approved ? 'approved' : 'pending';
+                const titleId = `review-title-${item.id}`;
                 const reviewImages = Array.isArray(item.images) && item.images.length ? item.images.map((img) => `<div class="review-image"><img src="${this.config.baseUrl}/${img}" alt="Imagen reseña"></div>`).join('') : '';
                 return `
-                    <div class="review-card" role="article" tabindex="0" data-review-id="${item.id}" data-review-rating="${item.rating}">
+                    <article class="review-card" tabindex="0" data-review-id="${item.id}" data-review-rating="${item.rating}" data-status="${status}" aria-labelledby="${titleId}">
                         <div class="review-meta">
                             <div class="user-avatar"><span>${initials}</span></div>
                         </div>
                         <div class="review-body">
                             <div class="review-head">
-                                <h4 class="review-title">${title}</h4>
-                                <div class="user-rating review-stars" aria-label="${item.rating} estrellas"><span class="badge-ghost">${item.rating} ★</span></div>
-                            </div>
-                            <div class="user-info">
-                                <strong>${userName}</strong>
-                                <span class="time">${this.formatDate(item.created_at)}</span>
-                                <div class="small text-muted">${verifiedBadge}</div>
+                                <div class="review-head-left">
+                                    <h4 id="${titleId}" class="review-title">${title}</h4>
+                                    <div class="user-subinfo small text-muted">
+                                        <strong class="review-user">${userName}</strong>
+                                        <span class="time">${this.formatDate(item.created_at)}</span>
+                                        ${categoryName ? `<span class="review-category"> · ${categoryName}</span>` : ''}
+                                    </div>
+                                </div>
+                                <div class="review-head-right">
+                                    <div class="user-rating review-stars" aria-label="${item.rating} estrellas"><span class="badge-ghost">${item.rating} ★</span></div>
+                                    <div class="review-badges small text-muted">${verifiedBadge} ${statusChip}</div>
+                                </div>
                             </div>
                             <p class="review-comment text-muted">${safeComment}${(item.comment || '').length > 160 ? '...' : ''}</p>
                             <div class="review-footer">
-                                <div class="review-product small text-muted">${productName}</div>
+                                <div class="review-product small text-muted" data-product-id="${item.product?.id || ''}">${productName}${item.product?.sku ? ` · SKU: ${item.product.sku}` : ''}</div>
+                                ${reviewImages ? `<div class="review-images small">${reviewImages}</div>` : ''}
                             </div>
                         </div>
                         <div class="review-actions actions">
-                            <button class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar" aria-label="Aprobar reseña"><i class="fas fa-check" aria-hidden="true"></i></button>
-                            <button class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar" aria-label="Rechazar reseña"><i class="fas fa-ban" aria-hidden="true"></i></button>
-                            <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada" aria-label="Marcar como verificada"><i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i></button>
+                            <button type="button" class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar" aria-label="Aprobar reseña"><i class="fas fa-check" aria-hidden="true"></i></button>
+                            <button type="button" class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar" aria-label="Rechazar reseña"><i class="fas fa-ban" aria-hidden="true"></i></button>
+                            <button type="button" class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada" aria-label="Marcar como verificada"><i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i></button>
                         </div>
-                        </div>
-                    </div>
+                    </article>
                 `;
             }).join('');
         }
@@ -460,19 +478,20 @@ class ReviewsInbox {
         this.tableBody.innerHTML = items.map((item) => {
             this.items.set(String(item.id), item);
             const comment = (item.comment || '').slice(0, 70);
+            const category = item.product?.category?.name || item.product?.category_name || item.category_name || '';
             return `
                 <tr data-id="${item.id}">
                     <td class="review">
                         <div>${item.title || 'Sin titulo'}</div>
-                        <small class="text-muted">${comment}${comment.length === 70 ? '...' : ''}</small>
+                        <small class="text-muted">${comment}${comment.length === 70 ? '...' : ''} ${category ? ' · ' + category : ''}</small>
                     </td>
                     <td>${item.product?.name || 'Producto'}</td>
                     <td><span class="badge-ghost">${item.rating} ★</span></td>
                     <td>${this.renderStatusChip(item)}</td>
                     <td class="actions">
-                        <button class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar"><i class="fas fa-check"></i></button>
-                        <button class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar"><i class="fas fa-ban"></i></button>
-                        <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada">
+                        <button type="button" class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar"><i class="fas fa-check"></i></button>
+                        <button type="button" class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar"><i class="fas fa-ban"></i></button>
+                        <button type="button" class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada">
                             <i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i>
                         </button>
                     </td>
@@ -487,19 +506,21 @@ class ReviewsInbox {
                 if (!row) return;
                 const verifyBtn = row.querySelector('button[data-action="verify"]');
                 const approveBtn = row.querySelector('button[data-action="approve"]');
-                if (!verifyBtn) return;
                 const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
                     if (isVerified) {
                     // If the review is verified, indicate it in the action cell and remove the action to avoid confusion
                     verifyBtn.setAttribute('title', 'Reseña verificada');
-                    verifyBtn.disabled = true;
+                        verifyBtn.disabled = true;
                     verifyBtn.classList.add('btn-verified');
+                        verifyBtn.setAttribute('aria-pressed', 'true');
+                        verifyBtn.setAttribute('aria-label', 'Reseña verificada');
                     // Show a small check mark and tooltip instead of clickable control
                     verifyBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i>';
                 } else {
                     verifyBtn.setAttribute('title', 'Marcar como verificada');
                     verifyBtn.disabled = false;
                     verifyBtn.classList.remove('btn-verified');
+                        verifyBtn.setAttribute('aria-pressed', 'false');
                 }
                 // Hide approve button if the review is already approved
                 const isApproved = Boolean(item.is_approved);

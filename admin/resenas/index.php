@@ -16,9 +16,9 @@ requireRole('admin');
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/management-hub.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/size/size.css?v=<?= filemtime(__DIR__ . '/../../css/admin/size/size.css') ?>">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/reviews-enhanced.css?v=<?= filemtime(__DIR__ . '/../../css/admin/reviews-enhanced.css') ?>">
     <!-- Reuse client review-card styles to make admin review list match product UI -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/producto/css/product-tabs.css?v=<?= filemtime(__DIR__ . '/../../producto/css/product-tabs.css') ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/reviews-enhanced.css?v=<?= filemtime(__DIR__ . '/../../css/admin/reviews-enhanced.css') ?>">
     <!-- Inline CSS overrides to guarantee color/application for review action buttons -->
     <style>
         /* Strongly enforce colors on review action icons and buttons */
