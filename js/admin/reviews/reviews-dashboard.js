@@ -24,6 +24,49 @@ class ReviewsInbox {
         this.scheduleIconFallbacks();
     }
 
+    buildMediaUrl(path) {
+        if (!path && path !== 0) return null;
+        let candidate = path;
+        if (typeof candidate === 'object' && candidate !== null) {
+            candidate = candidate.url || candidate.path || candidate.src || '';
+        }
+        candidate = String(candidate || '').trim();
+        if (!candidate) return null;
+        if (/^https?:\/\//i.test(candidate)) return candidate;
+        if (candidate.startsWith('//')) {
+            return window.location.protocol + candidate;
+        }
+        const base = (this.config.baseUrl || '').replace(/\/+$/, '');
+        const normalized = candidate.replace(/^\/+/, '');
+        if (!base) return '/' + normalized;
+        return `${base}/${normalized}`;
+    }
+
+    resolveProductImage(item) {
+        const product = item?.product || {};
+        const sources = [
+            product.thumbnail,
+            product.thumb,
+            product.image,
+            product.image_url,
+            product.main_image,
+            product.featured_image,
+            product.cover_image,
+            product.media,
+            item?.product_image,
+            item?.product_image_url
+        ];
+        if (Array.isArray(product.images)) sources.push(...product.images);
+        if (Array.isArray(product.gallery)) sources.push(...product.gallery);
+        if (Array.isArray(product.media)) sources.push(...product.media);
+        if (Array.isArray(item?.product_images)) sources.push(...item.product_images);
+        for (const src of sources) {
+            const url = this.buildMediaUrl(src);
+            if (url) return url;
+        }
+        return null;
+    }
+
     cacheDom() {
         this.container = document.getElementById('reviews-hub');
         this.statCards = this.container?.querySelectorAll('.stat-card') || [];
@@ -431,38 +474,50 @@ class ReviewsInbox {
                 const userName = item.customer?.name || item.customer?.email || 'Cliente';
                 const initials = (userName.split(' ').slice(0,2).map(p=>p[0]||'').join('') || '?').toUpperCase();
                 const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
-                const verifiedBadge = isVerified ? '<span class="badge verified small" aria-hidden="true">Verificada</span>' : '';
+                const verifiedPill = isVerified ? '<span class="pill pill-verified"><i class="fas fa-check-circle" aria-hidden="true"></i> Verificada</span>' : '';
                 const categoryName = item.product?.category?.name || item.product?.category_name || item.category_name || '';
-                const statusChip = item.is_approved ? '<span class="status-chip small success">Publicado</span>' : '<span class="status-chip small warning">Pendiente</span>';
+                const statusChip = item.is_approved ? '<span class="status-chip small success"><i class="fas fa-check"></i> Publicado</span>' : '<span class="status-chip small warning"><i class="fas fa-clock"></i> Pendiente</span>';
                 const productName = item.product?.name || 'Producto';
+                const productImageUrl = this.resolveProductImage(item);
                 const status = item.is_approved ? 'approved' : 'pending';
                 const titleId = `review-title-${item.id}`;
-                const reviewImages = Array.isArray(item.images) && item.images.length ? item.images.map((img) => `<div class="review-image"><img src="${this.config.baseUrl}/${img}" alt="Imagen reseña"></div>`).join('') : '';
+                const reviewImagesArr = Array.isArray(item.images) ? item.images : [];
+                const reviewImageUrls = reviewImagesArr.map((img) => this.buildMediaUrl(img)).filter(Boolean);
+                const reviewImages = reviewImageUrls.length ? reviewImageUrls.map((url) => `<div class="review-image"><img src="${url}" alt="Imagen reseña"></div>`).join('') : '';
+                const approvalPill = item.is_approved ? '<span class="pill pill-published"><i class="fas fa-check" aria-hidden="true"></i> Publicado</span>' : '<span class="pill pill-pending"><i class="fas fa-clock" aria-hidden="true"></i> Pendiente</span>';
+                const statusStack = [verifiedPill, approvalPill].filter(Boolean).join('');
+                const productInitial = (productName?.trim()?.charAt(0) || 'P').toUpperCase();
+                const productSku = item.product?.sku ? `<span class="product-sku">SKU: ${item.product.sku}</span>` : '';
+                const reviewGallery = reviewImages ? `<div class="review-gallery">${reviewImages}</div>` : '';
                 return `
                     <article class="review-card" tabindex="0" data-review-id="${item.id}" data-review-rating="${item.rating}" data-status="${status}" aria-labelledby="${titleId}">
-                        <div class="review-meta">
-                            <div class="user-avatar"><span>${initials}</span></div>
+                        <div class="review-media" data-product-id="${item.product?.id || ''}" aria-label="${productName}">
+                            <div class="review-product-thumb${productImageUrl ? '' : ' placeholder'}">
+                                ${productImageUrl ? `<img src="${productImageUrl}" alt="${productName}">` : `<span>${productInitial}</span>`}
+                            </div>
+                            <div class="product-mini-meta">
+                                <p class="product-name">${productName}</p>
+                                ${categoryName ? `<span class="product-category">${categoryName}</span>` : ''}
+                                ${productSku}
+                            </div>
                         </div>
                         <div class="review-body">
-                            <div class="review-head">
-                                <div class="review-head-left">
-                                    <h4 id="${titleId}" class="review-title">${title}</h4>
-                                    <div class="user-subinfo small text-muted">
+                            <div class="review-header-row">
+                                <div class="review-user-block">
+                                    <div class="user-avatar"><span>${initials}</span></div>
+                                    <div class="user-meta">
                                         <strong class="review-user">${userName}</strong>
                                         <span class="time">${this.formatDate(item.created_at)}</span>
-                                        ${categoryName ? `<span class="review-category"> · ${categoryName}</span>` : ''}
                                     </div>
                                 </div>
-                                <div class="review-head-right">
+                                <div class="review-score">
                                     <div class="user-rating review-stars" aria-label="${item.rating} estrellas"><span class="badge-ghost">${item.rating} ★</span></div>
-                                    <div class="review-badges small text-muted">${verifiedBadge} ${statusChip}</div>
+                                    ${statusStack ? `<div class="status-stack">${statusStack}</div>` : ''}
                                 </div>
                             </div>
+                            <h4 id="${titleId}" class="review-title">${title}</h4>
                             <p class="review-comment text-muted">${safeComment}${(item.comment || '').length > 160 ? '...' : ''}</p>
-                            <div class="review-footer">
-                                <div class="review-product small text-muted" data-product-id="${item.product?.id || ''}">${productName}${item.product?.sku ? ` · SKU: ${item.product.sku}` : ''}</div>
-                                ${reviewImages ? `<div class="review-images small">${reviewImages}</div>` : ''}
-                            </div>
+                            ${reviewGallery}
                         </div>
                         <div class="review-actions actions">
                             <button type="button" class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar" aria-label="Aprobar reseña"><i class="fas fa-check" aria-hidden="true"></i></button>
@@ -558,10 +613,14 @@ class ReviewsInbox {
     }
 
     applyActionButtonStyles() {
+        const root = getComputedStyle(document.documentElement);
+        const primary = (root.getPropertyValue('--primary-color') || root.getPropertyValue('--hub-primary') || '#0077b6').trim();
+        const primaryLight = (root.getPropertyValue('--primary-light') || 'rgba(0,119,182,0.08)').trim();
+        const primaryHover = (root.getPropertyValue('--primary-hover') || '#015e90').trim();
         const map = {
-            approve: { bg: 'rgba(15,157,88,0.08)', color: '#0f9d58', border: 'rgba(15,157,88,0.12)' },
+            approve: { bg: primaryLight, color: primary, border: primaryLight },
             reject: { bg: 'rgba(220,38,38,0.06)', color: '#dc2626', border: 'rgba(220,38,38,0.12)' },
-            verify: { bg: 'rgba(15,157,88,0.08)', color: '#0f9d58', border: 'rgba(15,157,88,0.12)' }
+            verify: { bg: primaryLight, color: primary, border: primaryLight }
         };
         // Table & Card buttons
         const allButtons = [ ...(this.tableBody ? Array.from(this.tableBody.querySelectorAll('td.actions button[data-action]')) : []), ...(this.listContainer ? Array.from(this.listContainer.querySelectorAll('.review-actions button[data-action]')) : []) ];
@@ -573,8 +632,12 @@ class ReviewsInbox {
             btn.style.borderColor = cfg.border;
             const ic = btn.querySelector('i') || btn.querySelector('svg');
             if (ic) {
-                ic.style.color = cfg.color;
-                if (ic.tagName?.toLowerCase() === 'svg') ic.style.fill = cfg.color;
+                try {
+                    ic.style.color = cfg.color;
+                    if (ic.tagName?.toLowerCase() === 'svg') ic.style.fill = cfg.color;
+                } catch(e) {
+                    // ignore css assignment errors
+                }
             }
         });
         // list buttons handled earlier via `allButtons` union to keep consistent.

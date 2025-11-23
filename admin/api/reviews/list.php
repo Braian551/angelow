@@ -57,6 +57,7 @@ try {
     $base = " FROM product_reviews pr
         LEFT JOIN users u ON u.id = pr.user_id
         LEFT JOIN products p ON p.id = pr.product_id
+        LEFT JOIN product_images pi ON pi.product_id = p.id AND pi.is_primary = 1
         LEFT JOIN (
             SELECT review_id, SUM(CASE WHEN is_helpful = 1 THEN 1 ELSE 0 END) AS helpful_votes,
                    SUM(CASE WHEN is_helpful = 0 THEN 1 ELSE 0 END) AS not_helpful
@@ -81,6 +82,7 @@ try {
 
     $dataSql = 'SELECT pr.id, pr.product_id, pr.user_id, pr.rating, pr.title, pr.comment, pr.images, pr.is_verified, pr.is_approved, pr.created_at,
         p.name AS product_name, p.slug AS product_slug,
+        COALESCE(pi.image_path, "uploads/productos/default-product.jpg") AS product_image,
         u.name AS user_name, u.email AS user_email, u.image AS user_image,
         COALESCE(votes.helpful_votes, 0) AS helpful_votes, COALESCE(votes.not_helpful, 0) AS not_helpful'
         . $base . $orderSql . ' LIMIT :limit OFFSET :offset';
@@ -128,7 +130,9 @@ function formatReview(array $row): array {
         'product' => [
             'id' => $row['product_id'],
             'name' => $row['product_name'],
-            'slug' => $row['product_slug']
+            'slug' => $row['product_slug'],
+            'image' => $row['product_image'],
+            'main_image' => $row['product_image']
         ],
         'customer' => [
             'id' => $row['user_id'],
