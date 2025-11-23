@@ -39,7 +39,7 @@ requireRole('admin');
             <section class="insights-grid" id="questions-insights">
                 <article class="stat-card" data-metric="total">
                     <div class="stat-top">
-                        <span class="stat-icon" aria-hidden="true"><i class="fas fa-messages"></i></span>
+                        <span class="stat-icon" aria-hidden="true"><i class="fas fa-comments"></i></span>
                         <h2>Total</h2>
                     </div>
                     <strong class="stat-value">--</strong>
@@ -92,7 +92,7 @@ requireRole('admin');
                         <table class="questions-table">
                             <thead>
                                 <tr>
-                                    <th><i class="fas fa-message"></i> Pregunta</th>
+                                    <th><i class="fas fa-comment"></i> Pregunta</th>
                                     <th><i class="fas fa-box"></i> Producto</th>
                                     <th><i class="fas fa-user"></i> Autor</th>
                                     <th><i class="fas fa-comments"></i> Estado</th>
@@ -134,7 +134,7 @@ requireRole('admin');
                             </div>
                         </header>
                         <div class="question-block">
-                            <h4><i class="fas fa-message"></i> Pregunta del cliente</h4>
+                            <h4><i class="fas fa-comment"></i> Pregunta del cliente</h4>
                             <p data-role="question" class="question-text"></p>
                         </div>
                         <div class="answers-section">
