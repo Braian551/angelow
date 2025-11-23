@@ -237,7 +237,7 @@
     display: inline-grid;
     place-items: center;
     position: relative; /* for pseudo-layer behind icon */
-    background: #ffffff !important; /* white square inside halo */
+    background: rgba(0, 119, 182, 0.07) !important; /* white square inside halo */
     color: var(--hub-muted) !important; /* default icon color - overridden per metric */
     box-shadow: none !important; /* remove any other box-shadow to avoid double look */
 }
@@ -293,7 +293,7 @@
 }
 
 #reviews-insights .stat-card[data-metric="verified"] .stat-icon::before {
-    background: rgba(16,185,129,0.06);
+    background: rgba(0, 119, 182, 0.07);
 }
 
 /* Force verified purchase stat icon to be visible regardless of cascade order
@@ -319,16 +319,12 @@
 
 /* Metric-specific colors for review hub (match client card color mapping) */
 /* Metric-specific halo colors (pseudo behind icon) and icon color on the glyph itself */
-#reviews-insights .stat-card[data-metric="pending"] .stat-icon::before { background: rgba(2, 132, 199, 0.12); }
 #reviews-insights .stat-card[data-metric="pending"] .stat-icon i,
 #reviews-insights .stat-card[data-metric="pending"] .stat-icon svg { color: #0284c7; fill: #0284c7; }
-#reviews-insights .stat-card[data-metric="approved"] .stat-icon::before { background: var(--primary-light); }
 #reviews-insights .stat-card[data-metric="approved"] .stat-icon i,
 #reviews-insights .stat-card[data-metric="approved"] .stat-icon svg { color: var(--hub-primary, var(--primary-color)); fill: var(--hub-primary, var(--primary-color)); }
-#reviews-insights .stat-card[data-metric="average"] .stat-icon::before { background: rgba(245, 158, 11, 0.12); }
 #reviews-insights .stat-card[data-metric="average"] .stat-icon i,
 #reviews-insights .stat-card[data-metric="average"] .stat-icon svg { color: #f59e0b; fill: #f59e0b; }
-#reviews-insights .stat-card[data-metric="verified"] .stat-icon::before { background: var(--primary-light); }
 #reviews-insights .stat-card[data-metric="verified"] .stat-icon i,
 #reviews-insights .stat-card[data-metric="verified"] .stat-icon svg { color: var(--hub-primary, var(--primary-color)); fill: var(--hub-primary, var(--primary-color)); }
 
@@ -443,7 +439,7 @@
 .management-hub#reviews-hub .reviews-list .review-card .review-head { padding-bottom: 0.6rem; border-bottom: 1px solid rgba(15,23,42,0.04); }
 .management-hub#reviews-hub .reviews-list .review-card .review-title { font-size: 1.28rem; font-weight: 800; color: var(--hub-text); margin: 0 0 2px 0; letter-spacing: -0.02em; }
 .management-hub#reviews-hub .reviews-list .review-card .review-user { font-size: 1rem; color: var(--hub-text); }
-.management-hub#reviews-hub .reviews-list .review-card .user-subinfo .time { color: var(--hub-muted); font-size: 0.9rem; }
+.management-hub#reviews-hub .reviews-list .review-card .user-subinfo .time { color: var(--hub-muted); font-size: 0.82rem; line-height: 1; }
 .management-hub#reviews-hub .reviews-list .review-card .review-category { font-size: 0.9rem; color: var(--hub-muted); }
 
 /* Rating bubble enhancement: stronger contrast and clearer number */
@@ -480,7 +476,7 @@
 .management-hub#reviews-hub .reviews-list .review-card .review-body .review-head .review-title { margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--hub-text); text-align: left; }
 .management-hub#reviews-hub .reviews-list .review-card .review-body .user-info { text-align:left; display:block; }
 .management-hub#reviews-hub .reviews-list .review-card .review-body .user-info strong { display:inline-block; font-size:1.08rem; font-weight:700; margin-right:0.6rem; }
-.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .time { display:block; color:var(--hub-muted); margin-top: 2px; }
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .time { display:block; color:var(--hub-muted); margin-top: 2px; font-size: 0.82rem; line-height: 1; }
 .management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .small.text-muted { display:flex; gap: 0.6rem; margin-top: 6px; align-items: center; }
 .management-hub#reviews-hub .reviews-list .review-card .review-body .review-comment { max-width: 100%; margin: 0; text-align: left; color: var(--hub-muted-strong); }
 
@@ -563,7 +559,7 @@
 .management-hub#reviews-hub .reviews-list .review-card .user-info .status-chip { margin-left: 0.6rem; }
 
 .management-hub#reviews-hub .reviews-list .review-card .review-footer { grid-column: 2 / 3; justify-self: start; text-align: left; margin-top: 0.6rem; }
-.management-hub#reviews-hub .reviews-list .review-card .user-info .time { color: var(--hub-muted); font-size: 0.92rem; }
+.management-hub#reviews-hub .reviews-list .review-card .user-info .time { color: var(--hub-muted); font-size: 0.82rem; line-height: 1; }
 
 /* Reduce motion for users preferring reduced motion */
 @media (prefers-reduced-motion: reduce) {
@@ -920,6 +916,21 @@
 #review-detail #review-detail-toggle { top: 8px !important; right: 8px !important; }
 
 /* End layout tweaks */
+
+/* ====== ADMIN: make timestamps smaller (visibility tweak) ====== */
+/* Reduce timestamp size in the reviews hub so it doesn't compete visually
+   with names, titles or rating badges; keep color muted and a single-line.
+   This override appears at the end of the file to ensure it takes precedence. */
+.management-hub#reviews-hub .reviews-list .review-card .user-info .time,
+.management-hub#reviews-hub .reviews-list .review-card .user-subinfo .time,
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .time,
+#reviews-highlights li .event-meta,
+#reviews-highlights li .event-meta .time {
+    font-size: 0.72rem; /* smaller than default 0.82rem */
+    line-height: 1;
+    color: var(--hub-muted);
+}
+
 /* ====== Card style for each review in the list to improve readability ====== */
 .management-hub#reviews-hub .reviews-list .review-card {
     background: var(--hub-card);
@@ -1014,7 +1025,7 @@
 }
 
 /* User time and verified badge */
-.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .time { color: var(--hub-muted); font-size: 0.9rem; display:block; margin-top:4px; }
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .time { color: var(--hub-muted); font-size: 0.82rem; display:block; margin-top:4px; line-height: 1; }
 .management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .badge.verified { display:inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(16,185,129,0.08); color: #10b981; font-weight:600; font-size:0.82rem; margin-top: 0.45rem; }
 
 .management-hub#reviews-hub .reviews-list .review-card .user-rating { /* default: positioned within header (static) */ position: static; z-index: 12; align-self: flex-start; transform: translateY(-6px); }
