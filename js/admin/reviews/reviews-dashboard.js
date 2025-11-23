@@ -429,26 +429,27 @@ class ReviewsInbox {
                     <div class="review-card" role="article" tabindex="0" data-review-id="${item.id}" data-review-rating="${item.rating}">
                         <div class="review-meta">
                             <div class="user-avatar"><span>${initials}</span></div>
-                            <div class="user-info">
-                                <strong>${userName}</strong>
-                                <span class="time">${this.formatDate(item.created_at)}</span>
-                                <div class="small text-muted">${verifiedBadge}</div>
-                            </div>
                         </div>
                         <div class="review-body">
                             <div class="review-head">
                                 <h4 class="review-title">${title}</h4>
                                 <div class="user-rating review-stars" aria-label="${item.rating} estrellas"><span class="badge-ghost">${item.rating} ★</span></div>
                             </div>
+                            <div class="user-info">
+                                <strong>${userName}</strong>
+                                <span class="time">${this.formatDate(item.created_at)}</span>
+                                <div class="small text-muted">${verifiedBadge}</div>
+                            </div>
                             <p class="review-comment text-muted">${safeComment}${(item.comment || '').length > 160 ? '...' : ''}</p>
                             <div class="review-footer">
                                 <div class="review-product small text-muted">${productName}</div>
-                                <div class="review-actions actions">
-                                    <button class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar" aria-label="Aprobar reseña"><i class="fas fa-check" aria-hidden="true"></i></button>
-                                    <button class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar" aria-label="Rechazar reseña"><i class="fas fa-ban" aria-hidden="true"></i></button>
-                                    <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada" aria-label="Marcar como verificada"><i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i></button>
-                                </div>
                             </div>
+                        </div>
+                        <div class="review-actions actions">
+                            <button class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar" aria-label="Aprobar reseña"><i class="fas fa-check" aria-hidden="true"></i></button>
+                            <button class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar" aria-label="Rechazar reseña"><i class="fas fa-ban" aria-hidden="true"></i></button>
+                            <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada" aria-label="Marcar como verificada"><i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i></button>
+                        </div>
                         </div>
                     </div>
                 `;
