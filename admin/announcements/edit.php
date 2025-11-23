@@ -35,42 +35,7 @@ if (!$announcement) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/form.css">
-    <style>
-        .form-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
-        .form-actions { display:flex; gap:10px; }
-        .img-preview { max-width: 240px; border:1px solid #eee; border-radius:6px; margin-top: 10px; }
-        .form-section { border: 1px solid #eee; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
-        .form-section h3 { margin-top: 0; color: #555; font-size: 1.1rem; }
-        .color-input-group { display: flex; gap: 10px; align-items: center; }
-        .color-preview { width: 40px; height: 40px; border-radius: 4px; border: 1px solid #ddd; }
-        .current-image { max-width: 200px; border: 1px solid #ddd; border-radius: 4px; padding: 5px; margin-bottom: 10px; }
-        /* Estilos para los iconos en el select */
-        .icon-select-container {
-            position: relative;
-        }
-        .icon-select-container select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            padding-right: 40px;
-        }
-        .icon-select-container::after {
-            content: '▼';
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-            color: #666;
-        }
-        .icon-preview {
-            display: inline-block;
-            margin-right: 8px;
-            width: 20px;
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/announcements-forms.css">
 </head>
 <body>
 <div class="admin-container">
@@ -91,22 +56,22 @@ if (!$announcement) {
                         <h3><i class="fas fa-info-circle"></i> Información Básica</h3>
                         
                         <div class="form-group">
-                            <label for="type">Tipo de Anuncio <span style="color:red">*</span></label>
+                            <label for="type">Tipo de Anuncio <span class="text-danger">*</span></label>
                             <select id="type" name="type" class="form-control" required onchange="toggleFields()">
                                 <option value="">Seleccionar...</option>
                                 <option value="top_bar" <?= $announcement['type'] === 'top_bar' ? 'selected' : '' ?>>Barra Superior</option>
                                 <option value="promo_banner" <?= $announcement['type'] === 'promo_banner' ? 'selected' : '' ?>>Banner Promocional</option>
                             </select>
-                            <small>Barra superior: aparece arriba del sitio. Banner: aparece en el contenido.</small>
+                            <small class="form-text text-muted">Barra superior: aparece arriba del sitio. Banner: aparece en el contenido.</small>
                         </div>
 
                         <div class="form-group">
-                            <label for="title">Título <span style="color:red">*</span></label>
+                            <label for="title">Título <span class="text-danger">*</span></label>
                             <input type="text" id="title" name="title" class="form-control" value="<?= htmlspecialchars($announcement['title']) ?>" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="message">Mensaje <span style="color:red">*</span></label>
+                            <label for="message">Mensaje <span class="text-danger">*</span></label>
                             <textarea id="message" name="message" class="form-control" rows="3" required><?= htmlspecialchars($announcement['message']) ?></textarea>
                         </div>
                     </div>
@@ -132,14 +97,16 @@ if (!$announcement) {
                         <div class="form-group">
                             <label for="image">Imagen de Banner (opcional)</label>
                             <?php if (!empty($announcement['image'])): ?>
-                                <div>
-                                    <img src="<?= BASE_URL . '/' . htmlspecialchars($announcement['image']) ?>" class="current-image" alt="Imagen actual">
-                                    <p><small>Imagen actual. Selecciona una nueva para reemplazarla.</small></p>
+                                <div class="mb-2">
+                                    <img src="<?= BASE_URL . '/' . htmlspecialchars($announcement['image']) ?>" class="img-thumbnail" style="max-width: 200px;" alt="Imagen actual">
+                                    <p><small class="text-muted">Imagen actual. Selecciona una nueva para reemplazarla.</small></p>
                                 </div>
                             <?php endif; ?>
                             <input type="file" id="image" name="image" accept="image/*" class="form-control">
-                            <small>Formatos permitidos: jpg, jpeg, png, webp. Máx 3MB.</small>
-                            <img id="preview" class="img-preview" style="display:none" />
+                            <small class="form-text text-muted">Formatos permitidos: jpg, jpeg, png, webp. Máx 3MB.</small>
+                            <div class="mt-2">
+                                <img id="preview" class="img-preview" style="display:none; max-width: 200px; border-radius: 4px;" />
+                            </div>
                         </div>
                     </div>
 
@@ -147,7 +114,7 @@ if (!$announcement) {
                         <h3><i class="fas fa-palette"></i> Apariencia</h3>
                         
                         <div class="form-group">
-                            <label for="icon">Icono <span style="color:red">*</span></label>
+                            <label for="icon">Icono <span class="text-danger">*</span></label>
                             <div class="icon-select-container">
                                 <select id="icon" name="icon" class="form-control" required>
                                     <option value="">Seleccionar icono...</option>
@@ -189,17 +156,16 @@ if (!$announcement) {
                                     </optgroup>
                                 </select>
                             </div>
-                            <div id="icon-preview" class="icon-preview-box" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; display: none;">
-                                <span id="selected-icon-display"></span>
+                            <div id="icon-preview" class="mt-2 p-2 bg-light rounded" style="display: none;">
+                                <span id="selected-icon-display" class="mr-2"></span>
                                 <span id="selected-icon-text"></span>
                             </div>
-                            <small>Selecciona el icono que mejor represente tu anuncio</small>
+                            <small class="form-text text-muted">Selecciona el icono que mejor represente tu anuncio</small>
                         </div>
 
-                        <div class="color-preview-box" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; margin-top: 15px;">
-                            <i class="fas fa-palette" style="font-size: 24px; margin-bottom: 10px;"></i>
-                            <p style="margin: 0; font-weight: 500;">Los anuncios usan colores profesionales predefinidos</p>
-                            <small style="opacity: 0.9;">Azul elegante para mejor visibilidad</small>
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-palette"></i>
+                            <strong>Nota:</strong> Los anuncios usan colores predefinidos
                         </div>
                     </div>
 
@@ -211,24 +177,27 @@ if (!$announcement) {
                             <input type="number" id="priority" name="priority" class="form-control" value="<?= $announcement['priority'] ?>" min="0" max="100">
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div class="form-group">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
                                 <label for="start_date">Fecha de Inicio (opcional)</label>
                                 <input type="datetime-local" id="start_date" name="start_date" class="form-control" value="<?= !empty($announcement['start_date']) ? date('Y-m-d\TH:i', strtotime($announcement['start_date'])) : '' ?>">
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group col-md-6">
                                 <label for="end_date">Fecha de Fin (opcional)</label>
                                 <input type="datetime-local" id="end_date" name="end_date" class="form-control" value="<?= !empty($announcement['end_date']) ? date('Y-m-d\TH:i', strtotime($announcement['end_date'])) : '' ?>">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label><input type="checkbox" name="is_active" value="1" <?= $announcement['is_active'] ? 'checked' : '' ?>> Activo</label>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" value="1" <?= $announcement['is_active'] ? 'checked' : '' ?>>
+                                <label class="custom-control-label" for="is_active">Activo</label>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-actions">
+                    <div class="form-actions mt-4">
                         <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Cambios</button>
                         <a href="<?= BASE_URL ?>/admin/announcements/list.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
                     </div>

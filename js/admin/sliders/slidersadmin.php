@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        let html = `<table class="sliders-table">
+        let html = `<table class="data-table">
             <thead>
                 <tr>
                     <th width="50"></th>
@@ -45,37 +45,39 @@ document.addEventListener('DOMContentLoaded', function() {
                     <th>Título</th>
                     <th>Subtítulo</th>
                     <th>Enlace</th>
-                    <th width="80">Estado</th>
-                    <th width="150">Acciones</th>
+                    <th width="100">Estado</th>
+                    <th width="120" class="text-right">Acciones</th>
                 </tr>
             </thead>
             <tbody id="sortable-sliders">`;
 
         items.forEach(s => {
-            const statusClass = s.is_active ? 'badge-success' : 'badge-secondary';
+            const statusClass = s.is_active ? 'active' : 'inactive';
             const statusText = s.is_active ? 'Activo' : 'Inactivo';
             const imgSrc = s.image || '<?= BASE_URL ?>/images/default-product.jpg';
 
             html += `
                 <tr data-id="${s.id}">
-                    <td><i class="fas fa-grip-vertical drag-handle"></i></td>
-                    <td><span class="order-badge">${s.order_position}</span></td>
-                    <td><img src="${imgSrc}" class="slider-img-preview" alt="${s.title}" onerror="this.src='<?= BASE_URL ?>/images/default-product.jpg'"></td>
+                    <td><i class="fas fa-grip-vertical drag-handle" style="cursor:grab; color:var(--text-light);"></i></td>
+                    <td><span class="order-badge" style="background:var(--bg-dark); padding:2px 8px; border-radius:4px;">${s.order_position}</span></td>
+                    <td><img src="${imgSrc}" class="slider-img-preview" alt="${s.title}" style="width:100px; height:60px; object-fit:cover; border-radius:var(--radius-sm);" onerror="this.src='<?= BASE_URL ?>/images/default-product.jpg'"></td>
                     <td><strong>${s.title}</strong></td>
-                    <td>${s.subtitle || '<em>Sin subtítulo</em>'}</td>
-                    <td>${s.link ? `<a href="${s.link}" target="_blank" style="color:#007bff;"><i class="fas fa-external-link-alt"></i></a>` : '-'}</td>
+                    <td>${s.subtitle || '<em class="text-muted">Sin subtítulo</em>'}</td>
+                    <td>${s.link ? `<a href="${s.link}" target="_blank" class="text-primary"><i class="fas fa-external-link-alt"></i> Ver enlace</a>` : '<span class="text-muted">-</span>'}</td>
                     <td>
-                        <span class="badge ${statusClass} toggle-active" data-id="${s.id}" data-active="${s.is_active}" style="cursor:pointer;">
+                        <span class="status-badge ${statusClass} toggle-active" data-id="${s.id}" data-active="${s.is_active}" style="cursor:pointer;">
                             ${statusText}
                         </span>
                     </td>
-                    <td class="actions-cell">
-                        <a href="<?= BASE_URL ?>/admin/sliders/edit_slider.php?id=${s.id}" class="btn btn-primary btn-icon" title="Editar">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <button class="btn btn-danger btn-icon btn-delete" data-id="${s.id}" title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="<?= BASE_URL ?>/admin/sliders/edit_slider.php?id=${s.id}" class="btn-icon btn-primary" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="btn-icon btn-danger btn-delete" data-id="${s.id}" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `;

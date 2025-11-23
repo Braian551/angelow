@@ -45,22 +45,44 @@ if (isset($_SESSION['alert'])) {
                 </div>
             </div>
 
-            <!-- Filtros y búsqueda -->
-            <div class="card filters-card">
-                <div class="filcen">
-                    <a href="<?= BASE_URL ?>/admin/announcements/add.php" class="btn btn-success" id="add-announcement-btn">
-                        <i class="fas fa-plus"></i> Agregar anuncio
-                    </a>
+            <!-- Actions Bar - Matching Categories -->
+            <div class="actions-bar">
+                <a href="<?= BASE_URL ?>/admin/announcements/add.php" class="btn btn-primary" id="add-announcement-btn">
+                    <i class="fas fa-plus"></i> Agregar Anuncio
+                </a>
+                <div class="search-box">
+                    <input type="text" placeholder="Buscar anuncios..." id="search-announcements">
+                    <button><i class="fas fa-search"></i></button>
                 </div>
+                <!-- Hidden element to prevent JS error -->
+                <span id="results-count" style="display: none;"></span>
             </div>
 
-            <div class="results-summary">
-                <p id="results-count">Cargando anuncios...</p>
-            </div>
 
             <!-- Listado de anuncios -->
-            <div class="products-grid" id="announcements-container">
-                <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando anuncios...</div>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th width="60">Icono</th>
+                                <th>Detalles del Anuncio</th>
+                                <th>Tipo</th>
+                                <th>Prioridad</th>
+                                <th>Fechas</th>
+                                <th>Estado</th>
+                                <th class="text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="announcements-container">
+                            <tr>
+                                <td colspan="7" class="loading-row">
+                                    <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando anuncios...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="pagination" id="pagination-container"></div>

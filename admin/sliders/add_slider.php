@@ -16,11 +16,6 @@ requireRole('admin');
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/form.css">
-    <style>
-        .form-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.05); max-width: 800px; }
-        .form-actions { display: flex; gap: 10px; margin-top: 20px; }
-        .img-preview { max-width: 100%; max-height: 300px; border: 1px solid #eee; border-radius: 6px; margin-top: 10px; }
-    </style>
 </head>
 <body>
 <div class="admin-container">
@@ -41,42 +36,63 @@ requireRole('admin');
                 <form action="<?= BASE_URL ?>/admin/sliders/save_slider.php" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="id" value="">
 
-                    <div class="form-group">
-                        <label for="title">Título *</label>
-                        <input type="text" id="title" name="title" class="form-control" required maxlength="255">
+                    <div class="form-section">
+                        <h3><i class="fas fa-info-circle"></i> Información del Slider</h3>
+                        
+                        <div class="form-group">
+                            <label for="title">Título <span class="text-danger">*</span></label>
+                            <input type="text" id="title" name="title" class="form-control" required maxlength="255" placeholder="Ej: Nueva Colección 2024">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subtitle">Subtítulo</label>
+                            <input type="text" id="subtitle" name="subtitle" class="form-control" maxlength="255" placeholder="Ej: Descubre los mejores estilos">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="link">Enlace (URL opcional)</label>
+                            <input type="text" id="link" name="link" class="form-control" placeholder="https://ejemplo.com o /pagina-interna">
+                            <small class="form-text text-muted">URL completa (https://...) o ruta relativa (/pagina). Dejar vacío si no hay enlace</small>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="subtitle">Subtítulo</label>
-                        <input type="text" id="subtitle" name="subtitle" class="form-control" maxlength="255">
+                    <div class="form-section">
+                        <h3><i class="fas fa-image"></i> Multimedia</h3>
+                        
+                        <div class="form-group">
+                            <label for="image">Imagen <span class="text-danger">*</span></label>
+                            <div class="custom-file-upload">
+                                <input type="file" id="image" name="image" accept="image/*" class="form-control" required>
+                                <small class="form-text text-muted">Formatos: jpg, jpeg, png, webp, avif. Máx 15MB. Recomendado: 1920x800px</small>
+                            </div>
+                            <div class="mt-3">
+                                <img id="preview" class="img-preview" style="display:none; max-width: 100%; max-height: 300px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="image">Imagen *</label>
-                        <input type="file" id="image" name="image" accept="image/*" class="form-control" required>
-                        <small>Formatos: jpg, jpeg, png, webp, avif. Máx 15MB. Recomendado: 1920x800px</small>
-                        <div><img id="preview" class="img-preview" style="display:none" /></div>
+                    <div class="form-section">
+                        <h3><i class="fas fa-cog"></i> Configuración</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="order_position">Orden</label>
+                                <input type="number" id="order_position" name="order_position" class="form-control" value="1" min="1">
+                                <small class="form-text text-muted">Posición de visualización (menor número = primero)</small>
+                            </div>
+
+                            <div class="form-group col-md-6 d-flex align-items-center">
+                                <div class="custom-control custom-switch mt-4">
+                                    <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" value="1" checked>
+                                    <label class="custom-control-label" for="is_active">Activo</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="link">Enlace (URL opcional)</label>
-                        <input type="text" id="link" name="link" class="form-control" placeholder="https://ejemplo.com o /pagina-interna">
-                        <small>URL completa (https://...) o ruta relativa (/pagina). Dejar vacío si no hay enlace</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="order_position">Orden</label>
-                        <input type="number" id="order_position" name="order_position" class="form-control" value="1" min="1">
-                        <small>Posición de visualización (menor número = primero)</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label><input type="checkbox" name="is_active" value="1" checked> Activo</label>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar</button>
-                        <a href="<?= BASE_URL ?>/admin/sliders/sliders_list.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+                    <div class="form-actions mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Slider</button>
+                        <a href="<?= BASE_URL ?>/admin/sliders/sliders_list.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Cancelar</a>
                     </div>
                 </form>
             </div>

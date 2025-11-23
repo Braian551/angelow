@@ -39,11 +39,6 @@ try {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/alerta.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/form.css">
-    <style>
-        .form-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.05); max-width: 800px; }
-        .form-actions { display: flex; gap: 10px; margin-top: 20px; }
-        .img-preview { max-width: 100%; max-height: 300px; border: 1px solid #eee; border-radius: 6px; margin-top: 10px; }
-    </style>
 </head>
 <body>
 <div class="admin-container">
@@ -65,7 +60,7 @@ try {
                     <input type="hidden" name="id" value="<?= (int)$slider['id'] ?>">
 
                     <div class="form-group">
-                        <label for="title">Título *</label>
+                        <label for="title">Título <span class="text-danger">*</span></label>
                         <input type="text" id="title" name="title" class="form-control" required maxlength="255" value="<?= htmlspecialchars($slider['title']) ?>">
                     </div>
 
@@ -78,30 +73,34 @@ try {
                         <label for="image">Imagen (dejar vacío para mantener la actual)</label>
                         <input type="file" id="image" name="image" accept="image/*" class="form-control">
                         <?php if (!empty($slider['image'])): ?>
-                            <div style="margin-top:10px">
-                                <img src="<?= BASE_URL . '/' . htmlspecialchars($slider['image']) ?>" class="img-preview" alt="Imagen actual" onerror="this.style.display='none'">
+                            <div class="mt-2">
+                                <img src="<?= BASE_URL . '/' . htmlspecialchars($slider['image']) ?>" class="img-preview" alt="Imagen actual" onerror="this.style.display='none'" style="max-width: 100%; max-height: 300px; border-radius: 6px;">
+                                <p><small class="text-muted">Imagen actual</small></p>
                             </div>
                         <?php endif; ?>
-                        <small>Formatos: jpg, jpeg, png, webp, avif. Máx 15MB. Recomendado: 1920x800px</small>
+                        <small class="form-text text-muted">Formatos: jpg, jpeg, png, webp, avif. Máx 15MB. Recomendado: 1920x800px</small>
                     </div>
 
                     <div class="form-group">
                         <label for="link">Enlace (URL opcional)</label>
                         <input type="text" id="link" name="link" class="form-control" placeholder="https://ejemplo.com o /pagina-interna" value="<?= htmlspecialchars($slider['link'] ?? '') ?>">
-                        <small>URL completa (https://...) o ruta relativa (/pagina). Dejar vacío si no hay enlace</small>
+                        <small class="form-text text-muted">URL completa (https://...) o ruta relativa (/pagina). Dejar vacío si no hay enlace</small>
                     </div>
 
                     <div class="form-group">
                         <label for="order_position">Orden</label>
                         <input type="number" id="order_position" name="order_position" class="form-control" value="<?= (int)$slider['order_position'] ?>" min="1">
-                        <small>Posición de visualización (menor número = primero)</small>
+                        <small class="form-text text-muted">Posición de visualización (menor número = primero)</small>
                     </div>
 
                     <div class="form-group">
-                        <label><input type="checkbox" name="is_active" value="1" <?= $slider['is_active'] ? 'checked' : '' ?>> Activo</label>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" value="1" <?= $slider['is_active'] ? 'checked' : '' ?>>
+                            <label class="custom-control-label" for="is_active">Activo</label>
+                        </div>
                     </div>
 
-                    <div class="form-actions">
+                    <div class="form-actions mt-4">
                         <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar</button>
                         <a href="<?= BASE_URL ?>/admin/sliders/sliders_list.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
                     </div>
