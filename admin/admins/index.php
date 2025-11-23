@@ -13,7 +13,7 @@ requireRole('admin');
     <title>Administradores | Panel Angelow</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/management-hub.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/administrators.css">
 </head>
 <body>
 <div class="admin-container">
@@ -21,41 +21,43 @@ requireRole('admin');
     <main class="admin-content">
         <?php require_once __DIR__ . '/../../layouts/headeradmin1.php'; ?>
 
-        <div class="management-hub" id="admins-hub">
+        <div class="dashboard-content">
             <div class="page-header">
-                <div>
-                    <h1><i class="fas fa-user-shield"></i> Administradores</h1>
-                    <p>Gestión de cuentas de administración y roles.</p>
-                </div>
-                <div class="actions">
-                    <a class="btn-soft" href="<?= BASE_URL ?>/admin/admins/create.php"><i class="fas fa-plus"></i> Nuevo administrador</a>
+                <h1><i class="fas fa-user-shield"></i> Administradores</h1>
+                <div class="breadcrumb">
+                    <a href="<?= BASE_URL ?>/admin">Dashboard</a> / 
+                    <span>Administradores</span>
                 </div>
             </div>
 
-            <section class="surface-card">
-                <header class="filter-bar">
-                    <div>
-                        <h2>Equipo administrativo</h2>
-                        <p class="text-muted">Roles, estado y accesos</p>
-                    </div>
-                </header>
-                <div class="table-wrapper">
-                    <table>
+            <div class="actions-bar">
+                <div class="drag-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Gestión de cuentas y roles</span>
+                </div>
+                <a href="<?= BASE_URL ?>/admin/admins/create.php" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nuevo administrador
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="data-table">
                         <thead>
                             <tr>
                                 <th>Nombre</th>
                                 <th>Email</th>
                                 <th>Rol</th>
                                 <th>Estado</th>
-                                <th>Acciones</th>
+                                <th class="text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="admins-table">
-                            <tr><td colspan="5">Cargando administradores...</td></tr>
+                            <tr><td colspan="5" class="loading-row"><div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando administradores...</div></td></tr>
                         </tbody>
                     </table>
                 </div>
-            </section>
+            </div>
         </div>
     </main>
 </div>

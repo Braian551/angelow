@@ -236,10 +236,14 @@
     border-radius: 12px;
     display: inline-grid;
     place-items: center;
-    position: relative; /* for pseudo-layer behind icon */
-    background: rgba(0, 119, 182, 0.07) !important; /* white square inside halo */
-    color: var(--hub-muted) !important; /* default icon color - overridden per metric */
-    box-shadow: none !important; /* remove any other box-shadow to avoid double look */
+    position: relative;
+    /* for pseudo-layer behind icon */
+    background: rgba(0, 119, 182, 0.07) !important;
+    /* white square inside halo */
+    color: var(--hub-muted) !important;
+    /* default icon color - overridden per metric */
+    box-shadow: none !important;
+    /* remove any other box-shadow to avoid double look */
 }
 
 /* base halo - neutral (in case metric-specific is absent) */
@@ -255,8 +259,10 @@
     filter: blur(8px);
     opacity: 0.75;
     transform: translate3d(0, 0, 0);
-    z-index: -1; /* keep behind the white square */
+    z-index: -1;
+    /* keep behind the white square */
 }
+
 /* Inline SVG fallback sizing and color so injected SVG inherits the stat color */
 #reviews-insights .stat-card .inline-icon.inline-icon-fallback {
     width: 18px;
@@ -301,13 +307,14 @@
    font renders badly). This mirrors the `insights-grid` metric-specific
    color used in the main `management-hub` styles. */
 #reviews-insights .stat-card[data-metric="verified"] .stat-icon {
-    background: rgba(16,185,129,0.06) !important;
+    background: rgba(16, 185, 129, 0.06) !important;
     color: #10b981 !important;
 }
 
 #reviews-insights .stat-card[data-metric="verified"] .stat-icon svg,
 #reviews-insights .stat-card[data-metric="verified"] .stat-icon .inline-icon {
-    fill: currentColor !important; /* ensures inline SVG picks up color */
+    fill: currentColor !important;
+    /* ensures inline SVG picks up color */
     color: inherit !important;
 }
 
@@ -320,36 +327,83 @@
 /* Metric-specific colors for review hub (match client card color mapping) */
 /* Metric-specific halo colors (pseudo behind icon) and icon color on the glyph itself */
 #reviews-insights .stat-card[data-metric="pending"] .stat-icon i,
-#reviews-insights .stat-card[data-metric="pending"] .stat-icon svg { color: #0284c7; fill: #0284c7; }
+#reviews-insights .stat-card[data-metric="pending"] .stat-icon svg {
+    color: #0284c7;
+    fill: #0284c7;
+}
+
 #reviews-insights .stat-card[data-metric="approved"] .stat-icon i,
-#reviews-insights .stat-card[data-metric="approved"] .stat-icon svg { color: var(--hub-primary, var(--primary-color)); fill: var(--hub-primary, var(--primary-color)); }
+#reviews-insights .stat-card[data-metric="approved"] .stat-icon svg {
+    color: var(--hub-primary, var(--primary-color));
+    fill: var(--hub-primary, var(--primary-color));
+}
+
 #reviews-insights .stat-card[data-metric="average"] .stat-icon i,
-#reviews-insights .stat-card[data-metric="average"] .stat-icon svg { color: #f59e0b; fill: #f59e0b; }
+#reviews-insights .stat-card[data-metric="average"] .stat-icon svg {
+    color: #f59e0b;
+    fill: #f59e0b;
+}
+
 #reviews-insights .stat-card[data-metric="verified"] .stat-icon i,
-#reviews-insights .stat-card[data-metric="verified"] .stat-icon svg { color: var(--hub-primary, var(--primary-color)); fill: var(--hub-primary, var(--primary-color)); }
+#reviews-insights .stat-card[data-metric="verified"] .stat-icon svg {
+    color: var(--hub-primary, var(--primary-color));
+    fill: var(--hub-primary, var(--primary-color));
+}
 
 /* smaller icon size for consistency */
-#reviews-insights .stat-card .stat-icon i, #reviews-insights .stat-card .stat-icon svg { font-size: 18px; }
+#reviews-insights .stat-card .stat-icon i,
+#reviews-insights .stat-card .stat-icon svg {
+    font-size: 18px;
+}
 
-#reviews-insights .stat-card[data-metric="pending"] .stat-value { color: #0284c7; }
-#reviews-insights .stat-card[data-metric="approved"] .stat-value { color: var(--hub-primary, var(--primary-color)); }
-#reviews-insights .stat-card[data-metric="average"] .stat-value { color: #f59e0b; }
-#reviews-insights .stat-card[data-metric="verified"] .stat-value { color: var(--hub-primary, var(--primary-color)); }
+#reviews-insights .stat-card[data-metric="pending"] .stat-value {
+    color: #0284c7;
+}
+
+#reviews-insights .stat-card[data-metric="approved"] .stat-value {
+    color: var(--hub-primary, var(--primary-color));
+}
+
+#reviews-insights .stat-card[data-metric="average"] .stat-value {
+    color: #f59e0b;
+}
+
+#reviews-insights .stat-card[data-metric="verified"] .stat-value {
+    color: var(--hub-primary, var(--primary-color));
+}
 
 /* Improve stat value sizing and spacing closer to client look */
-#reviews-insights .stat-card .stat-value { font-size: clamp(1.6rem, 2.2vw, 3rem); font-weight: 900; color: var(--hub-text); }
+#reviews-insights .stat-card .stat-value {
+    font-size: clamp(1.6rem, 2.2vw, 3rem);
+    font-weight: 900;
+    color: var(--hub-text);
+}
 
 /* Align stat-top left on wide screens for better alignment with icon */
 @media (min-width: 1160px) {
-    #reviews-insights .stat-card { align-items: flex-start; text-align: left; }
-    #reviews-insights .stat-card .stat-top { justify-content: flex-start; }
+    #reviews-insights .stat-card {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    #reviews-insights .stat-card .stat-top {
+        justify-content: flex-start;
+    }
 }
 
 /* Make stat title uppercase and align colors like clients */
-#reviews-insights .stat-card .stat-top h2 { text-transform: uppercase; font-weight: 700; color: var(--hub-muted); }
+#reviews-insights .stat-card .stat-top h2 {
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--hub-muted);
+}
 
 /* subtext color and spacing consistent with client */
-#reviews-insights .stat-card .stat-subtext { color: var(--hub-muted); font-size: 0.95rem; margin-top: 0.25rem; }
+#reviews-insights .stat-card .stat-subtext {
+    color: var(--hub-muted);
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+}
 
 /* ======== DETAIL PANEL - REORGANIZED ======== */
 
@@ -374,11 +428,14 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 1rem;
-    position: relative; /* allow absolute positioning of the header controls */
+    position: relative;
+    /* allow absolute positioning of the header controls */
 }
 
 /* Give room for the floating close control so header content doesn't underlap it */
-.detail-panel .detail-body header { padding-right: 72px; }
+.detail-panel .detail-body header {
+    padding-right: 72px;
+}
 
 .detail-panel .detail-title,
 .detail-panel .detail-body header .detail-name {
@@ -399,11 +456,13 @@
     background: white;
     display: flex;
     align-items: center;
-    position: relative; /* enable absolute positioning for corner controls */
+    position: relative;
+    /* enable absolute positioning for corner controls */
     cursor: pointer;
     transition: all 0.2s ease;
     flex-shrink: 0;
-    margin-left: 0; /* Avoid duplication of spacing in the header's controls area */
+    margin-left: 0;
+    /* Avoid duplication of spacing in the header's controls area */
 }
 
 /* ======== ADMIN REVIEW-CARD IMPROVEMENTS ======== */
@@ -416,83 +475,318 @@
     align-items: start;
 }
 
-.management-hub#reviews-hub .reviews-list .review-card:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(8,18,34,0.08); }
-.management-hub#reviews-hub .reviews-list .review-card { cursor: pointer; }
+.management-hub#reviews-hub .reviews-list .review-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(8, 18, 34, 0.08);
+}
+
+.management-hub#reviews-hub .reviews-list .review-card {
+    cursor: pointer;
+}
 
 .management-hub#reviews-hub .reviews-list .review-card .review-body {
-    grid-column: 2 / 3; /* main content in middle column */
+    grid-column: 2 / 3;
+    /* main content in middle column */
 }
 
 /* Center the body content (title, user info) for easier reading - keep product aligned left */
 .management-hub#reviews-hub .reviews-list .review-card .review-body {
-    text-align: left; /* left align all content */
-    display: block; /* use block flow for easier left alignment and wrap */
-    padding: 0 0.6rem; /* small inner padding */
+    text-align: left;
+    /* left align all content */
+    display: block;
+    /* use block flow for easier left alignment and wrap */
+    padding: 0 0.6rem;
+    /* small inner padding */
 }
-.management-hub#reviews-hub .reviews-list .review-card .review-body .review-head { width: 100%; position: relative; }
-.management-hub#reviews-hub .reviews-list .review-card .review-head-left { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
-.management-hub#reviews-hub .reviews-list .review-card .review-head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.45rem; margin-left: auto; padding-right: 20px; white-space: nowrap; }
-.management-hub#reviews-hub .reviews-list .review-card .user-subinfo { display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; }
-.management-hub#reviews-hub .reviews-list .review-card .review-category { color: var(--hub-muted); font-weight:600; }
-.management-hub#reviews-hub .reviews-list .review-card .review-badges { display:flex; gap: 0.4rem; align-items:center; justify-content:flex-end; }
+
+.management-hub#reviews-hub .reviews-list .review-card .review-body .review-head {
+    width: 100%;
+    position: relative;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-head-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-head-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.45rem;
+    margin-left: auto;
+    padding-right: 20px;
+    white-space: nowrap;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .user-subinfo {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-category {
+    color: var(--hub-muted);
+    font-weight: 600;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-badges {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    justify-content: flex-end;
+}
+
 /* Header enhancements: spacing and subtle divider */
-.management-hub#reviews-hub .reviews-list .review-card .review-head { padding-bottom: 0.6rem; border-bottom: 1px solid rgba(15,23,42,0.04); }
-.management-hub#reviews-hub .reviews-list .review-card .review-title { font-size: 1.28rem; font-weight: 800; color: var(--hub-text); margin: 0 0 2px 0; letter-spacing: -0.02em; }
-.management-hub#reviews-hub .reviews-list .review-card .review-user { font-size: 1rem; color: var(--hub-text); }
-.management-hub#reviews-hub .reviews-list .review-card .user-subinfo .time { color: var(--hub-muted); font-size: 0.82rem; line-height: 1; }
-.management-hub#reviews-hub .reviews-list .review-card .review-category { font-size: 0.9rem; color: var(--hub-muted); }
+.management-hub#reviews-hub .reviews-list .review-card .review-head {
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.04);
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-title {
+    font-size: 1.28rem;
+    font-weight: 800;
+    color: var(--hub-text);
+    margin: 0 0 2px 0;
+    letter-spacing: -0.02em;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-user {
+    font-size: 1rem;
+    color: var(--hub-text);
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .user-subinfo .time {
+    color: var(--hub-muted);
+    font-size: 0.82rem;
+    line-height: 1;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-category {
+    font-size: 0.9rem;
+    color: var(--hub-muted);
+}
 
 /* Rating bubble enhancement: stronger contrast and clearer number */
-.management-hub#reviews-hub .reviews-list .review-card .user-rating { background: #ffffff; padding: 0.35rem 0.7rem; border-radius: 999px; box-shadow: 0 8px 20px rgba(2,132,199,0.06); border: 1px solid rgba(2,132,199,0.06); display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 900; color: #0f172a; z-index: 12; align-self: flex-start; }
-.management-hub#reviews-hub .reviews-list .review-card .user-rating .badge-ghost { font-weight: 900; color: #0f172a; background: transparent; border: none; padding: 0; }
+.management-hub#reviews-hub .reviews-list .review-card .user-rating {
+    background: #ffffff;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    box-shadow: 0 8px 20px rgba(2, 132, 199, 0.06);
+    border: 1px solid rgba(2, 132, 199, 0.06);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 900;
+    color: #0f172a;
+    z-index: 12;
+    align-self: flex-start;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .user-rating .badge-ghost {
+    font-weight: 900;
+    color: #0f172a;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
 
 /* Verified badge (blue) and status chip (green / amber) styling */
-.management-hub#reviews-hub .reviews-list .review-card .badge.verified { background: rgba(59,130,246,0.12); color: #0369a1; border: 1px solid rgba(59,130,246,0.16); padding: 0.35rem 0.7rem; border-radius: 999px; display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 700; }
-.management-hub#reviews-hub .reviews-list .review-card .status-chip.small.success { background: var(--primary-light, rgba(0,119,182,0.08)); color: var(--hub-primary, var(--primary-color)); border: 1px solid var(--primary-light, rgba(0,119,182,0.12)); display:inline-flex; align-items:center; gap:0.3rem; padding: 0.35rem 0.6rem; border-radius:999px; font-weight:700; }
-.management-hub#reviews-hub .reviews-list .review-card .status-chip.small.warning { background: rgba(245,158,11,0.08); color: #d97706; border: 1px solid rgba(245,158,11,0.12); display:inline-flex; align-items:center; gap:0.3rem; padding: 0.35rem 0.6rem; border-radius:999px; font-weight:700; }
+.management-hub#reviews-hub .reviews-list .review-card .badge.verified {
+    background: rgba(59, 130, 246, 0.12);
+    color: #0369a1;
+    border: 1px solid rgba(59, 130, 246, 0.16);
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 700;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .status-chip.small.success {
+    background: var(--primary-light, rgba(0, 119, 182, 0.08));
+    color: var(--hub-primary, var(--primary-color));
+    border: 1px solid var(--primary-light, rgba(0, 119, 182, 0.12));
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .status-chip.small.warning {
+    background: rgba(245, 158, 11, 0.08);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.12);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    font-weight: 700;
+}
 
 /* Subtle label and comment contrast */
-.management-hub#reviews-hub .reviews-list .review-card .review-comment { color: var(--hub-muted-strong); font-size: 1rem; line-height: 1.6; }
+.management-hub#reviews-hub .reviews-list .review-card .review-comment {
+    color: var(--hub-muted-strong);
+    font-size: 1rem;
+    line-height: 1.6;
+}
 
 /* Avatar enhancements */
-.management-hub#reviews-hub .reviews-list .review-card .user-avatar { border: none; box-shadow: 0 12px 28px rgba(2,132,199,0.08); background: linear-gradient(180deg, var(--hub-primary) 0%, rgba(2,132,199,0.9) 100%); }
+.management-hub#reviews-hub .reviews-list .review-card .user-avatar {
+    border: none;
+    box-shadow: 0 12px 28px rgba(2, 132, 199, 0.08);
+    background: linear-gradient(180deg, var(--hub-primary) 0%, rgba(2, 132, 199, 0.9) 100%);
+}
 
 /* Actions: vertical group, strong icons, consistent background */
-.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft { width: 44px; height: 44px; border-radius: 12px; background: #fff; box-shadow: 0 6px 18px rgba(2,132,199,0.06); border: 1px solid rgba(15,23,42,0.06); }
-.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft i{ font-size: 1.15rem; }
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(2, 132, 199, 0.06);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft i {
+    font-size: 1.15rem;
+}
 
 /* Improve focus outline for accessibility */
-.management-hub#reviews-hub .reviews-list .review-card:focus-within { box-shadow: 0 20px 40px rgba(2,132,199,0.08); }
+.management-hub#reviews-hub .reviews-list .review-card:focus-within {
+    box-shadow: 0 20px 40px rgba(2, 132, 199, 0.08);
+}
 
 /* Small screens: reduce title size & ensure layout fits */
 @media (max-width: 760px) {
-    .management-hub#reviews-hub .reviews-list .review-card .review-title { font-size: 1.06rem; }
-    .management-hub#reviews-hub .reviews-list .review-card .user-avatar { width: 56px; height: 56px; }
+    .management-hub#reviews-hub .reviews-list .review-card .review-title {
+        font-size: 1.06rem;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card .user-avatar {
+        width: 56px;
+        height: 56px;
+    }
 }
-.management-hub#reviews-hub .reviews-list .review-card .review-badges .status-chip { margin-left: 0; }
-.management-hub#reviews-hub .reviews-list .review-card .review-badges .badge.verified { margin-left: 0; }
-.management-hub#reviews-hub .reviews-list .review-card .review-badges .status-chip.success { background: var(--primary-light, rgba(0,119,182,0.08)); color: var(--hub-primary, var(--primary-color)); padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; }
-.management-hub#reviews-hub .reviews-list .review-card .review-badges .status-chip.warning { background: rgba(245,158,11,0.08); color: #f59e0b; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; }
-.management-hub#reviews-hub .reviews-list .review-card .review-body .review-head .review-title { margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--hub-text); text-align: left; }
-.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info { text-align:left; display:block; }
-.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info strong { display:inline-block; font-size:1.08rem; font-weight:700; margin-right:0.6rem; }
-.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .time { display:block; color:var(--hub-muted); margin-top: 2px; font-size: 0.82rem; line-height: 1; }
-.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .small.text-muted { display:flex; gap: 0.6rem; margin-top: 6px; align-items: center; }
-.management-hub#reviews-hub .reviews-list .review-card .review-body .review-comment { max-width: 100%; margin: 0; text-align: left; color: var(--hub-muted-strong); }
+
+.management-hub#reviews-hub .reviews-list .review-card .review-badges .status-chip {
+    margin-left: 0;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-badges .badge.verified {
+    margin-left: 0;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-badges .status-chip.success {
+    background: var(--primary-light, rgba(0, 119, 182, 0.08));
+    color: var(--hub-primary, var(--primary-color));
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-badges .status-chip.warning {
+    background: rgba(245, 158, 11, 0.08);
+    color: #f59e0b;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-body .review-head .review-title {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--hub-text);
+    text-align: left;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info {
+    text-align: left;
+    display: block;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info strong {
+    display: inline-block;
+    font-size: 1.08rem;
+    font-weight: 700;
+    margin-right: 0.6rem;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .time {
+    display: block;
+    color: var(--hub-muted);
+    margin-top: 2px;
+    font-size: 0.82rem;
+    line-height: 1;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .small.text-muted {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 6px;
+    align-items: center;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-body .review-comment {
+    max-width: 100%;
+    margin: 0;
+    text-align: left;
+    color: var(--hub-muted-strong);
+}
 
 /* Keep footer product left aligned within the content column */
-.management-hub#reviews-hub .reviews-list .review-card .review-footer { grid-column: 2 / 3; justify-self: start; width:100%; }
-.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product { text-align: left; margin-left: 0; padding-left: 0; }
+.management-hub#reviews-hub .reviews-list .review-card .review-footer {
+    grid-column: 2 / 3;
+    justify-self: start;
+    width: 100%;
+}
 
-.management-hub#reviews-hub .reviews-list .review-card { padding-top: 1.8rem; }
-.management-hub#reviews-hub .reviews-list .review-card .user-avatar { align-self: start; margin-left: 0.9rem; width: 58px; height: 58px; }
+.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product {
+    text-align: left;
+    margin-left: 0;
+    padding-left: 0;
+}
 
-.management-hub#reviews-hub .reviews-list .review-card .review-meta { grid-column: 1 / 2; }
-.management-hub#reviews-hub .reviews-list .review-card .review-actions { grid-column: 3 / 4; display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end; justify-content: center; }
+.management-hub#reviews-hub .reviews-list .review-card {
+    padding-top: 1.8rem;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .user-avatar {
+    align-self: start;
+    margin-left: 0.9rem;
+    width: 58px;
+    height: 58px;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-meta {
+    grid-column: 1 / 2;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-actions {
+    grid-column: 3 / 4;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+    justify-content: center;
+}
 
 /* Status color strip and accessible focus styles */
-.management-hub#reviews-hub .reviews-list .review-card[data-status="approved"] { border-left: 4px solid var(--hub-primary, var(--primary-color)); }
-.management-hub#reviews-hub .reviews-list .review-card[data-status="pending"] { border-left: 4px solid rgba(245,158,11,0.95); }
+.management-hub#reviews-hub .reviews-list .review-card[data-status="approved"] {
+    border-left: 4px solid var(--hub-primary, var(--primary-color));
+}
+
+.management-hub#reviews-hub .reviews-list .review-card[data-status="pending"] {
+    border-left: 4px solid rgba(245, 158, 11, 0.95);
+}
 
 .management-hub#reviews-hub .reviews-list .review-card:focus {
     outline: none;
@@ -501,40 +795,74 @@
 }
 
 /* Admin: place rating near the actions, not absolutely positioned top-right (avoids collision with buttons) */
-.management-hub#reviews-hub .reviews-list .review-card .review-head { position: relative; }
+.management-hub#reviews-hub .reviews-list .review-card .review-head {
+    position: relative;
+}
+
 .management-hub#reviews-hub .reviews-list .review-card .user-rating {
-    position: absolute; /* move bubble to top-right */
+    position: absolute;
+    /* move bubble to top-right */
     top: 14px;
     right: 16px;
     left: auto;
     transform: none;
     display: inline-flex;
     gap: 0.35rem;
-    background: rgba(255,255,255,0.98);
+    background: rgba(255, 255, 255, 0.98);
     padding: 0.3rem 0.6rem;
     border-radius: 999px;
-    border: 1px solid rgba(12,52,84,0.06);
-    box-shadow: 0 6px 14px rgba(8,18,34,0.06);
+    border: 1px solid rgba(12, 52, 84, 0.06);
+    box-shadow: 0 6px 14px rgba(8, 18, 34, 0.06);
     z-index: 5;
 }
-.management-hub#reviews-hub .reviews-list .review-card .review-head { margin-right: 0; }
+
+.management-hub#reviews-hub .reviews-list .review-card .review-head {
+    margin-right: 0;
+}
 
 /* Make sure action buttons are clearly visible and easy to Tap on mobile */
-.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft { width: 42px; height: 42px; padding: 0; display: inline-grid; place-items: center; }
-.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-sm { min-width: 42px; }
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    display: inline-grid;
+    place-items: center;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-sm {
+    min-width: 42px;
+}
 
 /* On small screens layout stacks: avatar / body / actions */
 @media (max-width: 880px) {
-    .management-hub#reviews-hub .reviews-list .review-card { grid-template-columns: 56px 1fr; grid-template-rows: auto auto; }
-    .management-hub#reviews-hub .reviews-list .review-card .review-body { grid-column: 1 / -1; text-align: left; }
-    .management-hub#reviews-hub .reviews-list .review-card .review-actions { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: flex-start; }
-    .management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft { width: auto; height: auto; padding: 0.5rem 0.8rem; }
+    .management-hub#reviews-hub .reviews-list .review-card {
+        grid-template-columns: 56px 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card .review-body {
+        grid-column: 1 / -1;
+        text-align: left;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card .review-actions {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft {
+        width: auto;
+        height: auto;
+        padding: 0.5rem 0.8rem;
+    }
 }
 
 /* Verified action button state styling */
 .management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-verified {
-    background: var(--primary-light, rgba(0,119,182,0.08)) !important;
-    border-color: var(--primary-light, rgba(0,119,182,0.12)) !important;
+    background: var(--primary-light, rgba(0, 119, 182, 0.08)) !important;
+    border-color: var(--primary-light, rgba(0, 119, 182, 0.12)) !important;
     color: var(--hub-primary, var(--primary-color)) !important;
     cursor: default;
     opacity: 0.9;
@@ -549,21 +877,63 @@
     padding: 0.55rem;
 }
 
-.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-approve { background: var(--primary-light, rgba(0,119,182,0.08)); border-color: var(--primary-light, rgba(0,119,182,0.12)); color: var(--hub-primary, var(--primary-color)); }
-.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-reject { background: rgba(220,38,38,0.06); border-color: rgba(220,38,38,0.12); color: #dc2626; }
-.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-verify { background: var(--primary-light, rgba(0,119,182,0.08)); border-color: var(--primary-light, rgba(0,119,182,0.12)); color: var(--hub-primary, var(--primary-color)); }
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-approve {
+    background: var(--primary-light, rgba(0, 119, 182, 0.08));
+    border-color: var(--primary-light, rgba(0, 119, 182, 0.12));
+    color: var(--hub-primary, var(--primary-color));
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-reject {
+    background: rgba(220, 38, 38, 0.06);
+    border-color: rgba(220, 38, 38, 0.12);
+    color: #dc2626;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-verify {
+    background: var(--primary-light, rgba(0, 119, 182, 0.08));
+    border-color: var(--primary-light, rgba(0, 119, 182, 0.12));
+    color: var(--hub-primary, var(--primary-color));
+}
 
 /* Small visual polish: align rating, product and small info */
-.management-hub#reviews-hub .reviews-list .review-card .user-info { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; justify-content: center; text-align:center; }
-.management-hub#reviews-hub .reviews-list .review-card .user-info .badge.verified { background: var(--primary-light, rgba(0,119,182,0.12)); color: var(--hub-primary, var(--primary-color)); border: none; box-shadow: none; }
-.management-hub#reviews-hub .reviews-list .review-card .user-info .status-chip { margin-left: 0.6rem; }
+.management-hub#reviews-hub .reviews-list .review-card .user-info {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
 
-.management-hub#reviews-hub .reviews-list .review-card .review-footer { grid-column: 2 / 3; justify-self: start; text-align: left; margin-top: 0.6rem; }
-.management-hub#reviews-hub .reviews-list .review-card .user-info .time { color: var(--hub-muted); font-size: 0.82rem; line-height: 1; }
+.management-hub#reviews-hub .reviews-list .review-card .user-info .badge.verified {
+    background: var(--primary-light, rgba(0, 119, 182, 0.12));
+    color: var(--hub-primary, var(--primary-color));
+    border: none;
+    box-shadow: none;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .user-info .status-chip {
+    margin-left: 0.6rem;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-footer {
+    grid-column: 2 / 3;
+    justify-self: start;
+    text-align: left;
+    margin-top: 0.6rem;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .user-info .time {
+    color: var(--hub-muted);
+    font-size: 0.82rem;
+    line-height: 1;
+}
 
 /* Reduce motion for users preferring reduced motion */
 @media (prefers-reduced-motion: reduce) {
-    .management-hub#reviews-hub .reviews-list .review-card { transition: none; }
+    .management-hub#reviews-hub .reviews-list .review-card {
+        transition: none;
+    }
 }
 
 .detail-panel .btn-icon-close:hover {
@@ -576,7 +946,8 @@
 /* anchor specifically to the aside container to avoid unexpected ancestor positioning */
 #review-detail #review-detail-toggle,
 #review-detail-toggle {
-    position: absolute !important; /* override flow positioning */
+    position: absolute !important;
+    /* override flow positioning */
     top: 10px !important;
     right: 10px !important;
     z-index: 20 !important;
@@ -588,8 +959,10 @@
     box-shadow: 0 6px 20px rgba(8, 18, 34, 0.06) !important;
     display: inline-grid !important;
     place-items: center !important;
-    transform: translate(0, 0) !important; /* ensure no centering via transform */
-    margin: 0 !important; /* reset any margins */
+    transform: translate(0, 0) !important;
+    /* ensure no centering via transform */
+    margin: 0 !important;
+    /* reset any margins */
 }
 
 /* Light hover state for the corner X */
@@ -604,17 +977,21 @@
     right: 8px !important;
 }
 
-#review-detail-toggle { z-index: 40 !important; }
+#review-detail-toggle {
+    z-index: 40 !important;
+}
 
 /* Ensure toggles inside headers don't reserve space when we absolutely position them */
 .detail-panel .detail-body header .detail-controls {
     margin-left: 0;
-    position: relative; /* keep controls in flow (right-aligned via header flexbox) */
+    position: relative;
+    /* keep controls in flow (right-aligned via header flexbox) */
 }
 
 /* Ensure the section icon sits left and doesn't affect layout centering */
 .detail-panel .detail-body header .section-icon {
-    flex: 0 0 56px; /* reserve space to avoid interfering with centered title */
+    flex: 0 0 56px;
+    /* reserve space to avoid interfering with centered title */
     width: 56px;
     height: 56px;
     margin-right: 0.9rem;
@@ -627,14 +1004,28 @@
 .detail-panel .detail-body header .detail-name {
     flex: 1 1 auto;
     text-align: center;
-    padding-left: 0.2rem; /* slight offset from icon */
+    padding-left: 0.2rem;
+    /* slight offset from icon */
 }
 
 /* Smaller screens: reduce offset and sizing for the icon */
 @media (max-width: 768px) {
-    #review-detail-toggle { top: 8px !important; right: 8px !important; width: 40px !important; height: 40px !important; }
-    .detail-panel .detail-body header { padding-right: 56px; }
-    .detail-panel .detail-body header .section-icon { flex: 0 0 44px; width: 44px; height: 44px; }
+    #review-detail-toggle {
+        top: 8px !important;
+        right: 8px !important;
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .detail-panel .detail-body header {
+        padding-right: 56px;
+    }
+
+    .detail-panel .detail-body header .section-icon {
+        flex: 0 0 44px;
+        width: 44px;
+        height: 44px;
+    }
 }
 
 /* Rating badge - NO EMOJI */
@@ -737,9 +1128,9 @@
 }
 
 .detail-panel .action-approve {
-    background: var(--primary-light, rgba(0,119,182,0.12));
+    background: var(--primary-light, rgba(0, 119, 182, 0.12));
     color: var(--hub-primary, var(--primary-color));
-    border-color: var(--primary-light, rgba(0,119,182,0.25));
+    border-color: var(--primary-light, rgba(0, 119, 182, 0.25));
 }
 
 .detail-panel .action-approve:hover {
@@ -747,7 +1138,7 @@
     color: white;
     border-color: var(--primary-hover, var(--primary-color));
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(0,119,182,0.22);
+    box-shadow: 0 6px 16px rgba(0, 119, 182, 0.22);
 }
 
 .detail-panel .action-reject {
@@ -765,9 +1156,9 @@
 }
 
 .detail-panel .action-verify {
-    background: var(--primary-light, rgba(0,119,182,0.12));
+    background: var(--primary-light, rgba(0, 119, 182, 0.12));
     color: var(--hub-primary, var(--primary-color));
-    border-color: var(--primary-light, rgba(0,119,182,0.25));
+    border-color: var(--primary-light, rgba(0, 119, 182, 0.25));
 }
 
 .detail-panel .action-verify:hover {
@@ -775,7 +1166,7 @@
     color: white;
     border-color: var(--primary-hover, var(--primary-color));
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(0,119,182,0.22);
+    box-shadow: 0 6px 16px rgba(0, 119, 182, 0.22);
 }
 
 /* Responsive */
@@ -840,7 +1231,7 @@
 .detail-panel .detail-header {
     padding: 1.4rem 1.6rem;
     background: var(--hub-card);
-    border-bottom: 1px solid rgba(15,23,42,0.06);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .detail-panel .detail-name {
@@ -854,7 +1245,7 @@
 #reviews-highlights li .mini-dot {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: 50%;
     font-weight: 800;
     font-size: 16px;
     padding: 0.25rem;
@@ -885,8 +1276,13 @@
 }
 
 /* Make the main table/card wrapper span full width when detail panel is not open; when detail is open it occupies column 1 */
-.management-hub#reviews-hub.split-grid.layout-table-detail .table-wrapper { grid-column: 1 / -1; }
-.management-hub#reviews-hub.detail-open.split-grid.layout-table-detail .table-wrapper { grid-column: 1; }
+.management-hub#reviews-hub.split-grid.layout-table-detail .table-wrapper {
+    grid-column: 1 / -1;
+}
+
+.management-hub#reviews-hub.detail-open.split-grid.layout-table-detail .table-wrapper {
+    grid-column: 1;
+}
 
 /* When the detail panel is collapsed (hidden), allow the table to span full width */
 .management-hub#reviews-hub.split-grid.layout-table-detail .detail-panel.collapsed {
@@ -913,7 +1309,10 @@
 }
 
 /* Ensure the floating close (X) control doesn't overlap content when the detail header is narrow */
-#review-detail #review-detail-toggle { top: 8px !important; right: 8px !important; }
+#review-detail #review-detail-toggle {
+    top: 8px !important;
+    right: 8px !important;
+}
 
 /* End layout tweaks */
 
@@ -926,7 +1325,8 @@
 .management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .time,
 #reviews-highlights li .event-meta,
 #reviews-highlights li .event-meta .time {
-    font-size: 0.72rem; /* smaller than default 0.82rem */
+    font-size: 0.72rem;
+    /* smaller than default 0.82rem */
     line-height: 1;
     color: var(--hub-muted);
 }
@@ -941,7 +1341,8 @@
     grid-template-columns: 92px 1fr 160px;
     gap: 0.9rem;
     align-items: start;
-    position: relative; /* for rating bubble */
+    position: relative;
+    /* for rating bubble */
     width: 100%;
     box-sizing: border-box;
 }
@@ -955,47 +1356,101 @@
     place-items: center;
     font-weight: 800;
     font-size: 1.05rem;
-    border-radius: 999px; /* circular avatar */
-    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 999px;
+    /* circular avatar */
+    border: 2px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 8px 20px rgba(2, 132, 199, 0.08);
 }
 
 /* Horizontal layout for medium/large screens: place actions to the right */
 @media (min-width: 900px) {
-    .management-hub#reviews-hub .reviews-list { grid-template-columns: 1fr; }
-    .management-hub#reviews-hub .reviews-list .review-card { grid-template-columns: 92px 1fr 160px; align-items: flex-start; }
-    .management-hub#reviews-hub .reviews-list .review-card .user-avatar { grid-column: 1; }
-    .management-hub#reviews-hub .reviews-list .review-card .review-meta { align-items: flex-start; }
-    .management-hub#reviews-hub .reviews-list .review-card .review-body { grid-column: 2; padding-right: 140px; }
+    .management-hub#reviews-hub .reviews-list {
+        grid-template-columns: 1fr;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card {
+        grid-template-columns: 92px 1fr 160px;
+        align-items: flex-start;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card .user-avatar {
+        grid-column: 1;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card .review-meta {
+        align-items: flex-start;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card .review-body {
+        grid-column: 2;
+        padding-right: 140px;
+    }
+
     /* Place rating inside the header on large screens (right side of header), not inside the action column */
-    .management-hub#reviews-hub .reviews-list .review-card .user-rating { position: static; grid-column: auto; justify-self: flex-end; margin-top: 0; transform: translateY(-6px); }
-    .management-hub#reviews-hub .reviews-list .review-card .review-footer { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-    .management-hub#reviews-hub .reviews-list .review-card > .review-actions { grid-column: 3; justify-self: end; align-self: flex-start; display: flex; align-items: center; justify-content: flex-end; gap: 0.6rem; }
+    .management-hub#reviews-hub .reviews-list .review-card .user-rating {
+        position: static;
+        grid-column: auto;
+        justify-self: flex-end;
+        margin-top: 0;
+        transform: translateY(-6px);
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card .review-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card>.review-actions {
+        grid-column: 3;
+        justify-self: end;
+        align-self: flex-start;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.6rem;
+    }
 }
 
 /* Small screens: compact layout */
 @media (max-width: 899px) {
-    .management-hub#reviews-hub .reviews-list .review-card { grid-template-columns: 56px 1fr; }
-    .management-hub#reviews-hub .reviews-list .review-card > .review-actions { grid-column: 2; justify-self: start; margin-top: 8px; }
-    .management-hub#reviews-hub .reviews-list .review-card .user-rating { position: absolute; top: 12px; right: 12px; margin-left: 0; }
+    .management-hub#reviews-hub .reviews-list .review-card {
+        grid-template-columns: 56px 1fr;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card>.review-actions {
+        grid-column: 2;
+        justify-self: start;
+        margin-top: 8px;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card .user-rating {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        margin-left: 0;
+    }
 }
 
 .management-hub#reviews-hub .reviews-list .review-card .review-meta {
     display: flex;
     gap: 0.6rem;
     align-items: center;
-    justify-content: center; /* keep avatar centered in left column */
+    justify-content: center;
+    /* keep avatar centered in left column */
     min-width: 0;
 }
 
 .management-hub#reviews-hub .reviews-list .review-card .review-body .user-info {
-    min-width: 0; /* prevent overflow */
+    min-width: 0;
+    /* prevent overflow */
     display: flex;
     flex-direction: column;
 }
 
 .management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft:focus {
-    outline: 3px solid rgba(2,132,199,0.14);
+    outline: 3px solid rgba(2, 132, 199, 0.14);
     outline-offset: 2px;
 }
 
@@ -1025,11 +1480,40 @@
 }
 
 /* User time and verified badge */
-.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .time { color: var(--hub-muted); font-size: 0.82rem; display:block; margin-top:4px; line-height: 1; }
-.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .badge.verified { display:inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(16,185,129,0.08); color: #10b981; font-weight:600; font-size:0.82rem; margin-top: 0.45rem; }
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .time {
+    color: var(--hub-muted);
+    font-size: 0.82rem;
+    display: block;
+    margin-top: 4px;
+    line-height: 1;
+}
 
-.management-hub#reviews-hub .reviews-list .review-card .user-rating { /* default: positioned within header (static) */ position: static; z-index: 12; align-self: flex-start; transform: translateY(-6px); }
-.management-hub#reviews-hub .reviews-list .review-card .user-rating .badge-ghost { padding: 0.4rem 0.8rem; border-radius: 999px; font-weight:800; font-size:0.92rem; box-shadow: 0 6px 14px rgba(0,0,0,0.04); }
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info .badge.verified {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.08);
+    color: #10b981;
+    font-weight: 600;
+    font-size: 0.82rem;
+    margin-top: 0.45rem;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .user-rating {
+    /* default: positioned within header (static) */
+    position: static;
+    z-index: 12;
+    align-self: flex-start;
+    transform: translateY(-6px);
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .user-rating .badge-ghost {
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.04);
+}
 
 /* Hover and focus styles for card */
 .management-hub#reviews-hub .reviews-list .review-card:hover,
@@ -1045,45 +1529,149 @@
 }
 
 /* Make review title stand out (now rendered under review-head within review-body) */
-.management-hub#reviews-hub .reviews-list .review-card .review-title { font-size: 1.12rem; margin: 0.25rem 0 0 0; color: var(--hub-text); letter-spacing: -0.01em; }
+.management-hub#reviews-hub .reviews-list .review-card .review-title {
+    font-size: 1.12rem;
+    margin: 0.25rem 0 0 0;
+    color: var(--hub-text);
+    letter-spacing: -0.01em;
+}
 
-.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info strong { margin: 0; }
+.management-hub#reviews-hub .reviews-list .review-card .review-body .user-info strong {
+    margin: 0;
+}
 
 /* Review comment style */
-.management-hub#reviews-hub .reviews-list .review-card .review-comment { color: var(--hub-muted-strong); margin-top: 0.55rem; font-size: 0.98rem; }
+.management-hub#reviews-hub .reviews-list .review-card .review-comment {
+    color: var(--hub-muted-strong);
+    margin-top: 0.55rem;
+    font-size: 0.98rem;
+}
 
 /* Footer product label */
-.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product { color: var(--hub-muted); font-weight:600; font-size:0.9rem; margin-top: 0.35rem; display:flex; gap:0.6rem; align-items:center; }
-.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product { margin-left: 0; }
+.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product {
+    color: var(--hub-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 0.35rem;
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product {
+    margin-left: 0;
+}
 
 /* Product thumbnail next to name */
-.management-hub#reviews-hub .reviews-list .review-card .product-thumb { width: 44px; height: 44px; overflow: hidden; border-radius: 6px; display:inline-block; background: #fff; border: 1px solid rgba(15,23,42,0.06); box-shadow: 0 6px 18px rgba(8,18,34,0.04); }
-.management-hub#reviews-hub .reviews-list .review-card .product-thumb img { width: 100%; height: 100%; object-fit: cover; display:block; }
-.management-hub#reviews-hub .reviews-list .review-card .product-name { color: var(--hub-muted); font-weight:600; font-size:0.95rem; }
-.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product[data-product-id] { cursor: pointer; text-decoration: underline dotted; }
+.management-hub#reviews-hub .reviews-list .review-card .product-thumb {
+    width: 44px;
+    height: 44px;
+    overflow: hidden;
+    border-radius: 6px;
+    display: inline-block;
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 6px 18px rgba(8, 18, 34, 0.04);
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .product-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .product-name {
+    color: var(--hub-muted);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product[data-product-id] {
+    cursor: pointer;
+    text-decoration: underline dotted;
+}
 
 /* Small adjustments for action buttons on cards */
-.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft { width: 40px; height: 40px; border-radius: 999px; }
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+}
 
 /* Product thumbnail displayed in the actions column (right side) */
-.management-hub#reviews-hub .reviews-list .review-card .product-thumb-actions { width: 56px; height: 56px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(15,23,42,0.06); box-shadow: 0 8px 18px rgba(8,18,34,0.06); background: #fff; display: inline-block; margin-bottom: 6px; }
-.management-hub#reviews-hub .reviews-list .review-card .product-thumb-actions img { width: 100%; height: 100%; object-fit: cover; display:block; }
+.management-hub#reviews-hub .reviews-list .review-card .product-thumb-actions {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 8px 18px rgba(8, 18, 34, 0.06);
+    background: #fff;
+    display: inline-block;
+    margin-bottom: 6px;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .product-thumb-actions img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
 
 /* Review image thumbnails inside card footer */
-.management-hub#reviews-hub .reviews-list .review-card .review-images { display:flex; gap: 0.5rem; align-items:center; margin-top: 0.4rem; }
-.management-hub#reviews-hub .reviews-list .review-card .review-images .review-image { width: 44px; height: 44px; overflow: hidden; border-radius: 6px; border: 1px solid rgba(15,23,42,0.06); background: #fff; display:inline-block; box-shadow: 0 4px 10px rgba(8,18,34,0.04); }
-.management-hub#reviews-hub .reviews-list .review-card .review-images .review-image img { width: 100%; height: 100%; object-fit: cover; }
+.management-hub#reviews-hub .reviews-list .review-card .review-images {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 0.4rem;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-images .review-image {
+    width: 44px;
+    height: 44px;
+    overflow: hidden;
+    border-radius: 6px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    background: #fff;
+    display: inline-block;
+    box-shadow: 0 4px 10px rgba(8, 18, 34, 0.04);
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-images .review-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
 /* On small screens: stack actions under the review text */
 @media (max-width: 800px) {
-    .management-hub#reviews-hub .reviews-list .review-card { grid-template-columns: 56px 1fr; }
-    .management-hub#reviews-hub .reviews-list .review-card .user-rating { position: absolute; top: 12px; right: 12px; margin-left: auto; }
-    .management-hub#reviews-hub .reviews-list .review-card .review-footer { display: flex; flex-direction: column; gap: 0.5rem; }
-    .management-hub#reviews-hub .reviews-list .review-card .review-footer .review-actions { justify-content: flex-start; }
+    .management-hub#reviews-hub .reviews-list .review-card {
+        grid-template-columns: 56px 1fr;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card .user-rating {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        margin-left: auto;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card .review-footer {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .management-hub#reviews-hub .reviews-list .review-card .review-footer .review-actions {
+        justify-content: flex-start;
+    }
 }
 
 /* Improve the spacing of the table-card header controls for small viewports */
-.management-hub#reviews-hub .table-card header .filter-group { min-width: 120px; }
+.management-hub#reviews-hub .table-card header .filter-group {
+    min-width: 120px;
+}
 
 /* ====== Detail actions responsiveness tweaks ====== */
 /* Ensure verify/approve/reject detail buttons sit gracefully when stacked - make them full width on smaller screens */
@@ -1099,7 +1687,10 @@
 
 /* End detail actions tweaks */
 /* Minor improvement: increase timeline item's min-width so long product names don't overflow */
-#reviews-highlights li .event-content { min-width: 0; max-width: calc(100% - 120px); }
+#reviews-highlights li .event-content {
+    min-width: 0;
+    max-width: calc(100% - 120px);
+}
 
 /* Buttons inside table rows (small icon buttons) - styles inspired by sizes page */
 #reviews-table .btn-soft[data-action],
@@ -1116,9 +1707,9 @@
     overflow: hidden;
     padding: 0;
     border: 1px solid rgba(15, 23, 42, 0.06);
-    background: rgba(255,255,255,0.98);
+    background: rgba(255, 255, 255, 0.98);
     color: var(--hub-muted-strong);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
     min-width: auto;
 }
 
@@ -1130,7 +1721,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255,255,255,0.06);
+    background: rgba(255, 255, 255, 0.06);
     z-index: 0;
     transform: scaleX(0);
     transform-origin: right;
@@ -1154,12 +1745,13 @@
 #reviews-highlights li .btn-soft[data-action="approve"] {
     background-color: rgba(16, 185, 129, 0.08);
     color: #059669;
-    border-color: rgba(16,185,129,0.12);
+    border-color: rgba(16, 185, 129, 0.12);
 }
+
 #reviews-table .btn-soft[data-action="approve"]:hover,
 #reviews-highlights li .btn-soft[data-action="approve"]:hover {
-    background-color: rgba(16,185,129,0.16);
-    box-shadow: 0 10px 20px rgba(16,185,129,0.08);
+    background-color: rgba(16, 185, 129, 0.16);
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.08);
     transform: translateY(-2px) scale(1.04);
 }
 
@@ -1168,12 +1760,13 @@
 #reviews-highlights li .btn-soft[data-action="reject"] {
     background-color: rgba(220, 38, 38, 0.06);
     color: #dc2626;
-    border-color: rgba(220,38,38,0.12);
+    border-color: rgba(220, 38, 38, 0.12);
 }
+
 #reviews-table .btn-soft[data-action="reject"]:hover,
 #reviews-highlights li .btn-soft[data-action="reject"]:hover {
     background-color: rgba(220, 38, 38, 0.14);
-    box-shadow: 0 10px 20px rgba(220,38,38,0.06);
+    box-shadow: 0 10px 20px rgba(220, 38, 38, 0.06);
     transform: translateY(-2px) scale(1.04);
 }
 
@@ -1182,37 +1775,47 @@
 #reviews-highlights li .btn-soft[data-action="verify"] {
     background-color: rgba(16, 185, 129, 0.06);
     color: var(--hub-primary, var(--primary-color));
-    border-color: rgba(16,185,129,0.12);
+    border-color: rgba(16, 185, 129, 0.12);
 }
+
 #reviews-table .btn-soft[data-action="verify"]:hover,
 #reviews-highlights li .btn-soft[data-action="verify"]:hover {
     background-color: rgba(16, 185, 129, 0.16);
-    box-shadow: 0 10px 20px rgba(16,185,129,0.06);
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.06);
     transform: translateY(-2px) scale(1.04);
 }
 
 /* Verified state variant: visually indicates an already verified review and disables interaction */
 .btn-verified {
-    background-color: #10b981 !important; /* strong green */
+    background-color: #10b981 !important;
+    /* strong green */
     color: #fff !important;
-    border-color: rgba(16,185,129,0.14) !important;
+    border-color: rgba(16, 185, 129, 0.14) !important;
     cursor: default !important;
     pointer-events: none !important;
 }
-.btn-verified i, .btn-verified svg { color: #fff !important; fill: #fff !important; }
 
-/* Allow smaller icon sizing in some places */
-#reviews-table .btn-soft[data-action] { font-size: 1.0rem; }
-
-/* Table action layout: space buttons evenly and add small right margin */
-#reviews-hub .table-wrapper table tbody#reviews-table td > .btn-soft.btn-sm[data-action],
-#reviews-hub .table-wrapper table tbody#reviews-table td > .btn-soft[data-action] {
-    margin-right: 0.6rem;
-    padding: 0 !important; /* ensure square icon button */
+.btn-verified i,
+.btn-verified svg {
+    color: #fff !important;
+    fill: #fff !important;
 }
 
-#reviews-hub .table-wrapper table tbody#reviews-table td > .btn-soft.btn-sm[data-action]:last-child,
-#reviews-hub .table-wrapper table tbody#reviews-table td > .btn-soft[data-action]:last-child {
+/* Allow smaller icon sizing in some places */
+#reviews-table .btn-soft[data-action] {
+    font-size: 1.0rem;
+}
+
+/* Table action layout: space buttons evenly and add small right margin */
+#reviews-hub .table-wrapper table tbody#reviews-table td>.btn-soft.btn-sm[data-action],
+#reviews-hub .table-wrapper table tbody#reviews-table td>.btn-soft[data-action] {
+    margin-right: 0.6rem;
+    padding: 0 !important;
+    /* ensure square icon button */
+}
+
+#reviews-hub .table-wrapper table tbody#reviews-table td>.btn-soft.btn-sm[data-action]:last-child,
+#reviews-hub .table-wrapper table tbody#reviews-table td>.btn-soft[data-action]:last-child {
     margin-right: 0;
 }
 
@@ -1278,49 +1881,66 @@
 .btn-approve {
     background: #fff !important;
     color: var(--hub-primary, var(--primary-color)) !important;
-    border-color: rgba(16,185,129,0.12) !important;
+    border-color: rgba(16, 185, 129, 0.12) !important;
 }
+
 .btn-reject {
     background: #fff !important;
     color: #dc2626 !important;
-    border-color: rgba(220,38,38,0.12) !important;
+    border-color: rgba(220, 38, 38, 0.12) !important;
 }
+
 .btn-verify {
     background: #fff !important;
     color: var(--hub-success) !important;
-    border-color: rgba(16,185,129,0.12) !important;
+    border-color: rgba(16, 185, 129, 0.12) !important;
 }
 
 /* Ensure icon colors are explicit and more specific than global rules */
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-approve i,
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-approve i.fas,
-.btn-approve i { color: var(--hub-success) !important; opacity: 1 !important; filter: none !important; }
+.btn-approve i {
+    color: var(--hub-success) !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
 
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-reject i,
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-reject i.fas,
-.btn-reject i { color: #dc2626 !important; opacity: 1 !important; filter: none !important; }
+.btn-reject i {
+    color: #dc2626 !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
 
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-verify i,
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-verify i.fas,
-.btn-verify i { color: var(--hub-success) !important; opacity: 1 !important; filter: none !important; }
+.btn-verify i {
+    color: var(--hub-success) !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
 
 /* Hover states for icon buttons */
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-soft.btn-sm.btn-approve:hover,
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-approve:hover {
-    background-color: #f0fdf4 !important; /* subtle green tint */
-    box-shadow: 0 14px 30px rgba(16,185,129,0.06) !important;
+    background-color: #f0fdf4 !important;
+    /* subtle green tint */
+    box-shadow: 0 14px 30px rgba(16, 185, 129, 0.06) !important;
 }
 
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-soft.btn-sm.btn-reject:hover,
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-reject:hover {
-    background-color: #fff5f5 !important; /* subtle red tint */
-    box-shadow: 0 14px 30px rgba(220,38,38,0.06) !important;
+    background-color: #fff5f5 !important;
+    /* subtle red tint */
+    box-shadow: 0 14px 30px rgba(220, 38, 38, 0.06) !important;
 }
 
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-soft.btn-sm.btn-verify:hover,
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td .btn-verify:hover {
-    background-color: #eff8ff !important; /* subtle blue tint */
-    box-shadow: 0 14px 30px rgba(0,119,182,0.06) !important;
+    background-color: #eff8ff !important;
+    /* subtle blue tint */
+    box-shadow: 0 14px 30px rgba(0, 119, 182, 0.06) !important;
 }
 
 /* Use size.css button styles within reviews hub for consistent visual language */
@@ -1344,16 +1964,22 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     z-index: 0;
     transform: scaleX(0);
     transform-origin: right;
     transition: transform 0.3s cubic-bezier(0.5, 1.6, 0.4, 0.7);
 }
 
-#reviews-hub .btn-sm:hover::before { transform: scaleX(1); transform-origin: left; }
+#reviews-hub .btn-sm:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
 
-#reviews-hub .btn-sm i { position: relative; z-index: 1; }
+#reviews-hub .btn-sm i {
+    position: relative;
+    z-index: 1;
+}
 
 /* Color tones mapped similarly to size.css but per action */
 #reviews-hub .btn-approve {
@@ -1361,6 +1987,7 @@
     color: var(--hub-success) !important;
     border: 1px solid rgba(16, 185, 129, 0.2) !important;
 }
+
 #reviews-hub .btn-approve:hover {
     background-color: rgba(16, 185, 129, 0.16) !important;
     transform: translateY(-2px) scale(1.05) !important;
@@ -1371,6 +1998,7 @@
     color: #dc2626 !important;
     border: 1px solid rgba(220, 38, 38, 0.2) !important;
 }
+
 #reviews-hub .btn-reject:hover {
     background-color: rgba(220, 38, 38, 0.2) !important;
     transform: translateY(-2px) scale(1.05) !important;
@@ -1381,6 +2009,7 @@
     color: var(--hub-success) !important;
     border: 1px solid rgba(16, 185, 129, 0.12) !important;
 }
+
 #reviews-hub .btn-verify:hover {
     background-color: rgba(16, 185, 129, 0.16) !important;
     transform: translateY(-2px) scale(1.05) !important;
@@ -1392,6 +2021,7 @@
     color: var(--primary-color, #2563eb) !important;
     border: 1px solid rgba(37, 99, 235, 0.2) !important;
 }
+
 #reviews-hub .btn-edit:hover {
     background-color: rgba(37, 99, 235, 0.2) !important;
     color: var(--primary-hover, #1d4ed8) !important;
@@ -1403,6 +2033,7 @@
     color: var(--error-color, #dc2626) !important;
     border: 1px solid rgba(220, 38, 38, 0.2) !important;
 }
+
 #reviews-hub .btn-delete:hover {
     background-color: rgba(220, 38, 38, 0.2) !important;
     color: var(--error-hover, #b91c1c) !important;
@@ -1414,6 +2045,7 @@
     color: var(--info-color, #0284c7) !important;
     border: 1px solid rgba(2, 132, 199, 0.2) !important;
 }
+
 #reviews-hub .btn-status:hover {
     background-color: rgba(2, 132, 199, 0.2) !important;
     transform: translateY(-2px) scale(1.1) !important;
@@ -1430,7 +2062,7 @@
 
 
 .management-hub#reviews-hub .reviews-list .review-card[data-status="pending"]::before {
-    background: rgba(245,158,11,0.9);
+    background: rgba(245, 158, 11, 0.9);
 }
 
 .management-hub#reviews-hub .reviews-list .review-card .review-media {
@@ -1460,7 +2092,7 @@
 }
 
 .management-hub#reviews-hub .reviews-list .review-card .review-product-thumb.placeholder {
-    background: rgba(15,23,42,0.04);
+    background: rgba(15, 23, 42, 0.04);
     color: var(--hub-primary);
     font-weight: 800;
     font-size: 1.6rem;
@@ -1522,7 +2154,7 @@
 }
 
 .management-hub#reviews-hub .reviews-list .review-card .review-user-block .user-avatar {
-        width: 52px;
+    width: 52px;
     height: 56px;
     border-radius: 999px;
     background: var(--primary-color);
@@ -1564,21 +2196,21 @@
 }
 
 .management-hub#reviews-hub .reviews-list .review-card .pill-verified {
-    background: rgba(59,130,246,0.12);
+    background: rgba(59, 130, 246, 0.12);
     color: #1d4ed8;
-    border-color: rgba(59,130,246,0.2);
+    border-color: rgba(59, 130, 246, 0.2);
 }
 
 .management-hub#reviews-hub .reviews-list .review-card .pill-published {
-    background: rgba(16,185,129,0.12);
+    background: rgba(16, 185, 129, 0.12);
     color: #0f9d58;
-    border-color: rgba(16,185,129,0.18);
+    border-color: rgba(16, 185, 129, 0.18);
 }
 
 .management-hub#reviews-hub .reviews-list .review-card .pill-pending {
-    background: rgba(245,158,11,0.12);
+    background: rgba(245, 158, 11, 0.12);
     color: #d97706;
-    border-color: rgba(245,158,11,0.2);
+    border-color: rgba(245, 158, 11, 0.2);
 }
 
 .management-hub#reviews-hub .reviews-list .review-card .review-badges {
@@ -1641,11 +2273,13 @@
     .management-hub#reviews-hub .reviews-list .review-card {
         grid-template-columns: 1fr;
     }
+
     .management-hub#reviews-hub .reviews-list .review-card .review-media {
         flex-direction: row;
         align-items: center;
         gap: 1rem;
     }
+
     .management-hub#reviews-hub .reviews-list .review-card .review-actions {
         flex-direction: row;
         justify-content: flex-start;
@@ -1658,6 +2292,7 @@
         flex-direction: row;
         align-items: flex-start;
     }
+
     .management-hub#reviews-hub .reviews-list .review-card .review-score {
         align-items: flex-start;
     }
@@ -1684,7 +2319,7 @@
 .management-hub#reviews-hub .table-wrapper {
     border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 10px 24px rgba(8,18,34,0.04);
+    box-shadow: 0 10px 24px rgba(8, 18, 34, 0.04);
 }
 
 .management-hub#reviews-hub .table-wrapper table thead th {
@@ -1698,10 +2333,17 @@
     padding: 1.05rem 1.2rem !important;
 }
 
-.management-hub#reviews-hub .table-wrapper table thead th:first-child { border-top-left-radius: 12px; }
-.management-hub#reviews-hub .table-wrapper table thead th:last-child { border-top-right-radius: 12px; }
+.management-hub#reviews-hub .table-wrapper table thead th:first-child {
+    border-top-left-radius: 12px;
+}
 
-.management-hub#reviews-hub .table-wrapper table thead th:last-child { text-align: right; }
+.management-hub#reviews-hub .table-wrapper table thead th:last-child {
+    border-top-right-radius: 12px;
+}
+
+.management-hub#reviews-hub .table-wrapper table thead th:last-child {
+    text-align: right;
+}
 
 /* Reserve width for actions column and keep icons aligned */
 .management-hub#reviews-hub .table-wrapper table thead th:nth-child(5),
@@ -1710,12 +2352,18 @@
     text-align: right;
 }
 
-.management-hub#reviews-hub .table-wrapper table tbody tr td { padding: 1rem 1.1rem !important; }
+.management-hub#reviews-hub .table-wrapper table tbody tr td {
+    padding: 1rem 1.1rem !important;
+}
+
 .management-hub#reviews-hub .table-wrapper table thead th .stat-icon i,
 .management-hub#reviews-hub .table-wrapper table thead th .section-icon i {
     color: #ffffff !important;
 }
-.management-hub#reviews-hub .table-wrapper table tbody tr:hover td { background: rgba(0,0,0,0.02); }
+
+.management-hub#reviews-hub .table-wrapper table tbody tr:hover td {
+    background: rgba(0, 0, 0, 0.02);
+}
 
 /* Action column layout - center icons vertically and align them to the right like other admin pages */
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions {
@@ -1745,27 +2393,40 @@
 /* Also ensure buttons with data-action attributes get correct colors - highest specificity for table cells */
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button.btn-soft.btn-sm[data-action="approve"],
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button.btn-soft[data-action="approve"] {
-    background-color: var(--primary-light, rgba(0,119,182,0.08)) !important;
+    background-color: var(--primary-light, rgba(0, 119, 182, 0.08)) !important;
     color: var(--hub-primary, var(--primary-color)) !important;
-    border-color: var(--primary-light, rgba(0,119,182,0.12)) !important;
+    border-color: var(--primary-light, rgba(0, 119, 182, 0.12)) !important;
 }
+
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button.btn-soft.btn-sm[data-action="reject"],
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button.btn-soft[data-action="reject"] {
     background-color: rgba(220, 38, 38, 0.06) !important;
     color: #dc2626 !important;
     border-color: rgba(220, 38, 38, 0.12) !important;
 }
+
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button.btn-soft.btn-sm[data-action="verify"],
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button.btn-soft[data-action="verify"] {
-    background-color: var(--primary-light, rgba(0,119,182,0.08)) !important;
+    background-color: var(--primary-light, rgba(0, 119, 182, 0.08)) !important;
     color: var(--hub-primary, var(--primary-color)) !important;
-    border-color: var(--primary-light, rgba(0,119,182,0.12)) !important;
+    border-color: var(--primary-light, rgba(0, 119, 182, 0.12)) !important;
 }
 
 /* Explicit icon color for data-action buttons */
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="approve"] i,
-.management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="approve"] svg { color: var(--hub-primary, var(--primary-color)) !important; fill: var(--hub-primary, var(--primary-color)) !important; }
+.management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="approve"] svg {
+    color: var(--hub-primary, var(--primary-color)) !important;
+    fill: var(--hub-primary, var(--primary-color)) !important;
+}
+
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="reject"] i,
-.management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="reject"] svg { color: #dc2626 !important; fill: #dc2626 !important; }
+.management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="reject"] svg {
+    color: #dc2626 !important;
+    fill: #dc2626 !important;
+}
+
 .management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="verify"] i,
-.management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="verify"] svg { color: var(--hub-primary, var(--primary-color)) !important; fill: var(--hub-primary, var(--primary-color)) !important; }
+.management-hub#reviews-hub .table-wrapper table tbody#reviews-table td.actions button[data-action="verify"] svg {
+    color: var(--hub-primary, var(--primary-color)) !important;
+    fill: var(--hub-primary, var(--primary-color)) !important;
+}

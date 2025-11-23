@@ -21,7 +21,7 @@ class AdminsHub {
     async load() {
         this.table.innerHTML = '<tr><td colspan="5">Cargando administradores...</td></tr>';
         try {
-            const res = await fetch(this.cfg.endpoints.list, { credentials: 'same-origin'});
+            const res = await fetch(this.cfg.endpoints.list, { credentials: 'same-origin' });
             const json = await res.json();
             if (!json.success) throw new Error(json.message || 'API');
             this.render(json.items || []);
@@ -43,10 +43,16 @@ class AdminsHub {
                 <td>${a.name || 'Administrador'}</td>
                 <td>${a.email}</td>
                 <td>${a.role || 'Admin'}</td>
-                <td>${!a.is_blocked ? '<span class="status-chip success">Activo</span>' : '<span class="status-chip warning">Bloqueado</span>'}</td>
+                <td>${!a.is_blocked ? '<span class="status-badge active">Activo</span>' : '<span class="status-badge inactive">Bloqueado</span>'}</td>
                 <td>
-                    <button class="btn-soft" data-action="${a.is_blocked ? 'unblock' : 'block'}">${a.is_blocked ? 'Activar' : 'Bloquear'}</button>
-                    <a class="btn-soft" href="${baseUrl}/admin/services/admin_edit.php?id=${a.id}">Editar</a>
+                    <div class="action-buttons">
+                        <button class="btn-icon ${a.is_blocked ? 'btn-primary' : 'btn-danger'}" data-action="${a.is_blocked ? 'unblock' : 'block'}" title="${a.is_blocked ? 'Activar' : 'Bloquear'}">
+                            <i class="fas ${a.is_blocked ? 'fa-check' : 'fa-ban'}"></i>
+                        </button>
+                        <a class="btn-icon btn-primary" href="${baseUrl}/admin/services/admin_edit.php?id=${a.id}" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </div>
                 </td>
             </tr>
         `).join('');

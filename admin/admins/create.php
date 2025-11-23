@@ -33,7 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear administrador | Panel Angelow</title>
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/management-hub.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/administrators.css">
 </head>
 <body>
 <div class="admin-container">
@@ -41,33 +42,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <main class="admin-content">
         <?php require_once __DIR__ . '/../../layouts/headeradmin1.php'; ?>
 
-        <div class="management-hub">
+        <div class="dashboard-content">
             <div class="page-header">
-                <h1>Crear administrador</h1>
+                <h1><i class="fas fa-user-plus"></i> Crear administrador</h1>
+                <div class="breadcrumb">
+                    <a href="<?= BASE_URL ?>/admin">Dashboard</a> / 
+                    <a href="<?= BASE_URL ?>/admin/admins/index.php">Administradores</a> / 
+                    <span>Crear</span>
+                </div>
             </div>
-            <section class="surface-card">
-                <?php if ($errors): ?>
-                    <div class="text-danger"><?= implode('<br>', array_map('htmlspecialchars', $errors)) ?></div>
-                <?php endif; ?>
-                <form method="POST">
-                    <div class="form-row">
-                        <label>Nombre</label>
-                        <input type="text" name="name" required>
-                    </div>
-                    <div class="form-row">
-                        <label>Email</label>
-                        <input type="email" name="email" required>
-                    </div>
-                    <div class="form-row">
-                        <label>Password</label>
-                        <input type="password" name="password" required>
-                    </div>
-                    <div class="actions">
-                        <button class="btn-soft primary" type="submit">Crear</button>
-                        <a class="btn-soft" href="<?= BASE_URL ?>/admin/admins/index.php">Cancelar</a>
-                    </div>
-                </form>
-            </section>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Información del Administrador</h2>
+                </div>
+                <div class="card-body">
+                    <?php if ($errors): ?>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <?= implode('<br>', array_map('htmlspecialchars', $errors)) ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <form method="POST">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Nombre Completo</label>
+                            <input type="text" name="name" class="form-control" required placeholder="Ingrese el nombre completo">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Correo Electrónico</label>
+                            <input type="email" name="email" class="form-control" required placeholder="ejemplo@correo.com">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> Contraseña</label>
+                            <input type="password" name="password" class="form-control" required placeholder="Ingrese una contraseña segura">
+                        </div>
+                        
+                        <div class="form-actions mt-4" style="display: flex; gap: 1rem; justify-content: flex-end;">
+                            <a href="<?= BASE_URL ?>/admin/admins/index.php" class="btn btn-secondary" style="background-color: var(--text-light); color: white;">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-save"></i> Guardar Administrador
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </main>
 </div>

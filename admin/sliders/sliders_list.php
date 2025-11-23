@@ -38,15 +38,18 @@ if (isset($_SESSION['alert'])) {
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header-actions">
-                    <p class="text-muted mb-0"><i class="fas fa-info-circle"></i> Arrastra para reordenar los slides</p>
-                    <a href="<?= BASE_URL ?>/admin/sliders/add_slider.php" class="btn btn-success">
-                        <i class="fas fa-plus"></i> Agregar Slider
-                    </a>
+            <div class="actions-bar">
+                <div class="drag-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Arrastra para reordenar los slides</span>
                 </div>
+                <a href="<?= BASE_URL ?>/admin/sliders/add_slider.php" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Agregar Slider
+                </a>
+            </div>
 
-                <div id="sliders-container" class="table-responsive mt-3">
+            <div class="card">
+                <div id="sliders-container" class="table-responsive">
                     <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando sliders...</div>
                 </div>
             </div>
