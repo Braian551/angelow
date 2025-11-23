@@ -716,8 +716,7 @@
     font-weight: 700;
 }
 
-<<<<<<< HEAD
-=======
+/* ====== Layout tweaks for the reviews hub (improve detail panel and card layout) ====== */
 /* ====== Layout tweaks for the reviews hub (improve detail panel and card layout) ====== */
 /* Make the table + detail layout allocate more room to the detail panel by default */
 .management-hub#reviews-hub.split-grid.layout-table-detail {
@@ -756,29 +755,48 @@
 /* Ensure the floating close (X) control doesn't overlap content when the detail header is narrow */
 #review-detail #review-detail-toggle { top: 8px !important; right: 8px !important; }
 
->>>>>>> origin/main
+/* End layout tweaks */
 /* ====== Card style for each review in the list to improve readability ====== */
 .management-hub#reviews-hub .reviews-list .review-card {
     background: linear-gradient(180deg, #ffffff 0%, rgba(248,250,252,0.96) 100%);
     border: 1px solid rgba(15, 23, 42, 0.06);
     border-radius: 12px;
-    padding: 1rem 1.15rem;
+    padding: 1.1rem 1.25rem;
     display: grid;
-    grid-template-columns: 56px 1fr auto;
+    grid-template-columns: 64px 1fr auto;
     gap: 0.9rem;
     align-items: start;
+    position: relative; /* for rating bubble */
 }
 
 .management-hub#reviews-hub .reviews-list .review-card .user-avatar {
-    width: 56px;
-    height: 56px;
-    background: var(--hub-primary);
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #0ea5a5, #0284c7);
     color: #fff;
     display: inline-grid;
     place-items: center;
     font-weight: 800;
-    font-size: 1rem;
-    border-radius: 10px;
+    font-size: 1.05rem;
+    border-radius: 999px; /* circular avatar */
+    border: 2px solid rgba(255,255,255,0.08);
+    box-shadow: 0 8px 20px rgba(2, 132, 199, 0.08);
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-meta {
+    display: flex;
+    gap: 0.9rem;
+    align-items: center;
+    min-width: 0;
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-meta .user-info {
+    min-width: 0; /* prevent overflow */
+}
+
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft:focus {
+    outline: 3px solid rgba(2,132,199,0.14);
+    outline-offset: 2px;
 }
 
 .management-hub#reviews-hub .reviews-list .review-card .review-meta .user-info strong {
@@ -797,11 +815,51 @@
     align-items: center;
 }
 
+/* User time and verified badge */
+.management-hub#reviews-hub .reviews-list .review-card .review-meta .user-info .time { color: var(--hub-muted); font-size: 0.9rem; display:block; margin-top:2px; }
+.management-hub#reviews-hub .reviews-list .review-card .review-meta .user-info .badge.verified { display:inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(16,185,129,0.08); color: #10b981; font-weight:600; font-size:0.82rem; margin-top: 0.45rem; }
+
+/* Place rating badge top-right in the card */
+.management-hub#reviews-hub .reviews-list .review-card .user-rating { position: absolute; top: 12px; right: 12px; z-index: 4; }
+.management-hub#reviews-hub .reviews-list .review-card .user-rating .badge-ghost { padding: 0.4rem 0.8rem; border-radius: 999px; font-weight:800; font-size:0.92rem; box-shadow: 0 6px 14px rgba(0,0,0,0.04); }
+
+/* Hover and focus styles for card */
+.management-hub#reviews-hub .reviews-list .review-card:hover,
+.management-hub#reviews-hub .reviews-list .review-card:focus-within,
+.management-hub#reviews-hub .reviews-list .review-card.is-selected {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px rgba(8, 18, 34, 0.08);
+    border-color: rgba(2, 132, 199, 0.08);
+}
+
+.management-hub#reviews-hub .reviews-list .review-card.is-selected {
+    border-left: 4px solid var(--hub-primary);
+}
+
+/* Make review title stand out */
+.management-hub#reviews-hub .reviews-list .review-card .review-head .review-title { font-size: 1.18rem; margin: 0 0 0.15rem 0; color: var(--hub-text); letter-spacing: -0.01em; }
+
+/* Review comment style */
+.management-hub#reviews-hub .reviews-list .review-card .review-comment { color: var(--hub-muted-strong); margin-top: 0.55rem; font-size: 0.98rem; }
+
+/* Footer product label */
+.management-hub#reviews-hub .reviews-list .review-card .review-footer .review-product { color: var(--hub-muted); font-weight:600; font-size:0.92rem; }
+
+/* Small adjustments for action buttons on cards */
+.management-hub#reviews-hub .reviews-list .review-card .review-actions .btn-soft { width: 40px; height: 40px; border-radius: 999px; }
+
+/* On small screens: stack actions under the review text */
+@media (max-width: 800px) {
+    .management-hub#reviews-hub .reviews-list .review-card { grid-template-columns: 56px 1fr; }
+    .management-hub#reviews-hub .reviews-list .review-card .user-rating { position: static; margin-left: auto; }
+    .management-hub#reviews-hub .reviews-list .review-card .review-footer { display: flex; flex-direction: column; gap: 0.5rem; }
+    .management-hub#reviews-hub .reviews-list .review-card .review-footer .review-actions { justify-content: flex-start; }
+}
+
 /* Improve the spacing of the table-card header controls for small viewports */
 .management-hub#reviews-hub .table-card header .filter-group { min-width: 120px; }
 
-<<<<<<< HEAD
-=======
+/* ====== Detail actions responsiveness tweaks ====== */
 /* Ensure verify/approve/reject detail buttons sit gracefully when stacked - make them full width on smaller screens */
 .management-hub#reviews-hub .detail-panel .detail-actions .btn-soft.primary,
 .management-hub#reviews-hub .detail-panel .detail-actions .btn-soft[data-action] {
@@ -813,7 +871,7 @@
     border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
 
->>>>>>> origin/main
+/* End detail actions tweaks */
 /* Minor improvement: increase timeline item's min-width so long product names don't overflow */
 #reviews-highlights li .event-content { min-width: 0; max-width: calc(100% - 120px); }
 

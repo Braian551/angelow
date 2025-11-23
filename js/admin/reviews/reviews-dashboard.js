@@ -90,23 +90,8 @@ class ReviewsInbox {
                 this.handleAction(actionBtn.getAttribute('data-action'), id, evt);
             }
         };
-<<<<<<< HEAD
         this.tableBody?.addEventListener('click', delegatedClick);
         this.listContainer?.addEventListener('click', delegatedClick);
-=======
-        this.tableBody?.addEventListener('click', (evt) => delegatedClick(evt, false));
-        this.listContainer?.addEventListener('click', (evt) => delegatedClick(evt, true));
-
-        this.detailToggle?.addEventListener('click', (evt) => {
-            evt.stopPropagation();
-            if (!this.detailPanel) return;
-            const collapsed = this.detailPanel.classList.toggle('collapsed');
-            this.detailPanel.setAttribute('aria-hidden', String(collapsed));
-            // Keep container state so we can alter grid to allow full-width table when detail is closed
-            if (this.container) this.container.classList.toggle('detail-open', !collapsed);
-            this.detailToggle.setAttribute('aria-expanded', String(!collapsed));
-        });
->>>>>>> origin/main
 
         this.refreshBtn?.addEventListener('click', () => {
             this.loadOverview();
@@ -384,12 +369,11 @@ class ReviewsInbox {
         `;
         }).join('');
 
-        // Attach interactions to timeline items for keyboard and pointer accessibility
+        // Attach interactions to bring the matching review into view and stay keyboard-friendly
         this.highlightsList.querySelectorAll('li[tabindex]')?.forEach((li) => {
             li.addEventListener('click', () => {
                 const id = li.getAttribute('data-id');
-                // try to open detail if the ID is present in the list cache
-                if (id) this.openDetail(id);
+                if (id) this.highlightReview(id);
                 li.classList.toggle('selected');
             });
             li.addEventListener('keydown', (e) => {
@@ -399,6 +383,15 @@ class ReviewsInbox {
                 }
             });
         });
+    }
+
+    highlightReview(id) {
+        if (!id || !this.container) return;
+        const target = this.container.querySelector(`[data-id="${id}"]`) || this.container.querySelector(`[data-review-id="${id}"]`);
+        if (!target) return;
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.classList.add('is-selected');
+        setTimeout(() => target.classList.remove('is-selected'), 1200);
     }
 
     renderTable(items = []) {
@@ -429,11 +422,11 @@ class ReviewsInbox {
                 const userName = item.customer?.name || item.customer?.email || 'Cliente';
                 const initials = (userName.split(' ').slice(0,2).map(p=>p[0]||'').join('') || '?').toUpperCase();
                 const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
-                const verifiedBadge = isVerified ? '<span class="badge verified small">Verificada</span>' : '';
+                const verifiedBadge = isVerified ? '<span class="badge verified small" aria-hidden="true">Verificada</span>' : '';
                 const productName = item.product?.name || 'Producto';
                 const reviewImages = Array.isArray(item.images) && item.images.length ? item.images.map((img) => `<div class="review-image"><img src="${this.config.baseUrl}/${img}" alt="Imagen reseña"></div>`).join('') : '';
                 return `
-                    <div class="review-card" data-review-id="${item.id}" data-review-rating="${item.rating}">
+                    <div class="review-card" role="article" tabindex="0" data-review-id="${item.id}" data-review-rating="${item.rating}">
                         <div class="review-meta">
                             <div class="user-avatar"><span>${initials}</span></div>
                             <div class="user-info">
@@ -445,15 +438,15 @@ class ReviewsInbox {
                         <div class="review-body">
                             <div class="review-head">
                                 <h4 class="review-title">${title}</h4>
-                                <div class="user-rating review-stars"><span class="badge-ghost">${item.rating} ★</span></div>
+                                <div class="user-rating review-stars" aria-label="${item.rating} estrellas"><span class="badge-ghost">${item.rating} ★</span></div>
                             </div>
                             <p class="review-comment text-muted">${safeComment}${(item.comment || '').length > 160 ? '...' : ''}</p>
                             <div class="review-footer">
                                 <div class="review-product small text-muted">${productName}</div>
                                 <div class="review-actions actions">
-                                    <button class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar"><i class="fas fa-check"></i></button>
-                                    <button class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar"><i class="fas fa-ban"></i></button>
-                                    <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada"><i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i></button>
+                                    <button class="btn-soft btn-sm btn-approve" data-action="approve" title="Aprobar" aria-label="Aprobar reseña"><i class="fas fa-check" aria-hidden="true"></i></button>
+                                    <button class="btn-soft btn-sm btn-reject btn-delete" data-action="reject" title="Rechazar" aria-label="Rechazar reseña"><i class="fas fa-ban" aria-hidden="true"></i></button>
+                                    <button class="btn-soft btn-sm btn-verify btn-status" data-action="verify" title="Marcar como verificada" aria-label="Marcar como verificada"><i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -582,25 +575,22 @@ class ReviewsInbox {
         const confirmMap = {
             approve: '¿Aprobar esta reseña para publicación?',
             reject: '¿Rechazar esta reseña? No será visible en la tienda.',
-            // Will be replaced dynamically below when we map verify -> toggle_verified
             verify: '¿Marcar como compra verificada?'
         };
-        // Map logical client action to API action and determine any extra params
         const item = this.items.get(String(id));
         let apiAction = action;
         const extra = {};
         if (action === 'verify') {
             apiAction = 'toggle_verified';
-            // Toggle value if we already have it cached
             extra.value = item?.is_verified ? 0 : 1;
             confirmMap.verify = item?.is_verified ? '¿Marcar como NO verificada esta reseña?' : '¿Marcar como verificada esta reseña?';
         }
         const confirmMessage = confirmMap[action] || null;
         if (confirmMessage && !window.confirm(confirmMessage)) return;
 
-
-        // Show loading state on button
-        const button = evt?.target?.closest('button') || document.querySelector('[data-id="' + id + '"] button[data-action="' + action + '"]') || document.querySelector('[data-review-id="' + id + '"] button[data-action="' + action + '"]');
+        const button = evt?.target?.closest('button')
+            || document.querySelector('[data-id="' + id + '"] button[data-action="' + action + '"]')
+            || document.querySelector('[data-review-id="' + id + '"] button[data-action="' + action + '"]');
         const originalHTML = button?.innerHTML;
         if (button) {
             button.disabled = true;
@@ -618,30 +608,19 @@ class ReviewsInbox {
             const payload = await response.json();
             if (!payload.success) throw new Error('API');
 
-            // Success feedback
             if (payload.item) {
                 this.items.set(String(id), payload.item);
-                // Refresh both overview and list
                 this.loadOverview();
                 this.loadList();
             } else if (payload.deleted) {
                 this.state.page = 1;
                 this.loadOverview();
                 this.loadList();
-<<<<<<< HEAD
-=======
-                // Close detail panel
-                if (this.detailPanel) {
-                    this.detailPanel.classList.add('collapsed');
-                    this.detailPanel.setAttribute('aria-hidden', 'true');
-                    if (this.container) this.container.classList.remove('detail-open');
-                }
->>>>>>> origin/main
             }
         } catch (error) {
             console.error('review action', error);
             alert('No se pudo completar la acción. Por favor intenta de nuevo.');
-            // Restore button
+        } finally {
             if (button && originalHTML) {
                 button.disabled = false;
                 button.innerHTML = originalHTML;
@@ -649,66 +628,6 @@ class ReviewsInbox {
         }
     }
 
-<<<<<<< HEAD
-=======
-    openDetail(id) {
-        const item = this.items.get(String(id));
-        if (!item || !this.detailPanel) return;
-        // highlight selected row or review-card
-        this.tableBody?.querySelectorAll('tr[data-id]')?.forEach((r) => r.classList.toggle('is-selected', r.getAttribute('data-id') === String(id)));
-        this.listContainer?.querySelectorAll('.review-card[data-review-id]')?.forEach((r) => r.classList.toggle('is-selected', r.getAttribute('data-review-id') === String(id)));
-        // expand detail panel
-        this.detailPanel.classList.remove('collapsed');
-        if (this.container) this.container.classList.add('detail-open');
-        this.detailPanel.setAttribute('aria-hidden', 'false');
-        if (this.detailToggle) this.detailToggle.setAttribute('aria-expanded', 'true');
-        const emptyState = this.detailPanel.querySelector('[data-state="empty"]');
-        const content = this.detailPanel.querySelector('[data-state="content"]');
-        emptyState?.setAttribute('hidden', 'hidden');
-        content?.removeAttribute('hidden');
-        content.querySelector('[data-role="title"]').textContent = item.title || 'Sin titulo';
-        content.querySelector('[data-role="rating"]').textContent = `${item.rating} ★`;
-        content.querySelector('[data-role="customer"]').textContent = item.customer?.name || item.customer?.email || 'Cliente';
-        content.querySelector('[data-role="product"]').textContent = item.product?.name || 'Producto';
-        content.querySelector('[data-role="date"]').textContent = this.formatDate(item.created_at);
-        content.querySelector('[data-role="comment"]').textContent = item.comment;
-        const actions = content.querySelector('[data-role="detail-actions"]');
-        actions?.querySelectorAll('button').forEach((btn) => {
-            btn.onclick = (e) => this.handleAction(btn.getAttribute('data-action'), id, e);
-        });
-        // Configure verify and approve button label/state in the detail panel
-        const verifyBtn = actions?.querySelector('button[data-action="verify"]');
-                if (verifyBtn) {
-            const isVerified = Boolean(item.is_verified || item.is_verified_purchase || false);
-                if (isVerified) {
-                verifyBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Verificada';
-                verifyBtn.title = 'Reseña verificada';
-                verifyBtn.disabled = true;
-                verifyBtn.classList.add('btn-verified');
-                } else {
-                verifyBtn.innerHTML = '<i class="fa-solid fa-badge-check fa-fallback" data-fallback="fa-check-circle" aria-hidden="true"></i> Marcar como verificada';
-                verifyBtn.title = 'Marcar como verificada';
-                verifyBtn.disabled = false;
-                verifyBtn.classList.remove('btn-verified');
-            }
-        }
-        // Hide approve button in the detail panel if already approved
-        const approveBtn = actions?.querySelector('button[data-action="approve"]');
-        if (approveBtn) {
-            const isApproved = Boolean(item.is_approved);
-            if (isApproved) {
-                approveBtn.style.display = 'none';
-            } else {
-                approveBtn.style.display = '';
-            }
-        }
-        // Apply inline fallback styles to the detail panel action buttons
-        this.applyActionButtonStyles();
-        // Check for any icons that need a fallback replacement inside the detail
-        this.ensureIconFallbacks();
-    }
-
->>>>>>> origin/main
     renderStatusChip(item) {
         const status = item.is_approved ? 'Publicado' : 'Pendiente';
         const className = item.is_approved ? 'success' : 'warning';
