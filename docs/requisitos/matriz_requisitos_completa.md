@@ -1,5 +1,5 @@
 # Matriz de Requisitos Completa del Sistema
-## 157 Requisitos Funcionales
+## 160 Requisitos Funcionales
 
 | Módulo | Proceso | Número | Qué debe hacer el sistema | Número | Cómo funciona (Reglas de Negocio) | Número | Requisitos de Información |
 |---|---|---|---|---|---|---|---|
@@ -159,13 +159,16 @@
 | Configuración del Sistema | Configurar parámetros operacionales | RF-154 | El sistema debe permitir ajustar reglas generales (ej: moneda, zona horaria). | RN-154 | Configuración base de cómo opera el negocio. | RI-154 | El sistema debe guardar los Parámetros Globales de operación: Moneda por defecto, Zona horaria y reglas generales del negocio. |
 | Configuración del Sistema | Configurar redes sociales | RF-155 | El sistema debe permitir poner los links a Facebook, Instagram, etc. | RN-155 | Iconos que llevan a las redes de la tienda. | RI-155 | El sistema debe almacenar las URLs de los Perfiles Sociales de la marca (Facebook, Instagram, WhatsApp, etc.). |
 | Configuración del Sistema | Subir logo de marca | RF-156 | El sistema debe permitir cargar el archivo del logo. | RN-156 | Sube la imagen que aparecerá en el encabezado y correos. | RI-156 | El sistema debe procesar y guardar el Archivo de Imagen del Logo corporativo para su uso en la interfaz. |
-| Configuración del Sistema | Configurar reglas de envío (Global) | RF-157 | El sistema debe permitir definir la política general de envíos. | RN-157 | Configuración base para calcular costos de transporte. | RI-157 | El sistema debe guardar la Política General de Envíos, incluyendo costos base y tiempos estimados por defecto. |
+| Configuración del Sistema | Gestión de Métodos de Envío | RF-157 | El sistema debe permitir crear y gestionar diferentes formas de entrega (ej: Express, Estándar). | RN-157 | Cada método tiene su propio costo base y características. Se pueden activar o desactivar según disponibilidad. | RI-157 | El sistema debe guardar la Configuración del Método: Nombre, Descripción, Costo Base, Icono representativo y Estado. |
+| Configuración del Sistema | Configurar Envío Gratis por Monto | RF-158 | El sistema debe permitir definir un monto mínimo de compra para que un método de envío sea gratuito. | RN-158 | Incentiva las compras grandes. Si el cliente supera este valor, el costo de envío de este método se vuelve $0 automáticamente. | RI-158 | El sistema debe almacenar el Umbral de Gratuidad (Monto mínimo) asociado a cada método de envío específico. |
+| Configuración del Sistema | Reglas de Costo por Rango de Precio | RF-159 | El sistema debe permitir definir costos de envío variables según el valor total de la compra. | RN-159 | Permite cobrar tarifas diferentes dependiendo del tamaño del pedido (ej: pedidos pequeños pagan más envío). | RI-159 | El sistema debe gestionar las Reglas de Precio: Rango de valor del pedido (Mínimo y Máximo) y el Costo de envío a aplicar para ese rango. |
+| Configuración del Sistema | Estimación de Tiempos de Entrega | RF-160 | El sistema debe permitir configurar los días estimados que tardará la entrega. | RN-160 | Informa al cliente cuándo esperar su pedido. Se define un rango de días (mínimo y máximo). | RI-160 | El sistema debe registrar los Días Hábiles Estimados (Mínimo y Máximo) para calcular y mostrar la fecha probable de entrega. |
 
 ---
 
 ## Resumen Final
 
-**Total de Requisitos Funcionales**: 157 (RF-001 a RF-157)
+**Total de Requisitos Funcionales**: 160 (RF-001 a RF-160)
 
 **Requisitos eliminados**:
 - Noticias (4 requisitos): No implementado en el proyecto
@@ -180,4 +183,4 @@
 - Gestión de Órdenes y Postventa: 18 requisitos
 - Marketing y Contenido: 24 requisitos
 - Administración y Reportes: 19 requisitos
-- Configuración del Sistema: 6 requisitos
+- Configuración del Sistema: 9 requisitos
