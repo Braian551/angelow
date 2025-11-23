@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
 require_once __DIR__ . '/order_notification_service.php';
+require_once __DIR__ . '/../services/StockManager.php';
 
 header('Content-Type: application/json');
 
@@ -140,6 +141,7 @@ try {
                 $skippedOrders[] = ['order_id' => $orderId, 'reason' => $skipReason];
                 continue;
             }
+
             // Actualizar el estado de la orden (el trigger registrará el cambio)
             if ($targetPaymentStatus !== null) {
                 $stmt = $conn->prepare("UPDATE orders SET status = ?, payment_status = ?, updated_at = NOW() WHERE id = ?");
@@ -151,6 +153,9 @@ try {
             
             if ($stmt->rowCount() > 0) {
                 $affectedRows++;
+
+                // Ajustar stock
+                StockManager::adjustStock($conn, $orderId, $targetStatus, $currentOrder['status']);
 
                 if ($targetStatus === 'delivered') {
                     $ordersToNotifyDelivered[] = $orderId;
@@ -165,9 +170,9 @@ try {
                     } else {
                         try {
                             createOrderStatusNotification($conn, (int)$orderId, $targetStatus);
-                    } catch (Throwable $e) {
-                        error_log('[ORDER_NOTIFY] Error al crear notificación de estado: ' . $e->getMessage());
-                    }
+                        } catch (Throwable $e) {
+                            error_log('[ORDER_NOTIFY] Error al crear notificación de estado: ' . $e->getMessage());
+                        }
                     }
                 }
                 

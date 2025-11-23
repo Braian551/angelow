@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../settings/site_settings.php';
+global $conn;
 $siteSettings = fetch_site_settings($conn);
 ?>
     <footer class="main-footer">

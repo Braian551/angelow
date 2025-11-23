@@ -7,6 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../conexion.php';
 require_once __DIR__ . '/order_notification_service.php';
+require_once __DIR__ . '/../services/StockManager.php';
 
 header('Content-Type: application/json');
 
@@ -190,6 +191,10 @@ try {
         if ($stmt->rowCount() > 0) {
             $affectedRows++;
             $updatedOrders[] = $currentOrder['order_number'];
+
+            // Ajustar stock
+            StockManager::adjustStock($conn, $orderId, $targetStatus, $currentOrder['status']);
+
             if ($targetStatus === 'delivered') {
                 $ordersToNotifyDelivered[] = (int) $orderId;
             } else {

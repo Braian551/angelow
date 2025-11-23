@@ -2075,9 +2075,11 @@ button {
   }
 
   .btn-primary {
-    background: var(--primary-color);
+    background-color: var(--gradient-sky);
     color: #fff;
-    box-shadow: 0 10px 20px rgba(0, 119, 182, 0.15);
+    padding: 4px;
+    border-radius: 15px;
+    box-shadow: 0 15px 30px rgba(0, 119, 182, 0.2);
   }
 
   .btn-primary:hover {

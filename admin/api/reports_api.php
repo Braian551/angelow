@@ -206,13 +206,10 @@ function getTopProducts($conn, $limit = 10, $startDate = null, $endDate = null) 
     $params = [];
     
     if ($startDate && $endDate) {
-        $whereClause .= " AND DATE(o.created_at) BETWEEN ? AND ?";
-        $params = [$startDate, $endDate];
+        $whereClause .= " AND DATE(o.created_at) BETWEEN :start_date AND :end_date";
     }
     
-    $params[] = $limit;
-    
-    $stmt = $conn->prepare("
+    $sql = "
         SELECT 
             p.id,
             p.name,
@@ -230,9 +227,18 @@ function getTopProducts($conn, $limit = 10, $startDate = null, $endDate = null) 
         WHERE $whereClause
         GROUP BY p.id, p.name, p.slug, c.name
         ORDER BY total_revenue DESC
-        LIMIT ?
-    ");
-    $stmt->execute($params);
+        LIMIT :limit
+    ";
+
+    $stmt = $conn->prepare($sql);
+
+    if ($startDate && $endDate) {
+        $stmt->bindValue(':start_date', $startDate);
+        $stmt->bindValue(':end_date', $endDate);
+    }
+    
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
     
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -276,10 +282,11 @@ function getRecurringCustomers($conn, $minOrders = 2) {
         INNER JOIN orders o ON u.id = o.user_id
         WHERE o.status != 'cancelled'
         GROUP BY u.id, u.name, u.email, u.phone
-        HAVING total_orders >= ?
+        HAVING total_orders >= :min_orders
         ORDER BY total_orders DESC, total_spent DESC
     ");
-    $stmt->execute([$minOrders]);
+    $stmt->bindValue(':min_orders', (int)$minOrders, PDO::PARAM_INT);
+    $stmt->execute();
     
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -355,9 +362,10 @@ function getCustomerLifetimeValue($conn, $limit = 10) {
         WHERE o.status != 'cancelled' AND u.role = 'customer'
         GROUP BY u.id, u.name, u.email, u.created_at
         ORDER BY lifetime_value DESC
-        LIMIT ?
+        LIMIT :limit
     ");
-    $stmt->execute([$limit]);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
     
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

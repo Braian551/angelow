@@ -10,47 +10,47 @@ require_once __DIR__ . '/../../layouts/headeradmin2.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Informe de Ventas - Angelow</title>
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardadmin.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/informes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboard.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/admin/management-hub.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="admin-container">
-        <div class="main-content">
+        <?php require_once __DIR__ . '/../../layouts/headeradmin2.php'; ?>
+        
+        <main class="admin-content">
             <?php require_once __DIR__ . '/../../layouts/headeradmin1.php'; ?>
             
-            <div class="content-wrapper">
+            <div class="management-hub" id="sales-hub">
                 <div class="page-header">
                     <div>
-                        <a href="<?= BASE_URL ?>/admin/informes/dashboard.php" class="btn-link">
-                            <i class="fas fa-arrow-left"></i> Volver al Dashboard
-                        </a>
-                        <h1><i class="fas fa-chart-line"></i> Informe Detallado de Ventas</h1>
+                        <h1><i class="fas fa-chart-line"></i> Informe de Ventas</h1>
+                        <div class="breadcrumb">
+                            <a href="<?= BASE_URL ?>/admin">Dashboard</a> / <span>Informes</span> / <span>Ventas</span>
+                        </div>
                     </div>
-                    <div class="export-buttons">
-                        <button class="btn-export" onclick="exportToCSV()">
-                            <i class="fas fa-file-csv"></i> Exportar CSV
-                        </button>
-                        <button class="btn-export" onclick="printReport()">
-                            <i class="fas fa-print"></i> Imprimir
-                        </button>
+                    <div class="actions">
+                        <button class="btn-soft" onclick="resetFilters()"><i class="fas fa-undo"></i> Restablecer</button>
+                        <button class="btn-soft primary" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+                        <button class="btn-soft" onclick="printReport()"><i class="fas fa-print"></i> Imprimir</button>
                     </div>
                 </div>
 
                 <!-- Filtros -->
-                <div class="report-filters">
-                    <div class="filters-grid">
+                <section class="surface-card" style="margin-bottom: 2rem; padding: 1.5rem;">
+                    <div class="filters-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
                         <div class="filter-group">
-                            <label for="start-date">Fecha Inicio</label>
-                            <input type="date" id="start-date" class="form-control">
+                            <label for="start-date" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">Fecha Inicio</label>
+                            <input type="date" id="start-date" class="form-control" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem;">
                         </div>
                         <div class="filter-group">
-                            <label for="end-date">Fecha Fin</label>
-                            <input type="date" id="end-date" class="form-control">
+                            <label for="end-date" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">Fecha Fin</label>
+                            <input type="date" id="end-date" class="form-control" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem;">
                         </div>
                         <div class="filter-group">
-                            <label for="status-filter">Estado</label>
-                            <select id="status-filter" class="form-control">
+                            <label for="status-filter" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">Estado</label>
+                            <select id="status-filter" class="form-control" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem;">
                                 <option value="">Todos</option>
                                 <option value="pending">Pendiente</option>
                                 <option value="processing">En proceso</option>
@@ -60,123 +60,122 @@ require_once __DIR__ . '/../../layouts/headeradmin2.php';
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label for="period-filter">Agrupar por</label>
-                            <select id="period-filter" class="form-control">
+                            <label for="period-filter" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">Agrupar por</label>
+                            <select id="period-filter" class="form-control" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem;">
                                 <option value="day">Día</option>
                                 <option value="week">Semana</option>
                                 <option value="month" selected>Mes</option>
                                 <option value="year">Año</option>
                             </select>
                         </div>
+                        <div class="filter-actions">
+                            <button class="btn-primary" onclick="applyFilters()" style="width: 100%; justify-content: center;">
+                                <i class="fas fa-filter"></i> Aplicar
+                            </button>
+                        </div>
                     </div>
-                    <div class="filter-actions">
-                        <button class="btn-secondary" onclick="resetFilters()">
-                            <i class="fas fa-undo"></i> Restablecer
-                        </button>
-                        <button class="btn-primary" onclick="applyFilters()">
-                            <i class="fas fa-filter"></i> Aplicar Filtros
-                        </button>
-                    </div>
-                </div>
+                </section>
 
-                <!-- Métricas principales -->
-                <div class="summary-cards">
-                    <div class="summary-card blue">
-                        <div class="card-icon">
-                            <i class="fas fa-dollar-sign"></i>
+                <!-- Insights Grid -->
+                <section class="insights-grid" id="sales-insights">
+                    <article class="stat-card" data-metric="revenue">
+                        <div class="stat-top">
+                            <span class="stat-icon"><i class="fas fa-dollar-sign"></i></span>
+                            <h2>Ingresos Totales</h2>
                         </div>
-                        <div class="card-content">
-                            <h3>Ingresos Totales</h3>
-                            <p class="card-value" id="total-revenue">$0</p>
-                            <span class="card-subtitle" id="revenue-period">Período seleccionado</span>
-                        </div>
-                    </div>
+                        <strong class="stat-value" id="total-revenue">$0</strong>
+                        <div class="delta muted stat-subtext" id="revenue-period">Período seleccionado</div>
+                    </article>
 
-                    <div class="summary-card green">
-                        <div class="card-icon">
-                            <i class="fas fa-shopping-cart"></i>
+                    <article class="stat-card" data-metric="orders">
+                        <div class="stat-top">
+                            <span class="stat-icon"><i class="fas fa-shopping-cart"></i></span>
+                            <h2>Total Órdenes</h2>
                         </div>
-                        <div class="card-content">
-                            <h3>Total Órdenes</h3>
-                            <p class="card-value" id="total-orders">0</p>
-                            <span class="card-subtitle" id="avg-order-value">Valor promedio por pedido: $0</span>
-                        </div>
-                    </div>
+                        <strong class="stat-value" id="total-orders">0</strong>
+                        <div class="delta positive stat-subtext" id="avg-order-value">Ticket prom: $0</div>
+                    </article>
 
-                    <div class="summary-card purple">
-                        <div class="card-icon">
-                            <i class="fas fa-truck"></i>
+                    <article class="stat-card" data-metric="shipping">
+                        <div class="stat-top">
+                            <span class="stat-icon"><i class="fas fa-truck"></i></span>
+                            <h2>Costos de Envío</h2>
                         </div>
-                        <div class="card-content">
-                            <h3>Costos de Envío</h3>
-                            <p class="card-value" id="total-shipping">$0</p>
-                            <span class="card-subtitle">Ingresos por envío</span>
-                        </div>
-                    </div>
+                        <strong class="stat-value" id="total-shipping">$0</strong>
+                        <div class="delta muted stat-subtext">Ingresos por envío</div>
+                    </article>
 
-                    <div class="summary-card orange">
-                        <div class="card-icon">
-                            <i class="fas fa-percentage"></i>
+                    <article class="stat-card" data-metric="discounts">
+                        <div class="stat-top">
+                            <span class="stat-icon"><i class="fas fa-percentage"></i></span>
+                            <h2>Descuentos</h2>
                         </div>
-                        <div class="card-content">
-                            <h3>Descuentos Aplicados</h3>
-                            <p class="card-value" id="total-discounts">$0</p>
-                            <span class="card-subtitle">Total en descuentos</span>
-                        </div>
-                    </div>
-                </div>
+                        <strong class="stat-value" id="total-discounts">$0</strong>
+                        <div class="delta muted stat-subtext">Total aplicado</div>
+                    </article>
+                </section>
 
-                <!-- Gráficos de ventas -->
-                <div class="charts-grid">
-                    <div class="chart-card large">
+                <!-- Charts Section -->
+                <section class="client-charts" style="margin-top: 2rem;">
+                    <article class="chart-card chart-card-large">
                         <div class="chart-header">
-                            <h3><i class="fas fa-chart-area"></i> Evolución de Ventas</h3>
+                            <div>
+                                <h3><i class="fas fa-chart-area"></i> Evolución de Ventas</h3>
+                                <p class="chart-subtitle">Ingresos y órdenes en el tiempo.</p>
+                            </div>
                         </div>
                         <div class="chart-body">
-                            <canvas id="salesEvolutionChart"></canvas>
+                            <canvas id="salesEvolutionChart" height="320"></canvas>
                         </div>
-                    </div>
+                    </article>
 
-                    <div class="chart-card">
+                    <article class="chart-card">
                         <div class="chart-header">
-                            <h3><i class="fas fa-chart-bar"></i> Comparativa Mensual</h3>
+                            <div>
+                                <h3><i class="fas fa-chart-bar"></i> Comparativa Mensual</h3>
+                                <p class="chart-subtitle">Mes actual vs anterior.</p>
+                            </div>
                         </div>
                         <div class="chart-body">
-                            <canvas id="monthlyComparisonChart"></canvas>
+                            <canvas id="monthlyComparisonChart" height="280"></canvas>
                         </div>
-                    </div>
-                </div>
+                    </article>
+                </section>
 
-                <!-- Tabla detallada -->
-                <div class="data-table-card">
-                    <div class="table-header">
-                        <h3><i class="fas fa-table"></i> Detalle de Ventas por Período</h3>
-                    </div>
-                    <div class="table-body">
-                        <table class="data-table" id="sales-detail-table">
-                            <thead>
-                                <tr>
-                                    <th>Período</th>
-                                    <th>Órdenes</th>
-                                    <th>Subtotal</th>
-                                    <th>Envío</th>
-                                    <th>Descuentos</th>
-                                    <th>Total</th>
-                                    <th>Valor promedio por pedido (COP)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="7" class="loading">Cargando datos...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <!-- Detailed Table -->
+                <section class="split-grid" style="margin-top: 2rem; grid-template-columns: 1fr;">
+                    <article class="table-card">
+                        <header>
+                            <h3><i class="fas fa-table"></i> Detalle de Ventas por Período</h3>
+                        </header>
+                        <div class="table-wrapper">
+                            <table class="data-table" id="sales-detail-table">
+                                <thead>
+                                    <tr>
+                                        <th>Período</th>
+                                        <th>Órdenes</th>
+                                        <th>Subtotal</th>
+                                        <th>Envío</th>
+                                        <th>Descuentos</th>
+                                        <th>Total</th>
+                                        <th>Ticket Promedio</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" class="loading">Cargando datos...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>
+                </section>
+
             </div>
-        </div>
+        </main>
     </div>
 
     <script src="<?= BASE_URL ?>/js/admin/informes-ventas.js"></script>
 </body>
 </html>
+
