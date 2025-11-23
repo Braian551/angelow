@@ -653,6 +653,13 @@ class ReviewsInbox {
         const [prevBtn, nextBtn] = buttons;
         if (prevBtn) prevBtn.disabled = this.state.page <= 1;
         if (nextBtn) nextBtn.disabled = this.state.page >= pages;
+        // Hide pagination arrows when there is only a single page of results
+        const actionsContainer = this.pagination.querySelector('.actions');
+        if (actionsContainer) {
+            const hidden = pages <= 1;
+            actionsContainer.style.display = hidden ? 'none' : '';
+            if (hidden) actionsContainer.setAttribute('aria-hidden', 'true'); else actionsContainer.removeAttribute('aria-hidden');
+        }
     }
 
     async handleAction(action, id, evt) {

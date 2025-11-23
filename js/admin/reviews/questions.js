@@ -19,6 +19,7 @@ class QuestionsInbox {
         this.filterSelect = document.getElementById('questions-filter');
         this.pagination = document.getElementById('questions-pagination');
         this.detailPanel = document.getElementById('question-detail');
+        this.detailToggle = document.getElementById('question-detail-toggle');
         this.answersList = document.getElementById('question-answers');
         this.answerForm = document.getElementById('answer-form');
         this.statusCanvas = document.getElementById('questions-status-chart');
@@ -26,6 +27,7 @@ class QuestionsInbox {
         this.clearBtn = document.getElementById('questions-clear-filters');
         this.debugPanel = document.getElementById('questions-debug');
         this.debugPre = document.getElementById('questions-debug-pre');
+        this.refreshBtn = document.getElementById('questions-refresh');
     }
 
     bind() {
@@ -87,6 +89,11 @@ class QuestionsInbox {
             this.loadList();
         });
 
+        this.refreshBtn?.addEventListener('click', () => {
+            this.loadOverview();
+            this.loadList();
+        });
+
         this.detailToggle?.addEventListener('click', (e) => {
             e.stopPropagation();
             if (!this.detailPanel) return;
@@ -132,15 +139,17 @@ class QuestionsInbox {
             this.renderPagination(payload.pagination || { page: this.state.page, per_page: this.state.perPage, total: payload.items?.length || 0, pages: 1 });
             this.loadOverview();
             if (!payload.items || !payload.items.length) {
-                if (this.debugPanel && this.debugPre) {
-                    const params = new URLSearchParams({ page: this.state.page, per_page: this.state.perPage, search: this.state.search });
-                    if (this.state.answered !== 'all') params.set('answered', String(this.state.answered));
-                    this.debugPanel.style.display = '';
-                    this.debugPanel.removeAttribute('aria-hidden');
-                    this.debugPre.textContent = 'URL: ' + this.cfg.endpoints.list + '?' + params.toString() + '\n\n' + JSON.stringify(payload, null, 2);
+                // No items found, just ensure debug is hidden
+                if (this.debugPanel) {
+                    this.debugPanel.style.display = 'none';
+                    this.debugPanel.setAttribute('aria-hidden', 'true');
                 }
             } else {
-                if (this.debugPanel && this.debugPre) { this.debugPanel.style.display = 'none'; this.debugPanel.setAttribute('aria-hidden', 'true'); this.debugPre.textContent = ''; }
+                if (this.debugPanel) {
+                    this.debugPanel.style.display = 'none';
+                    this.debugPanel.setAttribute('aria-hidden', 'true');
+                    if (this.debugPre) this.debugPre.textContent = '';
+                }
             }
         } catch (e) {
             console.error('questions list', e);
@@ -174,7 +183,7 @@ class QuestionsInbox {
         const ctx = this.statusCanvas.getContext('2d');
         const labels = ['Respondidas', 'Sin responder'];
         const data = [answered, unanswered];
-        if (data.reduce((a,b)=>a+b, 0) === 0) {
+        if (data.reduce((a, b) => a + b, 0) === 0) {
             this.statusCanvas.style.display = 'none';
             if (this.statusLegend) this.statusLegend.innerHTML = '';
             return;
@@ -182,8 +191,9 @@ class QuestionsInbox {
         this.statusCanvas.style.display = '';
         this.charts.status = new Chart(ctx, {
             type: 'doughnut',
-            data: { labels, datasets: [{ data, backgroundColor: ['#3b82f6','#f97316'] }] },
-            options: { plugins: { legend: { display: false } }, maintainAspectRatio: false,
+            data: { labels, datasets: [{ data, backgroundColor: ['#3b82f6', '#f97316'] }] },
+            options: {
+                plugins: { legend: { display: false } }, maintainAspectRatio: false,
                 onClick: (evt, elements) => {
                     if (!elements.length) return;
                     const idx = elements[0].index;
@@ -208,12 +218,19 @@ class QuestionsInbox {
 
     renderTable(items) {
         if (!items.length) {
-            const filters = [];
-            if (this.state.search) filters.push(`Buscar: "${this.state.search}"`);
-            if (this.state.answered !== 'all') filters.push(`Respondidas: ${String(this.state.answered)}`);
-            const filtersText = filters.length ? ` — filtros activos: ${filters.join(', ')}` : '';
+            let message = 'Sin preguntas';
+
+            // Provide specific messages for filter states
+            if (this.state.answered === 1) {
+                message = 'No hay preguntas respondidas';
+            } else if (this.state.answered === 0) {
+                message = 'No hay preguntas sin responder';
+            } else if (this.state.search) {
+                message = `No se encontraron preguntas con "${this.state.search}"`;
+            }
+
             const clear = this.clearBtn ? `<button class="btn-soft" id="questions-inline-clear">Limpiar filtros</button>` : '';
-            this.tableBody.innerHTML = `<tr><td colspan="5">Sin preguntas${filtersText} ${clear}</td></tr>`;
+            this.tableBody.innerHTML = `<tr><td colspan="5">${message} ${clear}</td></tr>`;
             setTimeout(() => {
                 const btn = document.getElementById('questions-inline-clear');
                 btn?.addEventListener('click', () => this.clearBtn?.click());
@@ -224,15 +241,19 @@ class QuestionsInbox {
             this.items.set(String(q.id), q);
             const excerpt = (q.question || '').slice(0, 80);
             const date = new Date(q.created_at);
+            const isAnswered = q.answer_count > 0;
+            const statusBadge = isAnswered
+                ? '<span class="badge-status answered"><i class="fas fa-circle-check"></i> Respondida</span>'
+                : '<span class="badge-status unanswered"><i class="fas fa-clock"></i> Pendiente</span>';
             return `
                 <tr data-id="${q.id}">
                     <td><div>${excerpt}${excerpt.length === 80 ? '...' : ''}</div><small class="text-muted">${date.toLocaleString()}</small></td>
                     <td>${q.product_name || 'Producto'}</td>
                     <td>${q.customer_name || 'Cliente'}</td>
-                    <td><span class="badge-ghost">${q.answer_count} respuestas</span></td>
+                    <td>${statusBadge}</td>
                     <td>
-                        <button class="btn-soft" data-action="view">Ver</button>
-                        <button class="btn-soft" data-action="delete">Eliminar</button>
+                        <button class="btn-soft" data-action="view"><i class="fas fa-eye"></i> Ver</button>
+                        <button class="btn-soft danger" data-action="delete"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `;
@@ -249,12 +270,20 @@ class QuestionsInbox {
         const [prevBtn, nextBtn] = buttons;
         if (prevBtn) prevBtn.disabled = this.state.page <= 1;
         if (nextBtn) nextBtn.disabled = this.state.page >= pages;
+        // Hide pagination arrows when there is only a single page of results
+        const actionsContainer = this.pagination.querySelector('.actions');
+        if (actionsContainer) {
+            const hidden = pages <= 1;
+            actionsContainer.style.display = hidden ? 'none' : '';
+            if (hidden) actionsContainer.setAttribute('aria-hidden', 'true'); else actionsContainer.removeAttribute('aria-hidden');
+        }
     }
 
     async openDetail(id) {
-        if (!id) return;
+        if (!id || !this.detailPanel) return;
         try {
             const detailEndpoint = this.cfg.endpoints.detail || this.cfg.endpoints.getDetails || this.cfg.endpoints.getDetail;
+            if (!detailEndpoint) throw new Error('Endpoint detail no configurado');
             const resp = await fetch(`${detailEndpoint}?id=${id}`, { credentials: 'same-origin' });
             const payload = await resp.json();
             if (!payload.success) throw new Error(payload.message || 'API');
@@ -273,14 +302,16 @@ class QuestionsInbox {
             content.querySelector('[data-role="product"]').textContent = item.product_name;
             content.querySelector('[data-role="date"]').textContent = new Date(item.created_at).toLocaleString();
             content.querySelector('[data-role="question"]').textContent = item.question;
-            this.answersList.innerHTML = answers.length ? answers.map(a => `
+            if (this.answersList) {
+                this.answersList.innerHTML = answers.length ? answers.map(a => `
                 <li>
                     <strong>${a.user_name || 'Admin'}</strong>
                     <span>${a.answer}</span>
                     <small class="text-muted">${new Date(a.created_at).toLocaleString()}</small>
                 </li>
-            `).join('') : '<li class="text-muted">Sin respuestas</li>';
-            this.answerForm.dataset.questionId = id;
+                `).join('') : '<li class="text-muted">Sin respuestas</li>';
+            }
+            if (this.answerForm) this.answerForm.dataset.questionId = id;
         } catch (e) {
             console.error('questions.detail', e);
             alert('No se pudo cargar la pregunta');
@@ -299,15 +330,15 @@ class QuestionsInbox {
             const resp = await fetch(this.cfg.endpoints.delete, {
                 method: 'POST',
                 credentials: 'same-origin',
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ question_id: id })
             });
             const payload = await resp.json();
             if (!payload.success) throw new Error(payload.message || 'API');
             this.loadList();
             this.loadOverview();
-            const activeDetailId = this.answerForm.dataset.questionId;
-            if (String(activeDetailId) === String(id)) {
+            const activeDetailId = this.answerForm?.dataset.questionId;
+            if (activeDetailId && String(activeDetailId) === String(id)) {
                 const emptyState = this.detailPanel.querySelector('[data-state="empty"]');
                 const content = this.detailPanel.querySelector('[data-state="content"]');
                 content?.setAttribute('hidden', 'hidden');
@@ -321,15 +352,17 @@ class QuestionsInbox {
 
     async submitAnswer(e) {
         e.preventDefault();
+        if (!this.answerForm) return;
         const id = this.answerForm.dataset.questionId;
+        if (!id) return alert('Selecciona una pregunta');
         const fd = new FormData(this.answerForm);
-        fd.append('question_id', id);
         const answer = fd.get('answer');
         if (!answer) return alert('Escribe una respuesta');
         try {
             const resp = await fetch(this.cfg.endpoints.submitAnswer, {
                 method: 'POST',
                 credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ question_id: id, answer: answer })
             });
             const payload = await resp.json();

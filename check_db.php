@@ -1,17 +1,16 @@
 <?php
-require_once 'conexion.php';
-try {
-    $stmt = $conn->query('SELECT COUNT(*) as total FROM products');
-    $result = $stmt->fetch();
-    echo 'Total productos: ' . $result['total'] . PHP_EOL;
+require 'config.php';
+require 'conexion.php';
 
-    $stmt = $conn->query('SELECT id, name FROM products LIMIT 5');
-    $products = $stmt->fetchAll();
-    echo 'Primeros 5 productos:' . PHP_EOL;
-    foreach ($products as $p) {
-        echo $p['id'] . ': ' . $p['name'] . PHP_EOL;
+try {
+    $stmt = $conn->query("SELECT COUNT(*) as count FROM question_answers");
+    $count = $stmt->fetchColumn();
+    echo "Total answers in DB: " . $count . "\n";
+    
+    if ($count > 0) {
+        $stmt = $conn->query("SELECT * FROM question_answers LIMIT 5");
+        print_r($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 } catch (Exception $e) {
-    echo 'Error: ' . $e->getMessage();
+    echo "Error: " . $e->getMessage() . "\n";
 }
-?>
