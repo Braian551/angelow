@@ -791,11 +791,7 @@
 	gap: 0.75rem;
 }
 
-.tile-head h3 {
-	margin: 0;
-}
 
-/* ======== FILTERS & TABLE ======== */
 .table-card header,
 .filter-bar {
 	display: flex;
@@ -2829,3 +2825,37 @@ tbody tr:focus {
 			flex: 1;
 		}
 	}
+}
+
+/* ======== PRODUCT TABLE STYLES ======== */
+.product-cell {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.product-img {
+	width: 48px;
+	height: 48px;
+	border-radius: 8px;
+	object-fit: cover;
+	border: 1px solid var(--hub-border);
+	background: #fff;
+}
+
+.product-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+}
+
+.product-name {
+	font-weight: 600;
+	color: var(--hub-text);
+	font-size: 0.95rem;
+}
+
+.product-sku {
+	font-size: 0.8rem;
+	color: var(--hub-muted);
+}
