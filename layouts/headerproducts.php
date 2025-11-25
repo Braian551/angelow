@@ -105,33 +105,9 @@ $currentSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''
             <li><a href="<?= BASE_URL ?>/index.php">Inicio</a></li>
             <li class="mega-menu">
                 <a href="<?= BASE_URL ?>/ninas.html">Niñas</a>
-                <div class="mega-menu-content">
-                    <div class="mega-menu-column">
-                        <h4>Por categoría</h4>
-                        <ul>
-                            <li><a href="<?= BASE_URL ?>/ninas-vestidos.html">Vestidos</a></li>
-                            <li><a href="<?= BASE_URL ?>/ninas-conjuntos.html">Conjuntos</a></li>
-                            <li><a href="<?= BASE_URL ?>/ninas-pijamas.html">Pijamas</a></li>
-                            <li><a href="<?= BASE_URL ?>/ninas-zapatos.html">Zapatos</a></li>
-                        </ul>
-                    </div>
-                    <div class="mega-menu-column">
-                        <h4>Por edad</h4>
-                        <ul>
-                            <li><a href="<?= BASE_URL ?>/ninas-0-12m.html">0-12 meses</a></li>
-                            <li><a href="<?= BASE_URL ?>/ninas-1-3a.html">1-3 años</a></li>
-                            <li><a href="<?= BASE_URL ?>/ninas-4-6a.html">4-6 años</a></li>
-                            <li><a href="<?= BASE_URL ?>/ninas-7-10a.html">7-10 años</a></li>
-                        </ul>
-                    </div>
-                    <div class="mega-menu-column">
-                        <img src="<?= BASE_URL ?>/images/ropa.png" alt="Colección niñas">
-                    </div>
-                </div>
             </li>
             <li class="mega-menu">
                 <a href="<?= BASE_URL ?>/ninos.html">Niños</a>
-                <!-- Contenido similar al de niñas -->
             </li>
             <li><a href="<?= BASE_URL ?>/bebes.html">Bebés</a></li>
             <li><a href="<?= BASE_URL ?>/novedades.html">Novedades</a></li>
