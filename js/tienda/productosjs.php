@@ -365,8 +365,8 @@
                             console.log('Error en wishlist:', response.error);
                         }
                     }.bind(this));
-                });
             });
+        });
         }
 
         // Actualizar la paginación
@@ -483,6 +483,13 @@
             });
         });
 
+        // Filtro por colección
+        document.querySelectorAll('input[name="collection"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateUrlParam('collection', this.value, true);
+            });
+        });
+
         // Filtro por ofertas
         const offersCheckbox = document.getElementById('offers-only');
         if (offersCheckbox) {
@@ -571,6 +578,11 @@
             
             if (paramsObj.gender) {
                 document.querySelector(`input[name="gender"][value="${paramsObj.gender}"]`).checked = true;
+            }
+
+            if (paramsObj.collection) {
+                const collectionRadio = document.querySelector(`input[name="collection"][value="${paramsObj.collection}"]`);
+                if (collectionRadio) collectionRadio.checked = true;
             }
             
             if (paramsObj.min_price) {

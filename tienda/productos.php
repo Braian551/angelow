@@ -14,6 +14,7 @@ $genderFilter = isset($_GET['gender']) ? $_GET['gender'] : '';
 $priceMin = isset($_GET['min_price']) ? floatval($_GET['min_price']) : null;
 $priceMax = isset($_GET['max_price']) ? floatval($_GET['max_price']) : null;
 $showOffersOnly = isset($_GET['offers']) && $_GET['offers'] === '1';
+$collectionFilter = isset($_GET['collection']) ? intval($_GET['collection']) : null;
 $sortBy = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $limit = 12; // Productos por página
@@ -24,7 +25,7 @@ $userId = $isLoggedIn ? $_SESSION['user_id'] : null;
 
 try {
     // Llamar al procedimiento almacenado
-    $stmt = $conn->prepare("CALL GetFilteredProducts(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("CALL GetFilteredProducts(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bindValue(1, $searchQuery, PDO::PARAM_STR);
     $stmt->bindValue(2, $categoryFilter, $categoryFilter !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
     $stmt->bindValue(3, $genderFilter, $genderFilter !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
@@ -35,21 +36,11 @@ try {
     $stmt->bindValue(8, $offset, PDO::PARAM_INT);
     $stmt->bindValue(9, $userId, $userId !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
     $stmt->bindValue(10, $showOffersOnly, PDO::PARAM_INT);
+    $stmt->bindValue(11, $collectionFilter, $collectionFilter !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
     $stmt->execute();
 
     // Obtener los productos
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Convertir is_favorite a integer para consistencia
-    $products = array_map(function($product) {
-        if (isset($product['is_favorite'])) {
-            $product['is_favorite'] = (int)$product['is_favorite'];
-        }
-        return $product;
-    }, $products);
-
-    // Asegurar que cada producto tenga información consistente de precios
-    $products = hydrateProductsPricing($conn, $products);
 
     // Obtener el conteo total (segundo conjunto de resultados)
     $totalProducts = 0;
@@ -63,9 +54,25 @@ try {
                 $totalPages = max(1, (int) ceil($totalProducts / $limit));
             }
         }
+        // CRITICAL: Consumir cualquier otro result set pendiente para liberar la conexión
+        while ($stmt->nextRowset()) {}
     } catch (\Exception $ex) {
         error_log("Error fetching total products rowset: " . $ex->getMessage());
     }
+
+    // Cerrar el cursor del procedimiento antes de ejecutar otras consultas
+    $stmt->closeCursor();
+
+    // Convertir is_favorite a integer para consistencia
+    $products = array_map(function($product) {
+        if (isset($product['is_favorite'])) {
+            $product['is_favorite'] = (int)$product['is_favorite'];
+        }
+        return $product;
+    }, $products);
+
+    // Asegurar que cada producto tenga información consistente de precios
+    $products = hydrateProductsPricing($conn, $products);
 
 } catch (PDOException $e) {
     error_log("Error fetching products: " . $e->getMessage());
@@ -73,16 +80,20 @@ try {
     $totalProducts = 0;
     $totalPages = 1;
 }
-
-// Cerrar el cursor del procedimiento antes de ejecutar otras consultas
-$stmt->closeCursor();
-
 // Obtener categorías para el filtro
 $categories = [];
 try {
     $categories = $conn->query("SELECT id, name FROM categories WHERE is_active = 1 ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     error_log("Error fetching categories: " . $e->getMessage());
+}
+
+// Obtener colecciones para el filtro
+$collections = [];
+try {
+    $collections = $conn->query("SELECT id, name, description FROM collections WHERE is_active = 1 ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log("Error fetching collections: " . $e->getMessage());
 }
 ?>
 
@@ -185,6 +196,23 @@ try {
                         <input type="checkbox" name="offers" id="offers-only" value="1" <?= $showOffersOnly ? 'checked' : '' ?>>
                         <label for="offers-only">Solo productos en oferta</label>
                     </div>
+                </div>
+            </div>
+
+            <!-- Filtro por colección -->
+            <div class="filter-group">
+                <div class="filter-title" data-toggle="collections-filter">
+                    <h4>Colecciones</h4>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="filter-options" id="collections-filter">
+                    <?php foreach ($collections as $collection): ?>
+                        <div class="filter-option">
+                            <input type="radio" name="collection" id="col-<?= $collection['id'] ?>"
+                                value="<?= $collection['id'] ?>" <?= $collectionFilter == $collection['id'] ? 'checked' : '' ?>>
+                            <label for="col-<?= $collection['id'] ?>"><?= htmlspecialchars($collection['name']) ?></label>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
 

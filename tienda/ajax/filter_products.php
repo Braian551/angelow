@@ -16,6 +16,7 @@ $priceMin = isset($params['min_price']) ? floatval($params['min_price']) : null;
 $priceMax = isset($params['max_price']) ? floatval($params['max_price']) : null;
 $sortBy = isset($params['sort']) ? $params['sort'] : 'newest';
 $showOffersOnly = isset($params['offers']) && $params['offers'] === '1';
+$collectionFilter = isset($params['collection']) ? intval($params['collection']) : null;
 $page = isset($params['page']) ? max(1, intval($params['page'])) : 1;
 $limit = 12;
 $offset = ($page - 1) * $limit;
@@ -25,7 +26,7 @@ $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 try {
     // Llamar al procedimiento almacenado GetFilteredProducts
-    $stmt = $conn->prepare("CALL GetFilteredProducts(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("CALL GetFilteredProducts(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bindValue(1, $searchQuery, PDO::PARAM_STR);
     $stmt->bindValue(2, $categoryFilter, $categoryFilter !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
     $stmt->bindValue(3, $genderFilter, $genderFilter !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
@@ -36,6 +37,7 @@ try {
     $stmt->bindValue(8, $offset, PDO::PARAM_INT);
     $stmt->bindValue(9, $userId, $userId !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
     $stmt->bindValue(10, $showOffersOnly, PDO::PARAM_INT);
+    $stmt->bindValue(11, $collectionFilter, $collectionFilter !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
     $stmt->execute();
 
     // Obtener los productos
@@ -44,15 +46,19 @@ try {
     // Obtener el conteo total (segundo conjunto de resultados)
     $totalProducts = 0;
     $totalPages = 1;
-    if ($stmt->nextRowset()) {
-        $totalResult = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($totalResult !== false && isset($totalResult['total'])) {
-            $totalProducts = (int)$totalResult['total'];
-            $totalPages = max(1, (int) ceil($totalProducts / $limit));
+    
+    // Consumir todos los rowsets para evitar error 2014
+    do {
+        if ($stmt->columnCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row && isset($row['total'])) {
+                $totalProducts = (int)$row['total'];
+                $totalPages = max(1, (int) ceil($totalProducts / $limit));
+            }
         }
-    }
+    } while ($stmt->nextRowset());
 
-    // Cerrar el cursor
+    // Cerrar el cursor explícitamente
     $stmt->closeCursor();
 
 } catch (PDOException $e) {

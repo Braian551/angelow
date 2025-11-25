@@ -110,7 +110,6 @@ $currentSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''
                 <a href="<?= BASE_URL ?>/ninos.html">Niños</a>
             </li>
             <li><a href="<?= BASE_URL ?>/bebes.html">Bebés</a></li>
-            <li><a href="<?= BASE_URL ?>/novedades.html">Novedades</a></li>
             <li><a href="<?= BASE_URL ?>/ofertas.html">Ofertas</a></li>
             <li><a href="<?= BASE_URL ?>/colecciones.html">Colecciones</a></li>
         </ul>
