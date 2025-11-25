@@ -1,0 +1,87 @@
+@startuml DIAGRAMA_COMPONENTES_ANGELOW
+title Diagrama de Componentes - AngeloW (High-level)
+!define AW_COLOR #1f6feb
+!define DB_COLOR #10b981
+!define EXTERNAL_COLOR #f59e0b
+skinparam componentStyle rectangle
+
+' Actors
+actor "Cliente / Navegador" as Browser
+actor "Administrador" as AdminUser
+
+' Main system node
+node "Servidor Web / PHP (Apache/Nginx + PHP-FPM)" as WebServer {
+  component "FrontendHTML/CSS/JS" as Frontend
+  component "Plantillas / Layouts" as Layouts
+  component "Módulo Tienda (tienda/)" as StoreModule
+  component "API Rest / Endpoints (tienda/api/, api/)" as RestAPI
+  component "Módulo Admin (admin/)" as AdminModule
+  component "Módulo Usuarios (users/)" as UsersModule
+  component "Módulo Auth (auth/)" as AuthModule
+  component "Módulo Pagos / Facturación (tienda/api/pay/)" as Payments
+  component "Notificaciones / Email" as Notifications
+  component "Background / CLI scripts (database/scripts)" as CLI
+}
+
+' Datastores
+database "MySQL (relacional)" as MySQL <<Database>> #DB_COLOR
+database "MongoDB (NoSQL)" as MongoDB <<Database>> #DB_COLOR
+file "Uploads / imágenes (uploads/)" as Uploads
+file "Archivos estáticos (css/, js/, images/)" as StaticAssets
+
+' External Services
+rectangle "Servicios Externos / 3rd Party" as External <<EXTERNAL_COLOR>> {
+  component "Proveedor de Pago (MercadoPago/Stripe/...)" as PaymentGateway
+  component "SMTP / Email Provider (PHPMailer / Gmail SMTP)" as SMTP
+  component "Geocoding (OpenStreetMap / Google)" as Geocoding
+  component "PDF Generator (TCPDF)" as PDFLib
+}
+
+' Relations - front-end interactions
+Browser --> Frontend : HTTP / HTML pages
+Browser --> Frontend : Request static assets (CSS/JS/images)
+Frontend --> RestAPI : AJAX / fetch() / GET/POST
+Frontend --> StoreModule : Rendered server pages (SSR PHP)
+Browser --> AdminModule : Admin UI (auth required)
+AdminUser --> AdminModule : Admin UI actions
+
+' Relations - backend responsibilities
+WebServer --> MySQL : PDO (CRUD, queries, migrations)
+WebServer --> MongoDB : MongoDB Client (analytics, sessions, other collections)
+WebServer --> Uploads : Read/Write images and product files
+WebServer --> StaticAssets : Serve css, js, images
+WebServer --> CLI : Trigger or run background scripts / migrations
+
+' Relations - external integrations
+Payments --> PaymentGateway : Payment requests / callbacks
+Notifications --> SMTP : Send emails (order confirmation, welcome)
+RestAPI --> Geocoding : Reverse Geocoding calls (users/api/geocoding.php)
+Payments --> PDFLib : Generate invoices / PDFs
+
+' Arrow usage for who calls who
+RestAPI --> MySQL : Read/Write products, orders, users
+StoreModule --> MySQL : Queries for product lists and details
+AdminModule --> MySQL : CRUD operations for products, orders, settings
+UsersModule --> MySQL : User accounts, addresses, orders
+
+' Background processes - database & notification flows
+CLI --> MySQL : Migrations / scripts
+CLI --> MongoDB : Populate notifications / analytics data
+
+' Highlights / Notes
+note right of WebServer
+  • PHP monolith with MVC-like modules (tienda/, api/, admin/, users/)
+  • REST-like endpoints under `tienda/api/` and `api/`
+  • Heavy use of PDO (MySQL), PHPMailer (SMTP), TCPDF (PDF generation), MongoDB for specific features
+end note
+
+note left of MySQL
+  • DB migrations in `database/migrations/` and SQL schema under `database/`
+  • Backup / dump files present in `backups/`
+end note
+
+note top of RestAPI
+  • AJAX and REST handlers used by the frontend (wishlist, cart, search, payment, reviews)
+end note
+
+@enduml

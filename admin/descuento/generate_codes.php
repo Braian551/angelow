@@ -131,9 +131,9 @@ if ($edit_id) {
     try {
         $stmt = $conn->prepare("
             SELECT dc.*, 
-                   pd.percentage, pd.max_discount_amount,
-                   fad.amount, fad.min_order_amount,
-                   fsd.shipping_method_id,
+                   MAX(pd.percentage) as percentage, MAX(pd.max_discount_amount) as max_discount_amount,
+                   MAX(fad.amount) as amount, MAX(fad.min_order_amount) as min_order_amount,
+                   MAX(fsd.shipping_method_id) as shipping_method_id,
                    GROUP_CONCAT(dcp.product_id) as product_ids
             FROM discount_codes dc
             LEFT JOIN percentage_discounts pd ON dc.id = pd.discount_code_id AND dc.discount_type_id = 1

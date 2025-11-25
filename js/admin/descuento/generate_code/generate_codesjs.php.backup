@@ -1,4 +1,4 @@
-﻿<script>
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     // Declarar todas las variables al inicio para evitar errores de hoisting
     let selectedProducts = [];
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectAllUsersCheckbox = document.getElementById('select-all-users-checkbox');
     const selectedUsersCount = document.getElementById('selected-users-count');
 
-    // Inicializar arrays despuÃ©s de obtener los elementos del DOM
+    // Inicializar arrays después de obtener los elementos del DOM
     if (selectedProductsInput) {
         selectedProducts = JSON.parse(selectedProductsInput.value || '[]');
     }
@@ -70,29 +70,29 @@ document.addEventListener('DOMContentLoaded', function() {
         loadUsersFromServer();
     }
 
-    // Inicializar sidebar (soluciÃ³n para el error setupSidebarCollapse)
+    // Inicializar sidebar (solución para el error setupSidebarCollapse)
     if (typeof setupSidebarCollapse === 'function') {
         setupSidebarCollapse();
     }
 
-    // Si estamos en modo ediciÃ³n, inicializar campos
+    // Si estamos en modo edición, inicializar campos
     if (window.editMode && window.editCodeData) {
         initializeEditMode();
     }
 
     // FUNCIONES PRINCIPALES
 
-    // FunciÃ³n para inicializar modo ediciÃ³n
+    // Función para inicializar modo edición
     function initializeEditMode() {
         const codeData = window.editCodeData;
-        console.log('Inicializando modo ediciÃ³n con datos:', codeData);
+        console.log('Inicializando modo edición con datos:', codeData);
         
-        // Forzar la actualizaciÃ³n de campos segÃºn tipo de descuento
+        // Forzar la actualización de campos según tipo de descuento
         setTimeout(() => {
             updateDiscountFields();
             updateDiscountFieldsOriginal();
             
-            // Si hay productos seleccionados, mostrar la secciÃ³n
+            // Si hay productos seleccionados, mostrar la sección
             if (codeData.product_ids) {
                 const productIds = codeData.product_ids.split(',').map(id => parseInt(id.trim()));
                 if (productIds.length > 0) {
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     }
 
-    // FunciÃ³n para cargar usuarios desde el servidor
+    // Función para cargar usuarios desde el servidor
     function loadUsersFromServer() {
         fetch('<?= BASE_URL ?>/admin/api/descuento/search_users.php')
             .then(response => response.json())
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (Array.isArray(data)) {
                     allUsers = data;
                     filteredUsers = data;
-                    console.log('Usuarios cargados vÃ­a AJAX:', allUsers.length);
+                    console.log('Usuarios cargados vía AJAX:', allUsers.length);
                 } else {
                     console.error('Error al cargar usuarios:', data);
                 }
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // FunciÃ³n debounce para bÃºsquedas
+    // Función debounce para búsquedas
     function debounce(func, wait) {
         let timeout;
         return function() {
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // FunciÃ³n para escapar HTML
+    // Función para escapar HTML
     function escapeHtml(text) {
         const map = {
             '&': '&amp;',
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // FUNCIONES DE PRODUCTOS
 
-    // FunciÃ³n para limpiar la selecciÃ³n de productos
+    // Función para limpiar la selección de productos
     function clearProductsSelection(skipVisibilityUpdate = false) {
         selectedProducts = [];
         if (selectedProductsInput) {
@@ -161,12 +161,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         updateProductsSelectionSummary();
         
-        // Solo actualizar visibilidad si no se estÃ¡ saltando (evita recursiÃ³n)
+        // Solo actualizar visibilidad si no se está saltando (evita recursión)
         if (!skipVisibilityUpdate) {
             updateProductsSelectionVisibility();
         }
 
-        // Actualizar checkboxes en el modal si estÃ¡ abierto
+        // Actualizar checkboxes en el modal si está abierto
         if (productsModal && productsModal.style.display === 'block' && productsList) {
             const checkboxes = productsList.querySelectorAll('.product-checkbox');
             checkboxes.forEach(checkbox => {
@@ -181,16 +181,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // FunciÃ³n para actualizar la visibilidad del resumen de productos segÃºn "Aplicar a todos"
+    // Función para actualizar la visibilidad del resumen de productos según "Aplicar a todos"
     function updateProductsSelectionVisibility() {
         const applyToAllCheckbox = document.getElementById('apply_to_all');
         const selectedProductsInfo = document.getElementById('selected-products-info');
 
         if (applyToAllCheckbox && selectedProductsInfo) {
             if (applyToAllCheckbox.checked) {
-                // Si aplica a todos, ocultar el resumen y limpiar selecciÃ³n
+                // Si aplica a todos, ocultar el resumen y limpiar selección
                 selectedProductsInfo.style.display = 'none';
-                // Pasar true para evitar recursiÃ³n infinita
+                // Pasar true para evitar recursión infinita
                 clearProductsSelection(true);
             } else {
                 // Si no aplica a todos, mostrar el resumen si hay productos seleccionados
@@ -202,20 +202,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // TambiÃ©n actualizar visibilidad del botÃ³n del modal
+        // También actualizar visibilidad del botón del modal
         if (openProductsModalBtn) {
             openProductsModalBtn.style.display = (applyToAllCheckbox && applyToAllCheckbox.checked) ? 'none' : 'block';
         }
     }
 
-    // FunciÃ³n para actualizar el resumen de productos seleccionados
+    // Función para actualizar el resumen de productos seleccionados
     function updateProductsSelectionSummary() {
         const selectedProductsInfo = document.getElementById('selected-products-info');
         const selectedProductsCountDisplay = document.getElementById('selected-products-count-display');
         const applyToAllCheckbox = document.getElementById('apply_to_all');
 
         if (selectedProductsInfo && selectedProductsCountDisplay) {
-            // Solo mostrar si NO estÃ¡ marcado "Aplicar a todos" Y hay productos seleccionados
+            // Solo mostrar si NO está marcado "Aplicar a todos" Y hay productos seleccionados
             if (!applyToAllCheckbox || (!applyToAllCheckbox.checked && selectedProducts.length > 0)) {
                 selectedProductsInfo.style.display = 'block';
                 selectedProductsCountDisplay.textContent = `${selectedProducts.length} producto(s) seleccionado(s)`;
@@ -253,13 +253,13 @@ document.addEventListener('DOMContentLoaded', function() {
         updateProductsSelectionSummary();
     }
 
-    // FunciÃ³n para cargar productos reales desde la base de datos
+    // Función para cargar productos reales desde la base de datos
     function loadRealProducts(searchTerm = '') {
         if (productsLoading) productsLoading.style.display = 'block';
         if (productsList) productsList.innerHTML = '';
         if (noProductsFound) noProductsFound.style.display = 'none';
 
-        // Hacer peticiÃ³n AJAX para obtener productos reales
+        // Hacer petición AJAX para obtener productos reales
         const formData = new FormData();
         formData.append('search', searchTerm);
         formData.append('action', 'get_products_for_discount');
@@ -287,9 +287,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                console.error('Error en la peticiÃ³n:', error);
+                console.error('Error en la petición:', error);
                 if (typeof showAlert === 'function') {
-                    showAlert('Error de conexiÃ³n al cargar productos: ' + error.message, 'error');
+                    showAlert('Error de conexión al cargar productos: ' + error.message, 'error');
                 }
             })
             .finally(() => {
@@ -331,10 +331,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div>
                         <strong>${escapeHtml(product.name)}</strong>
                         <div style="font-size: 0.8em; color: #666;">
-                            ${escapeHtml(product.category)} â€¢ ${genderText}
+                            ${escapeHtml(product.category)} • ${genderText}
                         </div>
                         <div style="font-size: 0.7em; color: #888;">
-                            ${product.color_variants} colores â€¢ ${product.size_variants} tallas
+                            ${product.color_variants} colores • ${product.size_variants} tallas
                         </div>
                     </div>
                 </div>
@@ -379,9 +379,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getGenderText(gender) {
         const genderMap = {
-            'niÃ±o': 'NiÃ±o',
-            'niÃ±a': 'NiÃ±a',
-            'bebe': 'BebÃ©',
+            'niño': 'Niño',
+            'niña': 'Niña',
+            'bebe': 'Bebé',
             'unisex': 'Unisex'
         };
         return genderMap[gender] || 'Unisex';
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // FUNCIONES DE USUARIOS
 
-    // FunciÃ³n para limpiar la selecciÃ³n de usuarios
+    // Función para limpiar la selección de usuarios
     function clearUsersSelection() {
         selectedUsers = [];
         if (selectedUsersInput) {
@@ -444,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         updateUsersSelectionSummary();
 
-        // Actualizar checkboxes en el modal si estÃ¡ abierto
+        // Actualizar checkboxes en el modal si está abierto
         if (userModal && userModal.style.display === 'block' && usersList) {
             const checkboxes = usersList.querySelectorAll('.user-checkbox');
             checkboxes.forEach(checkbox => {
@@ -459,14 +459,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // FunciÃ³n para actualizar el resumen de usuarios seleccionados
+    // Función para actualizar el resumen de usuarios seleccionados
     function updateUsersSelectionSummary() {
         const selectedUsersInfo = document.getElementById('selected-users-info');
         const selectedUsersCountDisplay = document.getElementById('selected-users-count-display');
         const sendNotificationCheckbox = document.getElementById('send_notification');
 
         if (selectedUsersInfo && selectedUsersCountDisplay) {
-            // Solo mostrar si estÃ¡ marcado "Enviar notificaciÃ³n" Y hay usuarios seleccionados
+            // Solo mostrar si está marcado "Enviar notificación" Y hay usuarios seleccionados
             if (sendNotificationCheckbox && sendNotificationCheckbox.checked && selectedUsers.length > 0) {
                 selectedUsersInfo.style.display = 'block';
                 selectedUsersCountDisplay.textContent = `${selectedUsers.length} usuario(s) seleccionado(s)`;
@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadUsers(searchTerm = '') {
-        console.log('Cargando usuarios con tÃ©rmino:', searchTerm);
+        console.log('Cargando usuarios con término:', searchTerm);
         console.log('Total usuarios disponibles:', allUsers.length);
 
         if (searchTerm) {
@@ -600,7 +600,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // FUNCIONES DE CAMPOS DE FORMULARIO
 
-    // FunciÃ³n para actualizar los campos segÃºn el tipo de descuento
+    // Función para actualizar los campos según el tipo de descuento
     function updateDiscountFields() {
         if (!discountType) return;
         
@@ -614,7 +614,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (minOrderGroup) minOrderGroup.style.display = 'none';
         if (shippingMethodGroup) shippingMethodGroup.style.display = 'none';
         
-        // Mostrar grupos segÃºn tipo
+        // Mostrar grupos según tipo
         switch(type) {
             case '1': // Porcentaje
                 if (discountValueGroup) discountValueGroup.style.display = 'block';
@@ -624,13 +624,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (fixedAmountGroup) fixedAmountGroup.style.display = 'block';
                 if (minOrderGroup) minOrderGroup.style.display = 'block';
                 break;
-            case '3': // EnvÃ­o gratis
+            case '3': // Envío gratis
                 if (shippingMethodGroup) shippingMethodGroup.style.display = 'block';
                 break;
         }
     }
 
-    // Mostrar/ocultar campos segÃºn tipo de descuento (versiÃ³n original mejorada)
+    // Mostrar/ocultar campos según tipo de descuento (versión original mejorada)
     const discountTypeSelect = document.getElementById('discount_type');
     const discountValueGroupOriginal = document.getElementById('discount-value-group');
     const fixedAmountGroupOriginal = document.getElementById('fixed-amount-group');
@@ -650,9 +650,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (minOrderGroupOriginal) minOrderGroupOriginal.style.display = 'none';
         if (shippingMethodGroupOriginal) shippingMethodGroupOriginal.style.display = 'none';
 
-        // En modo ediciÃ³n, no limpiar valores
+        // En modo edición, no limpiar valores
         if (!window.editMode) {
-            // Limpiar valores de campos que se ocultan solo si NO estamos en modo ediciÃ³n
+            // Limpiar valores de campos que se ocultan solo si NO estamos en modo edición
             const discountValueInput = document.getElementById('discount_value');
             const fixedAmountInput = document.getElementById('fixed_amount');
 
@@ -660,7 +660,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (fixedAmountInput) fixedAmountInput.value = '';
         }
 
-        // Mostrar los campos relevantes segÃºn el tipo
+        // Mostrar los campos relevantes según el tipo
         switch (discountType) {
             case '1': // Porcentaje
                 if (discountValueGroupOriginal) discountValueGroupOriginal.style.display = 'block';
@@ -670,7 +670,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (fixedAmountGroupOriginal) fixedAmountGroupOriginal.style.display = 'block';
                 if (minOrderGroupOriginal) minOrderGroupOriginal.style.display = 'block';
                 break;
-            case '3': // EnvÃ­o gratis
+            case '3': // Envío gratis
                 if (shippingMethodGroupOriginal) shippingMethodGroupOriginal.style.display = 'block';
                 break;
         }
@@ -698,7 +698,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Manejar cambio en "Enviar notificaciÃ³n"
+    // Manejar cambio en "Enviar notificación"
     if (sendNotification) {
         sendNotification.addEventListener('change', function() {
             const isChecked = sendNotification.checked;
@@ -706,7 +706,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 notificationEmailGroup.style.display = isChecked ? 'block' : 'none';
             }
             
-            // Si se desmarca la notificaciÃ³n, limpiar la selecciÃ³n de usuarios
+            // Si se desmarca la notificación, limpiar la selección de usuarios
             if (!isChecked) {
                 clearUsersSelection();
             } else {
@@ -849,59 +849,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             updateUsersSelectionSummary();
 
-    if (openUserModalBtn) {
-        openUserModalBtn.addEventListener('click', function() {
-            if (userModal) {
-                userModal.style.display = 'block';
-                loadUsers();
-            }
-        });
-    }
-
-    if (closeUserModal) {
-        closeUserModal.forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (userModal) {
-                    userModal.style.display = 'none';
-                }
-            });
-        });
-    }
-
-    if (selectAllUsersCheckbox) {
-        selectAllUsersCheckbox.addEventListener('change', function() {
-            if (!usersList) return;
-            
-            const visibleCheckboxes = usersList.querySelectorAll('.user-checkbox');
-
-            visibleCheckboxes.forEach(checkbox => {
-                const row = checkbox.closest('tr');
-
-                if (this.checked) {
-                    checkbox.checked = true;
-                    if (!selectedUsers.includes(checkbox.value)) {
-                        selectedUsers.push(checkbox.value);
-                    }
-                    if (row) row.classList.add('selected');
-                } else {
-                    checkbox.checked = false;
-                    selectedUsers = selectedUsers.filter(id => id !== checkbox.value);
-                    if (row) row.classList.remove('selected');
-                }
-            });
-            updateSelectedUsersCount();
-            updateUsersSelectionSummary();
-        });
-    }
-
-    if (applyUsersBtn) {
-        applyUsersBtn.addEventListener('click', function() {
-            if (selectedUsersInput) {
-                selectedUsersInput.value = JSON.stringify(selectedUsers);
-            }
-
-            updateUsersSelectionSummary();
-
             if (userModal) {
                 userModal.style.display = 'none';
             }
@@ -911,6 +858,181 @@ document.addEventListener('DOMContentLoaded', function() {
     if (userSearchInput) {
         userSearchInput.addEventListener('input', debounce(function() {
             loadUsers(this.value.trim());
+        }, 300));
+    }
+
+    // BÚSQUEDA Y FUNCIONALIDADES ADICIONALES
+
+    // Buscador de códigos
+    const searchCodesInput = document.getElementById('search-codes');
+    if (searchCodesInput) {
+        searchCodesInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.data-table tbody tr');
+            let hasResults = false;
+
+            rows.forEach(row => {
+                const code = row.getAttribute('data-searchable');
+                if (code && code.includes(searchTerm)) {
+                    row.style.display = '';
+                    hasResults = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const noResults = document.getElementById('no-results');
+            if (noResults) {
+                if (!hasResults && searchTerm.length > 0) {
+                    noResults.style.display = 'flex';
+                } else {
+                    noResults.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    // Copiar código al portapapeles
+    document.querySelectorAll('.btn-copy').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const code = this.getAttribute('data-code');
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(code).then(() => {
+                    if (typeof showAlert === 'function') {
+                        showAlert('Código copiado al portapapeles', 'success');
+                    }
+                });
+            } else {
+                // Fallback para navegadores que no soportan clipboard API
+                const textArea = document.createElement('textarea');
+                textArea.value = code;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                if (typeof showAlert === 'function') {
+                    showAlert('Código copiado al portapapeles', 'success');
+                }
+            }
+        });
+    });
+
+    // VALIDACIÓN DEL FORMULARIO
+
+    // Validación del formulario antes del envío
+    const discountForm = document.getElementById('discount-form');
+    if (discountForm) {
+        discountForm.addEventListener('submit', function(e) {
+            const discountTypeValue = discountTypeSelect ? discountTypeSelect.value : '';
+            
+            // En modo edición, verificar si el campo está deshabilitado
+            const isEditMode = window.editMode && window.editCodeData;
+            
+            // Validar que se haya seleccionado un tipo (solo si no estamos en modo edición)
+            if (!isEditMode && !discountTypeValue) {
+                e.preventDefault();
+                if (typeof showAlert === 'function') {
+                    showAlert('Por favor selecciona un tipo de descuento', 'error');
+                } else {
+                    alert('Por favor selecciona un tipo de descuento');
+                }
+                return false;
+            }
+
+            // En modo edición, obtener el tipo desde los datos guardados
+            const typeToValidate = isEditMode ? window.editCodeData.discount_type_id : discountTypeValue;
+
+            // Validar valores según el tipo
+            if (typeToValidate == '1') { // Porcentaje
+                const discountValue = document.getElementById('discount_value');
+                if (!discountValue || !discountValue.value || parseFloat(discountValue.value) <= 0 || parseFloat(discountValue.value) > 100) {
+                    e.preventDefault();
+                    if (typeof showAlert === 'function') {
+                        showAlert('El porcentaje de descuento debe estar entre 1 y 100', 'error');
+                    } else {
+                        alert('El porcentaje de descuento debe estar entre 1 y 100');
+                    }
+                    return false;
+                }
+            } else if (typeToValidate == '2') { // Monto fijo
+                const fixedAmount = document.getElementById('fixed_amount');
+                if (!fixedAmount || !fixedAmount.value || parseFloat(fixedAmount.value) <= 0) {
+                    e.preventDefault();
+                    if (typeof showAlert === 'function') {
+                        showAlert('El monto fijo debe ser mayor a 0', 'error');
+                    } else {
+                        alert('El monto fijo debe ser mayor a 0');
+                    }
+                    return false;
+                }
+            }
+
+            // Validar fechas
+            const startDate = document.getElementById('start_date');
+            const endDate = document.getElementById('end_date');
+            if (startDate && endDate && startDate.value && endDate.value) {
+                const start = new Date(startDate.value);
+                const end = new Date(endDate.value);
+                if (start > end) {
+                    e.preventDefault();
+                    if (typeof showAlert === 'function') {
+                        showAlert('La fecha de inicio no puede ser mayor a la fecha de fin', 'error');
+                    } else {
+                        alert('La fecha de inicio no puede ser mayor a la fecha de fin');
+                    }
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    // CERRAR MODALES AL HACER CLIC FUERA
+
+    // Cerrar modales al hacer clic fuera
+    window.addEventListener('click', function(event) {
+        if (event.target === productsModal) {
+            productsModal.style.display = 'none';
+        }
+        if (event.target === userModal) {
+            userModal.style.display = 'none';
+        }
+    });
+
+    // INICIALIZACIÓN DE TOOLTIPS
+
+    // Inicializar tooltips de Bootstrap
+    if (typeof $ !== 'undefined') {
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip({
+                trigger: 'hover',
+                placement: 'top'
+            });
+        });
+    } else {
+        // Fallback si jQuery no está disponible
+        document.addEventListener('mouseover', function(e) {
+            const target = e.target;
+            if (target.hasAttribute('data-toggle') && target.getAttribute('data-toggle') === 'tooltip') {
+                const title = target.getAttribute('title');
+                if (title) {
+                    // Crear tooltip simple
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute;
+                        background: #333;
+                        color: white;
+                        padding: 5px 10px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        z-index: 10000;
+                        white-space: nowrap;
+                    `;
+                    document.body.appendChild(tooltip);
         }, 300));
     }
 
@@ -1169,7 +1291,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         window.location.href = `generate_codes.php?action=delete&id=${id}`;
                     });
                 }
-            } else if (confirm('Estás seguro de que deseas eliminar este código?')) {
+            } else if (confirm('¿Estás seguro de que deseas eliminar este código?')) {
                 // Fallback si no hay modal
                 window.location.href = `generate_codes.php?action=delete&id=${id}`;
             }
