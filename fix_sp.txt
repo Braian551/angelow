@@ -1,0 +1,40 @@
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS GetFilteredProducts //
+
+CREATE PROCEDURE GetFilteredProducts(
+    IN p_search_query VARCHAR(255) COLLATE utf8mb4_general_ci,
+    IN p_category_id INT,
+    IN p_gender VARCHAR(50) COLLATE utf8mb4_general_ci,
+    IN p_min_price DECIMAL(10,2),
+    IN p_max_price DECIMAL(10,2),
+    IN p_sort_by VARCHAR(50) COLLATE utf8mb4_general_ci,
+    IN p_limit INT,
+    IN p_offset INT,
+    IN p_user_id INT,
+    IN p_show_offers_only TINYINT
+)
+BEGIN
+    SELECT SQL_CALC_FOUND_ROWS p.*, 
+           c.name as category_name,
+           (SELECT COUNT(*) FROM product_favorites WHERE product_id = p.id AND user_id = p_user_id) as is_favorite
+    FROM products p
+    LEFT JOIN categories c ON p.category_id = c.id
+    WHERE p.is_active = 1
+    AND (p_search_query = '' OR p.name LIKE CONCAT('%', p_search_query, '%') OR p.description LIKE CONCAT('%', p_search_query, '%'))
+    AND (p_category_id IS NULL OR p.category_id = p_category_id)
+    AND (p_gender IS NULL OR p.gender = p_gender)
+    AND (p_min_price IS NULL OR p.price >= p_min_price)
+    AND (p_max_price IS NULL OR p.price <= p_max_price)
+    AND (p_show_offers_only = 0 OR (p.compare_price > p.price))
+    ORDER BY
+        CASE WHEN p_sort_by = 'price_asc' THEN p.price END ASC,
+        CASE WHEN p_sort_by = 'price_desc' THEN p.price END DESC,
+        CASE WHEN p_sort_by = 'newest' THEN p.created_at END DESC,
+        p.created_at DESC
+    LIMIT p_limit OFFSET p_offset;
+
+    SELECT FOUND_ROWS() as total;
+END //
+
+DELIMITER ;

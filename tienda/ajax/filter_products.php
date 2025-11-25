@@ -15,6 +15,7 @@ $genderFilter = isset($params['gender']) ? $params['gender'] : '';
 $priceMin = isset($params['min_price']) ? floatval($params['min_price']) : null;
 $priceMax = isset($params['max_price']) ? floatval($params['max_price']) : null;
 $sortBy = isset($params['sort']) ? $params['sort'] : 'newest';
+$showOffersOnly = isset($params['offers']) && $params['offers'] === '1';
 $page = isset($params['page']) ? max(1, intval($params['page'])) : 1;
 $limit = 12;
 $offset = ($page - 1) * $limit;
@@ -24,7 +25,7 @@ $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 try {
     // Llamar al procedimiento almacenado GetFilteredProducts
-    $stmt = $conn->prepare("CALL GetFilteredProducts(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("CALL GetFilteredProducts(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bindValue(1, $searchQuery, PDO::PARAM_STR);
     $stmt->bindValue(2, $categoryFilter, $categoryFilter !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
     $stmt->bindValue(3, $genderFilter, $genderFilter !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
@@ -34,6 +35,7 @@ try {
     $stmt->bindValue(7, $limit, PDO::PARAM_INT);
     $stmt->bindValue(8, $offset, PDO::PARAM_INT);
     $stmt->bindValue(9, $userId, $userId !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
+    $stmt->bindValue(10, $showOffersOnly, PDO::PARAM_INT);
     $stmt->execute();
 
     // Obtener los productos
@@ -55,9 +57,12 @@ try {
 
 } catch (PDOException $e) {
     error_log("Error fetching products: " . $e->getMessage());
-    $products = [];
-    $totalProducts = 0;
-    $totalPages = 1;
+    $response = [
+        'success' => false,
+        'error' => "Database Error: " . $e->getMessage()
+    ];
+    echo json_encode($response);
+    exit;
 }
 
 // Obtener categorías para el filtro

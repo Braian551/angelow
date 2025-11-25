@@ -483,6 +483,14 @@
             });
         });
 
+        // Filtro por ofertas
+        const offersCheckbox = document.getElementById('offers-only');
+        if (offersCheckbox) {
+            offersCheckbox.addEventListener('change', function() {
+                updateUrlParam('offers', this.checked ? '1' : '', true);
+            });
+        }
+
         // Filtro por precio
         const minPriceInput = document.querySelector('.min-price');
         const maxPriceInput = document.querySelector('.max-price');
@@ -573,6 +581,11 @@
             if (paramsObj.max_price) {
                 maxPriceInput.value = paramsObj.max_price;
                 maxPriceValue.textContent = `$${formatPrice(paramsObj.max_price)}`;
+            }
+
+            const offersCheckbox = document.getElementById('offers-only');
+            if (offersCheckbox) {
+                offersCheckbox.checked = paramsObj.offers === '1';
             }
             
             // Cargar productos

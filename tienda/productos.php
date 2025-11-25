@@ -13,6 +13,7 @@ $categoryFilter = isset($_GET['category']) ? intval($_GET['category']) : null;
 $genderFilter = isset($_GET['gender']) ? $_GET['gender'] : '';
 $priceMin = isset($_GET['min_price']) ? floatval($_GET['min_price']) : null;
 $priceMax = isset($_GET['max_price']) ? floatval($_GET['max_price']) : null;
+$showOffersOnly = isset($_GET['offers']) && $_GET['offers'] === '1';
 $sortBy = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $limit = 12; // Productos por página
@@ -23,7 +24,7 @@ $userId = $isLoggedIn ? $_SESSION['user_id'] : null;
 
 try {
     // Llamar al procedimiento almacenado
-    $stmt = $conn->prepare("CALL GetFilteredProducts(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("CALL GetFilteredProducts(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bindValue(1, $searchQuery, PDO::PARAM_STR);
     $stmt->bindValue(2, $categoryFilter, $categoryFilter !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
     $stmt->bindValue(3, $genderFilter, $genderFilter !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
@@ -33,6 +34,7 @@ try {
     $stmt->bindValue(7, $limit, PDO::PARAM_INT);
     $stmt->bindValue(8, $offset, PDO::PARAM_INT);
     $stmt->bindValue(9, $userId, $userId !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
+    $stmt->bindValue(10, $showOffersOnly, PDO::PARAM_INT);
     $stmt->execute();
 
     // Obtener los productos
@@ -168,6 +170,20 @@ try {
                             <span class="min-price-value">$<?= number_format($priceMin ?? 0, 0, ',', '.') ?></span>
                             <span class="max-price-value">$<?= number_format($priceMax ?? 200000, 0, ',', '.') ?></span>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtro por ofertas -->
+            <div class="filter-group">
+                <div class="filter-title" data-toggle="offers-filter">
+                    <h4>Ofertas</h4>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="filter-options" id="offers-filter">
+                    <div class="filter-option">
+                        <input type="checkbox" name="offers" id="offers-only" value="1" <?= $showOffersOnly ? 'checked' : '' ?>>
+                        <label for="offers-only">Solo productos en oferta</label>
                     </div>
                 </div>
             </div>
