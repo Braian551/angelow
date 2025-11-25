@@ -377,7 +377,7 @@ $collections = $collections_stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="collections-grid">
             <?php if (!empty($collections)): ?>
                 <?php foreach ($collections as $collection): ?>
-                    <a href="<?php echo BASE_URL; ?>/tienda/tienda.php?collection=<?php echo $collection['id']; ?>" class="collection-card">
+                    <a href="<?php echo BASE_URL; ?>/tienda/productos.php?collection=<?php echo $collection['id']; ?>" class="collection-card">
                         <?php if (!empty($collection['image'])): ?>
                             <img src="<?php echo htmlspecialchars(BASE_URL . '/' . $collection['image']); ?>" 
                                  alt="<?php echo htmlspecialchars($collection['name']); ?>">

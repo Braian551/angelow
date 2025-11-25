@@ -104,14 +104,14 @@ $currentSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''
         <ul>
             <li><a href="<?= BASE_URL ?>/index.php">Inicio</a></li>
             <li class="mega-menu">
-                <a href="<?= BASE_URL ?>/ninas.html">Niñas</a>
+                <a href="<?= BASE_URL ?>/tienda/productos.php?gender=niña">Niñas</a>
             </li>
             <li class="mega-menu">
-                <a href="<?= BASE_URL ?>/ninos.html">Niños</a>
+                <a href="<?= BASE_URL ?>/tienda/productos.php?gender=niño">Niños</a>
             </li>
-            <li><a href="<?= BASE_URL ?>/bebes.html">Bebés</a></li>
-            <li><a href="<?= BASE_URL ?>/ofertas.html">Ofertas</a></li>
-            <li><a href="<?= BASE_URL ?>/colecciones.html">Colecciones</a></li>
+            <li><a href="<?= BASE_URL ?>/tienda/productos.php?gender=bebe">Bebés</a></li>
+            <li><a href="<?= BASE_URL ?>/tienda/productos.php?offers=1">Ofertas</a></li>
+            <li><a href="<?= BASE_URL ?>/colecciones.php">Colecciones</a></li>
         </ul>
     </nav>
 </header>
