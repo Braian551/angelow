@@ -24,6 +24,9 @@
 | Gestión de Usuarios y Accesos | Registro de intentos fallidos | RF-019 | El sistema debe contar los intentos fallidos de contraseña para detectar ataques. | RN-019 | Si alguien se equivoca muchas veces seguidas, el sistema toma nota para proteger la cuenta. | RI-019 | El sistema debe registrar cada Intento Fallido de Acceso, guardando: el Usuario o Correo intentado, la Dirección IP de origen, y la Fecha y Hora exacta del intento para monitorear seguridad. |
 | Gestión de Usuarios y Accesos | Bloqueo automático de cuenta | RF-020 | El sistema debe bloquear la cuenta temporalmente tras 5 intentos fallidos. | RN-020 | Si fallan 5 veces en una hora, la cuenta se bloquea para evitar que adivinen la contraseña. | RI-020 | El sistema debe gestionar el Estado de Bloqueo de la cuenta, registrando el motivo (exceso de intentos), la hora de inicio del bloqueo y el tiempo de duración hasta el desbloqueo automático. |
 | Gestión de Usuarios y Accesos | Redirección post-login | RF-021 | El sistema debe llevar al usuario a la página que quería ver después de loguearse. | RN-021 | Si el usuario quería ver un producto y se le pidió login, al entrar debe volver a ese producto, no al inicio. | RI-021 | El sistema debe recordar temporalmente la URL de la Página Solicitada antes del inicio de sesión para redirigir al usuario a esa misma dirección exacta una vez que se haya identificado correctamente. |
+| Gestión de Usuarios y Accesos | Recuperar contraseña - Solicitar código | - | El sistema debe permitir que la persona escriba su correo y pida un código para recuperar su contraseña. | - | Solo envía el código si el correo está registrado, muestra un aviso claro y limita cuántas solicitudes seguidas se pueden hacer. | - | Debe recibir el correo capturado, registrar la hora en que se generó el código y guardar el estado de la solicitud. |
+| Gestión de Usuarios y Accesos | Recuperar contraseña - Verificar código | - | El sistema debe mostrar un espacio para escribir el código recibido y confirmar que coincide. | - | El código dura unos minutos, se usa una sola vez y, si es incorrecto, el sistema explica qué pasó y deja volver a intentarlo. | - | Debe recibir el código ingresado, relacionarlo con la cuenta correcta y marcar si quedó aprobado, vencido o rechazado. |
+| Gestión de Usuarios y Accesos | Recuperar contraseña - Crear nueva contraseña | - | El sistema debe permitir escribir y confirmar una nueva contraseña cuando el código ya fue validado. | - | Solo guarda la contraseña si ambos campos coinciden, cumplen la longitud mínima y al finalizar avisa que la clave cambió. | - | Debe recibir la nueva contraseña y su confirmación, registrar la fecha del cambio y limpiar los códigos usados para evitar reutilizarlos. |
 | Gestión de Administradores | Listar administradores | RF-022 | El sistema debe mostrar una lista de todas las personas con acceso administrativo. | RN-022 | Solo el administrador principal debe poder ver quién más tiene acceso al panel de control. | RI-022 | El sistema debe mostrar el Listado de Personal Administrativo incluyendo: Nombre completo, Dirección de correo electrónico corporativa o personal, Rol asignado y Estado actual de la cuenta (Activo/Inactivo). |
 | Gestión de Administradores | Crear administrador | RF-023 | El sistema debe permitir dar acceso de administrador a nuevas personas. | RN-023 | Se crea una cuenta especial con permisos totales para gestionar la tienda. | RI-023 | El sistema debe capturar los Datos del Nuevo Administrador: Nombre completo, Correo electrónico para acceso, y una Contraseña inicial segura, asignándole automáticamente el perfil de permisos de administrador. |
 | Gestión de Administradores | Editar administrador | RF-024 | El sistema debe permitir actualizar los datos de otros administradores. | RN-024 | Permite corregir nombres o actualizar correos del equipo de trabajo. | RI-024 | El sistema debe permitir modificar los Datos del Administrador existente: Nombre completo y Correo electrónico, manteniendo el historial de quién realizó la modificación. |
@@ -168,14 +171,14 @@
 
 ## Resumen Final
 
-**Total de Requisitos Funcionales**: 160 (RF-001 a RF-160)
+**Total de Requisitos Funcionales**: 163 (RF-001 a RF-160 + recuperación de contraseña)
 
 **Requisitos eliminados**:
 - Noticias (4 requisitos): No implementado en el proyecto
 - Diagnóstico técnico (8 requisitos): Información solo para desarrolladores
 
 **Distribución por Módulo**:
-- Gestión de Usuarios y Accesos: 21 requisitos
+- Gestión de Usuarios y Accesos: 24 requisitos
 - Gestión de Administradores: 5 requisitos
 - Gestión de Productos e Inventario: 23 requisitos
 - Experiencia de Compra (Tienda): 25 requisitos

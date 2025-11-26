@@ -1,0 +1,155 @@
+/* ===== ESTILOS RECUPERACIÓN DE CONTRASEÑA ===== */
+.recovery-container, .login-container {
+    max-width: 520px;
+    margin: 4rem auto;
+    padding: 3rem;
+    background: #fdfdff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+    border: 1px solid rgba(15, 23, 42, 0.05);
+    animation: fadeIn 0.45s ease;
+}
+.login-container .recovery-header { margin-bottom: 2.5rem; }
+
+.recovery-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.recovery-logo img {
+    max-height: 62px;
+    margin-bottom: 1.5rem;
+}
+
+.recovery-header h1 {
+    font-size: 2.4rem;
+    color: #0f172a;
+    margin-bottom: 0.8rem;
+}
+
+.recovery-header p {
+    color: #475569;
+    font-size: 1.4rem;
+}
+
+.recovery-form {
+    position: relative;
+    min-height: 240px;
+}
+
+.form-step {
+    display: none;
+    animation: fadeIn 0.45s ease;
+}
+
+.form-step.active {
+    display: block;
+}
+
+.code-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+#codeInfo {
+    color: #334155;
+    font-size: 1.2rem;
+    line-height: 1.5;
+}
+
+.code-status-pill {
+    align-self: flex-start;
+    padding: 0.25rem 10px;
+    border-radius: 999px;
+    background: rgba(11, 107, 189, 0.08);
+    color: #0b6bbd;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.code-status-pill.pending { background: rgba(11, 107, 189, 0.08); color: #0b6bbd; }
+.code-status-pill.valid { background: rgba(16, 185, 129, 0.12); color: #047857; }
+.code-status-pill.expired { background: rgba(239, 68, 68, 0.08); color: #dc2626; }
+
+.password-group .toggle-password {
+    color: #94a3b8;
+}
+
+.password-group .toggle-password:hover {
+    color: #0b6bbd;
+}
+
+.resend-wrapper {
+    margin-top: 1.5rem;
+    font-size: 1.3rem;
+    color: #64748b;
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+}
+
+.resend-wrapper .link-button { font-size: 1.2rem; }
+
+.link-button {
+    background: none;
+    border: none;
+    color: #0b6bbd;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.link-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.error-message {
+    margin-top: 0.6rem;
+}
+
+.recovery-footer {
+    margin-top: 2.5rem;
+    text-align: center;
+    color: #64748b;
+    font-size: 1.3rem;
+}
+
+.recovery-footer a {
+    color: #0b6bbd;
+    font-weight: 600;
+}
+
+/* Links at the bottom */
+.login-redirect, .register-redirect {
+    margin-top: 1.2rem;
+    text-align: center;
+    color: #64748b;
+    font-size: 1.25rem;
+}
+.login-redirect .text-link, .register-redirect .text-link {
+    color: #0b6bbd;
+    font-weight: 600;
+}
+
+/* Adaptar botones */
+#requestCodeBtn,
+#verifyCodeBtn,
+#resetPasswordBtn {
+    gap: 0.8rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .recovery-container {
+        padding: 2rem;
+        margin: 2rem 1rem;
+    }
+
+    .resend-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
