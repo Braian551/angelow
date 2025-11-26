@@ -31,13 +31,13 @@ try {
 }
 
 // Procesar acciones CRUD
-$action = $_GET['action'] ?? '';
+$actionParam = isset($_GET['action']) ? strtolower(trim($_GET['action'])) : '';
 $id = $_GET['id'] ?? 0;
 $id = filter_var($id, FILTER_VALIDATE_INT);
 $edit_id = $_GET['edit'] ?? 0;
 
 // Manejar acciones
-switch ($action) {
+switch ($actionParam) {
     case 'generate':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             require_once 'includes/generate_code_process.php';
@@ -214,7 +214,7 @@ if (isset($_SESSION['alert'])) {
                         <a href="<?= BASE_URL ?>/admin/dashboardadmin.php">Dashboard</a> / <span>Descuentos</span>
                     </div>
                 </div>
-                <?php if ($action === 'generate' || $edit_id): ?>
+                <?php if ($actionParam === 'generate' || $edit_id): ?>
                     <?php require_once 'includes/generate_form.php'; ?>
                 <?php else: ?>
                     <?php require_once 'includes/codes_list.php'; ?>
