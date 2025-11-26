@@ -30,14 +30,14 @@ try {
 }
 
 // Procesar acciones CRUD
-$discount_action = $_GET['action'] ?? '';
+$action = $_GET['action'] ?? '';
 $id = $_GET['id'] ?? 0;
 
 // Validar y sanitizar entrada
 $id = filter_var($id, FILTER_VALIDATE_INT);
 
 // Manejar acciones
-switch ($discount_action) {
+switch ($action) {
     case 'add':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $min_quantity = (int)$_POST['min_quantity'];
@@ -167,7 +167,7 @@ $reglasDescuento = obtenerReglasDescuento($conn);
 
 // Obtener datos de una regla específica para edición
 $reglaActual = null;
-if ($discount_action === 'edit' && $id > 0) {
+if ($action === 'edit' && $id > 0) {
     try {
         $stmt = $conn->prepare("SELECT * FROM bulk_discount_rules WHERE id = ?");
         $stmt->execute([$id]);
@@ -222,30 +222,18 @@ if (isset($_SESSION['alert'])) {
                         <i class="fas fa-percentage"></i> Descuentos por Cantidad
                     </h1>
                     <div class="breadcrumb">
-                        <a href="<?= BASE_URL ?>/admin">Dashboard</a> / 
-                        <?php if (in_array($discount_action, ['add', 'edit'])): ?>
-                            <a href="bulk_discounts.php">Descuentos</a> / <span><?= $discount_action === 'add' ? 'Agregar' : 'Editar' ?></span>
-                        <?php else: ?>
-                            <span>Descuentos</span>
-                        <?php endif; ?>
+                        <a href="<?= BASE_URL ?>/admin">Dashboard</a> / <span>Descuentos</span>
                     </div>
                 </div>
 
-
-                <?php if (in_array($discount_action, ['add', 'edit'])): ?>
+                <?php if (in_array($action, ['add', 'edit'])): ?>
                     <!-- Formulario para agregar/editar reglas de descuento -->
-                    <div class="actions-bar" style="margin-bottom: 20px;">
-                        <a href="bulk_discounts.php" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Volver al listado
-                        </a>
-                    </div>
-                    
                     <div class="card">
                         <div class="card-header">
-                            <h3><?= $discount_action === 'add' ? 'Agregar Nueva Regla' : 'Editar Regla de Descuento' ?></h3>
+                            <h3><?= $action === 'add' ? 'Agregar Nueva Regla' : 'Editar Regla de Descuento' ?></h3>
                         </div>
                         <div class="card-body">
-                            <form id="discount-form" method="POST" action="bulk_discounts.php?action=<?= $discount_action ?><?= $discount_action === 'edit' ? '&id=' . $id : '' ?>">
+                            <form id="discount-form" method="POST" action="bulk_discounts.php?action=<?= $action ?><?= $action === 'edit' ? '&id=' . $id : '' ?>">
                                 <div class="form-group">
                                     <label for="min_quantity">Cantidad Mínima*</label>
                                     <input type="number" id="min_quantity" name="min_quantity" class="form-control"
@@ -280,7 +268,7 @@ if (isset($_SESSION['alert'])) {
 
                                 <div class="form-actions">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> <?= $discount_action === 'add' ? 'Crear Regla' : 'Actualizar Regla' ?>
+                                        <i class="fas fa-save"></i> <?= $action === 'add' ? 'Crear Regla' : 'Actualizar Regla' ?>
                                     </button>
                                     <a href="bulk_discounts.php" class="btn btn-secondary">
                                         <i class="fas fa-times"></i> Cancelar
