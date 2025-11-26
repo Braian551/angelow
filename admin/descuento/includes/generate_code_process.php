@@ -8,9 +8,12 @@ error_log("POST data recibida para generación/actualización: " . print_r($_POS
 $code_id = $_POST['code_id'] ?? null;
 $discount_type = $_POST['discount_type'] ?? ($_POST['discount_type_display'] ?? null);
 $discount_value = null;
-$max_uses = $_POST['max_uses'] ?: null;
-$start_date = $_POST['start_date'] ?: null;
-$end_date = $_POST['end_date'] ?: null;
+$max_uses = $_POST['max_uses'] ?? null;
+$max_uses = ($max_uses === '' || $max_uses === null) ? null : $max_uses;
+$start_date = $_POST['start_date'] ?? null;
+$start_date = ($start_date === '' || $start_date === null) ? null : $start_date;
+$end_date = $_POST['end_date'] ?? null;
+$end_date = ($end_date === '' || $end_date === null) ? null : $end_date;
 $is_single_use = isset($_POST['is_single_use']) ? 1 : 0;
 // Por defecto, al crear un nuevo código queremos que esté activo (1).
 // Si el formulario envía explícitamente is_active (checkbox presente), respetamos su valor.
@@ -142,6 +145,8 @@ try {
         case '1': // Porcentaje
         case 1:
             $max_discount = $_POST['max_discount_amount'] ?? null;
+            // Convertir string vacío a NULL
+            $max_discount = ($max_discount === '' || $max_discount === null) ? null : $max_discount;
             // Verificar si ya existe un registro
             $stmt = $conn->prepare("SELECT id FROM percentage_discounts WHERE discount_code_id = ?");
             $stmt->execute([$code_id]);
@@ -162,6 +167,8 @@ try {
         case '2': // Monto fijo
         case 2:
             $min_order = $_POST['min_order_amount'] ?? null;
+            // Convertir string vacío a NULL
+            $min_order = ($min_order === '' || $min_order === null) ? null : $min_order;
             $stmt = $conn->prepare("SELECT id FROM fixed_amount_discounts WHERE discount_code_id = ?");
             $stmt->execute([$code_id]);
             
@@ -181,6 +188,8 @@ try {
         case '3': // Envío gratis
         case 3:
             $shipping_method = $_POST['shipping_method_id'] ?? null;
+            // Convertir string vacío a NULL
+            $shipping_method = ($shipping_method === '' || $shipping_method === null) ? null : $shipping_method;
             $stmt = $conn->prepare("SELECT id FROM free_shipping_discounts WHERE discount_code_id = ?");
             $stmt->execute([$code_id]);
             
