@@ -24,12 +24,27 @@ function generateOrderPdfContent($order, $orderItems) {
     
     $dompdf = new Dompdf($options);
 
+    // Mapa de traducción de estados
+    $statusTranslations = [
+        'pending' => 'Pendiente',
+        'processing' => 'Procesando',
+        'shipped' => 'Enviado',
+        'delivered' => 'Entregado',
+        'cancelled' => 'Cancelado',
+        'completed' => 'Completado',
+        'refunded' => 'Reembolsado',
+        'failed' => 'Fallido'
+    ];
+
+    $statusKey = strtolower($order['status']);
+    $statusLabel = isset($statusTranslations[$statusKey]) ? $statusTranslations[$statusKey] : ucfirst($statusKey);
+
     // Verificar si es recogida en tienda
     $isStorePickup = isStorePickupMethod($order);
     $storeAddress = $isStorePickup ? getStorePickupAddress() : null;
     $routeLink = $isStorePickup ? buildStoreRouteLink($order['shipping_address'] ?? '') : null;
 
-    // HTML para el contenido del PDF (mismo que el archivo principal)
+    // HTML para el contenido del PDF
     $html = '
     <!DOCTYPE html>
     <html>
@@ -241,7 +256,7 @@ function generateOrderPdfContent($order, $orderItems) {
                             <span class="info-label">Estado:</span>
                             <span class="info-value">
                                 <span class="status-badge status-' . htmlspecialchars($order['status']) . '">
-                                    ' . ucfirst(htmlspecialchars($order['status'])) . '
+                                    ' . htmlspecialchars($statusLabel) . '
                                 </span>
                             </span>
                         </div>
@@ -310,13 +325,61 @@ function generateOrderPdfContent($order, $orderItems) {
         $imageUrl = !empty($item['primary_image']) ? 
                    $item['primary_image'] : 
                    BASE_URL . '/images/default-product.jpg';
+        
+        // Convertir URL a ruta absoluta del sistema de archivos para Dompdf
+        $imagePathFound = false;
+        
+        // 1. Intentar resolver usando BASE_URL
+        if (strpos($imageUrl, BASE_URL) === 0) {
+            $projectRoot = realpath(__DIR__ . '/../../..');
+            $relativePath = substr($imageUrl, strlen(BASE_URL));
+            $relativePath = strtok($relativePath, '?'); // Limpiar query strings
+            
+            if (strpos($relativePath, '/') !== 0) {
+                $relativePath = '/' . $relativePath;
+            }
+            
+            $localPath = $projectRoot . $relativePath;
+            $localPath = str_replace(['//', '\\'], ['/', DIRECTORY_SEPARATOR], $localPath);
+            
+            if (file_exists($localPath)) {
+                $imageUrl = $localPath;
+                $imagePathFound = true;
+            }
+        }
+        
+        // 2. Fallback: buscar en carpetas comunes
+        if (!$imagePathFound) {
+            $projectRoot = realpath(__DIR__ . '/../../..');
+            $parts = parse_url($imageUrl);
+            $path = $parts['path'] ?? $imageUrl;
+            $path = ltrim($path, '/');
+            
+            $projectName = basename($projectRoot);
+            if (strpos($path, $projectName . '/') === 0) {
+                $path = substr($path, strlen($projectName) + 1);
+            }
+            
+            $candidates = [
+                $projectRoot . '/' . $path,
+                $projectRoot . '/uploads/' . basename($path),
+                $projectRoot . '/images/' . basename($path)
+            ];
+            
+            foreach ($candidates as $candidate) {
+                $candidate = str_replace(['//', '\\'], ['/', DIRECTORY_SEPARATOR], $candidate);
+                if (file_exists($candidate)) {
+                    $imageUrl = $candidate;
+                    $imagePathFound = true;
+                    break;
+                }
+            }
+        }
                    
         $html .= '
                     <tr>
                         <td class="text-center">
-                            <img src="' . $imageUrl . '" class="product-image" style="width:50px; height:50px; object-fit:cover;">';
-        
-        $html .= '
+                            <img src="' . $imageUrl . '" class="product-image" style="width:50px; height:50px; object-fit:cover;">
                         </td>
                         <td>
                             <strong>' . htmlspecialchars($item['product_name']) . '</strong>';
