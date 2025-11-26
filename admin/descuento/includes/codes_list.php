@@ -3,7 +3,7 @@
 ?>
 <!-- Listado de códigos -->
 <div class="actions-bar">
-    <a href="generate_codes.php?action=generate" class="btn btn-primary">
+    <a href="<?= BASE_URL ?>/admin/descuento/generate_codes.php?action=generate" class="btn btn-primary">
         <i class="fas fa-plus"></i> Generar Código
     </a>
     <div class="search-box2">
@@ -18,7 +18,7 @@
             <div class="empty-state">
                 <i class="fas fa-percentage"></i>
                 <p>No hay códigos de descuento generados</p>
-                <a href="generate_codes.php?action=generate" class="btn btn-primary">
+                <a href="<?= BASE_URL ?>/admin/descuento/generate_codes.php?action=generate" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Generar primer código
                 </a>
             </div>
@@ -135,7 +135,7 @@
                                     </span>
                                 </td>
                                 <td class="actions">
-                                    <button class="btn btn-sm btn-copy"
+                                    <button type="button" class="btn btn-sm btn-copy"
                                         title="Copiar código"
                                         data-code="<?= htmlspecialchars($codigo['code']) ?>">
                                         <i class="fas fa-copy"></i>
@@ -147,13 +147,13 @@
                                         <i class="fas fa-file-pdf"></i>
                                     </a>
 
-                                    <a href="generate_codes.php?action=generate&edit=<?= $codigo['id'] ?>"
+                                    <a href="<?= BASE_URL ?>/admin/descuento/generate_codes.php?action=generate&edit=<?= $codigo['id'] ?>"
                                         class="btn btn-sm btn-edit"
                                         title="Editar código">
                                         <i class="fas fa-edit"></i>
                                     </a>
 
-                                    <button class="btn btn-sm btn-status"
+                                    <button type="button" class="btn btn-sm btn-status"
                                         title="<?= $isActive ? 'Desactivar' : 'Activar' ?>"
                                         data-id="<?= $codigo['id'] ?>"
                                         data-active="<?= $isActive ? '1' : '0' ?>">

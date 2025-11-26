@@ -849,59 +849,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             updateUsersSelectionSummary();
 
-    if (openUserModalBtn) {
-        openUserModalBtn.addEventListener('click', function() {
-            if (userModal) {
-                userModal.style.display = 'block';
-                loadUsers();
-            }
-        });
-    }
-
-    if (closeUserModal) {
-        closeUserModal.forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (userModal) {
-                    userModal.style.display = 'none';
-                }
-            });
-        });
-    }
-
-    if (selectAllUsersCheckbox) {
-        selectAllUsersCheckbox.addEventListener('change', function() {
-            if (!usersList) return;
-            
-            const visibleCheckboxes = usersList.querySelectorAll('.user-checkbox');
-
-            visibleCheckboxes.forEach(checkbox => {
-                const row = checkbox.closest('tr');
-
-                if (this.checked) {
-                    checkbox.checked = true;
-                    if (!selectedUsers.includes(checkbox.value)) {
-                        selectedUsers.push(checkbox.value);
-                    }
-                    if (row) row.classList.add('selected');
-                } else {
-                    checkbox.checked = false;
-                    selectedUsers = selectedUsers.filter(id => id !== checkbox.value);
-                    if (row) row.classList.remove('selected');
-                }
-            });
-            updateSelectedUsersCount();
-            updateUsersSelectionSummary();
-        });
-    }
-
-    if (applyUsersBtn) {
-        applyUsersBtn.addEventListener('click', function() {
-            if (selectedUsersInput) {
-                selectedUsersInput.value = JSON.stringify(selectedUsers);
-            }
-
-            updateUsersSelectionSummary();
-
             if (userModal) {
                 userModal.style.display = 'none';
             }

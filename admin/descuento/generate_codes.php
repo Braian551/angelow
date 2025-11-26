@@ -215,19 +215,18 @@ if (isset($_SESSION['alert'])) {
                     </div>
                 </div>
                 <?php if ($action === 'generate' || $edit_id): ?>
-                <?php require_once 'includes/generate_form.php'; ?>
+                    <?php require_once 'includes/generate_form.php'; ?>
                 <?php else: ?>
-                <?php require_once 'includes/codes_list.php'; ?>
+                    <?php require_once 'includes/codes_list.php'; ?>
                 <?php endif; ?>
             </div>
         </main>
     </div>
 
-    <?php if ($action === 'generate' || $edit_id): ?>
     <?php require_once __DIR__ . '/../../admin/descuento/modals/modal_usuario.php'; ?>
     <?php require_once __DIR__ . '/../../admin/descuento/modals/modal_producto.php'; ?>
 
-    <?php endif; ?>
+
 
     <!-- Script para pasar datos de PHP a JavaScript -->
     <script>
@@ -290,9 +289,8 @@ if (isset($_SESSION['alert'])) {
     <script src="<?= BASE_URL ?>/js/dashboardadmin.js"></script>
     <script src="<?= BASE_URL ?>/js/alerta.js"></script>
 
-    <?php if ($action === 'generate' || $edit_id): ?>
     <?php require_once __DIR__ . '/../../js/admin/descuento/generate_code/generate_codesjs.php'; ?>
-    <?php endif; ?>
+
 </body>
 
 </html>

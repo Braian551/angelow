@@ -23,7 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Copiar código al portapapeles
     const copyButtons = document.querySelectorAll('.btn-copy');
     copyButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
             const code = this.getAttribute('data-code');
             navigator.clipboard.writeText(code).then(() => {
                 // Mostrar feedback visual
@@ -58,7 +59,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentStatusButton = null;
     
     statusButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
             currentStatusButton = this;
             const codeId = this.getAttribute('data-id');
             const isActive = this.getAttribute('data-active') === '1';
