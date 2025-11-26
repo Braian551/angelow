@@ -103,6 +103,7 @@ function calculateDiscountAmount($order, $subtotal) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/orders.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/user/orders/order_detail.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/css/user/alert_user.css">
 </head>
 <body>
     <div class="user-dashboard-container">
@@ -332,7 +333,9 @@ function calculateDiscountAmount($order, $subtotal) {
         </main>
     </div>
 
+    <?php includeFromRoot('users/alertas/alert_user.php'); ?>
     <?php includeFromRoot('layouts/footer.php'); ?>
+    <script src="<?= BASE_URL ?>/js/user/alert_user.js"></script>
 
     <script>
         const BASE_URL = '<?= BASE_URL ?>';
@@ -371,22 +374,30 @@ function calculateDiscountAmount($order, $subtotal) {
 
         // Función para cancelar orden
         function cancelOrder(orderId) {
-            const reason = prompt('Por favor, indica el motivo de la cancelación:');
-            if (reason === null) return;
-            
-            if (reason.trim() === '') {
-                alert('Debes proporcionar un motivo para cancelar el pedido.');
-                return;
+            // Prefer the modern prompt if available, otherwise fallback to native prompt
+            if (typeof window.showUserPrompt === 'function') {
+                // Input collection is disabled project-wide via ALERT_INPUT_ENABLED=false.
+                // We only present a confirmation modal here; reason is optional.
+                showUserPrompt(`¿Estás seguro de que quieres cancelar el pedido #${orderId}?`, function(reason) {
+                    // Reason will be null if input collection is disabled. We don't require a value for now.
+                    performCancelFetch(orderId, reason || '');
+                }, { title: 'Cancelar Pedido', confirmText: 'Cancelar pedido', cancelText: 'Volver', placeholder: 'Motivo de la cancelacion (opcional)', type: 'textarea', rows: 4 });
+            } else {
+                const reason = prompt('¿Estás seguro de que quieres cancelar el pedido? (Motivo opcional)');
+                if (reason === null) return;
+                if (confirm('¿Estás seguro de que quieres cancelar este pedido? Esta acción no se puede deshacer.')) {
+                    performCancelFetch(orderId, reason || '');
+                }
             }
+        }
 
-            if (confirm('¿Estás seguro de que quieres cancelar este pedido? Esta acción no se puede deshacer.')) {
-                showLoading('Cancelando pedido...');
-                
-                fetch(`${BASE_URL}/users/ajax/ajax_cancel_order.php`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `id=${orderId}&reason=${encodeURIComponent(reason)}`
-                })
+        function performCancelFetch(orderId, reason) {
+            showLoading('Cancelando pedido...');
+            fetch(`${BASE_URL}/users/ajax/ajax_cancel_order.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id=${orderId}&reason=${encodeURIComponent(reason)}`
+            })
                 .then(response => response.json())
                 .then(data => {
                     hideLoading();
@@ -404,7 +415,6 @@ function calculateDiscountAmount($order, $subtotal) {
                     console.error('Error:', error);
                     showNotification('Error al cancelar el pedido', 'error');
                 });
-            }
         }
 
         // Función para descargar factura

@@ -77,12 +77,14 @@ try {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboarduser2.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/orders.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/user/alert_user.css">
 </head>
 <body>
     <div class="user-dashboard-container">
         <?php require_once __DIR__ . '/../layouts/asideuser.php'; ?>
         
         <main class="user-main-content">
+            <?php require_once __DIR__ . '/alertas/alert_user.php'; ?>
             <div class="dashboard-header">
                 <h1>Mis Pedidos</h1>
                 <p>Revisa el estado de tus compras. El equipo de Angelow actualizará tus pedidos cuando sean enviados o entregados.</p>
@@ -301,9 +303,9 @@ try {
     <script>
         const BASE_URL = '<?= BASE_URL ?>';
     </script>
+    <script src="<?= BASE_URL ?>/js/user/alert_user.js"></script>
     <script src="<?= BASE_URL ?>/js/user/orders.js"></script>
 </body>
-</html>
 
 <?php
 // Funciones auxiliares

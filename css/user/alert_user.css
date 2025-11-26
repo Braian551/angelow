@@ -125,6 +125,25 @@
     line-height: 1.6;
 }
 
+/* Input field used by showUserPrompt */
+.user-alert-input{
+    width:100%;
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
+    font-size: 1.1rem;
+    color: #222;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.user-alert-input::placeholder{ color:#bdbdbd; }
+.user-alert-input:focus{ outline:none; border-color:var(--primary-color); box-shadow:0 4px 12px rgba(0,119,182,0.10); }
+.user-alert-input.textarea{ min-height:86px; max-height:320px; resize:vertical; padding:0.8rem 1rem; }
+
+/* Make sure input sits nicely inside the message area */
+.user-alert-message .user-alert-input{ margin-top:12px; }
+
 /* Contador de tiempo */
 .user-alert-countdown {
     font-size: 1.4rem;

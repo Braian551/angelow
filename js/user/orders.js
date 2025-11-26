@@ -40,13 +40,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 const orderId = this.dataset.orderId;
                 const orderCard = this.closest('.order-card');
                 const orderNumber = orderCard.dataset.orderNumber;
-                
-                showConfirmationModal(
-                    'Cancelar Pedido',
-                    `¿Estás seguro de que quieres cancelar el pedido #${orderNumber}?`,
-                    'cancelar',
-                    () => cancelOrder(orderId, orderCard)
-                );
+                // Usar la UI centralizada para preguntar el motivo de la cancelación
+                // Use new modal if available, otherwise fallback to prompts
+                if (typeof window.showUserPrompt === 'function') {
+                    // Note: the input collection in the modal is currently disabled via
+                    // ALERT_INPUT_ENABLED = false. The modal continues to act as a
+                    // confirmation (reason is optional) until business logic is added.
+                    showUserPrompt(
+                        `¿Estás seguro de que quieres cancelar el pedido #${orderNumber}?`,
+                        (reason) => {
+                            // Input is currently disabled (ALERT_INPUT_ENABLED=false) so reason will be null.
+                            // We don't require a reason to cancel the order yet; the logic will be added later.
+                            cancelOrder(orderId, orderCard, reason || '');
+                        },
+                        {
+                            title: 'Cancelar Pedido',
+                            confirmText: 'Cancelar pedido',
+                            cancelText: 'Volver',
+                            placeholder: 'Motivo de la cancelación (opcional)',
+                            rows: 4,
+                            type: 'textarea'
+                        }
+                    );
+                } else {
+                    const reason = prompt(`¿Estás seguro de que quieres cancelar el pedido #${orderNumber}? (Motivo opcional)`);
+                    if (reason === null) return; // user cancelled native prompt
+                    // Accept empty reasons for now; reason validation will be implemented later
+                    if (confirm('¿Estás seguro de que quieres cancelar el pedido?')) {
+                        cancelOrder(orderId, orderCard, reason || '');
+                    }
+                }
             });
         });
 
@@ -68,12 +91,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // startLiveTracking(orderId) { ... }
 
     // Cancelar orden
-    async function cancelOrder(orderId, orderCard) {
+    async function cancelOrder(orderId, orderCard, reason = '') {
         try {
             const response = await fetch(`${BASE_URL}/users/ajax/ajax_cancel_order.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `id=${orderId}`
+                body: `id=${orderId}&reason=${encodeURIComponent(reason)}`
             });
             const data = await response.json();
 

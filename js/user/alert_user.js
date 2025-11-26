@@ -10,6 +10,13 @@ const ALERT_DEBUG = (function(){
     } catch (e) { return false; }
 })();
 
+// Feature flag: disable input fields in alert modals for now. When true:
+// - Input boxes won't be rendered, but `onConfirm` still receives `null` or an empty string.
+// This allows UI to display a confirmation modal without input until the backend logic
+// for cancel reasons is implemented fully in the future.
+// To re-enable input in the future, set this flag to `true`.
+window.ALERT_INPUT_ENABLED = false;
+
 class UserAlertSystem {
     constructor() {
         this.overlay = document.getElementById('userAlertOverlay');
@@ -57,6 +64,7 @@ class UserAlertSystem {
             actions = [],
             autoClose = null,
             onClose = null
+            , input = null
         } = options;
 
         // Limpiar timeouts anteriores
@@ -116,12 +124,51 @@ class UserAlertSystem {
 
         // Aplicar contenido
         this.titleElement.textContent = title;
-        this.messageElement.textContent = message;
+        // Clear message element then apply message (allow html if needed)
+        this.messageElement.innerHTML = '';
+        if (typeof message === 'string') {
+            const p = document.createElement('p');
+            p.textContent = message;
+            this.messageElement.appendChild(p);
+        } else if (message instanceof HTMLElement) {
+            this.messageElement.appendChild(message);
+        }
+
+        // Clear existing input if present
+        if (this.inputEl) {
+            this.inputEl.remove();
+            this.inputEl = null;
+        }
+
+        // If an input was requested by the caller, only create the input if the global
+        // feature flag `ALERT_INPUT_ENABLED` is true. For now we keep it disabled so
+        // the UI doesn't collect reasons until the business logic is implemented.
+        if (input && typeof input === 'object' && window.ALERT_INPUT_ENABLED) {
+            const type = input.type || 'text';
+            const placeholder = input.placeholder || '';
+            const defaultValue = input.value || '';
+            if (type === 'textarea') {
+                this.inputEl = document.createElement('textarea');
+                this.inputEl.className = 'user-alert-input textarea';
+                this.inputEl.rows = input.rows || 4;
+            } else {
+                this.inputEl = document.createElement('input');
+                this.inputEl.type = 'text';
+                this.inputEl.className = 'user-alert-input';
+            }
+            this.inputEl.placeholder = placeholder;
+            this.inputEl.value = defaultValue;
+            this.inputEl.style.width = '100%';
+            this.inputEl.style.marginTop = '10px';
+            this.messageElement.appendChild(this.inputEl);
+            // Autofocus
+            setTimeout(() => this.inputEl && this.inputEl.focus(), 100);
+        }
 
         // Limpiar y crear acciones
         this.actionsContainer.innerHTML = '';
         
-        if (actions.length > 0) {
+                if (actions.length > 0) {
             actions.forEach(action => {
                 const button = document.createElement('button');
                 button.className = `user-alert-btn ${action.type || 'secondary'}`;
@@ -135,8 +182,11 @@ class UserAlertSystem {
                 }
                 
                 button.addEventListener('click', () => {
+                    // If input is disabled we still call the callback, but pass null to keep
+                    // the API stable; the caller should not require the value yet.
+                    const inputValue = (window.ALERT_INPUT_ENABLED && this.inputEl) ? this.inputEl.value : null;
                     if (action.callback) {
-                        action.callback();
+                        action.callback(inputValue);
                     }
                     if (action.closeOnClick !== false) {
                         this.close();
@@ -675,6 +725,37 @@ window.showUserConfirm = function(message, onConfirm, options = {}) {
                 type: 'primary',
                 icon: 'fas fa-check',
                 callback: onConfirm
+            }
+        ]
+    });
+};
+
+window.showUserPrompt = function(message, onConfirm, options = {}) {
+    const alertInst = _getUserAlertInstance();
+    const title = options.title || '';
+    const confirmText = options.confirmText || 'Aceptar';
+    const cancelText = options.cancelText || 'Cancelar';
+    const placeholder = options.placeholder || '';
+    const type = options.type || 'text';
+
+        alertInst.show({
+        type: 'question',
+        title: title,
+        message: message,
+        input: { type, placeholder, value: options.value || '', rows: options.rows || 4 },
+        actions: [
+            {
+                text: cancelText,
+                type: 'secondary',
+                icon: 'fas fa-times'
+            },
+            {
+                text: confirmText,
+                type: 'primary',
+                icon: 'fas fa-check',
+                callback: function(inputValue) {
+                    if (onConfirm) onConfirm(inputValue);
+                }
             }
         ]
     });
