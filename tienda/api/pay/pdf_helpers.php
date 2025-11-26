@@ -363,7 +363,8 @@ function generateOrderPdfContent($order, $orderItems) {
             $candidates = [
                 $projectRoot . '/' . $path,
                 $projectRoot . '/uploads/' . basename($path),
-                $projectRoot . '/images/' . basename($path)
+                $projectRoot . '/images/' . basename($path),
+                $projectRoot . '/assets/img/products/' . basename($path)
             ];
             
             foreach ($candidates as $candidate) {
@@ -375,6 +376,45 @@ function generateOrderPdfContent($order, $orderItems) {
                 }
             }
         }
+
+        // Conversión de WebP a PNG para Dompdf
+        $conversionLog = "No conversion needed";
+        if ($imagePathFound && strtolower(pathinfo($imageUrl, PATHINFO_EXTENSION)) === 'webp') {
+            try {
+                if (function_exists('imagecreatefromwebp')) {
+                    $im = @imagecreatefromwebp($imageUrl);
+                    if ($im) {
+                        ob_start();
+                        imagepng($im);
+                        $imageData = ob_get_clean();
+                        imagedestroy($im);
+                        
+                        if ($imageData) {
+                            $base64 = base64_encode($imageData);
+                            $imageUrl = 'data:image/png;base64,' . $base64;
+                            $conversionLog = "Converted WebP to PNG Data URI";
+                        } else {
+                            $conversionLog = "Failed to get image data from GD";
+                        }
+                    } else {
+                        $conversionLog = "imagecreatefromwebp returned false";
+                    }
+                } else {
+                    $conversionLog = "imagecreatefromwebp function not available";
+                }
+            } catch (Exception $e) {
+                $conversionLog = "Exception: " . $e->getMessage();
+            }
+        }
+
+        // DEBUG LOGGING
+        $logMsg = "Product: " . $item['product_name'] . " | Variant: " . ($item['variant_name'] ?? 'N/A') . "\n";
+        $logMsg .= "Original URL: " . ($item['primary_image'] ?? 'EMPTY') . "\n";
+        $logMsg .= "Resolved Path: " . (strpos($imageUrl, 'data:') === 0 ? 'DATA URI (truncated)' : $imageUrl) . "\n";
+        $logMsg .= "Found: " . ($imagePathFound ? 'YES' : 'NO') . "\n";
+        $logMsg .= "WebP Conversion: " . $conversionLog . "\n";
+        $logMsg .= "-----------------------------------\n";
+        file_put_contents(__DIR__ . '/pdf_debug.log', $logMsg, FILE_APPEND);
                    
         $html .= '
                     <tr>
