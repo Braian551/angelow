@@ -80,7 +80,16 @@ function enforceRoleAccess() {
     global $conn;
     
     // No verificar en páginas públicas
-    $publicPages = ['index.php', 'login.php', 'register.php', 'logout.php', 'productos.php', 'verproducto.php'];
+    $publicPages = [
+        'index.php',
+        'login.php',
+        'register.php',
+        'logout.php',
+        'productos.php',
+        'verproducto.php',
+        'colecciones.php',
+        'colecciones.html'
+    ];
     $currentScript = basename($_SERVER['PHP_SELF']);
     
     if (in_array($currentScript, $publicPages)) {

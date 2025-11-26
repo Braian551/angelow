@@ -3,9 +3,19 @@
 
 require_once __DIR__ . '/../../../config.php';
 require_once __DIR__ . '/../../../conexion.php';
-require_once __DIR__ . '/../../../vendor/autoload.php';
 
-use TCPDF;
+$tcpdfCacheDir = __DIR__ . '/../../../storage/cache/tcpdf';
+if (!is_dir($tcpdfCacheDir)) {
+    if (!mkdir($tcpdfCacheDir, 0775, true) && !is_dir($tcpdfCacheDir)) {
+        error_log('No se pudo crear el directorio de caché para TCPDF: ' . $tcpdfCacheDir);
+    }
+}
+
+if (is_dir($tcpdfCacheDir) && !defined('K_PATH_CACHE')) {
+    define('K_PATH_CACHE', rtrim($tcpdfCacheDir, '/\\') . DIRECTORY_SEPARATOR);
+}
+
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 // Configurar manejo de errores para obtener excepciones en lugar de warnings/notices
 set_error_handler(function($severity, $message, $file, $line) {
@@ -52,7 +62,7 @@ function generateDiscountPdfContent(int $id)
         }
 
         // Crear el PDF en memoria con la misma configuración y HTML que generate_pdf.php
-        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
+        $pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
         $pdf->SetCreator(PDF_CREATOR);
         $pdf->SetAuthor('Angelow Ropa Infantil');
         $pdf->SetTitle('Código de Descuento ' . $codigo['code']);

@@ -2,7 +2,9 @@
 require_once __DIR__ . '/../../conexion.php';
 require_once __DIR__ . '/../../config.php';
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
