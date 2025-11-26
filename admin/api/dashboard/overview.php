@@ -295,7 +295,7 @@ function fetchRecentActivity(PDO $conn): array {
         $activities[] = [
             'type' => 'order',
             'title' => 'Nueva orden ' . $row['order_number'],
-            'description' => $row['actor'] . ' • Estado: ' . $row['status'],
+            'description' => $row['actor'] . ' • Estado: ' . translateStatus($row['status']),
             'created_at' => $row['created_at']
         ];
     }
@@ -330,6 +330,19 @@ function fetchRecentActivity(PDO $conn): array {
     });
 
     return array_slice($activities, 0, 8);
+}
+
+function translateStatus(string $status): string {
+    $translations = [
+        'pending' => 'Pendiente',
+        'processing' => 'En proceso',
+        'shipped' => 'Enviado',
+        'delivered' => 'Entregado',
+        'cancelled' => 'Cancelado',
+        'refunded' => 'Reembolsado'
+    ];
+    
+    return $translations[$status] ?? ucfirst($status);
 }
 
 function scalarQuery(PDO $conn, string $query, array $params = []) {
