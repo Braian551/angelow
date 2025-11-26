@@ -378,7 +378,6 @@ function generateOrderPdfContent($order, $orderItems) {
         }
 
         // Conversión a Data URI para TODAS las imágenes (soluciona problemas con caracteres especiales como 'ñ' y WebP)
-        $conversionLog = "No conversion attempted";
         if ($imagePathFound) {
             try {
                 $imageContent = file_get_contents($imageUrl);
@@ -395,30 +394,16 @@ function generateOrderPdfContent($order, $orderItems) {
                             $imageContent = ob_get_clean();
                             imagedestroy($im);
                             $mimeType = 'image/png';
-                            $conversionLog = "Converted WebP to PNG Data URI";
                         }
-                    } else {
-                        $conversionLog = "Embedded as Data URI ($mimeType)";
                     }
 
                     $base64 = base64_encode($imageContent);
                     $imageUrl = 'data:' . $mimeType . ';base64,' . $base64;
-                } else {
-                    $conversionLog = "Failed to read file content";
                 }
             } catch (Exception $e) {
-                $conversionLog = "Exception: " . $e->getMessage();
+                // Silent fail
             }
         }
-
-        // DEBUG LOGGING
-        $logMsg = "Product: " . $item['product_name'] . " | Variant: " . ($item['variant_name'] ?? 'N/A') . "\n";
-        $logMsg .= "Original URL: " . ($item['primary_image'] ?? 'EMPTY') . "\n";
-        $logMsg .= "Resolved Path: " . (strpos($imageUrl, 'data:') === 0 ? 'DATA URI (truncated)' : $imageUrl) . "\n";
-        $logMsg .= "Found: " . ($imagePathFound ? 'YES' : 'NO') . "\n";
-        $logMsg .= "Conversion: " . $conversionLog . "\n";
-        $logMsg .= "-----------------------------------\n";
-        file_put_contents(__DIR__ . '/pdf_debug.log', $logMsg, FILE_APPEND);
                    
         $html .= '
                     <tr>
