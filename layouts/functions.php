@@ -165,6 +165,34 @@ if (!function_exists('getRefundStatusText')) {
     }
 }
 
+// Traduce tipos de notificación (de 'order', 'product', etc.) a etiquetas en español
+if (!function_exists('translateNotificationType')) {
+    function translateNotificationType(?string $typeName = null, ?string $relatedType = null): string {
+        $map = [
+            'order' => 'Órdenes',
+            'orders' => 'Órdenes',
+            'product' => 'Productos',
+            'promotion' => 'Promociones',
+            'account' => 'Cuenta',
+            'system' => 'Sistema'
+        ];
+
+        if (!empty($typeName)) {
+            $key = strtolower(trim($typeName));
+            if (isset($map[$key])) return $map[$key];
+            return ucfirst($typeName);
+        }
+
+        if (!empty($relatedType)) {
+            $key = strtolower(trim($relatedType));
+            if (isset($map[$key])) return $map[$key];
+            return ucfirst($relatedType);
+        }
+
+        return '';
+    }
+}
+
 /**
  * Notificar a usuarios interesados cuando un producto tiene una promoción (compare_price)
  * Por defecto manda la notificación a usuarios que tengan el producto en su wishlist.

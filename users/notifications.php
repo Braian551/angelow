@@ -60,6 +60,8 @@ if ($unread_count > 0) {
 }
 */
 
+// (Traducción de tipos de notificación ubicada en layouts/functions.php)
+
 // Filtros
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
 $type_filter = isset($_GET['type']) ? $_GET['type'] : 'all';
@@ -174,7 +176,7 @@ try {
 
                     <select id="filter-type" class="filter-select" onchange="applyFilters()">
                         <option value="all" <?= $type_filter === 'all' ? 'selected' : '' ?>>Todos los tipos</option>
-                        <option value="order" <?= $type_filter === 'order' ? 'selected' : '' ?>>Pedidos</option>
+                        <option value="order" <?= $type_filter === 'order' ? 'selected' : '' ?>>Ordenes</option>
                         <option value="product" <?= $type_filter === 'product' ? 'selected' : '' ?>>Productos</option>
                         <option value="promotion" <?= $type_filter === 'promotion' ? 'selected' : '' ?>>Promociones</option>
                         <option value="system" <?= $type_filter === 'system' ? 'selected' : '' ?>>Sistema</option>
@@ -224,7 +226,7 @@ try {
                                     <h3>
                                         <?= htmlspecialchars($notification['title']) ?>
                                         <?php if (!empty($notification['type_name']) || !empty($notification['related_entity_type'])): ?>
-                                            <span class="notification-type"><?= htmlspecialchars($notification['type_name'] ?? ucfirst($notification['related_entity_type'])) ?></span>
+                                            <span class="notification-type"><?= htmlspecialchars(translateNotificationType($notification['type_name'] ?? null, $notification['related_entity_type'] ?? null)) ?></span>
                                         <?php endif; ?>
                                     </h3>
                                     <span class="notification-time">

@@ -193,8 +193,8 @@ if (!function_exists('getAdminSearchShortcuts')) {
             return $item;
         };
 
-        foreach (getAdminQuickActions() as $action) {
-            $shortcuts[$action['id']] = $withCategory($action, 'action');
+        foreach (getAdminQuickActions() as $qa) {
+            $shortcuts[$qa['id']] = $withCategory($qa, 'action');
         }
 
         foreach (getAdminNavigationShortcuts() as $nav) {

@@ -96,13 +96,13 @@ $notificationsEndpoint = $baseUrl . '/admin/api/dashboard/notifications.php';
                     </div>
                     <div class="dropdown-body">
                         <ul class="quick-actions-list" data-quick-actions-container>
-                            <?php foreach ($quickActions as $action): ?>
-                                <li class="quick-action-item" data-action-id="<?= htmlspecialchars($action['id'], ENT_QUOTES) ?>">
-                                    <a href="<?= htmlspecialchars($baseUrl . $action['path'], ENT_QUOTES) ?>" class="quick-action-link">
-                                        <span class="icon" aria-hidden="true"><i class="fas <?= htmlspecialchars($action['icon'], ENT_QUOTES) ?>"></i></span>
+                            <?php foreach ($quickActions as $quickAction): ?>
+                                <li class="quick-action-item" data-action-id="<?= htmlspecialchars($quickAction['id'], ENT_QUOTES) ?>">
+                                    <a href="<?= htmlspecialchars($baseUrl . $quickAction['path'], ENT_QUOTES) ?>" class="quick-action-link">
+                                        <span class="icon" aria-hidden="true"><i class="fas <?= htmlspecialchars($quickAction['icon'], ENT_QUOTES) ?>"></i></span>
                                         <div>
-                                            <strong><?= htmlspecialchars($action['label']) ?></strong>
-                                            <p><?= htmlspecialchars($action['description']) ?></p>
+                                            <strong><?= htmlspecialchars($quickAction['label']) ?></strong>
+                                            <p><?= htmlspecialchars($quickAction['description']) ?></p>
                                         </div>
                                     </a>
                                 </li>
