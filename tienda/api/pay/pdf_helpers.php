@@ -377,30 +377,34 @@ function generateOrderPdfContent($order, $orderItems) {
             }
         }
 
-        // Conversión de WebP a PNG para Dompdf
-        $conversionLog = "No conversion needed";
-        if ($imagePathFound && strtolower(pathinfo($imageUrl, PATHINFO_EXTENSION)) === 'webp') {
+        // Conversión a Data URI para TODAS las imágenes (soluciona problemas con caracteres especiales como 'ñ' y WebP)
+        $conversionLog = "No conversion attempted";
+        if ($imagePathFound) {
             try {
-                if (function_exists('imagecreatefromwebp')) {
-                    $im = @imagecreatefromwebp($imageUrl);
-                    if ($im) {
-                        ob_start();
-                        imagepng($im);
-                        $imageData = ob_get_clean();
-                        imagedestroy($im);
-                        
-                        if ($imageData) {
-                            $base64 = base64_encode($imageData);
-                            $imageUrl = 'data:image/png;base64,' . $base64;
+                $imageContent = file_get_contents($imageUrl);
+                if ($imageContent !== false) {
+                    $finfo = new finfo(FILEINFO_MIME_TYPE);
+                    $mimeType = $finfo->buffer($imageContent);
+                    
+                    // Si es WebP y no tenemos soporte nativo, convertir a PNG
+                    if ($mimeType === 'image/webp' && function_exists('imagecreatefromwebp')) {
+                        $im = @imagecreatefromwebp($imageUrl);
+                        if ($im) {
+                            ob_start();
+                            imagepng($im);
+                            $imageContent = ob_get_clean();
+                            imagedestroy($im);
+                            $mimeType = 'image/png';
                             $conversionLog = "Converted WebP to PNG Data URI";
-                        } else {
-                            $conversionLog = "Failed to get image data from GD";
                         }
                     } else {
-                        $conversionLog = "imagecreatefromwebp returned false";
+                        $conversionLog = "Embedded as Data URI ($mimeType)";
                     }
+
+                    $base64 = base64_encode($imageContent);
+                    $imageUrl = 'data:' . $mimeType . ';base64,' . $base64;
                 } else {
-                    $conversionLog = "imagecreatefromwebp function not available";
+                    $conversionLog = "Failed to read file content";
                 }
             } catch (Exception $e) {
                 $conversionLog = "Exception: " . $e->getMessage();
@@ -412,7 +416,7 @@ function generateOrderPdfContent($order, $orderItems) {
         $logMsg .= "Original URL: " . ($item['primary_image'] ?? 'EMPTY') . "\n";
         $logMsg .= "Resolved Path: " . (strpos($imageUrl, 'data:') === 0 ? 'DATA URI (truncated)' : $imageUrl) . "\n";
         $logMsg .= "Found: " . ($imagePathFound ? 'YES' : 'NO') . "\n";
-        $logMsg .= "WebP Conversion: " . $conversionLog . "\n";
+        $logMsg .= "Conversion: " . $conversionLog . "\n";
         $logMsg .= "-----------------------------------\n";
         file_put_contents(__DIR__ . '/pdf_debug.log', $logMsg, FILE_APPEND);
                    

@@ -64,7 +64,6 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
                 '',
                 $rawPath
             );
-            
             // Obtener la ruta absoluta
             $productImagePath = realpath(__DIR__ . '/../../../' . $imagePath);
             
@@ -74,8 +73,16 @@ function sendOrderConfirmationEmail(array $order, array $orderItems, $pdfContent
             if ($productImagePath && file_exists($productImagePath)) {
                 if (is_readable($productImagePath)) {
                     try {
-                        $mail->addEmbeddedImage($productImagePath, $embedId, basename($productImagePath));
-                        $imageUrl = 'cid:' . $embedId;
+                        // Usar addStringEmbeddedImage para evitar problemas con caracteres especiales en la ruta
+                        $imageContent = file_get_contents($productImagePath);
+                        if ($imageContent !== false) {
+                            $mail->addStringEmbeddedImage($imageContent, $embedId, basename($productImagePath), 'base64', mime_content_type($productImagePath));
+                            $imageUrl = 'cid:' . $embedId;
+                        } else {
+                            // Fallback a addEmbeddedImage si falla la lectura
+                            $mail->addEmbeddedImage($productImagePath, $embedId, basename($productImagePath));
+                            $imageUrl = 'cid:' . $embedId;
+                        }
                     } catch (Exception $e) {
                         error_log('Error al embeber imagen de producto en email: ' . $e->getMessage());
                     }
